@@ -1,0 +1,28 @@
+
+*** These modified files were found in JOE when it aborted on Tue Mar 27 15:59:51 2007
+*** JOE was aborted by UNIX signal 15
+
+*** File '(Unnamed)'
+PALTYPE_BPAL
+xover
+AL
+XZ_PAL
+xover
+'a'
+pal_item
+edit
+image
+MATE
+
+*** File '(Unnamed)'
+struct.h
+struct.h
+bguard.c
+board.c
+struct.h
+perm.h
+battr.h
+struct.h
+hdr.h
+hdr.h
+hdr.h
