@@ -73,8 +73,8 @@ mgets(fd)
 
     ch = *head;
 
-    if (ch == '\n')
-    {
+    if (ch == '\n'){
+    
       *head++ = '\0';
       more_base = head - pool;
       return base;
@@ -279,6 +279,7 @@ outs_header(str, header_len)	/* 印出檔頭 */
   int i;
   char *ptr, *word;
 
+
   /* 處理檔頭 */
 
   if ((header_len == LEN_AUTHOR1 && !memcmp(str, header1[0], LEN_AUTHOR1 - 1)) ||
@@ -289,13 +290,13 @@ outs_header(str, header_len)	/* 印出檔頭 */
     if ((ptr = strstr(word, str_post1)) || (ptr = strstr(word, str_post2)))
     {
       ptr[-1] = ptr[4] = '\0';
-        prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m", 
+        prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m\n", 
         	header1[0], d_cols + 53, d_cols + 53, word, ptr, ptr + 5);
     }
     else
     {
       /* 少看板這欄 */
-      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m", 
+      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m\n", 
 	header1[0], d_cols + 72, d_cols + 72, word);
     }
 
@@ -309,12 +310,12 @@ outs_header(str, header_len)	/* 印出檔頭 */
     {
       /* 其他檔頭都只有一欄 */
       word = str + header_len;
-      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m", 
+      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m\n", 
 	header1[i], d_cols + 72, d_cols + 72, word);
 
 
-//    if(i==(LINE_HEADER-1))
-//     prints("\n\033[36m───────────────────────────────────────\033[m");
+    //if(i==(LINE_HEADER-1))
+     //prints("\n");
 
 /*dexter:水藍色分隔線*/
 
@@ -323,7 +324,7 @@ outs_header(str, header_len)	/* 印出檔頭 */
   }
 
   /* 如果不是檔頭，就當一般文字印出 */
-  //  outs_line(str);  
+    //outs_line(str);  
   //20070410 smiler : 其餘不印出,避免標線顯示混亂
   //"其餘"部分,只會有轉信路徑的結尾而已
 }
@@ -439,13 +440,15 @@ more(fpath, footer)
   foff = fimage;
   fend = fimage + fsize;
 
-  /* 找檔頭結束的地方 */
-  for (i = 0; i < LINE_HEADER; i++)
+  /* 找檔頭結束的地方 
+     ckm.Apr1207: 檔頭包括空白的那一行*/
+  for (i = 0; i <= LINE_HEADER; i++)
   {
     if (!more_line(buf))
       break;
 
     /* 讀出檔案第一列，來判斷站內信還是站外信 */
+
     if (i == 0)
     {
       header_len = 
@@ -499,13 +502,12 @@ more(fpath, footer)
    又,foff==headend 且有 header時,結尾要多印出 一直線,
    當foff>headend時,直接當一般檔案印出
   */
-  
+
     if ((foff < headend))
     {
       if((header_len != 0))
       {
         outs_header(buf, header_len);
-        outc('\n');
       }
       else
       {
@@ -524,7 +526,7 @@ therefore, by replacing original function  outc('\n')  with   prints("a hor. cya
       if(header_len != 0)
       {
         outs_header(buf, header_len);
-        prints("\033[36m───────────────────────────────────────\033[m\n");
+	prints("\033[36m───────────────────────────────────────\033[m\n\n");
       }
       else
       {
