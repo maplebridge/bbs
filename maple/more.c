@@ -526,7 +526,7 @@ therefore, by replacing original function  outc('\n')  with   prints("a hor. cya
       if(header_len != 0)
       {
         outs_header(buf, header_len);
-	prints("\033[36m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w\033[m\n\n");
+	prints("\033[36m¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w¢w\033[m\n");
       }
       else
       {
@@ -534,8 +534,7 @@ therefore, by replacing original function  outc('\n')  with   prints("a hor. cya
         outc('\n');
       }
     }
-
-    if (foff > headend)    
+    if (foff > headend )    
     {  
       outs_line(buf);
       outc('\n');

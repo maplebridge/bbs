@@ -16,7 +16,7 @@
 #define FN_DIR_TMP2
 
 char bufini[64];    /* 暫存路徑 */
-int lora=0;
+int lora=1;
 
 int isopen=0;       // for debug only
 char global_buf[64];
@@ -166,7 +166,8 @@ trans_hdr(old, new , name)
       new->xmode=new->xmode - 0x00080000 + 0x20000000;
       //存於楓橋的xmode,某一代SA可能忘記renew了
   if((new->xmode & 0x00000100)==0x00000100)
-      new->xmode=new->xmode - 0x00000100;    
+      new->xmode=new->xmode - 0x00000100;
+
 
   if(isopen)
     printf("new xmode = %x\n",new->xmode);
@@ -201,7 +202,7 @@ trans_hdr(old, new , name)
   if(isopen)
     getchar();
 
-//  if(strcmp(new->xname,"A0U41613")==0)
+//  if(strcmp(new->xname,"A0U99BGV")==0)
 //	  isopen=1;
 }
 
@@ -221,8 +222,16 @@ trans_gem(name)
     char buftmp1[64];
     char buftmp2[64];
     int notopen=0;
-    sprintf(bufs1, "%s/%c/%s", bufini, name[7], name);
-    sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[7], name);
+	if(name[0]=='@')
+	{
+	   sprintf(bufs1, "%s/%c/%s", bufini, name[0], name);
+       sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[0], name);	
+	}
+	else
+	{
+     sprintf(bufs1, "%s/%c/%s", bufini, name[7], name);
+     sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[7], name);
+	}
 
     if(isopen)
     {
@@ -256,12 +265,15 @@ trans_gem(name)
          //轉換工作進行中,同時取出xname當作新一階段的轉換檔名(sname)
          trans_hdr(&old, &hdr ,sname); 
          if(isopen)
-           printf(" trans_hdr(&old, &hdr ,sname);  %s<---\n",sname);   
-         sprintf(bufs, "%s/%c/%s", bufini, sname[7], sname);
+           printf(" trans_hdr(&old, &hdr ,sname);  %s<---\n",sname);
+		 if(sname[0]=='@')
+               printf(bufs, "%s/%c/%s", bufini, sname[0], sname);
+         else
+               sprintf(bufs, "%s/%c/%s", bufini, sname[7], sname);
          sxmode=hdr.xmode;
          if(isopen)
          {
-  printf("\n\n pay attention please sxmode now == %x  %d \n\n",sxmode,sxmode);
+           printf("\n\n pay attention please sxmode now == %x  %d \n\n",sxmode,sxmode);
            printf(" sxmode now == %x\n",sxmode);
          }
          //若此 sname 可被開啟,代表之前的檔案 name 為正確的.DIR,非文字檔
@@ -274,18 +286,9 @@ trans_gem(name)
          else if(!(fps = fopen(bufs, "r")))
          {
             if((sxmode != 0) && 
-            ( (sxmode & 0x10000000) == 0x00000000 ) && 
-            ( (sxmode & 0x00010000) == 0x00000000 ) && 
-            ( (sxmode & 0x00000800) == 0x00000000))
-            {
-                notopen=1;
-                if(isopen)
-                {
-                  printf("now changed --- 001\n");
-                  getchar();
-                }
-            }
-            else
+            ( (sxmode & 0x10000000) == 0x10000000 ) && 
+            ( (sxmode & 0x00010000) == 0x00010000 ) && 
+            ( (sxmode & 0x00000800) == 0x00000800))
             {
                 //塞轉換完後的資料至 name.tmp
                 rec_add(bufs2, &hdr, sizeof(HDR)); 
@@ -294,6 +297,16 @@ trans_gem(name)
                   printf(" %s is a title,not a article \n",sname);
                   getchar();
                 }
+            }
+            else
+            {
+                notopen=1;
+                if(isopen)
+                {
+                  printf("now changed --- 001\n");
+                  getchar();
+                }
+
             }
 //            fclose(fps);
           }
@@ -322,7 +335,10 @@ trans_gem(name)
           result=rename(bufs2, bufs1);
           if(result != 0 )
           {
-  sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[7],name,name,name);
+			  if(name[0]=='@')
+                 sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[0],name,name,name);
+			  else
+                 sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[7],name,name,name);
              system (buftmp1);
              if(isopen)
              system ("ls");
@@ -431,8 +447,16 @@ main(argc, argv)
 		tmp.key=0;
 #endif
           Delete(&tmp);
-          sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
-          sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
+		  if(tmp.xname[0]=='@')
+		  {
+                sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[0], tmp.xname);
+                sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[0], tmp.xname);
+		  }
+          else
+		  {
+                sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
+                sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
+		  }
           rename(buftmp2,buftmp);
         }
       }
@@ -447,8 +471,16 @@ main(argc, argv)
 		tmp.key=0;
 #endif
         Delete(&tmp);
-        sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
-        sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
+		if(tmp.xname[0]=='@')
+		{
+             sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[0], tmp.xname);
+             sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[0], tmp.xname);
+		}
+		else
+		{
+             sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
+             sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
+		}
         rename(buftmp2,buftmp);
     }
     closedir(dirp);
