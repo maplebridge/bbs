@@ -45,6 +45,7 @@ static char *battr_tbl[NUMBATTRS] =
   "不公開投票結果",		/* BRD_NOVOTE */
   "匿名看板",			/* BRD_ANONYMOUS */
   "不評分看板",			/* BRD_NOSCORE */
+  "公眾板",			/* BRD_PUBLIC */
 };
 
 #endif
