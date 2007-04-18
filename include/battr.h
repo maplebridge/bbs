@@ -32,7 +32,7 @@
 
 #define NUMBATTRS	8
 
-#define STR_BATTR	"zTcsvAP"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
+#define STR_BATTR	"zTcsvA%P"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
