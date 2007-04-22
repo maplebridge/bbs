@@ -145,6 +145,19 @@ trans_hdr(old, new)
 }
 
 
+static void
+trans_pal(old, new)
+  MAPLE_PAL *old;
+  PAL *new;
+{
+  memset(new, 0, sizeof(PAL));
+
+  str_ncpy(new->userid, old->userid, sizeof(new->userid));
+  new->ftype = old->ftype;  
+  str_ncpy(new->ship, old->ship, sizeof(new->ship));
+  new->userno = ntohl(old->userno);
+}
+
 int
 main(argc, argv)
   int argc;
@@ -153,6 +166,7 @@ main(argc, argv)
   ACCT new;
   char c;
   HDR hdr;
+  PAL new_pal;
   FILE *fp;
   
   /*printf("%d\n", argc);*/
@@ -181,6 +195,7 @@ main(argc, argv)
     {
       userec old;
       MAPLECS_HDR old_hdr;
+      MAPLE_PAL old_pal;
       int fd;
       char *str;
 
@@ -211,6 +226,33 @@ main(argc, argv)
       fd = open(buf, O_WRONLY | O_CREAT, 0600);	/* itoc.010831: 重建新的 FN_ACCT */
       write(fd, &new, sizeof(ACCT));
       close(fd);
+
+      // ckm.Apr22: for FRIEND
+      sprintf(buf, "%s/friend", str);
+      sprintf(buf2, "%s/friend.tmp", str);
+      if(fp = fopen(buf, "r")){
+	while (fread(&old_pal, sizeof(old_pal), 1, fp) == 1)
+	{
+	  trans_pal(&old_pal, &new_pal);
+
+	  rec_add(buf2, &new_pal, sizeof(PAL));
+	}
+	fclose(fp);
+	unlink(buf);
+	rename(buf2, buf);
+      }else
+	        printf("This user has no :\n",buf);
+
+
+      // ckm.Apr22,07: for signture
+      sprintf(buf, "%s/sign", str);
+      sprintf(buf2, "%s/sign.1",  str);
+      if(fp = fopen(buf, "r")){
+	rename(buf, buf2);
+	fclose(fp);
+      }else
+	printf("This user has no :\n",buf);
+
 
       /* ckm.Feb01,07: 修改.DIR */
       sprintf(buf, "%s/" FN_DIR, str);
