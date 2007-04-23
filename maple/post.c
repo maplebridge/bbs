@@ -828,7 +828,7 @@ post_item(num, hdr)
   {
     num = hdr->score;
     if (num <= 99 && num >= -99)
-      prints("\033[1;3%cm%2d\033[m", num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
+      prints("\033[%c;3%cm%2d\033[m", num == 0 ? '0' : '1', num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
     else
       prints("\033[1;3%s\033[m", num >= 0 ? "1mÃz" : "2m¼N");
   }
@@ -2100,7 +2100,7 @@ post_score(xo)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m¡G%-*s%02d/%02d/%02d\n", 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m¡G\033[0;33m%-*s%02d/%02d/%02d\n\033[m", 
       verb, userid, maxlen, reason, 
       ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
     fclose(fp);

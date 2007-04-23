@@ -278,6 +278,9 @@ post_changeBM(xo)
   blist = oldbrd->BM;
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
     return XO_FOOT;
+    
+  if (oldbrd.battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+    return XO_FOOT;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -369,6 +372,9 @@ post_brdlevel(xo)
 
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
+  
+  if (oldbrd.battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+    return XO_FOOT;
 
   switch (vans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
   {
