@@ -843,7 +843,15 @@ XoPost(bno)
     currbattr = brd->battr;
     strcpy(currboard, brd->brdname);
     str = brd->BM;
-    sprintf(currBM, "板主：%s", *str <= ' ' ? "徵求中" : str);
+    char BMstr[17];/*by ryancid 砍到剩16*/
+    strncpy(BMstr, str, 16);
+    if(strlen(str)>16)
+    {
+      BMstr[14]=0xA1;
+      BMstr[15]=0x4B;
+    }/*印出...*/
+    BMstr[16]='\0';
+    sprintf(currBM, "板主：%s", *str <= ' ' ? "徵求中" : BMstr);/**/
 #ifdef HAVE_BRDMATE
     strcpy(cutmp->reading, currboard);
 #endif
