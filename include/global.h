@@ -187,6 +187,7 @@
 #define FN_ETC_TIP	"etc/tip"		/* 每日小秘訣 */
 
 #define FN_ETC_LOVELETTER "etc/loveletter"	/* 情書產生器文庫 */
+#define FN_ETC_NOCROSSPOST "etc/crosspost"	/* crosspost 特例名單*/
 
 
   /* --------------------------------------------------- */
