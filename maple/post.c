@@ -1840,7 +1840,7 @@ post_edit(xo)
   hdr_fpath(fpath, xo->dir, hdr);
 
   //ckm:Debug
-  vmsg(fpath);
+  //vmsg(fpath);
   
   if (HAS_PERM(PERM_ALLBOARD))			/* 站長修改 */
   {
@@ -2036,7 +2036,7 @@ post_score(xo)
     return XO_NONE;
 #endif
 
-  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [Q] "))
+  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
   {
   case '1':
     verb = "1m△";
@@ -2060,7 +2060,9 @@ post_score(xo)
     break;*/
 
   default:
-    return XO_FOOT;
+    ans='3';
+    verb = "7m─";
+    vtlen = 2;
   }
 
 #ifdef HAVE_ANONYMOUS
@@ -2100,18 +2102,16 @@ post_score(xo)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s%02d/%02d/%02d\n\033[m", 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s\033[1;30m%02d/%02d/%02d\n", 
       verb, userid, maxlen, reason, 
       ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
     fclose(fp);
   }
 
-  curraddscore = ans;
-  
-  currchrono = hdr->chrono;
-  rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
-  return XO_LOAD;
-
+    curraddscore = ans;
+    currchrono = hdr->chrono;
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
+    return XO_LOAD;
 
   return XO_FOOT;
 }
