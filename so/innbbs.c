@@ -636,7 +636,7 @@ a_innbbs()
       redraw = 1;
       break;
 
-    case Ctrl('P'):
+    case 'P':
       if (add_func(fpath, NULL, -1))
       {
 	dirty = 1;

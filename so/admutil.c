@@ -149,6 +149,10 @@ a_xfile()		/* 設定系統檔案 */
     "拒絕連線名單",
 #endif
 
+#ifdef  HAVE_DETECT_CROSSPOST
+    "Crosspost特例",
+#endif
+
     NULL
   };
 
@@ -191,6 +195,11 @@ a_xfile()		/* 設定系統檔案 */
 #ifdef HAVE_LOGIN_DENIED
     BBS_ACLFILE,
 #endif
+
+#ifdef  HAVE_DETECT_CROSSPOST
+    FN_ETC_NOCROSSPOST,
+#endif
+    
   };
 
   x_file(M_XFILES, desc, path);
