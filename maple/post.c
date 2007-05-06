@@ -255,6 +255,9 @@ check_crosspost(fpath, bno)
   blist = (bshm->bcache + bno)->BM;
   if (HAS_PERM(PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
     return 0;
+  
+  else if (acl_has(FN_ETC_NOCROSSPOST, "", cuser.userid) > 0)
+    return 0;
 
   if (checksum_find(fpath))
   {
