@@ -21,10 +21,10 @@
 #include <resolv.h>
 
 
-#undef	HAVE_RELAY_SERVER	/* 採用 relay server 來外寄信件 */
+#define	HAVE_RELAY_SERVER	/* 採用 relay server 來外寄信件 */
 
 #ifdef HAVE_RELAY_SERVER
-#define	RELAY_SERVER	"msa.hinet.net"	/* outbound mail server */
+#define	RELAY_SERVER	"smtp.cs.nthu.edu.tw"	/* outbound mail server */
 #endif
 
 

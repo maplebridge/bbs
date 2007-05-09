@@ -220,9 +220,9 @@ COLOR1 " 轉信設定 " COLOR2 " (↑/↓)上下 (PgUp/PgDn)上下頁 (Home/End)首尾 (←)(q
 
 /*dexter  把origin,From改成兩行*/
 #define EDIT_BANNER	"\n--\n" \
-			"\033[32m※ Origin: 楓橋驛站<bbs.cs.nthu.edu.tw>\n ◆ From: %s @%s\n\033[m"
+			"\033[32m※ Origin: 楓橋驛站<bbs.cs.nthu.edu.tw>\n◆ From: %s @%s\n\033[m"
 
-#define MODIFY_BANNER	" \033[1;45m(^_^)ψ\033[m \033[1mMo\033[30mdi\033[mfy: %s 於 \033[1;34m%s\033[m 修改\n"
+#define MODIFY_BANNER	"\033[1;45m(^_^)ψ\033[m \033[1mMo\033[30mdi\033[mfy: %s 於 \033[1;34m%s\033[m 修改\n"
 
 
 /* ----------------------------------------------------- */

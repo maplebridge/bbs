@@ -17,6 +17,7 @@
 /*--------------------------------------------------------------------*/
 
 
+
 #ifndef	_CONFIG_H_
 #define	_CONFIG_H_
 
@@ -34,8 +35,8 @@
 //#define MYIPADDR	"220.132.144.144"               /* IP address */
 //#define MYHOSTNAME	"220-132-144-144.HINET-IP.hinet.net"    /* 網路地址 FQDN */
 
-#define MYIPADDR        "140.114.87.91"	/* IP address */
-#define MYHOSTNAME      "b1.cs.nthu.edu.tw"	/* 網路地址 FQDN */
+#define MYIPADDR        "140.114.87.5"	/* IP address */
+#define MYHOSTNAME      "bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 
 #define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, \
                          NULL}
