@@ -481,7 +481,7 @@ b_nthu()
   *domain++ = '\0';
     
   /* songsongboy.070404: 判斷是否為 NTHU 成員*/
-  if (!strncmp(domain,"oz.nthu.edu.tw",14) || !strncmp(domain,"mx.nthu.edu.tw",14))
+  if (!strncmp(domain,"oz.nthu.edu.tw",14) || !strncmp(domain,"mx.nthu.edu.tw",14) || !strncmp(domain,"alumni.nthu.edu.tw",18) )
   {
     if (!HAS_PERM(PERM_XVALID))
       buy_level(PERM_XVALID);
