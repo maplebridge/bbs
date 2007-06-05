@@ -39,6 +39,7 @@
 #define MYHOSTNAME      "bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 
 #define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, "nthucs.twbbs.org",\
+                         "nthucs.twbbs.org.tw",\
                          NULL}
 
 #define MYCHARSET	"big5"			/* BBS 所使用的字集 */

@@ -9,6 +9,7 @@
 
 #include "bbs.h"
 
+
 #ifdef MY_FAVORITE
 #define MSG_ZONE_SWITCH	"快速切換：(A)精華 (B)文章 (C)看板 (F)最愛 (M)信件 (U)使用者 (W)水球："
 #else
@@ -1519,6 +1520,7 @@ every_Z(zone)
   int zone;				/* 傳入所在 XZ_ZONE，若傳入 0，表示不在 xover() 中 */
 {
   int cmd, tmpbno, tmpmode;
+  int tmpstate;         /* smiler.070602: every_z 到看板時,可暫存看板權限(bbsstate) */
 
   /* itoc.000319: 最多 every_Z 一層 */
   if (z_status >= 1)
@@ -1527,8 +1529,9 @@ every_Z(zone)
     z_status++;
 
   cmd = zone;
+  
   outz(MSG_ZONE_SWITCH);
-
+  
   tmpbno = vkey();	/* 借用 tmpbno 來換成小寫 */
   if (tmpbno >= 'A' && tmpbno <= 'Z')
     tmpbno |= 0x20;
@@ -1590,11 +1593,14 @@ every_Z(zone)
     tmpbno = -1;
 
   tmpmode = bbsmode;
+  tmpstate = bbstate;   /* smiler.070602: every_z時,先暫存目前看板權限 */
   xover(cmd);
-  utmp_mode(tmpmode);
 
   if (tmpbno >= 0)		/* itoc.030731: 有可能進入別的板，就需要重新 XoPost，會再看一次進板畫面 */
     XoPost(tmpbno);
+
+  bbstate = tmpstate;   /* smiler.070602: every_z回來後,取回之前暫存的看板權限,避免看板權限被蓋掉 */
+  utmp_mode (tmpmode);  
 
   z_status--;
   return XO_INIT;		/* 需要重新載入 xo_pool，若在 xover() 中也可藉此重繪 */

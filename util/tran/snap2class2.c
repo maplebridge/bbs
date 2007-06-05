@@ -17,8 +17,7 @@
 #define FN_GEM_TMP2
 
 char bufini[64];    /* ¼È¦s¸ô®| */
-int lora;
-lora=0;
+int lora=0;
 
 int isopen=0;
 char global_buf[64];
@@ -41,7 +40,7 @@ int IsEmpty(int top);
 int IsFull(int top);
 void add(element item);
 void Delete(element *selement);
-char empty[32]="                                 ";
+char empty[32]="                                ";
 
 int IsEmpty(int top)
 {
@@ -219,7 +218,7 @@ trans_gem(name)
 	char bufs1[64];
 	char bufs2[64];
 	char buftmp1[64];
-	char buftmp2[64];
+//	char buftmp2[64];
 	int notopen=0;
 	if(name[0]=='@')
 	{

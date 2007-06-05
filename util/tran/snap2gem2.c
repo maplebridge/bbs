@@ -11,10 +11,8 @@
 
 #include "snap.h"
 #include <netinet/in.h>
-
-#define FN_GEM		".GEM"
+#define FN_GEM      ".GEM"
 #define FN_GEM_TMP	".GEM.tmp"
-#define FN_GEM_TMP2
 
 char bufini[64];    /* 暫存路徑 */
 int lora=1;
@@ -158,7 +156,7 @@ trans_hdr(old, new , name)
   //修改xmode//
 
   if(isopen)
-    printf("old xmode = %x\n",new->xmode);
+    printf("old xmode = %x\n",old->xmode);
   //GEM_GOPHER lexel有,itoc沒有,改位置至 0x10000000
   if((new->xmode & 0x00040000)==0x00040000)  
       new->xmode=new->xmode - 0x00040000 + 0x10000000;
@@ -168,10 +166,13 @@ trans_hdr(old, new , name)
       //存於楓橋的xmode,某一代SA可能忘記renew了
   if((new->xmode & 0x00000100)==0x00000100)
       new->xmode=new->xmode - 0x00000100;
+  if((new->xmode & 0x00000010)==0x00000010)
+      new->xmode=new->xmode - 0x00000010;
 
 
   if(isopen)
     printf("new xmode = %x\n",new->xmode);
+
 
   new->xid = ntohl(old->xid);
 
@@ -198,176 +199,152 @@ trans_hdr(old, new , name)
   if(isopen)
     printf("%s \n",new->title);
 
-//  printf(" xname = %s , xmode = %x\n",new->xname, new->xmode);
-
   if(isopen)
     getchar();
 
-//  if(strcmp(new->xname,"A0U99BGV")==0)
-//	  isopen=1;
+                                                                    
 }
 
 
 static void
-trans_gem(name)
+trans_gem(name ,oxmode)
   char name[32];
+  int oxmode;
 {
     FILE *fp;
-    FILE *fp2;
     FILE *fps;
+	FILE *f_turned;
     HDR hdr;
     MAPLECS_HDR old;
     char bufs[64];
     char bufs1[64];
     char bufs2[64];
+    char buf_turned[64];
     char buftmp1[64];
     char buftmp2[64];
     int notopen=0;
-	if(name[0]=='@')
+
+	sprintf(buf_turned,"%s/%s.tmp",bufini,name);
+
+	if( !(f_turned = fopen(buf_turned,"r")) )  //偵測是否已對相同檔案trans過
 	{
-	   sprintf(bufs1, "%s/%c/%s", bufini, name[0], name);
-       sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[0], name);	
-	}
-	else
-	{
-     sprintf(bufs1, "%s/%c/%s", bufini, name[7], name);
-     sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[7], name);
-	}
+	   if(name[0]=='@')
+	   {
+	      sprintf(bufs1, "%s/%c/%s", bufini, name[0], name);
+          sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[0], name);	
+	   }
+	   else
+	   {
+          sprintf(bufs1, "%s/%c/%s", bufini, name[7], name);
+          sprintf(bufs2, "%s/%c/%s.tmp", bufini, name[7], name);
+	   }
 
-    if(isopen)
-    {
-       printf("now in file name %s\n",name);             //
-       printf("initial notopen = %d\n",notopen);//
-       getchar();//
-    }
+       if(isopen)
+	   {
+          printf("now in file name %s\n",name);             //
+          printf("initial notopen = %d\n",notopen);//
+          getchar();//
+	   }
 
-    /* 是否可開檔 */
-    if ((fp = fopen(bufs1, "r")))
-    {
-      /* 是否為小於一個sizeof(old) 的文字檔 */
-      fp2 = fopen(bufs1, "r");
-      if((fread(&old, sizeof(old), 1, fp2) != 1))
-      {
-          notopen=1;
+	   if(fp = fopen(bufs1, "r"))
+	   {
+          while ( ((fread(&old, sizeof(old), 1, fp) == 1)) && (notopen==0) )
+		  {
+             char sname[32];
+             int sxmode;
+             trans_hdr(&old, &hdr ,sname);		 
+		     if(sname[0]=='@')
+                 sprintf(bufs, "%s/%c/%s", bufini, sname[0], sname);
+             else
+                 sprintf(bufs, "%s/%c/%s", bufini, sname[7], sname);
+             sxmode=hdr.xmode;
 
+		     if(sxmode == 0 || sxmode == 0x00000800)
+			 {
+			     if(isopen)
+                    printf("only a article\n");
+                 rec_add(bufs2, &hdr, sizeof(HDR));
+			 }
+		     else if(((sxmode & 0x00010000)==0x00010000 ) && ((sxmode & 0x10000000)==0x00000000 ))
+			 {
+			     if(isopen)
+			  	   printf("have content\n");
+                 rec_add(bufs2, &hdr, sizeof(HDR));
+			     if(fps = fopen(bufs, "r"))
+				 {
+					 if(isopen)
+						 printf("do something\n");
+				    trans_gem(sname,sxmode);
+			        fclose(fps);
+				 }
+			 }
+		     else
+			 {
+			     if(isopen)
+			  	   printf("only a title\n");
+                 rec_add(bufs2, &hdr, sizeof(HDR));
+			 }
+
+		  }
+	     fclose(fp);
+	   }
+
+
+       /* 刪除舊的，把新的更名 */
+       if(notopen==0)
+       {
+          int result;
           if(isopen)
-          printf("now changed --- 000\n");
+		  {
+            printf("now unlink bufs1=%s\n",bufs1);
+            getchar();
+		  }
+		  if(name[0]=='@')
+             sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[0],name,name,name);
+		  else
+             sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[7],name,name,name);
+          system (buftmp1); //若此檔案不曾被trans過,則把 filename.tmp 放進 brd/版名/內,以供之後的辨認
 
-      }
-      fclose(fp2);
-      if(notopen==0)
-      {
-        /* 進行轉換工作 */
-        while (((fread(&old, sizeof(old), 1, fp) == 1)) && (notopen==0))
-        {
-
-         char sname[32];
-         int sxmode;
-         //轉換工作進行中,同時取出xname當作新一階段的轉換檔名(sname)
-         trans_hdr(&old, &hdr ,sname); 
-         if(isopen)
-           printf(" trans_hdr(&old, &hdr ,sname);  %s<---\n",sname);
-		 if(sname[0]=='@')
-               printf(bufs, "%s/%c/%s", bufini, sname[0], sname);
-         else
-               sprintf(bufs, "%s/%c/%s", bufini, sname[7], sname);
-         sxmode=hdr.xmode;
-         if(isopen)
-         {
-           printf("\n\n pay attention please sxmode now == %x  %d \n\n",sxmode,sxmode);
-           printf(" sxmode now == %x\n",sxmode);
-         }
-         //若此 sname 可被開啟,代表之前的檔案 name 為正確的.DIR,非文字檔
-         if(fps = fopen(bufs, "r")) 
-         {
-           rec_add(bufs2, &hdr, sizeof(HDR)); //塞轉換完後的資料至 name.tmp
-           trans_gem(sname);      //往下一層 bufini/sname[7]/sname 進行轉換
-           fclose(fps);
-         }
-         else if(!(fps = fopen(bufs, "r")))
-         {
-            if((sxmode != 0) && 
-            ( (sxmode & 0x10000000) == 0x10000000 ) && 
-            ( (sxmode & 0x00010000) == 0x00010000 ) && 
-            ( (sxmode & 0x00000800) == 0x00000800))
-            {
-                //塞轉換完後的資料至 name.tmp
-                rec_add(bufs2, &hdr, sizeof(HDR)); 
-                if(isopen)
-                {
-                  printf(" %s is a title,not a article \n",sname);
-                  getchar();
-                }
-            }
-            else
-            {
-                notopen=1;
-                if(isopen)
-                {
-                  printf("now changed --- 001\n");
-                  getchar();
-                }
-
-            }
-//            fclose(fps);
-          }
-        }
-      }
-      fclose(fp);
-
-
-
-      /* 刪除舊的，把新的更名 */
-      if(notopen==0)
-      {
-        int result;
-        if(isopen)
-          printf("now unlink bufs1=%s\n",bufs1);
-        unlink(bufs1);
-        if(isopen)
-        {
-          printf("now rename(bufs2=%s,bufs1=%s)\n",bufs2,bufs1);
-          getchar();
-        }
-        result=rename(bufs2, bufs1);
-        if(result != 0 )
-        {
-          perror( "Error renaming file" );
-          result=rename(bufs2, bufs1);
+          unlink(bufs1);
+          if(isopen)
+		  {
+            printf("prepare to rename....\n");
+            printf("bufs1 = %s\n",bufs1);
+            printf("bufs2 = %s\n",bufs2);
+            printf("now rename(bufs2=%s,bufs1=%s)\n",bufs2,bufs1);
+            getchar();
+		  }
+          result=rename(bufs2,bufs1);
           if(result != 0 )
-          {
-			  if(name[0]=='@')
-                 sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[0],name,name,name);
-			  else
-                 sprintf(buftmp1,"cd %s/%c ; cp %s.tmp .. ; cp %s.tmp %s",bufini,name[7],name,name,name);
-             system (buftmp1);
-             if(isopen)
-             system ("ls");
-             system (buftmp2);
+		  {
+            perror( "Error renaming file" );
+            result=rename(bufs2, bufs1);
+            if(result != 0 )
+			{
 
-             printf("%3d  %s\n",boardnumber,global_buf);
+               if(isopen)
+                  system ("ls");
 
-             element tmp;
+               printf("%3d  %s\n",boardnumber,global_buf);
+
+               element tmp;
 #if usekey
-	         tmp.key=0;
+	           tmp.key=0;
 #endif
-             strcpy(tmp.xname,name);
-             add(tmp);
-          }
-        }
-        if(isopen)
-        {
-          printf("after rename(bufs2=%s,bufs1=%s)\n",bufs2,bufs1); //
-          getchar();
-        }//
-      }
-      else
-      {
-        if(isopen)
-          printf("now unlink bufs2=%s\n",bufs2);
-        unlink(bufs2);
-        printf("%3d  %s\n",boardnumber,global_buf);
-      }
+               strcpy(tmp.xname,name);
+               add(tmp);
+
+			   if(isopen)
+			   	 printf("send to stack !!\n");
+			}
+		  }
+          if(isopen)
+		  {
+             printf("after rename(bufs2=%s,bufs1=%s)\n",bufs2,bufs1); //
+             getchar();
+		  }//
+	   }
+                                 
     }
 }
 
@@ -378,6 +355,7 @@ main(argc, argv)
   char *argv[];
 {
   FILE *fp;
+  FILE *fps;
   HDR hdr;
   if (argc > 2)
   {
@@ -385,8 +363,10 @@ main(argc, argv)
     return -1;
   }
 
+    int sxmode;
     char buf[64];
     char buf2[64];
+	char bufs[64];
 
 
     struct dirent *de;
@@ -399,69 +379,90 @@ main(argc, argv)
 
     while (de = readdir(dirp))
     {
-      MAPLECS_HDR old;
-      char *str;
+        MAPLECS_HDR old;
+        char *str;
 
-      str = de->d_name;
-      if (*str <= ' ' || *str == '.')
-	     continue;
+        str = de->d_name;
+        if (*str <= ' ' || *str == '.')
+	       continue;
 
-      if ((argc == 2) && str_cmp(str, argv[1]))
-	     continue;
+        if ((argc == 2) && str_cmp(str, argv[1]))
+	       continue;
 
-      sprintf(buf, "%s/" FN_GEM, str);
-      sprintf(buf2, "%s/" FN_GEM_TMP, str);
-	  sprintf(bufini, "%s", str);
+        sprintf(buf, "%s/" FN_GEM, str);
+        sprintf(buf2, "%s/" FN_GEM_TMP, str);
+	    sprintf(bufini, "%s", str);
 
-     if((fp = fopen(buf, "r")))
-     {
+        if((fp = fopen(buf, "r")))
+		{
 
-       while (fread(&old, sizeof(old), 1, fp) == 1)
-       {
+           while (fread(&old, sizeof(old), 1, fp) == 1)
+		   {
 
-           char name[32];
-           trans_hdr(&old, &hdr ,name);
-           if(isopen)
-           {
-              printf("1.%s = \n\n",name);
-              getchar();
-           }
+              char name[32];
+              trans_hdr(&old, &hdr ,name);
+              if(isopen)
+			  {
+                 printf("1.%s = \n\n",name);
+                 getchar();
+			  }
 
-           rec_add(buf2, &hdr, sizeof(HDR));
-           trans_gem(name);
-        }
+              //rec_add(buf2, &hdr, sizeof(HDR));
 
-        fclose(fp);
+		      if(name[0]=='@')
+                  sprintf(bufs, "%s/%c/%s", bufini, name[0], name);
+              else
+                  sprintf(bufs, "%s/%c/%s", bufini, name[7], name);
+              sxmode=hdr.xmode;
+		      if(sxmode == 0 || sxmode == 0x00000800)
+                  rec_add(buf2, &hdr, sizeof(HDR));
+		      else if(((sxmode & 0x00010000)==0x00010000) && ((sxmode & 0x10000000)==0x00000000))
+			  {
+                  rec_add(buf2, &hdr, sizeof(HDR));
+		          if(fps = fopen(bufs, "r"))
+				  {
+                     trans_gem(name,0x00010000);
+			         fclose(fps);
+				  }
+			  }
+		      else
+                 rec_add(buf2, &hdr, sizeof(HDR));
+		   }
 
-        boardnumber++;
-        printf("%3d  %s\n",boardnumber,buf);
-        strcpy(global_buf,buf);
-        /*刪除舊的,把新的更名*/
-        unlink(buf);
-        rename(buf2, buf);
-        while(top > (-1))
-        {
-          char buftmp[64];
-          char buftmp2[64];
-          element tmp;
+           fclose(fp);
+
+           boardnumber++;
+           printf("%3d  %s\n",boardnumber,buf);
+           strcpy(global_buf,buf);
+           /*刪除舊的,把新的更名*/
+           unlink(buf);
+           rename(buf2, buf);
+           while(top > (-1))
+		   {
+              char buftmp[64];
+              char buftmp2[64];
+              element tmp;
 #if usekey
 		tmp.key=0;
 #endif
-          Delete(&tmp);
-		  if(tmp.xname[0]=='@')
-		  {
-                sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[0], tmp.xname);
-                sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[0], tmp.xname);
-		  }
-          else
-		  {
-                sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
-                sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
-		  }
-          rename(buftmp2,buftmp);
-        }
-      }
-    }
+              Delete(&tmp);
+		      if(tmp.xname[0]=='@')
+			  {
+                   sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[0], tmp.xname);
+                   sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[0], tmp.xname);
+			  }
+              else
+			  {
+                   sprintf(buftmp, "%s/%c/%s", bufini, tmp.xname[7], tmp.xname);
+                   sprintf(buftmp2, "%s/%c/%s.tmp", bufini, tmp.xname[7], tmp.xname);
+			  }
+              rename(buftmp2,buftmp);
+		   }
+		}
+//		char buf_rm[64];
+//		sprintf(buf_rm,"cd %s;rm -rf *.tmp;",bufini);
+//		system(buf_rm);
+	}
 
     while(top > (-1))
     {
@@ -493,4 +494,3 @@ main(argc, argv)
     }
     return 0;
 }
-

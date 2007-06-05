@@ -15,6 +15,7 @@
 #include "dns.h"
 
 
+
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -51,6 +52,7 @@ extern UMODELOG modelog;
 extern time_t mode_lastchange;
 #endif
 
+int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
 
 /* ----------------------------------------------------- */
 /* 離開 BBS 程式					 */
@@ -590,13 +592,14 @@ login_user(content)
       login_abort("\n再見 ...");
     }
 
-    vget(b_lines - 2, 0, "   [您的帳號] ", uid, IDLEN + 1, DOECHO);
+    /* smiler.070602: 更改進站板面配置,輸入帳號,密碼皆改為b_lines-1 */
+    vget(b_lines - 1, 0, "   [您的帳號] ", uid, IDLEN + 1, DOECHO);
 
     if (!str_cmp(uid, STR_NEW))
     {
 #ifdef LOGINASNEW
 #  ifdef HAVE_GUARANTOR		/* itoc.000319: 保證人制度 */
-      vget(b_lines - 2, 0, "   [您的保人] ", uid, IDLEN + 1, DOECHO);
+      vget(b_lines - 1, 0, "   [您的保人] ", uid, IDLEN + 1, DOECHO);
       if (!*uid || (acct_load(&cuser, uid) < 0))
       {
 	vmsg("抱歉，沒有介紹人不得加入本站");
@@ -605,7 +608,7 @@ login_user(content)
       {
 	vmsg("抱歉，您不夠資格擔任別人的介紹人");
       }
-      else if (!vget(b_lines - 2, 40, "[保人密碼] ", passbuf, PSWDLEN + 1, NOECHO))
+      else if (!vget(b_lines - 1, 40, "[保人密碼] ", passbuf, PSWDLEN + 1, NOECHO))
       {       
 	continue;
       }
@@ -661,7 +664,7 @@ login_user(content)
     }
     else if (str_cmp(uid, STR_GUEST))	/* 一般使用者 */
     {
-      if (!vget(b_lines - 2, 40, "[您的密碼] ", passbuf, PSWDLEN + 1, NOECHO))
+      if (!vget(b_lines - 1, 40, "[您的密碼] ", passbuf, PSWDLEN + 1, NOECHO))
 	continue;	/* 不打密碼則取消登入 */
 
       /* itoc.040110: 在輸入完 ID 及密碼，才載入 .ACCT */
@@ -1072,11 +1075,11 @@ tn_main()
 
   time(&ap_start);
 
-  prints("%s ⊙ " SCHOOLNAME " ⊙ " MYIPADDR "\n"
-    "歡迎光臨【\033[1;33;46m %s \033[m】目前線上人數 [%d] 人",
-    str_host, str_site, ushm->count);
-
-  film_out((ap_start % 3) + FILM_OPENING0, 3);	/* 亂數顯示開頭畫面 */
+  /* smiler.070602:更改進站版面配置 */
+  prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉        \033[40m\n",
+	  str_site,ushm->count);
+  prints("\033[1;33;41m                                                                            \n");
+  film_out((ap_start % 3) + FILM_OPENING0, 2);	/* 亂數顯示開頭畫面 */ /* smiler.070602:更改進站版面配置 */
   
   currpid = getpid();
 
@@ -1521,6 +1524,16 @@ main(argc, argv)
 
     ap_start++;
     argc = *totaluser;
+
+	/* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
+	if (ChangeLoging==1)
+	{
+      sprintf(currtitle, "程式修改中，請稍後再來\n");     /* 公佈修改進度及相關資訊 */
+      send(csock, currtitle, strlen(currtitle), 0);
+      close(csock);
+      continue;
+	}
+
     if (argc >= MAXACTIVE - 5 /* || *avgload > THRESHOLD */ )
     {
       /* 借用 currtitle */

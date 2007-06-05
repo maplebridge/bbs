@@ -14,6 +14,7 @@
 
 #include "bbs.h"
 
+
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
@@ -1101,8 +1102,8 @@ main(argc, argv)
     keeplog(FN_RUN_MAIL_LOG, BN_SECURITY, title, 2);
 
 #ifdef HAVE_ANONYMOUS
-    sprintf(title, "%s匿名文章發表", date);
-    keeplog(FN_RUN_ANONYMOUS, BN_SECURITY, title, 2);
+//    sprintf(title, "%s匿名文章發表", date);             /* smiler.070602:取消於log板顯示匿名 */
+//    keeplog(FN_RUN_ANONYMOUS, BN_SECURITY, title, 2);
 #endif
 
 #ifdef HAVE_BUY

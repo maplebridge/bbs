@@ -10,6 +10,7 @@
 #include "bbs.h"
 
 
+
 extern BCACHE *bshm;
 extern XZ xz[];
 extern char xo_pool[];
@@ -25,6 +26,204 @@ time_t brd_visit[MAXBOARD];		/* 最近瀏覽時間 */
 static char *class_img = NULL;
 static XO board_xo;
 
+//********/* smiler.070602: for xsort 起始處 */********/
+
+#define min(a, b)	(a) < (b) ? a : b
+#undef	TEST
+
+
+/* Qsort routine from Bentley & McIlroy's "Engineering a Sort Function". */
+
+
+#define swapcode(TYPE, parmi, parmj, n) { 		\
+	long i = (n) / sizeof (TYPE); 			\
+	register TYPE *pi = (TYPE *) (parmi); 		\
+	register TYPE *pj = (TYPE *) (parmj); 		\
+	do { 						\
+		register TYPE	t = *pi;		\
+		*pi++ = *pj;				\
+		*pj++ = t;				\
+        } while (--i > 0);				\
+}
+
+
+#define SWAPINIT(a, es) \
+	swaptype = (((char *)a - (char *)0) % sizeof(long) || \
+	es % sizeof(long)) ? 2 : (es == sizeof(long)? 0 : 1);
+
+
+static inline void
+swapfunc(a, b, n, swaptype)
+  char *a, *b;
+  int n, swaptype;
+{
+  if (swaptype <= 1)
+    swapcode(long, a, b, n)
+  else
+    swapcode(char, a, b, n)
+}
+
+
+#define swap(a, b)					\
+	if (swaptype == 0) {				\
+		long t = *(long *)(a);			\
+		*(long *)(a) = *(long *)(b);		\
+		*(long *)(b) = t;			\
+	} else						\
+		swapfunc(a, b, es, swaptype)
+
+
+#define vecswap(a, b, n) 	if ((n) > 0) swapfunc(a, b, n, swaptype)
+
+
+static inline char *
+med3(a, b, c, cmp)
+  char *a, *b, *c;
+  int (*cmp) ();
+{
+  return cmp(a, b) < 0 ?
+    (cmp(b, c) < 0 ? b : (cmp(a, c) < 0 ? c : a))
+    : (cmp(b, c) > 0 ? b : (cmp(a, c) < 0 ? a : c));
+}
+
+
+void
+xsort(a, n, es, cmp)
+  void *a;
+  size_t n, es;
+  int (*cmp) ();
+{
+  char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
+  int d, r, swaptype, swap_cnt;
+
+  SWAPINIT(a, es);
+
+loop:
+
+  swap_cnt = 0;
+  if (n < 7)
+  {
+    for (pm = a + es; pm < (char *) a + n * es; pm += es)
+      for (pl = pm; pl > (char *) a && cmp(pl - es, pl) > 0;
+	pl -= es)
+	swap(pl, pl - es);
+    return;
+  }
+
+  pm = a + (n / 2) * es;
+
+  if (n > 7)
+  {
+    pl = a;
+    pn = a + (n - 1) * es;
+    if (n > 40)
+    {
+      d = (n >> 3) * es;
+      pl = med3(pl, pl + d, pl + d + d, cmp);
+      pm = med3(pm - d, pm, pm + d, cmp);
+      pn = med3(pn - 2 * d, pn - d, pn, cmp);
+    }
+    pm = med3(pl, pm, pn, cmp);
+  }
+  swap(a, pm);
+  pa = pb = a + es;
+
+  pc = pd = a + (n - 1) * es;
+  for (;;)
+  {
+    while (pb <= pc && (r = cmp(pb, a)) <= 0)
+    {
+      if (r == 0)
+      {
+	swap_cnt = 1;
+	swap(pa, pb);
+	pa += es;
+      }
+      pb += es;
+    }
+    while (pb <= pc && (r = cmp(pc, a)) >= 0)
+    {
+      if (r == 0)
+      {
+	swap_cnt = 1;
+	swap(pc, pd);
+	pd -= es;
+      }
+      pc -= es;
+    }
+    if (pb > pc)
+      break;
+    swap(pb, pc);
+    swap_cnt = 1;
+    pb += es;
+    pc -= es;
+  }
+
+  if (swap_cnt == 0)
+  {				/* Switch to insertion sort */
+    for (pm = a + es; pm < (char *) a + n * es; pm += es)
+      for (pl = pm; pl > (char *) a && cmp(pl - es, pl) > 0; pl -= es)
+	swap(pl, pl - es);
+    return;
+  }
+
+  pn = a + n * es;
+  r = min(pa - (char *) a, pb - pa);
+  vecswap(a, pb - r, r);
+
+  r = min(pd - pc, pn - pd - es);
+  vecswap(pb, pn - r, r);
+
+  if ((r = pb - pa) > es)
+    xsort(a, r / es, es, cmp);
+
+  if ((r = pd - pc) > es)
+  {
+    /* Iterate rather than recurse to save stack space */
+    a = pn - r;
+    n = r / es;
+    goto loop;
+  }
+  /* xsort(pn - r, r / es, es, cmp); */
+}
+
+
+#ifdef	TEST
+
+#define	MMM	(0x40000)
+
+static int
+int_cmp(a, b)
+  int *a;
+  int *b;
+{
+  return *a - *b;
+}
+
+
+main()
+{
+  int *x, *y, *z, n;
+
+  x = malloc(MMM * sizeof(int));
+  if (!x)
+    return;
+
+  y = x;
+  z = x + MMM;
+
+  n = time(0) & (0x40000 -1) /* 16387 */;
+
+  do
+  {
+    *x = n = (n * 10001) & (0x100000 - 1);
+  } while (++x < z);
+
+  xsort(y, MMM, sizeof(int), int_cmp);
+}
+#endif
+
+//*******/* smiler.070602: for xsort 結束處 */********/
 
 /* ----------------------------------------------------- */
 /* 看板閱讀記錄 .BRH (Board Reading History)		 */
@@ -932,6 +1131,17 @@ static int class_flag = 0;
 static int class_jumpnext = 0;	/* itoc.010910: 是否跳去下一個未讀板 1:要 0:不要 */
 #endif
 
+/* smiler.070602: for熱門看板 */
+static int class_hot = 0;
+/* smiler.070602: 看板人氣排序 */
+static int
+mantime_cmp(a, b)
+short *a;
+short *b;
+{
+  return bshm->mantime[*b] - bshm->mantime[*a];
+}
+
 
 #define	BFO_YANK	0x01
 
@@ -943,6 +1153,7 @@ class_load(xo)
   short *cbase, *chead, *ctail;
   int chn;			/* ClassHeader number */
   int pos, max, val, zap;
+  int bnum=0;       /* smiler.070602: for熱門看板 */
   BRD *brd;
   char *bits;
 
@@ -983,6 +1194,7 @@ class_load(xo)
       val = bits[chn];
       if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
 	continue;
+      if (class_hot && bshm->mantime[chn] < 0) continue; /* smiler.070602: for熱門看板 */
     }
     else		/* 分類群組 */
     {
@@ -992,7 +1204,15 @@ class_load(xo)
 
     max++;
     *cbase++ = chn;
+     if (chn >= 0) bnum++; /* smiler.070602: for熱門看板 */
   } while (chead < ctail);
+
+  /* smiler.070602: for熱門看板 */
+  if (class_hot && bnum > 0)
+  {
+    cbase -= bnum;
+    xsort(cbase, bnum, sizeof(short), mantime_cmp);
+  }
 
   xo->max = max;
   if (xo->pos >= max)
@@ -1680,6 +1900,23 @@ class_browse(xo)
   chn = *chp;
   if (chn < 0)		/* 進入分類 */
   {
+
+    /*=====================================*/
+	/* smiler.070602: for熱門看板 */
+    short *chx;
+    char *img, *str;    
+    img = class_img;
+    chx = (short *) img + (CH_END - chn);
+    str = img + *chx;
+    // "HOT/" 名稱可自定，若改名也要順便改後面的長度 4
+    if (!strncmp(str, "HOT/", 4))
+    {
+      class_hot = 1;
+      chn = CH_END;
+    }
+    else class_hot = 0;
+    /*=====================================*/
+
     if (!XoClass(chn))
       return XO_NONE;
   }
@@ -2075,6 +2312,7 @@ board_main()
 int
 Boards()
 {
+   class_hot = 0;  /* smiler.070602: for熱門看板 */
   /* class_xo = &board_xo; *//* Thor: 已有 default, 不需作此 */
 
 #ifdef AUTO_JUMPBRD
