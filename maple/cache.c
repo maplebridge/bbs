@@ -575,12 +575,15 @@ film_out(tag, row)
 	*ptr = '\0';
       move(row++, (d_cols >> 1));
       outx(film);
+      prints("\033[0m");
       if (ptr)
 	film = ptr + 1;
     }
   }
-  else
+  else{
     outx(buf);
+    prints("\033[0m");
+  }
 
   if (row < 0)			/* help screen */
     vmsg(NULL);
