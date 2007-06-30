@@ -1078,7 +1078,7 @@ tn_main()
   /* smiler.070602:更改進站版面配置 */
   prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉        \033[40m\n",
 	  str_site,ushm->count);
-  prints("\033[1;33;41m                                                                            \n");
+  prints("\033[1;33;41m                                                                            \033[0m\n");
   film_out((ap_start % 3) + FILM_OPENING0, 2);	/* 亂數顯示開頭畫面 */ /* smiler.070602:更改進站版面配置 */
   
   currpid = getpid();
