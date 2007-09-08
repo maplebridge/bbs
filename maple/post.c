@@ -627,16 +627,18 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
   UTMP *online;
 #endif
 
+   cc=cc-1; /*smiler.070724: 標題少需印一格 */
   /* --------------------------------------------------- */
   /* 印出日期						 */
   /* --------------------------------------------------- */
 
 #ifdef HAVE_DECLARE
   /* itoc.010217: 改用星期幾來上色 */
-  prints("\033[1;3%dm%s\033[m ", cal_day(hdr->date) + 1, hdr->date + 3);
+  /*smiler.070724: 日期印出前,多空一格*/
+  prints(" \033[1;3%dm%s\033[m ", cal_day(hdr->date) + 1, hdr->date + 3);
+
 #else
-  outs(hdr->date + 3);
-  outc(' ');
+  prints(" \033[m%s\033[m ",hdr->date + 3);
 #endif
 
   /* --------------------------------------------------- */

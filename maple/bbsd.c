@@ -15,7 +15,6 @@
 #include "dns.h"
 
 
-
 #include <sys/wait.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -54,6 +53,25 @@ extern time_t mode_lastchange;
 
 int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
 
+/* ----------------------------------------------------- */
+/* ip to string 程式					 */
+/* ----------------------------------------------------- */
+void ip_to_str(char *tn_addr_buf,int addr)
+{
+	int i;
+	int addr_buf[8];
+	for(i=0;i<8;i++)
+	{
+		addr_buf[i]=addr%16;
+		addr=addr/16;
+	}
+    addr_buf[0]=addr_buf[1]*16+addr_buf[0];
+    addr_buf[1]=addr_buf[3]*16+addr_buf[2];
+    addr_buf[2]=addr_buf[5]*16+addr_buf[4];
+    addr_buf[3]=addr_buf[7]*16+addr_buf[6];
+    sprintf(tn_addr_buf,"%d.%d.%d.%d",addr_buf[0],addr_buf[1],addr_buf[2],addr_buf[3]);
+	printf("%s\n",tn_addr_buf);
+}
 /* ----------------------------------------------------- */
 /* 離開 BBS 程式					 */
 /* ----------------------------------------------------- */
@@ -1069,8 +1087,21 @@ tn_main()
   clear();
 
 #ifdef HAVE_LOGIN_DENIED
-  if (acl_has(BBS_ACLFILE, "", fromhost))
-    login_abort("\n貴機器於不被敝站接受");
+  char tn_addr_buf[15];           /* smiler.070719: ip address of string form */
+  ip_to_str(tn_addr_buf,tn_addr);
+  if(acl_has(BBS_ACPFILE, "","") != -1) /* BBS_ACLFILE不存在*/
+  {
+    if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf))) /* smiler.070724 */
+       login_abort("\n系統維護中,請稍後連入\n");
+  }
+  else
+  {
+    if(acl_has(BBS_DNYFILE, "","") != -1)
+    {
+      if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", tn_addr_buf))) /* smiler.070724 */
+         login_abort("\n您的機器不被本站台接受\n");
+    }
+  }
 #endif
 
   time(&ap_start);

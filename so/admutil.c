@@ -145,12 +145,13 @@ a_xfile()		/* 設定系統檔案 */
     "收信白名單",
     "收信黑名單",
 
-#ifdef HAVE_LOGIN_DENIED
-    "拒絕連線名單",
-#endif
-
 #ifdef  HAVE_DETECT_CROSSPOST
     "Crosspost特例",
+#endif
+
+#ifdef HAVE_LOGIN_DENIED
+    "接受連線名單",    /* smiler.070724 */
+    "拒絕連線名單",
 #endif
 
     NULL
@@ -192,12 +193,13 @@ a_xfile()		/* 設定系統檔案 */
     MAIL_ACLFILE,
     UNMAIL_ACLFILE,
 
-#ifdef HAVE_LOGIN_DENIED
-    BBS_ACLFILE,
-#endif
-
 #ifdef  HAVE_DETECT_CROSSPOST
     FN_ETC_NOCROSSPOST,
+#endif
+
+#ifdef HAVE_LOGIN_DENIED
+    BBS_ACPFILE,
+    BBS_DNYFILE,
 #endif
     
   };

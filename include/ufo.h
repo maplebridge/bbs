@@ -43,7 +43,7 @@
 
 #define UFO_ZHC		BFLAG(18)	/* hightman.060504: 全型字偵測 */
 #define UFO_JUMPBRD	BFLAG(19)	/* itoc.020122: 自動跳去下一個未讀看板 */
-#define UFO_NOUSE20	BFLAG(20)
+#define UFO_TIMEKICKER	BFLAG(20)	/* smiler.070724: TIME_KICKER */
 #define UFO_NOUSE21	BFLAG(21)
 #define UFO_NOUSE22	BFLAG(22)
 #define UFO_NOUSE23	BFLAG(23)
@@ -92,9 +92,9 @@
 
 #define NUMUFOS		27
 #define NUMUFOS_GUEST	5	/* guest 可以用前 5 個 ufo */
-#define NUMUFOS_USER	20	/* 一般使用者 可以用前 20 個 ufo */
+#define NUMUFOS_USER	21	/* 一般使用者 可以用前 21 個 ufo */
 
-#define STR_UFO		"-mpsnemPBQFANbwtSHZJ----CHA"		/* itoc: 新增習慣的時候別忘了改這裡啊 */
+#define STR_UFO		"-mpsnemPBQFANbwtSHZJT---CHA"		/* itoc: 新增習慣的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -154,7 +154,7 @@ char *ufo_tbl[NUMUFOS] =
   "保留",
 #endif
 
-  "保留",
+  "IDLE過久自動離站(選擇/不用)",	/*  UFO_TIMEKICKER */ /* smiler.070724 */
   "保留",
   "保留",
   "保留",

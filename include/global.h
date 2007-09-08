@@ -200,8 +200,8 @@
 #define MAIL_ACLFILE	"etc/mail.acl"		/* 收信白名單 */
 #define UNMAIL_ACLFILE	"etc/unmail.acl"	/* 收信黑名單 */
 
-#define BBS_ACLFILE	"etc/bbs.acl"		/* 拒絕 telnet 連線名單 */
-
+#define BBS_ACPFILE	"etc/bbs.acplg"		/* 接受 telnet 連線名單 */
+#define BBS_DNYFILE	"etc/bbs.dnylg"		/* 拒絕 telnet 連線名單 */
 
 /* ----------------------------------------------------- */
 /* 各個板的檔名設定                                      */

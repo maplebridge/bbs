@@ -726,7 +726,8 @@ XoSongSub()
 {
   int bno;
 
-  if ((bno = brd_bno(BN_REQUEST)) >= 0)
+  /*ckm.07Aug29: 歌本投稿看版改為 ArtSys*/
+  if ((bno = brd_bno("ArtSys")) >= 0)
   {
     XoPost(bno);
     xover(XZ_POST);

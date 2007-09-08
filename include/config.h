@@ -88,7 +88,7 @@
 #undef	HAVE_GUARANTOR		/* itoc.000319: 採用保證人制度 */
 #endif
 
-#undef	HAVE_LOGIN_DENIED	/* itoc.000319: 擋掉某些來源的連結，參照 etc/bbs.acl */
+#define	HAVE_LOGIN_DENIED	/* itoc.000319: 擋掉某些來源的連結，參照 etc/bbs.acl */ /* smiler.070724 */
 
 #undef	NEWUSER_LIMIT		/* 新手上路的三天限制 */
 

@@ -6,7 +6,6 @@
 /* update : 96/10/10				 	 */
 /*-------------------------------------------------------*/
 
-
 #include <stdarg.h>
 #include <arpa/telnet.h>
 
@@ -1330,6 +1329,8 @@ igetch()
 	  /* Thor.990201.註解: 除了talk_rqst、chat之外，需要在動一動之後，重設tv_sec為60秒嗎? (預設值) */
 
 #ifdef TIME_KICKER
+    if(cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
+    {
 	  if (idle > IDLE_TIMEOUT)
 	  {
 	    outs("★ 超過閒置時間！");
@@ -1341,7 +1342,8 @@ igetch()
 	    bell();		/* itoc.010315: 叫一下 :p */
 	    prints("\033[1;5;31m警告\033[m您已經閒置過久，系統將在 %d 分鐘後把您踢除！", IDLE_WARNOUT);
 	    refresh();
-	  }	  
+	  }
+	}
 #endif
 
 #ifndef DETAIL_IDLETIME

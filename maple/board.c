@@ -10,7 +10,6 @@
 #include "bbs.h"
 
 
-
 extern BCACHE *bshm;
 extern XZ xz[];
 extern char xo_pool[];
@@ -25,6 +24,9 @@ time_t brd_visit[MAXBOARD];		/* 最近瀏覽時間 */
 
 static char *class_img = NULL;
 static XO board_xo;
+
+static inline int in_favor(char *brdname); /* smiler.070724 */
+
 
 //********/* smiler.070602: for xsort 起始處 */********/
 
@@ -620,7 +622,7 @@ Ben_Perm(bno, ulevel)
   {
     bits = 0;
   }
-
+  
   /* Thor.980813.註解: 特別為 BM 考量，板主有該板的所有權限 */
   blist = brd->BM;
   if ((ulevel & PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
@@ -1302,7 +1304,7 @@ btime_refresh(brd)
   }
 }
 
-
+/* smiler.070724: 我的最愛看板上色*/
 void
 class_item(num, bno, brdpost)
   int num, bno, brdpost;
@@ -1352,16 +1354,150 @@ class_item(num, bno, brdpost)
   else
     str3 = "  ";
 
-  prints("%6d%c%s%-13s\033[1;3%dm%-5s\033[m%s ",
-    num, token, str1, brd->brdname,
-    brd->class[3] & 7, brd->class, str2);
+
+    /*smiler.070724: 看板配色,人氣 */
+    prints("%6d%c%s%-13s",num, token, str1, brd->brdname);
+
+    if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
+        prints("\033[1;31m");
+    else if(strcmp(brd->class,"地方")==0 || strcmp(brd->class,"體育")==0)
+        prints("\033[1;32m");
+    else if(strcmp(brd->class,"個人")==0)
+        prints("\033[1;33m");
+    else if(strcmp(brd->class,"清華")==0 || strcmp(brd->class,"資訊")==0 || strcmp(brd->class,"校隊")==0)
+        prints("\033[1;34m");
+    else if(strcmp(brd->class,"Comp")==0 || strcmp(brd->class,"電腦")==0)
+        prints("\033[1;36m");
+    else if(strcmp(brd->class,"社團")==0)
+	    prints("\033[33m");
+    else if(strcmp(brd->class,"嗜好")==0)
+        prints("\033[35m");
+    else
+        prints("\033[1;3%dm",brd->class[3] & 7);
+    prints("%-5s\033[m%s ",brd->class,str2);
+
+
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
   str1 = brd->title;
-  num = (d_cols >> 1) + 33;
+  num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
-  prints("%s %.*s\n", str3, d_cols - (d_cols >> 1) + 12, brd->BM);
+  /* smiler.070724: 獨立處理看板人氣 */
+  if(bno>60)
+      prints("\033[1;35m爆了\033[m ");
+  else if(bno>40)
+      prints("\033[1;31m熱門\033[m ");
+  else if(bno>20)
+      prints("\033[1;33m有勁\033[m ");
+  else if(bno>10)
+      prints("\033[1;31m%4d\033[m ", bno);
+  else if(bno>5)
+      prints("\033[1;33m%4d\033[m ", bno);
+  else if(bno>0)
+      prints("%4d ", bno);
+  else
+      prints("     ");
+  prints("%.*s\n",d_cols - (d_cols >> 1) + 12, brd->BM);
+
 }
 
+
+void
+class_mf_item(num, bno, brdpost)
+  int num, bno, brdpost;
+{
+  BRD *brd;
+  char *str1, *str2, *str3, token, buf[16];
+
+  brd = bshm->bcache + bno;
+
+  btime_refresh(brd);
+
+  /* 處理 編號/篇數 */
+  if (brdpost)
+    num = brd->bpost;
+
+  /* 處理 zap/friend/secret 板的符號 */
+  if (brd_bits[bno] & BRD_Z_BIT)
+    token = TOKEN_ZAP_BRD;
+  else if (brd->readlevel == PERM_SYSOP)
+    token = TOKEN_SECRET_BRD;
+  else if (brd->readlevel == PERM_BOARD)
+    token = TOKEN_FRIEND_BRD;
+  else
+    token = ' ';
+
+  /* 處理 已讀/未讀 */
+#ifdef ENHANCED_VISIT
+  /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
+  brh_get(brd->bstamp, bno);
+  str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#else
+  str1 = brd->blast > brd_visit[bno] ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#endif
+
+  /* 處理 投票/轉信 */
+  if (brd->bvote)
+    str2 = (brd->bvote > 0) ? ICON_VOTED_BRD : ICON_GAMBLED_BRD;
+  else
+    str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
+
+  /* 處理 人氣 */
+  bno = bshm->mantime[bno];
+  if (bno > 99)
+    str3 = "\033[1;31m爆\033[m";
+  else if (bno > 0)
+    sprintf(str3 = buf, "%2d", bno);
+  else
+    str3 = "  ";
+
+/*  prints("%6d%c%s%-13s\033[1;3%dm%-5s\033[m%s ",
+    num, token, str1, brd->brdname,
+    brd->class[3] & 7, brd->class, str2);*/
+
+    /*smiler.070724: 看板配色,人氣 */
+    prints("%6d%c%s\033[1;36m%-13s\033[m",num, token, str1, brd->brdname);
+
+    if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
+        prints("\033[1;31m");
+    else if(strcmp(brd->class,"地方")==0 || strcmp(brd->class,"體育")==0)
+        prints("\033[1;32m");
+    else if(strcmp(brd->class,"個人")==0)
+        prints("\033[1;33m");
+    else if(strcmp(brd->class,"清華")==0 || strcmp(brd->class,"資訊")==0 || strcmp(brd->class,"校隊")==0)
+        prints("\033[1;34m");
+    else if(strcmp(brd->class,"Comp")==0 || strcmp(brd->class,"電腦")==0)
+        prints("\033[1;36m");
+    else if(strcmp(brd->class,"社團")==0)
+	    prints("\033[33m");
+    else if(strcmp(brd->class,"嗜好")==0)
+        prints("\033[35m");
+    else
+        prints("\033[1;3%dm",brd->class[3] & 7);
+    prints("%-5s\033[m%s ",brd->class,str2);
+
+
+  /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
+  str1 = brd->title;
+  num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
+  prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
+  /* smiler.070724: 獨立處理看板人氣 */
+  if(bno>60)
+      prints("\033[1;35m爆了\033[m ");
+  else if(bno>40)
+      prints("\033[1;31m熱門\033[m ");
+  else if(bno>20)
+      prints("\033[1;33m有勁\033[m ");
+  else if(bno>10)
+      prints("\033[1;31m%4d\033[m ", bno);
+  else if(bno>5)
+      prints("\033[1;33m%4d\033[m ", bno);
+  else if(bno>0)
+      prints("%4d ", bno);
+  else
+      prints("     ");
+  prints("%.*s\n",d_cols - (d_cols >> 1) + 12, brd->BM);
+
+}
 
 static int
 class_body(xo)
@@ -1432,7 +1568,15 @@ class_body(xo)
       cnt++;
       if (chn >= 0)		/* 一般看板 */
       {
-	class_item(cnt, chn, brdpost);
+		 /*smiler.070724: 我的最愛看板板名上色 */
+         BRD *bhdr;
+         bhdr = bshm->bcache + chn;
+         if (in_favor(bhdr->brdname))
+		 {
+            class_mf_item(cnt, chn, brdpost);
+		 }
+		 else
+	        class_item(cnt, chn, brdpost);
       }
       else			/* 分類群組 */
       {
@@ -1978,6 +2122,7 @@ class_switch(xo)
 /* ----------------------------------------------------- */
 /* MyFavorite [我的最愛]				 */
 /* ----------------------------------------------------- */
+
 
 
 static inline int

@@ -75,7 +75,7 @@ mf_item(num, mf)
   else if (mftype & MF_BOARD)
   {
     if ((bno = brd_bno(mf->xname)) >= 0)
-      class_item(num, bno, brdpost);
+      class_mf_item(num, bno, brdpost);
     else
       /* itoc.010821: 不見的看板，讓 user 自己清掉，如此 user 才知道哪些看板被砍了 */
       prints("         \033[36m<%s 已改名或被刪除，請將本捷徑刪除>\033[m\n", mf->xname);
