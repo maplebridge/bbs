@@ -310,7 +310,7 @@ do_today()
 	  str_ncpy(today, ptr2, sizeof(image.today));
 
 	  if (ptr3 = strtok(NULL, " \t\n"))
-	    sprintf(feast, "etc/feasts/%s", ptr3);
+	    sprintf(feast, "gem/@/@%s", ptr3);  //smiler.070925
 	  if (!dashf(feast))
 	    feast[0] = '\0';
 

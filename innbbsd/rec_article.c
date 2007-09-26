@@ -141,11 +141,13 @@ update_btime(brdname)
   } while (++brdp < bend);
 }
 
-
+/* smiler.070916 */
 static void
-bbspost_add(board, addr, nick)
-  char *board, *addr, *nick;
+bbspost_topic_add(board, addr, nick ,board_from)
+  char *board, *addr, *nick, *board_from;
 {
+  int cc;
+  char *str;
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
@@ -159,12 +161,29 @@ bbspost_add(board, addr, nick)
     fprintf(fp, "發信人: %.50s 看板: %s\n", FROM, board);
     fprintf(fp, "標  題: %.70s\n", SUBJECT);
     if (SITE)
-      fprintf(fp, "發信站: %.27s (%.40s)\n", SITE, DATE);
+      fprintf(fp, "發信站: %.27s (%.40s)\n\n", SITE, DATE);
     else
-      fprintf(fp, "發信站: %.40s\n", DATE);
-    fprintf(fp, "轉信站: %.70s\n\n", PATH);
+      fprintf(fp, "發信站: %.40s\n\n", DATE);
 
-    fprintf(fp, "%s", BODY);	/* chuan: header 跟 body 要空行格開 */
+    /* chuan: header 跟 body 要空行隔開 */
+	if(strcmp(board_from,"nthu")==0)
+        fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板 , 原看板文章自動刪除  *** <\033[0m\n",board_from);
+	else
+        fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板  *** <\033[0m\n",board_from);
+    /* fprintf(fp, "%s", BODY); */
+
+    for (str = BODY; cc = *str; str++)
+    {
+      if (cc == '.')
+      {
+	/* for line beginning with a period, collapse the doubled period to a single one. */
+	if (str >= BODY + 2 && str[-1] == '.' && str[-2] == '\n')
+	  continue;
+      }
+
+      fputc(cc, fp);
+    }
+
     fclose(fp);
   }
 
@@ -183,8 +202,67 @@ bbspost_add(board, addr, nick)
   update_btime(board);
 
   HISadd(MSGID, board, hdr.xname);
+
 }
 
+static void
+bbspost_add(board, addr, nick)
+  char *board, *addr, *nick;
+{
+  char folder[64], fpath[64];
+  HDR hdr;
+  FILE *fp;
+
+  char board2[30];                // smiler.070916
+  strcpy(board2,"nthu.forsale");  // smiler.070916
+
+  /* 寫入文章內容 */
+
+  brd_fpath(folder, board, FN_DIR);
+
+  brd_fpath(folder, board, FN_DIR);
+
+  /* smiler.070916 */
+  if(strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清"))
+  {
+	  if( (!strstr(board,"P_")) && (!strstr(board,"R_")) && 
+		  (!strstr(board,"LAB_")) && (!strstr(board,"G_")) )
+      bbspost_topic_add(board2, addr, nick , board);
+  }
+  if(!( (strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清")) 
+	  && (strcmp(board,"nthu")==0) ) )
+  {
+    if (fp = fdopen(hdr_stamp(folder, 'A', &hdr, fpath), "w"))
+	{
+      fprintf(fp, "發信人: %.50s 看板: %s\n", FROM, board);
+      fprintf(fp, "標  題: %.70s\n", SUBJECT);
+      if (SITE)
+        fprintf(fp, "發信站: %.27s (%.40s)\n", SITE, DATE);
+      else
+        fprintf(fp, "發信站: %.40s\n", DATE);
+      fprintf(fp, "轉信站: %.70s\n\n", PATH);
+
+      fprintf(fp, "%s", BODY);	/* chuan: header 跟 body 要空行格開 */
+      fclose(fp);
+	}
+
+    /* 造 HDR */
+
+    hdr.xmode = POST_INCOME;
+
+    /* Thor.980825: 防止字串太長蓋過頭 */
+    str_ncpy(hdr.owner, addr, sizeof(hdr.owner));
+    str_ncpy(hdr.nick, nick, sizeof(hdr.nick));
+    str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
+    str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
+
+    rec_bot(folder, &hdr, sizeof(HDR));
+
+    update_btime(board);
+
+    HISadd(MSGID, board, hdr.xname);
+  } // smiler.070916                                  
+}
 
 /* ----------------------------------------------------- */
 /* process cancel write					 */

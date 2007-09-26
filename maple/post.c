@@ -9,7 +9,7 @@
 
 #include "bbs.h"
 
-
+#define DO_POST_FILTER
 
 extern BCACHE *bshm;
 extern XZ xz[];
@@ -33,6 +33,27 @@ cmpchrono(hdr)
   return hdr->chrono == currchrono;
 }
 
+/* smiler 0914*/
+int
+post_filter(acl)
+  char *acl;			/* file name of access control list */
+{
+  FILE *fp;
+  char filter[256];
+
+  if (!(fp = fopen(acl, "r")))
+    return -1;
+
+  while (fgets(filter, sizeof(filter), fp))
+  {
+     if(strstr(filter,"paperdo@gmail.com") || strstr(filter,"http://paperdo.googlepages.com/index.htm")
+		 || strstr(filter,"論文代寫") || strstr(filter,"代寫論文"))
+		 return 1;
+  }
+
+  fclose(fp);
+  return 0;
+}
 
 /* ----------------------------------------------------- */
 /* 改良 innbbsd 轉出信件、連線砍信之處理程序		 */
@@ -338,6 +359,10 @@ do_post(xo, title)
   char fpath[64], *folder, *nick, *rcpt;
   int mode;
   time_t spendtime, prev, chrono;
+  char buf_filepath[50];                       /* smiler.070914: for post_filter */
+  HDR hdr2, buf2;                              /* smiler.070916: for 轉文至 nthu.forsale */
+  char fpath2[64], folder2[64];                // smiler.070916
+  char board_from[30];                         // smiler.070916
 
   if (!(bbstate & STAT_POST))
   {
@@ -406,6 +431,20 @@ do_post(xo, title)
   folder = xo->dir;
   hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
 
+  strcpy(buf_filepath,folder);                        // smiler.070914
+  buf_filepath[strlen(buf_filepath)-4]=hdr.xname[7];  // smiler.070914
+  buf_filepath[strlen(buf_filepath)-3]='/';           // smiler.070914
+  buf_filepath[strlen(buf_filepath)-2]='\0';          // smiler.070914
+  strcat(buf_filepath,hdr.xname);                     // smiler.070914
+
+  strcpy(fpath2,fpath);                               // smiler.070916
+  strcpy(folder2,folder);                             // smiler.070916
+  folder2[4]='\0';                                    // smiler.070916
+  strcat(folder2,"nthu.forsale/.DIR");                // smiler.070916 
+  hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);  // smiler.070916
+  strcpy(board_from,folder+4);                        // smiler.070916
+  board_from[strlen(board_from)-5]='\0';              // smiler.070916
+
   /* set owner to anonymous for anonymous board */
 
 #ifdef HAVE_ANONYMOUS
@@ -441,8 +480,33 @@ do_post(xo, title)
   strcpy(hdr.nick, nick);
   strcpy(hdr.title, title);
 
+  hdr2.xmode = mode;                     // smiler.070916
+  strcpy(hdr2.owner, rcpt);              // smiler.070916
+  strcpy(hdr2.nick, nick);               // smiler.070916
+  strcpy(hdr2.title, title);             // smiler.070916
+
+#ifdef DO_POST_FILTER
+  if(post_filter(buf_filepath) ==1)       /* smiler 0914 */
+  {
+    unlink(buf_filepath);
+    vmsg("請勿大量洗板,洗站,廣告 !!");
+    return XO_HEAD;
+  }
+#endif
   rec_bot(folder, &hdr, sizeof(HDR));
   btime_update(currbno);
+
+  /* smiler 0916 */
+  if(strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清"))
+  {
+	 if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
+	   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) )
+	 {
+          rec_bot(folder2, &hdr2, sizeof(HDR));
+          btime_update(brd_bno("nthu.forsale"));
+	 }
+  }
+
 
   if (mode & POST_OUTGO)
     outgo_post(&hdr, currboard);
