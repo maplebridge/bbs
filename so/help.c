@@ -17,6 +17,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
 {
   char *str;
   char fpath[64];
+  char fpath_help_all[64];                       //smiler.070927
   int num, pageno, pagemax, redraw, reload;
   int ch, cur, i;
   struct stat st;
@@ -30,6 +31,9 @@ do_help(path)	/* itoc.021122: 說明文件 */
   pageno = 0;
   cur = 0;
   pal = NULL;
+
+  sprintf(fpath_help_all, "etc/help/help.all");  //smiler.070927
+  more(fpath_help_all, NULL);                    //smiler.070927
 
   do
   {
@@ -183,7 +187,14 @@ do_help(path)	/* itoc.021122: 說明文件 */
 	redraw = 1;
       }
       break;
-
+    
+    case 'h':                          //smiler.070927
+      more(fpath_help_all, NULL);                    
+      reload = 1;
+      pageno = 0;
+      cur = 0;
+      pal = NULL;
+      break;
     default:
       ch = xo_cursor(ch, pagemax, num, &pageno, &cur, &redraw);
       break;

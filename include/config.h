@@ -372,7 +372,7 @@
 
 /* bbsd.c mail.c 整理週期 */
 
-#define	CHECK_PERIOD	(86400 * 20)	/* 整理信箱/朋友名單的週期(秒) */
+#define	CHECK_PERIOD	(86400 * 7)	/* 整理信箱/朋友名單的週期(秒) */
 
 /* camera.c 動態看板 */
 

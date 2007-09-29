@@ -12,7 +12,7 @@
 # ------------------------------------------------------ #
 
 
-EXE =	collect_uno conflict_uno fix_uno
+EXE =	show_dotUSR collect_uno conflict_uno fix_uno
 
 
 all: 
