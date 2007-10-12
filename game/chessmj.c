@@ -731,7 +731,8 @@ main_chessmj()
         if (flag == 32)
         {
           strcpy(msg, "流局");
-          goto next_game;
+    addmoney(money);  /* ckm.07Oct12: 流局不扣押金 */ 
+    	  goto next_game;
         }
 	    move(18, 2 + (jp - 1) * 6);
 	    outs("  ");
@@ -810,7 +811,8 @@ main_chessmj()
       {
         host_card[4] = 0;
         strcpy(msg, "流局");
-        goto next_game;
+        addmoney(money);  /* ckm.07Oct12: 流局不扣押金 */
+	goto next_game;
       }
 
       host_card[4] = chesslist[flag];
