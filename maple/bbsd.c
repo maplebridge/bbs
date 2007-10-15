@@ -528,8 +528,8 @@ utmp_setup(mode)
 #ifdef GUEST_NICK
   if (!cuser.userlevel)		/* guest */
   {
-    char nick[9][5] = {"遊子", "水滴", "訪客", "補帖", "豬頭", "影子", "病毒", "童年", "石像"};
-    sprintf(cuser.username, "太陽下的%s", nick[ap_start % 9]);
+    char nick[7][10] = {"廣藿香娘", "負四小店", "黯然消魂", "海景無敵", "扣你十分", "坑坑疤疤", "跳湖景點"};
+    sprintf(cuser.username, "書桌前的%s", nick[ap_start % 7]);    
   }
 #endif	/* GUEST_NICK */
 
@@ -541,9 +541,9 @@ utmp_setup(mode)
   if (!cuser.userlevel)		/* guest */
   {
     /* itoc.010910: GUEST_NICK 和 GUEST_WHERE 的亂數模數避免一樣 */
-    char from[16][9] = {"風亭九思", "青埔朝陽", "率意通衢", "南台遠眺", "康莊迎曦", "碧草如茵", "緣慧潤生", "西庭笑語",
-			"玉樹向榮", "綠掩重樓", "松林立翠", "竹湖晨風", "竹園映亭", "曲道夾蔭", "荷塘月色", "思園春曉"};
-    strcpy(utmp.from, from[ap_start % 16]);
+    char from[7][18] = {"紫荊圖書館", "紫荊小吃部", "紫荊水木餐\廳", "紫荊風雲樓",
+    "紫荊呂媽辦公室", "紫荊共同管線", "紫荊成功\湖"};
+    strcpy(utmp.from, from[ap_start % 7]);
   }
   else
 #  endif	/* GUEST_WHERE */
