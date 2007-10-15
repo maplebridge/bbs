@@ -1309,11 +1309,11 @@ post_cross(xo)
 
   /* 原作者轉錄自己文章時，可以選擇「原文轉載」 */
   method = (HAS_PERM(PERM_ALLBOARD) || (!tag && !strcmp(hdr->owner, cuser.userid))) &&
-    (vget(2, 0, "(1)原文轉載 (2)轉錄文章？[2] ", buf, 3, DOECHO) == '1') ? 1 : 0; /* smiler.070602: 改預設為2 */
+    (vget(2, 0, "(1)原文轉載 (2)轉錄文章？[2] ", buf, 3, DOECHO) == '1') ? 0 : 1; /* smiler.070602: 改預設為2 */
 
   if (!tag)	/* lkchu.981201: 整批轉錄就不要一一詢問 */
   {
-    if (!method)
+    if (method)
       sprintf(ve_title, "[轉錄] %.65s", hdr->title); /* smiler.070602: 改為轉錄時,標題為[轉錄]開頭 */
     else
       strcpy(ve_title, hdr->title);
