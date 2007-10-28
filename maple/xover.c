@@ -1285,15 +1285,22 @@ xover(cmd)
 	}
 	else if (pos > num)
 	{
-	  if (zone == XZ_POST)
-	    pos = num;	/* itoc.000304: 閱讀到最後一篇按 KEY_DOWN 或 KEY_PGDN 不會翻到最前 */
-	  else
-	    pos = (cmd || pos == num + XO_TALL) ? 0 : num;	/* itoc.020124: 要避免如果在倒數第二頁按 KEY_PGDN，
+          if (cmd)
+          {
+            pos = 0;
+          }
+          else
+          {
+            if (zone == XZ_POST)
+	      pos = num;	/* itoc.000304: 閱讀到最後一篇按 KEY_DOWN 或 KEY_PGDN 不會翻到最前 */
+	    else
+	      pos = (cmd || pos == num + XO_TALL) ? 0 : num;	/* itoc.020124: 要避免如果在倒數第二頁按 KEY_PGDN，
 								   而最後一頁篇數太少會直接跳去第一頁，使用者會
 								   不知道有最後一頁，故先在最後一項停一下 */
-	}
-
-	/* check cursor's range */
+          }
+        }
+        
+        /* check cursor's range */
 
 	cmd = xo->pos;
 
