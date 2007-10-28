@@ -1147,7 +1147,7 @@ re_key:
     case 'h':
       xo_help("post");
       break;
-    case 'f':
+    case 'o':
       if ((bbstate & STAT_BOARD) && !(xmode & POST_NOFORWARD))
       {
         /* hdr->xmode = xmode ^ POST_NOFORWARD; */
@@ -2260,7 +2260,7 @@ KeyFunc post_cb[] =
   's', post_switch,
   KEY_TAB, post_gem,
   'z', post_gem,
-  'f', post_noforward,
+  'o', post_noforward,
 
   'y', post_reply,
   'd', post_delete,
@@ -2334,7 +2334,7 @@ KeyFunc xpost_cb[] =
   't', post_tag,
   'x', post_cross,
   'X', post_forward,
-  'f', post_noforward,
+  'o', post_noforward,
   'c', post_copy,
   'g', gem_gather,
   'm', post_mark,
