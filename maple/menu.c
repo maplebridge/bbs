@@ -404,7 +404,7 @@ typedef struct
 
 
 static MENU menu_main[];
-
+static MENU menu_system[];
 
 /* ----------------------------------------------------- */
 /* administrator's maintain menu			 */
@@ -414,36 +414,49 @@ static MENU menu_main[];
 static MENU menu_admin[] =
 {
   "bin/admutil.so:a_user", PERM_ALLACCT, - M_SYSTEM,
-  "User       ◤ 顧客資料 ◢",
+  "User       【 顧客資料 】",
 
   "bin/admutil.so:a_search", PERM_ALLACCT, - M_SYSTEM,
-  "Hunt       ◤ 搜尋引擎 ◢",
+  "Hunt       【 搜尋引擎 】",
 
   "bin/admutil.so:a_editbrd", PERM_ALLBOARD, - M_SYSTEM,
-  "QSetBoard  ◤ 設定看板 ◢",
+  "QSetBoard  【 設定看板 】",
 
   "bin/innbbs.so:a_innbbs", PERM_ALLBOARD, - M_SYSTEM,
-  "InnBBS     ◤ 轉信設定 ◢",
+  "InnBBS     【 轉信設定 】",
 
 #ifdef HAVE_REGISTER_FORM
   "bin/admutil.so:a_register", PERM_ALLREG, - M_SYSTEM,
-  "Register   ◤ 審註冊單 ◢",
+  "Register   【 審註冊單 】",
 
   "bin/admutil.so:a_regmerge", PERM_ALLREG, - M_SYSTEM,
-  "Merge      ◤ 復原審核 ◢",
+  "Merge      【 復原審核 】",
 #endif
 
-  "bin/admutil.so:a_xfile", PERM_ALLADMIN, - M_XFILES,
-  "Xfile      ◤ 系統檔案 ◢",
+  menu_system, PERM_ALLADMIN, M_AMENU,
+  "System     【 系統設定 】",
   
   "bin/admutil.so:a_resetsys", PERM_ALLADMIN, - M_SYSTEM,
-  "BBSreset   ◤ 重置系統 ◢",
+  "BBSreset   【 重置系統 】",
 
   "bin/admutil.so:a_restore", PERM_SYSOP, - M_SYSTEM,
-  "TRestore   ◤ 還原備份 ◢",
+  "TRestore   【 還原備份 】",
 
   menu_main, PERM_MENU + Ctrl('A'), M_AMENU,
   "系統維護"
+};
+
+
+static MENU menu_system[] =
+{
+  "bin/admutil.so:a_system_setup", PERM_ALLADMIN, - M_XFILES,
+  "Setup      【 控制設定 】",
+                                                                                
+  "bin/admutil.so:a_xfile", PERM_ALLADMIN, - M_XFILES,
+  "Xfile      【 系統檔案 】",
+
+  menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
+  "系統維護" 
 };
 
 
@@ -665,13 +678,13 @@ static MENU menu_tool[];
 static MENU menu_song[] =
 {
   "bin/song.so:XoSongLog", 0, - M_XMODE,
-  "KTV        ♂ 點歌紀錄 ♀",
+  "KTV        【 點歌紀錄 】",
 
   "bin/song.so:XoSongMain", 0, - M_XMODE,
-  "Book       ♂ 唱所欲言 ♀",
+  "Book       【 唱所欲言 】",
 
   "bin/song.so:XoSongSub", 0, - M_XMODE,
-  "Note       ♂ 歌本投稿 ♀",
+  "Note       【 歌本投稿 】",
 
   menu_tool, PERM_MENU + 'K', M_XMENU,
   "玩點歌機"
@@ -708,31 +721,31 @@ static MENU menu_game[];
 static MENU menu_game1[] =
 {
   "bin/liteon.so:main_liteon", 0, - M_GAME,
-  "0LightOn   ♂ 房間開燈 ♀",
+  "0LightOn   【 房間開燈 】",
 
   "bin/guessnum.so:guessNum", 0, - M_GAME,
-  "1GuessNum  ♂ 玩猜數字 ♀",
+  "1GuessNum  【 玩猜數字 】",
 
   "bin/guessnum.so:fightNum", 0, - M_GAME,
-  "2FightNum  ♂ 互猜數字 ♀",
+  "2FightNum  【 互猜數字 】",
 
   "bin/km.so:main_km", 0, - M_GAME,
-  "3KongMing  ♂ 孔明棋譜 ♀",
+  "3KongMing  【 孔明棋譜 】",
 
   "bin/recall.so:main_recall", 0, - M_GAME,
-  "4Recall    ♂ 回憶之卵 ♀",
+  "4Recall    【 回憶之卵 】",
 
   "bin/mine.so:main_mine", 0, - M_GAME,
-  "5Mine      ♂ 亂踩地雷 ♀",
+  "5Mine      【 亂踩地雷 】",
 
   "bin/fantan.so:main_fantan", 0, - M_GAME, 
-  "6Fantan    ♂ 番攤接龍 ♀",
+  "6Fantan    【 番攤接龍 】",
 
   "bin/dragon.so:main_dragon", 0, - M_GAME,
-  "7Dragon    ♂ 接龍遊戲 ♀",
+  "7Dragon    【 接龍遊戲 】",
 
   "bin/nine.so:main_nine", 0, - M_GAME,
-  "8Nine      ♂ 天地九九 ♀",
+  "8Nine      【 天地九九 】",
 
   menu_game, PERM_MENU + '0', M_XMENU,
   "益智空間"
@@ -741,31 +754,31 @@ static MENU menu_game1[] =
 static MENU menu_game2[] =
 {
   "bin/dice.so:main_dice", 0, - M_GAME,
-  "0Dice      ♂ 狂擲骰子 ♀",
+  "0Dice      【 狂擲骰子 】",
 
   "bin/gp.so:main_gp", 0, - M_GAME,
-  "1GoldPoker ♂ 金牌撲克 ♀",
+  "1GoldPoker 【 金牌撲克 】",
 
   "bin/bj.so:main_bj", 0, - M_GAME,
-  "2BlackJack ♂ 二十一點 ♀",
+  "2BlackJack 【 二十一點 】",
 
   "bin/chessmj.so:main_chessmj", 0, - M_GAME,
-  "3ChessMJ   ♂ 象棋麻將 ♀",
+  "3ChessMJ   【 象棋麻將 】",
 
   "bin/seven.so:main_seven", 0, - M_GAME,
-  "4Seven     ♂ 賭城七張 ♀",
+  "4Seven     【 賭城七張 】",
  
   "bin/race.so:main_race", 0, - M_GAME,
-  "5Race      ♂ 進賽馬場 ♀",
+  "5Race      【 進賽馬場 】",
 
   "bin/bingo.so:main_bingo", 0, - M_GAME,
-  "6Bingo     ♂ 賓果大戰 ♀",
+  "6Bingo     【 賓果大戰 】",
 
   "bin/marie.so:main_marie", 0, - M_GAME,
-  "7Marie     ♂ 大小瑪莉 ♀",
+  "7Marie     【 大小瑪莉 】",
 
   "bin/bar.so:main_bar", 0, - M_GAME,
-  "8Bar       ♂ 吧台瑪莉 ♀",
+  "8Bar       【 吧台瑪莉 】",
 
   menu_game, PERM_MENU + '0', M_XMENU,
   "遊戲樂園"
@@ -774,16 +787,16 @@ static MENU menu_game2[] =
 static MENU menu_game3[] =
 {
   "bin/pip.so:main_pip", PERM_BASIC, - M_GAME,
-  "0Chicken   ♂ 電子小雞 ♀",
+  "0Chicken   【 電子小雞 】",
 
   "bin/pushbox.so:main_pushbox", 0, - M_GAME,
-  "1PushBox   ♂ 倉庫番番 ♀",
+  "1PushBox   【 倉庫番番 】",
 
   "bin/tetris.so:main_tetris", 0, - M_GAME,
-  "2Tetris    ♂ 俄羅斯塊 ♀",
+  "2Tetris    【 俄羅斯塊 】",
 
   "bin/gray.so:main_gray", 0, - M_GAME,
-  "3Gray      ♂ 淺灰大戰 ♀",
+  "3Gray      【 淺灰大戰 】",
 
   menu_game, PERM_MENU + '0', M_XMENU,
   "反斗特區"
@@ -814,25 +827,25 @@ static MENU menu_game[] =
 static MENU menu_buy[] =
 {
   "bin/bank.so:x_bank", PERM_BASIC, - M_GAME,
-  "Bank       ♂ 信託銀行 ♀",
+  "Bank       【 信託銀行 】",
 
   "bin/bank.so:b_invis", PERM_BASIC, - M_GAME,
-  "Invis      ♂ 隱形現身 ♀",
+  "Invis      【 隱形現身 】",
 
   "bin/bank.so:b_cloak", PERM_BASIC, - M_GAME,
-  "Cloak      ♂ 無限隱形 ♀",
+  "Cloak      【 無限隱形 】",
 
   "bin/bank.so:b_mbox", PERM_BASIC, - M_GAME,
-  "Mbox       ♂ 信箱無限 ♀",
+  "Mbox       【 信箱無限 】",
 
   "bin/bank.so:b_xempt", PERM_VALID, - M_GAME,
-  "Xempt      ♂ 永久保留 ♀",
+  "Xempt      【 永久保留 】",
   
   "bin/bank.so:b_xvalid", PERM_VALID, - M_GAME,
-  "Valid      ♂ 永免認證 ♀",
+  "Valid      【 永免認證 】",
   
   "bin/bank.so:b_nthu", PERM_VALID, - M_GAME,
-  "Nthu       ♂ 清華成員 ♀",
+  "Nthu       【 清華成員 】",
 /*  
   "bin/bank.so:b_celebrate", PERM_VALID, - M_GAME,
   "Present    ♂ 開站好禮 ♀",
@@ -850,37 +863,37 @@ static MENU menu_buy[] =
 static MENU menu_other[] =
 {
   "bin/vote.so:vote_all", PERM_BASIC, - M_VOTE,	/* itoc.010414: 投票中心 */
-  "VoteAll    ♂ 投票中心 ♀",
+  "VoteAll    【 投票中心 】",
 
 #ifdef HAVE_TIP
   "bin/xyz.so:x_tip", 0, - M_READA,
-  "Tip        ♂ 教學精靈 ♀",
+  "Tip        【 教學精靈 】",
 #endif
 
 #ifdef HAVE_LOVELETTER
   "bin/xyz.so:x_loveletter", 0, - M_READA,
-  "LoveLetter ♂ 情書撰寫 ♀",
+  "LoveLetter 【 情書撰寫 】",
 #endif
 
   "bin/xyz.so:x_password", PERM_VALID, - M_XMODE,
-  "Password   ♂ 忘記密碼 ♀",
+  "Password   【 忘記密碼 】",
 
 #ifdef HAVE_CLASSTABLE
   "bin/classtable.so:main_classtable", PERM_BASIC, - M_XMODE,
-  "ClassTable ♂ 功\課時段 ♀",
+  "ClassTable 【 功\課時段 】",
 #endif
 
 #ifdef HAVE_CREDIT
   "bin/credit.so:main_credit", PERM_BASIC, - M_XMODE,
-  "MoneyNote  ♂ 記帳手札 ♀",
+  "MoneyNote  【 記帳手札 】",
 #endif
 
 #ifdef HAVE_CALENDAR
   "bin/todo.so:main_todo", PERM_BASIC, - M_XMODE,
-  "XTodo      ♂ 個人行程 ♀",
+  "XTodo      【 個人行程 】",
 
   "bin/calendar.so:main_calendar", 0, - M_XMODE,
-  "YCalendar  ♂ 萬年月曆 ♀",
+  "YCalendar  【 萬年月曆 】",
 #endif
 
   menu_tool, PERM_MENU + Ctrl('A'), M_XMENU,	/* itoc.020829: 怕 guest 沒選項 */
@@ -1225,7 +1238,9 @@ default_key:
 
     if (cc != cx)	/* 若游標移動位置 */
     {
-#ifdef CURSOR_BAR
+//#ifdef CURSOR_BAR
+	if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
+	{
       if (cx >= 0)
       {
 	move(MENU_XPOS + cx, MENU_YPOS);
@@ -1233,7 +1248,7 @@ default_key:
 	{
 	  mptr = table[cx];
 	  str = mptr->desc;
-	  prints("  (\033[1;36m%c\033[m)%s ", *str, str + 1);
+	  prints("  (\033[1;36m%c\033[m)%s  ", *str, str + 1);
 	}
 	else
 	{
@@ -1243,9 +1258,12 @@ default_key:
       move(MENU_XPOS + cc, MENU_YPOS);
       mptr = table[cc];
       str = mptr->desc;
-      prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
+      prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
       cx = cc;
-#else		/* 沒有 CURSOR_BAR */
+	}
+//#else		/* 沒有 CURSOR_BAR */
+	else
+	{
       if (cx >= 0)
       {
 	move(MENU_XPOS + cx, MENU_YPOS);
@@ -1254,18 +1272,23 @@ default_key:
       move(MENU_XPOS + cc, MENU_YPOS);
       outc('>');
       cx = cc;
-#endif
+	}
+//#endif
     }
     else		/* 若游標的位置沒有變 */
     {
-#ifdef CURSOR_BAR
+//#ifdef CURSOR_BAR
+	if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
+	{
       move(MENU_XPOS + cc, MENU_YPOS);
       mptr = table[cc];
       str = mptr->desc;
-      prints(COLOR4 "> (%c)%s \033[m", *str, str + 1);
-#else
+      prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+	}
+//#else
+	else
       move(MENU_XPOS + cc, MENU_YPOS + 1);
-#endif
+//#endif
     }
 
 menu_key:

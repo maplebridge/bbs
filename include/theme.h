@@ -23,6 +23,18 @@
 #define COLOR6		"\033[37;44m"	/* more 檔頭的內容顏色 */
 #define COLOR7		"\033[1m"	/* 作者在線上的顏色 */
 
+#define COLORBAR_MENU   "\033[0;30;47m" /*  menu.c 選單光棒 */
+#define	COLORBAR_BRD	"\033[1;41m"	/*  board.c, favor.c 選單光棒 */
+#define COLORBAR_POST	"\033[1;43m"	/*  post.c 選單光棒 */
+#define COLORBAR_GEM	"\033[1;42m"	/*  gem.c  選單光棒 */
+#define COLORBAR_PAL	"\033[1;45m"	/*  pal.c  選單光棒 */
+#define COLORBAR_USR	"\033[1;45m"	/*  ulist.c 選單光棒 */
+#define COLORBAR_BMW	"\033[1;43m"	/*  bmw.c 選單光棒 */
+#define COLORBAR_MAIL	"\033[1;42m"	/*  mail.c 選單光棒 */
+#define COLORBAR_ALOHA	"\033[1;41m"	/*  aloha.c 選單光棒 */
+#define COLORBAR_VOTE	"\033[0;30;43m"	/*  vote.c 選單光棒 */
+#define COLORBAR_NBRD	"\033[1;46m"	/*	newbrd.c 選單光棒 */
+#define COLORBAR_SONG	"\033[1;42m"	/*  song.c 選單光棒 */
 
 /* ----------------------------------------------------- */
 /* 使用者名單顏色					 */
@@ -89,7 +101,7 @@
 			COLOR3 "  編號     主              題%*s                            [編      選] [日  期]\033[m"
 
 #define NECKER_NEWS	"[←]離開 [→]閱\讀 [h]說明\n" \
-			COLOR3 "  編號    日 期 作  者       新  聞  標  題%*s                                   \033[m"
+			COLOR3 "  編號     日 期 作  者       新  聞  標  題%*s                                   \033[m"
 
 #define NECKER_XPOST	"\n" \
 			COLOR3 "  編號    日 期 作  者       文  章  標  題%*s                            評:%s  \033[m"

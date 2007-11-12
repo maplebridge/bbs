@@ -24,15 +24,17 @@
 #define BRD_ANONYMOUS	0x20	/* 匿名看板 */
 #define BRD_NOSCORE	0x40	/* 不評分看板 */
 #define BRD_PUBLIC	0x80	/* 公眾板 */
+#define BRD_NOL		0x00000100	/* 不可鎖文 */
+#define	BRD_SHOWPAL	0x00000200	/* 顯示板友名單 */
 
 /* ----------------------------------------------------- */
 /* 各種旗標的中文意義					 */
 /* ----------------------------------------------------- */
 
 
-#define NUMBATTRS	8
+#define NUMBATTRS	10
 
-#define STR_BATTR	"zTcsvA%P"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
+#define STR_BATTR	"zTcsvA%PLG"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -46,6 +48,8 @@ static char *battr_tbl[NUMBATTRS] =
   "匿名看板",			/* BRD_ANONYMOUS */
   "不評分看板",			/* BRD_NOSCORE */
   "公眾板",			/* BRD_PUBLIC */
+  "不可鎖文",		/* BRD_NOL */
+  "顯示板友名單",	/* BRD_SHOWPAL */
 };
 
 #endif

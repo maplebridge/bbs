@@ -10,6 +10,7 @@
 #include "bbs.h"
 
 
+
 /* #define	VE_WIDTH	(ANSILINELEN - 1) */
 /* Thor.990330: 為防止引言後, ">"要變色, 一行會超過ANSILINELEN, 故多留空間 */
 /* itoc.010317.註解: 那麼實際一列可以放下的有效字數為 VE_WIDTH - 3 */
@@ -60,6 +61,20 @@ char anonymousid[IDLEN + 1];	/* itoc.010717: 自定匿名 ID */
 
 #define	FN_BAK		"bak"
 
+void
+str_lower_edit(dst, src)
+  char *dst, *src;
+{
+  int ch;
+
+  do
+  {
+    ch = *src++;
+    if (ch >= 'A' && ch <= 'Z')
+      ch |= 0x20;
+    *dst++ = ch;
+  } while (ch);
+}
 
 /* ----------------------------------------------------- */
 /* 記憶體管理與編輯處理					 */
@@ -1275,12 +1290,13 @@ quote_check()
 
   if ((quot_line >> 2) <= post_line)   /* 文章行數要多於引言行數四分之一 */
     return 0;
-
-  if (HAS_PERM(PERM_ALLADMIN))
+  else
     return (vans("引言過多 (E)繼續編輯 (W)強制寫入？[E] ") != 'w');
+  //if (HAS_PERM(PERM_ALLADMIN))
+  //  return (vans("引言過多 (E)繼續編輯 (W)強制寫入？[E] ") != 'w');
 
-  vmsg("引言太多，請按 Ctrl+Y 來刪除不必要之引言");
-  return 1;
+  //vmsg("引言太多，請按 Ctrl+Y 來刪除不必要之引言");
+  //return 1;
 }
 
 
@@ -1432,29 +1448,275 @@ ve_header(fp)
 
 
 void
-ve_banner(fp, modify)		/* 加上來源等訊息 */
+ve_banner(fp, modify)       /* 加上來源等訊息 */
   FILE *fp;
-  int modify;			/* 1:修改 0:原文 */
+  int modify;           /* 1:修改 0:原文 */
 {
   /* itoc: 建議 banner 不要超過三行，過長的站簽可能會造成某些使用者的反感 */
 
+
+  FILE *host_personal;
+  char host_personal_path[64];
+  char host_personal_choice_char[3];
+  int  host_personal_choice_int;
+                                                                                
+  FILE *hello;                /* smiler.071030: 使用者想對大家說的話
+                                              以及相關id ip顯示 */
+  char helloworld[38];
+  char user_hello_path[256];
+  char hello_id[40];
+  char hello_ip[42];
+  char hello_hostspace[18];
+  char x_id[40];              /* smiler.071030: 匿名使用者想對大家說的話
+                                              以及相關id ip顯示 */
+  char x_hello[38];
+  char x_ip[42];
+  FILE *f_model;              /* smiler.071030: 站簽娃娃相關顯示 */
+  char model_path[256];
+  char model_type[24];
+                                                                                
+  char m[6][50];
+  char space[50]="                                                  ";
+                //123456789 123456789 123456789 123456789 123456789 //
+
+  char post_userid[13];
+  strncpy(post_userid,space,13);
+  strcpy(post_userid,cuser.userid);
+  post_userid[strlen(cuser.userid)]=' ';
+  post_userid[13]='\0';
+
+  FILE *file_tmp;
+  char buf_tmp[64];
+
+  int i;
+  time_t time_now;
+  int select;
+  int select_devide=1;
+  time(&time_now);
+  struct tm *t = localtime(&time_now);
+
+
+  char userid_tmp[16];
+  str_lower_edit(userid_tmp,cuser.userid);
+
+  host_sight_number=4;  
+  if(host_sight_number)
+  {
+	  sprintf(buf_tmp,"gem/@/@host_%d",host_sight_number-1);
+	  if(file_tmp=fopen(buf_tmp,"r"))
+	  {
+		  fclose(file_tmp);
+		  select_devide=host_sight_number;
+	  }
+  }
+ //select_devide=4;
+  select=(int) (t->tm_sec) % (select_devide);  /* smiler.071030: select witch 站簽 */
+ 
+                                                                                
+                                                                               
+  if(cuser.sex==0)      /* smiler.071030: 由使用者性別設定要load的站簽娃娃 */
+      strcpy(model_type,"model_0");
+  else if(cuser.sex==1)
+      strcpy(model_type,"model_1");
+  else
+      strcpy(model_type,"model_2");
+ 
+  /* 站長指定全站站簽娃選擇 */
+  if(model_select)
+  {
+	  sprintf(buf_tmp,"gem/@/@model_%d",model_select-1);
+	  if(file_tmp=fopen(buf_tmp,"r"))
+	  {
+		  fclose(file_tmp);
+		  sprintf(model_type,"model_%d",model_select-1);
+	  }
+  } 
+  
+  /* load 站簽娃娃 */
+  sprintf(model_path,"gem/@/@%s",model_type);
+  if(f_model = fopen(model_path,"r"))
+  {
+    for(i=0;i<=5;i++)
+        fgets(m[i],50,f_model);
+	fclose(f_model);
+  }
+  else
+  {
+	  for(i=0;i<=5;i++)
+		strcpy(m[i],"\n");
+  }
+   
+  /* 處理站址長度 */
+  if(strlen(MYHOSTNAME) < 18)
+    strncpy(hello_hostspace,space,18-strlen(MYHOSTNAME));
+  else if(strlen(MYHOSTNAME) == 18)
+	  hello_hostspace[0]='\0';
+  else
+  {
+	  select=0; /* 若站址的長度超過,將不使用個人化站簽功能 */
+      hello_hostspace[0]='\0';
+  }
+
+
+  /* 處理使用者"想對大家說的話"相關顯示 */
+  sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
+  if(hello = fopen(user_hello_path,"r"))
+  {
+      fgets(helloworld,38,hello);
+	  fclose(hello);
+  }
+  else
+      strcpy(helloworld,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+
+  if(strlen(helloworld)<37)
+  {
+      strncpy(helloworld+strlen(helloworld),space,37-strlen(helloworld));
+      helloworld[37]='\0';
+  }
+                                                                                
+  /* 處理站簽個人化的使用者名言該行顯示  */
+  sprintf(hello_id,"%s的名言:",cuser.userid);
+  if(strlen(hello_id)<40)
+  {
+      strncpy(hello_id+strlen(hello_id),space,40-strlen(hello_id));
+      hello_id[40]='\0';
+  }
+                                                                                
+  /* 處理使用者ip顯示 */
+  strcpy(hello_ip,fromhost);
+  if(strlen(hello_ip)<42)
+  {
+      strncpy(hello_ip+strlen(hello_ip),space,42-strlen(hello_ip));
+      hello_ip[42]='\0';
+  }
+                                                                                
+  /* 處理匿名使用者站簽個人化的顯示 */
+  strcpy(x_id,STR_ANONYMOUS);
+  strncpy(x_id+strlen(x_id),space,40-strlen(x_id));
+  x_id[40]='\0';
+                                                                                
+  strcpy(x_hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+  strncpy(x_hello+strlen(x_hello),space,37-strlen(x_hello));
+  x_hello[37]='\0';
+                                                                                
+  strcpy(x_ip,"遙遠的那美克星");
+  strncpy(x_ip+strlen(x_ip),space,42-strlen(x_ip));
+  x_ip[42]='\0';
+
+  sprintf(host_personal_path,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+  host_personal=fopen(host_personal_path,"r");
+  if(host_personal)
+  {
+	  fgets(host_personal_choice_char,3,host_personal);
+	  fclose(host_personal);
+  }
+
+
+  host_personal_choice_int=atoi(host_personal_choice_char);
+  if(host_personal_choice_int != 0)
+  {
+	  if(host_personal_choice_int >0 && host_personal_choice_int <=host_sight_number)
+		  select=host_personal_choice_int-1;
+  }
+  
+
+  /* 站長指定全站站簽選擇 */
+  if(host_sight_select)
+  {
+	  sprintf(buf_tmp,"gem/@/@host_%d",host_sight_select-1);
+	  if(file_tmp=fopen(buf_tmp,"r"))
+	  {
+		  fclose(file_tmp);
+		  select=host_sight_select-1;
+	  }
+  }
+
   if (!modify)
   {
-    fprintf(fp, EDIT_BANNER, 
+    if(select==0)
+    {
+    fprintf(fp, EDIT_BANNER,
 #ifdef HAVE_ANONYMOUS
-      (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
+           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
 #endif
-      cuser.userid, 
+           cuser.userid,
 #ifdef HAVE_ANONYMOUS
-      (curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" : 
+           (curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
 #endif
-      fromhost);
+          fromhost);
+    }
+    else if(select==1)
+    {
+        fprintf(fp,"\033[m\n--\n\033[0m\033[47m      \033[31m◢\033[37m     \033[32;4m清大資工˙楓橋驛站\033[0;32;47m \033[4mtelnet://"MYHOSTNAME"\033[m\033[0;47m%s |\033[0m%s\033[0m\033[47m  \033[31;41;1m╲\033[0;41m    \033[47m      \033[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[37m  |\033[0m%s\033[0m\033[47m  \033[31;41;1m  ╲╱  \033[0;41m◢\033[47m \033[40m▌  \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[31;47m◢\033[41;1m  ─╲\033[0;41m◢\033[47m   \033[40m▌     \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[47m    \033[31;41;1m  \033[0;41m◢\033[31;47;1m╲\033[0;47m    \033[40m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[47m  |\033[0m%s\033[0m\033[47m    \033[31m◤\033[37m    \033[31;1m╲\033[0;47m \033[32mFrom:%s\033[37m|\033[0m%s",hello_hostspace,m[0],m[1],
+//      fprintf(fp,"\033[m\n--\n\033[0m\033[47m      \033[31m◢\033[37m     \033[32;4m清大資工˙楓橋驛站\033[0;32;47m \033[4mtelnet://bbs.cs.nthu.edu.tw\033[0;47m |\033[0m%s\033[0m\033[47m  \033[31;41;1m╲\033[0;41m    \033[47m      \033[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[37m  |\033[0m%s\033[0m\033[47m  \033[31;41;1m  ╲╱  \033[0;41m◢\033[47m \033[40m▌  \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[31;47m◢\033[41;1m  ─╲\033[0;41m◢\033[47m   \033[40m▌     \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[47m    \033[31;41;1m  \033[0;41m◢\033[31;47;1m╲\033[0;47m    \033[40m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[47m  |\033[0m%s\033[0m\033[47m    \033[31m◤\033[37m    \033[31;1m╲\033[0;47m \033[32mFrom:%s\033[37m|\033[0m%s\n",m[0],m[1],
+#ifdef HAVE_ANONYMOUS
+        (curredit & EDIT_ANONYMOUS) ? x_id :
+      //(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
+#endif
+      hello_id,m[2],
+#ifdef HAVE_ANONYMOUS
+        (curredit & EDIT_ANONYMOUS) ? x_hello :
+#endif
+      helloworld,m[3],m[4],
+#ifdef HAVE_ANONYMOUS
+        (curredit & EDIT_ANONYMOUS) ? x_ip :
+      //(curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
+#endif
+      hello_ip,m[5]);
+    }
+    else if(select==2)
+    {
+    fprintf(fp,
+"\033[m\n--\n"
+"\033[1;30m成功\湖畔..\033[m      \033[1;5;37m☆\033[m       \033[1;33m●\033[37m ▃▅▂    \033[5m☆\033[m                \033[1;30m▂▄▅▆▄▂   \033[;31m▁▁\033[37m\n"
+"   \033[1;30m楓橋夜泊..\033[m     \033[1;5;37m☆\033[m    \033[30;47m▆▄▅▆\033[m           ○   \033[31m◢▇◣\033[37m  \033[30;47m▆▆▄▃▅▆\033[m \033[30;41m▉\033[1;31;40m楓橋\033[;31m▏\033[37m\n"
+"                                            ▽  │  │               \033[30;41m▉\033[1;31;40m驛站\033[;31m▏\033[37m\n"
+"                 \033[34m＿ˍ▁▂▃▂▁ˍ＿\033[37m     ╰─ㄍ─┴─┴╯   \033[1;34mˍ▂▁\033[m      \033[30;41m▇▇\033[m\n"
+"\033[1;34m遊客：\033[37m %s   \033[m\033[1;36m＿ˍ▁ˍ＿\033[m \033[1;36m＿ˍ▁\033[34m▃\033[m ────╯\033[1;34m▃▂\033[36m▁ˍ＿\033[34m ˍ▁▂▁ˍ\033[m\n"
+"\033[1;36m故鄉：\033[37m %s                        \033[m\n"
+"\033[32m☆ 清華資工 - 楓橋驛站 ☆\033[37m \033[33m系統穩定、可申請個人板\033[37m telnet://bbs.cs.nthu.edu.tw    \033[m"
+#if 0
+"\033[m\n--\n"
+"\033[1;30m成功\湖畔..\033[m      \033[1;5;37m☆\033[m       \033[1;33m●\033[37m ▃▅▂    \033[5m☆\033[m                \033[1;30m▂▄▅▆▄▂   \033[;31m▁▁\033[37m\n"
+"   \033[1;30m楓橋夜泊..\033[m     \033[1;5;37m☆\033[m    \033[30;47m▆▄▅▆\033[m           ○   \033[31m◢▇◣\033[37m  \033[30;47m▆▆▄▃▅▆\033[m \033[30;41m▉\033[1;31;40m楓橋\033[;31m▏\033[37m\n"
+"                                            ▽  │  │               \033[30;41m▉\033[1;31;40m驛站\033[;31m▏\033[37m\n"
+"                 \033[34m＿ˍ▁▂▃▂▁ˍ＿\033[37m     ╰─ㄍ─┴─┴╯   \033[1;34mˍ▂▁\033[m      \033[30;41m▇▇\033[m\n"
+"\033[1;34m遊客：\033[37m ID   \033[m            \033[1;36m＿ˍ▁ˍ＿\033[m \033[1;36m＿ˍ▁\033[34m▃\033[m ────╯\033[1;34m▃▂\033[36m▁ˍ＿\033[34m ˍ▁▂▁ˍ\033[m\n"
+"\033[1;36m故鄉：\033[37m IP                        \033[m\n"
+"\033[32m☆ 清華資工 - 楓橋驛站 ☆\033[37m \033[33m系統穩定、可申請個人板\033[37m telnet://bbs.cs.nthu.edu.tw\033[m"
+#endif
+		,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
+#endif
+           post_userid,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
+#endif
+          fromhost);
+    }
+	else if(select==3)
+	{
+    fprintf(fp,
+"\033[m\n--\n"
+"\033[41m▂\033[31;40m◣ ▁▁\033[37m\n"
+"\033[31m▄▌\033[30;41m▊\033[40m \033[1;33;43m楓\033[40m     \033[m楓橋驛站<bbs.cs.nthu.edu.tw>\n"
+"\033[31m▃▌\033[30;41m▊\033[40m  \033[1;33;43m橋\033[40m    \033[m來自： %s\n"
+"\033[30;47m▇\033[31;40m▌\033[30;41m▊\033[40m \033[33m╰\033[30;43m▆\033[m"
+		,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
+#endif
+          fromhost);
+	}
+
   }
   else
   {
     fprintf(fp, MODIFY_BANNER, cuser.userid, fromhost, Now());
   }
 }
+
 
 
 static int

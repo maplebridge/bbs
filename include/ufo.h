@@ -44,7 +44,7 @@
 #define UFO_ZHC		BFLAG(18)	/* hightman.060504: 全型字偵測 */
 #define UFO_JUMPBRD	BFLAG(19)	/* itoc.020122: 自動跳去下一個未讀看板 */
 #define UFO_TIMEKICKER	BFLAG(20)	/* smiler.070724: TIME_KICKER */
-#define UFO_NOUSE21	BFLAG(21)
+#define UFO_LIGHTBAR  BFLAG(21)       /* 整行光棒 */
 #define UFO_NOUSE22	BFLAG(22)
 #define UFO_NOUSE23	BFLAG(23)
 
@@ -59,8 +59,8 @@
 
 /* 新註冊帳號、guest 的預設 ufo */
 
-#define UFO_DEFAULT_NEW		(UFO_BRDNOTE | UFO_MOTD | UFO_BMWDISPLAY | UFO_NWLOG | UFO_NOSIGN)
-#define UFO_DEFAULT_GUEST	(UFO_MOVIE | UFO_BRDNOTE | UFO_QUIET | UFO_NOALOHA | UFO_NWLOG | UFO_NTLOG | UFO_NOSIGN)
+#define UFO_DEFAULT_NEW		(UFO_BRDNOTE | UFO_MOTD | UFO_BMWDISPLAY | UFO_NWLOG | UFO_NOSIGN | UFO_LIGHTBAR)
+#define UFO_DEFAULT_GUEST	(UFO_MOVIE | UFO_BRDNOTE | UFO_QUIET | UFO_NOALOHA | UFO_NWLOG | UFO_NTLOG | UFO_NOSIGN | UFO_LIGHTBAR)
 
 
 /* ----------------------------------------------------- */
@@ -92,9 +92,9 @@
 
 #define NUMUFOS		27
 #define NUMUFOS_GUEST	5	/* guest 可以用前 5 個 ufo */
-#define NUMUFOS_USER	21	/* 一般使用者 可以用前 21 個 ufo */
+#define NUMUFOS_USER	22	/* 一般使用者 可以用前 22 個 ufo */
 
-#define STR_UFO		"-mpsnemPBQFANbwtSHZJT---CHA"		/* itoc: 新增習慣的時候別忘了改這裡啊 */
+#define STR_UFO		"-mpsnemPBQFANbwtSHZJTL--CHA"		/* itoc: 新增習慣的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -155,7 +155,13 @@ char *ufo_tbl[NUMUFOS] =
 #endif
 
   "IDLE過久自動離站(選擇/不用)",	/*  UFO_TIMEKICKER */ /* smiler.070724 */
+
+#ifdef HAVE_LIGHTBAR
+  "整行光棒        (光棒/普通)",        /* UFO_LIGHTBAR */
+#else
   "保留",
+#endif
+
   "保留",
   "保留",
 

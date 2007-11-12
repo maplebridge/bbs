@@ -615,24 +615,25 @@ x_file(mode, xlist, flist)
   while (desc = xlist[n])
   {
     n++;
-    if (n <= 9)			/* itoc.020123: 分二欄，一欄九個 */
+    if (n <= 18)			/* itoc.020123: 分二欄，一欄十八個 */
     {
-      move(n + MENU_XPOS - 1, 0);
+      move(n + 1 - 1, 0);
+      //prints("\033[m  (%d)",n);         /* smiler.071112: 修正note色碼多出來 */
       clrtoeol();
-      move(n + MENU_XPOS - 1, 2);
+      //move(n + 1 - 1, 2);
     }
     else
     {
-      move(n + MENU_XPOS - 10, 40);
+      move(n + 1 - 19, 40);
     }
-    prints("(%d) %s", n, desc);
+    prints("\033[m  (%d) %s", n, desc);
 
     if (mode == M_XFILES)	/* Thor.980806.註解: 印出檔名 */
     {
-      if (n <= 9)
-	move(n + MENU_XPOS - 1, 22);
+      if (n <= 18)
+	move(n + 1 - 1, 22);
       else
-	move(n + MENU_XPOS - 10, 62);
+	move(n + 1 - 19, 62);
       outs(flist[n - 1]);
     }
   }

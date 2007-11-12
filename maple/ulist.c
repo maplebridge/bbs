@@ -143,7 +143,7 @@ ulist_item(num, up, slot, now, sysop)
 {
   time_t diff, ftype;
   int userno, ufo;
-  char pager, buf[15], *fcolor;
+  char pager, buf[64], *fcolor;
 
   if (!(userno = up->userno))
   {
@@ -154,7 +154,7 @@ ulist_item(num, up, slot, now, sysop)
   /* itoc.011022: 若生日當天上站，借用 idle 欄位來放壽星 */
   if (up->status & STATUS_BIRTHDAY)
   {
-    strcpy(buf, "\033[1;31m壽星\033[m");
+    strcpy(buf, "\033[1;31m 壽星 \033[m");
   }
   else
   {
@@ -232,6 +232,113 @@ ulist_item(num, up, slot, now, sysop)
 #endif
     up->from : "*", bmode(up, 0), buf);
 }
+
+#ifdef HAVE_LIGHTBAR
+static void
+ulist_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+  time_t diff, ftype;
+  int userno, ufo;
+  char pager, buf[64], *fcolor;
+  UTMP *up;
+                                                                                
+  up = ulist_pool[xo->pos];
+                                                                                
+  if (!(userno = up->userno))
+  {
+    outs("      < 此位網友正巧離開 >\n");
+    return;
+  }
+                                                                                
+  /* itoc.011022: 若生日當天上站，借用 idle 欄位來放壽星 */
+  if (up->status & STATUS_BIRTHDAY)
+  {
+    strcpy(buf, "\033[1;31m 壽星 \033[m");
+  }
+  else
+  {
+#ifdef DETAIL_IDLETIME
+    if ((diff = time(NULL) - up->idle_time) >= 60)   /* 超過 60 秒才算閒置 */
+      sprintf(buf, "%3d'%02d", diff / 60, diff % 60);
+#else
+    if (diff = up->idle_time)
+      sprintf(buf, "%2d", diff);
+#endif
+    else
+      buf[0] = '\0';
+  }
+                                                                                
+  ufo = up->ufo;
+                                                                                
+  /*         pager 狀態                       */
+  /*  #：不接受任何人呼叫，也不接受任何人廣播 */
+  /*  *：只接受好友呼叫，且只接受好友廣播     */
+  /*  !：只接受好友呼叫，但不接受任何人廣播   */
+  /*  -：接受任何人呼叫，但不接受任何人廣播   */
+  /*   ：都沒有就是沒有限制啦                 */
+  if (ufo & UFO_QUIET)
+  {
+    pager = '#';
+  }
+  else if (ufo & UFO_PAGER)
+  {
+#ifdef HAVE_NOBROAD
+    if (ufo & UFO_RCVER)
+      pager = '!';
+    else
+#endif
+      pager = '*';
+  }
+#ifdef HAVE_NOBROAD
+  else if (ufo & UFO_RCVER)
+  {
+    pager = '-';
+  }
+#endif
+  else
+  {
+    pager = ' ';
+  }
+  ftype = ulist_ftype[up - ushm->uslot];
+                                                                                
+  fcolor =
+#ifdef HAVE_BRDMATE
+# ifdef HAVE_ANONYMOUS
+    up->mode == M_READA && !(currbattr & BRD_ANONYMOUS) &&
+      !strcmp(currboard, up->reading) ? COLOR_BRDMATE :
+# else
+    up->mode == M_READA && !strcmp(currboard, up->reading) ? COLOR_BRDMATE :
+#  endif
+#endif
+    ftype & FTYPE_NORMAL ? COLOR_NORMAL :
+    ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD :
+    ftype & FTYPE_MYGOOD ? COLOR_MYGOOD :
+    ftype & FTYPE_OGOOD ? COLOR_OGOOD :
+    ftype & FTYPE_SELF ? COLOR_SELF :
+    ftype & FTYPE_MYBAD ? COLOR_MYBAD :
+    "";
+                                                                                
+  prints("%s%6d%c%c%s%-13s%-*.*s\033[m%s%-*.*s%-11.10s%6s%s",
+    mode ? COLORBAR_USR : "",
+    xo->pos + 1, ufo & UFO_CLOAK ? ')' : ' ', pager,
+    fcolor, up->userid,
+    (d_cols >> 1) + 21, (d_cols >> 1) + 20, up->username,
+    mode ? COLORBAR_USR : "",
+    d_cols - (d_cols >> 1) + 19, d_cols - (d_cols >> 1) + 18,
+    pickup_ship ? pal_ship(ftype, up->userno) :
+#ifdef GUEST_WHERE
+    (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
+      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD) || !up->userlevel) ?
+#else
+    (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
+      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD)) ?
+#endif
+    up->from : "*", bmode(up, 0), buf,
+    mode ? "\033[m" : "");
+}
+#endif
 
 
 static int
@@ -1018,6 +1125,9 @@ ulist_help(xo)
 
 static KeyFunc ulist_cb[] =
 {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, ulist_item_bar,
+#endif
   XO_INIT, ulist_init,
   XO_LOAD, ulist_body,
   XO_HEAD, ulist_head,

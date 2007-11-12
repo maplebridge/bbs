@@ -64,6 +64,27 @@ vote_item(num, vch)
     vch->cdate, vch->owner, vch->title);
 }
 
+#ifdef HAVE_LIGHTBAR
+static int
+vote_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+  VCH *vch;
+                                                                                
+  vch = (VCH *) xo_pool + xo->pos - xo->top;
+                                                                                
+  prints("%s%6d%c%c%c%c %-9.8s%-12s %-45.45s%s",
+    mode ? COLORBAR_VOTE : "",         //這裡是光棒的顏色，可以自己改
+    xo->pos + 1, tag_char(vch->chrono),
+    vch->vsort, vch->vpercent, vch->vprivate,
+    vch->cdate, vch->owner, vch->title,
+    mode ? "\033[m" : "");
+                                                                                
+  return XO_NONE;
+}
+#endif
+
 
 static int
 vote_body(xo)
@@ -1172,6 +1193,9 @@ vote_help(xo)
 
 static KeyFunc vote_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, vote_item_bar,
+#endif
   XO_INIT, vote_init,
   XO_LOAD, vote_load,
   XO_HEAD, vote_head,

@@ -53,6 +53,31 @@ extern time_t mode_lastchange;
 
 int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
 
+
+/* ----------------------------------------------------- */
+/*                     load .USR                         */
+/* ----------------------------------------------------- */
+/* smiler.071110: load .USR 進來 */
+void
+setuploader()
+{
+	FILE *fp;
+	char file_space[64];
+	sprintf(file_space,".SET");
+	if(fp=fopen(file_space,"r"))
+    {
+       fscanf(fp,"%d",&host_sight_number);
+       fscanf(fp,"%d",&host_sight_select);
+       fscanf(fp,"%d",&model_number);
+       fscanf(fp,"%d",&model_select);          
+       fscanf(fp,"%d",&editlog_use);
+       fscanf(fp,"%d",&deletelog_use);
+       fscanf(fp,"%d",&mail_to_newone);
+	   fclose(fp);
+	}
+
+}
+
 /* ----------------------------------------------------- */
 /* ip to string 程式					 */
 /* ----------------------------------------------------- */
@@ -157,6 +182,7 @@ u_exit(mode)
 	if (diff > 0)
 	{
 	  cuser.numlogins++;	/* Thor.980727.註解: 在站上未超過一分鐘不予計算次數 */
+
 	  addmoney(diff);	/* itoc.010805: 上站一分鐘加一元 */
 	  cuser.staytime+=diff;	/* songsongboy.070404: 紀錄總上站時間 */
 	}
@@ -948,6 +974,29 @@ login_other()
   ve_recover();				/* 上次斷線，編輯器回存 */
 }
 
+/* smiler.071111: 站務寄信給使用者 */
+static void
+board_mail_to_user()
+{
+  HDR hdr;
+  char fpath_mail[80];
+
+  if(mail_to_newone)
+  {
+	  if(cuser.numlogins==15)         //在此設定權限
+	  {
+         usr_fpath(fpath_mail, cuser.userid, FN_DIR);
+         if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
+		 { 
+            strcpy(hdr.title, "楓橋站務寄給您的情書");
+            strcpy(hdr.owner, STR_SYSOP);
+            hdr.xmode = MAIL_NOREPLY;
+            rec_add(fpath_mail, &hdr, sizeof(HDR));
+            cutmp->status |= STATUS_BIFF;
+		 }
+	  }
+  }
+}
 
 static void
 tn_login()
@@ -1002,6 +1051,11 @@ tn_login()
     /* ------------------------------------------------- */
 
     login_status(multi);
+
+	/*  ------------------------------------------------ */
+	/*  smiler.071111: 站務寄信給使用者 */	  
+	/*  ------------------------------------------------ */
+    board_mail_to_user();
 
     /* ------------------------------------------------- */
     /* 秀些資訊						 */
@@ -1539,6 +1593,8 @@ main(argc, argv)
   totaluser = &ushm->count;
   /* avgload = &ushm->avgload; */
 
+
+
   for (;;)
   {
     value = 1;
@@ -1555,6 +1611,12 @@ main(argc, argv)
 
     ap_start++;
     argc = *totaluser;
+
+    //if(argc<=1)
+    if(argc>0)
+	{
+      setuploader();
+	}
 
 	/* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
 	if (ChangeLoging==1)

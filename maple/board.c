@@ -1269,6 +1269,7 @@ btime_refresh(brd)
     int fd, fsize;
     char folder[64];
     struct stat st;
+    time_t maxchrono;
 
     brd->btime = 1;
     brd_fpath(folder, brd->brdname, fn_dir);
@@ -1281,14 +1282,17 @@ btime_refresh(brd)
 
 	brd->bpost = fsize / sizeof(HDR);
 	/* itoc.020829: 找最後一篇未被加密、不是置底的 HDR */
-	while ((fsize -= sizeof(HDR)) >= 0)
+    maxchrono = 0;
+    while (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
 	{
-	  lseek(fd, fsize, SEEK_SET);
-	  read(fd, &hdr, sizeof(HDR));
 	  if (!(hdr.xmode & (POST_RESTRICT | POST_BOTTOM)))
-	    break;
+      {
+         maxchrono = BMAX(maxchrono, hdr.chrono);
+         maxchrono = BMAX(maxchrono, hdr.stamp);
+      }
+
 	}
-	brd->blast = hdr.chrono;
+	brd->blast = maxchrono;
 #else
 	brd->bpost = fsize / sizeof(HDR);
 	lseek(fd, fsize - sizeof(HDR), SEEK_SET);
@@ -1498,6 +1502,296 @@ class_mf_item(num, bno, brdpost)
   prints("%.*s\n",d_cols - (d_cols >> 1) + 12, brd->BM);
 
 }
+
+
+#ifdef HAVE_LIGHTBAR
+#ifdef MY_FAVORITE
+void
+#else
+static void
+#endif
+class_item_bar(brd, bno, chn, brdpost ,pbno)
+  BRD *brd;
+  int bno, chn, brdpost, pbno;
+{
+  int num;
+  char *str1, *str2, *str3, token, buf[16];
+  char tmp_bm[12];
+  char tmp_space[13]="             ";
+
+
+  btime_refresh(brd);
+                                                                                
+  /* 處理 編號/篇數 */
+  num = brdpost ? brd->bpost : bno;
+                                                                                
+  /* 處理 zap/friend/secret 板的符號 */
+  if (brd_bits[chn] & BRD_Z_BIT)
+    token = TOKEN_ZAP_BRD;
+  else if (brd->readlevel == PERM_SYSOP)
+    token = TOKEN_SECRET_BRD;
+  else if (brd->readlevel == PERM_BOARD)
+    token = TOKEN_FRIEND_BRD;
+  else
+    token = ' ';
+
+
+  /* 處理 已讀/未讀 */
+#ifdef ENHANCED_VISIT
+  /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
+  brh_get(brd->bstamp, chn);
+  str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#else
+  str1 = brd->blast > brd_visit[chn] ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#endif
+
+  /* 處理 投票/轉信 */
+  if (brd->bvote)
+    str2 = (brd->bvote > 0) ? ICON_VOTED_BRD : ICON_GAMBLED_BRD;
+  else
+    str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
+
+  /* 處理 人氣 */
+  bno = bshm->mantime[bno];
+  bno = pbno;
+  if (bno > 99)
+    str3 = "\033[1;31m爆\033[m";
+  else if (bno > 0)
+    sprintf(str3 = buf, "%2d", bno);
+  else
+    str3 = "  ";
+
+
+    /*smiler.070724: 看板配色,人氣 */
+    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD"%-13s",num, token, str1, brd->brdname);
+
+    if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
+        prints("\033[1;31m");
+    else if(strcmp(brd->class,"地方")==0 || strcmp(brd->class,"體育")==0)
+        prints("\033[1;32m");
+    else if(strcmp(brd->class,"個人")==0)
+        prints("\033[1;33m");
+    else if(strcmp(brd->class,"清華")==0 || strcmp(brd->class,"資訊")==0 || strcmp(brd->class,"校隊")==0)
+        prints("\033[1;34m");
+    else if(strcmp(brd->class,"Comp")==0 || strcmp(brd->class,"電腦")==0)
+        prints("\033[1;36m");
+    else if(strcmp(brd->class,"社團")==0)
+	    prints("\033[33m");
+    else if(strcmp(brd->class,"嗜好")==0)
+        prints("\033[35m");
+    else
+        prints("\033[1;3%dm",brd->class[3] & 7);
+    prints("%-5s\033[m"COLORBAR_BRD"%s%s ",brd->class,str2,COLORBAR_BRD);
+
+
+  /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
+  str1 = brd->title;
+  num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
+  prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
+  /* smiler.070724: 獨立處理看板人氣 */
+  prints(COLORBAR_BRD);
+  if(bno>60)
+      prints("\033[1;35m爆了\033[m"COLORBAR_BRD" ");
+  else if(bno>40)
+      prints("\033[1;31m熱門\033[m"COLORBAR_BRD" ");
+  else if(bno>20)
+      prints("\033[1;33m有勁\033[m"COLORBAR_BRD" ");
+  else if(bno>10)
+      prints("\033[1;31m%4d\033[m"COLORBAR_BRD" ", bno);
+  else if(bno>5)
+      prints("\033[1;33m%4d\033[m"COLORBAR_BRD" ", bno);
+  else if(bno>0)
+      prints("%4d ", bno);
+  else
+      prints("     ");
+
+  if(strlen(brd->BM)<12)
+  {
+  strncpy(tmp_bm,tmp_space,12-strlen(brd->BM));
+  tmp_bm[12-strlen(brd->BM)]='\0';
+  }
+  else
+	  tmp_bm[0]='\0';
+
+  prints(COLORBAR_BRD);
+  prints("%.*s",d_cols - (d_cols >> 1) + 12, brd->BM);
+  prints("%s\033[m",tmp_bm);
+
+}
+                                                                                
+
+#ifdef MY_FAVORITE
+void
+#else
+static void
+#endif
+class_mf_item_bar(brd, bno, chn, brdpost, pbno)
+  BRD *brd;
+  int bno, chn, brdpost, pbno;
+{
+  int num;
+  char *str1, *str2, *str3, token, buf[16];
+  char tmp_bm[12];
+  char tmp_space[13]="             ";
+
+
+  btime_refresh(brd);
+                                                                                
+  /* 處理 編號/篇數 */
+  num = brdpost ? brd->bpost : bno;
+                                                                                
+  /* 處理 zap/friend/secret 板的符號 */
+  if (brd_bits[chn] & BRD_Z_BIT)
+    token = TOKEN_ZAP_BRD;
+  else if (brd->readlevel == PERM_SYSOP)
+    token = TOKEN_SECRET_BRD;
+  else if (brd->readlevel == PERM_BOARD)
+    token = TOKEN_FRIEND_BRD;
+  else
+    token = ' ';
+
+
+  /* 處理 已讀/未讀 */
+#ifdef ENHANCED_VISIT
+  /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
+  brh_get(brd->bstamp, chn);
+  str1 = brh_unread(brd->blast) ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#else
+  str1 = brd->blast > brd_visit[chn] ? ICON_UNREAD_BRD : ICON_READ_BRD;
+#endif
+
+  /* 處理 投票/轉信 */
+  if (brd->bvote)
+    str2 = (brd->bvote > 0) ? ICON_VOTED_BRD : ICON_GAMBLED_BRD;
+  else
+    str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
+
+  /* 處理 人氣 */
+  bno = bshm->mantime[bno];
+  bno = pbno;
+  if (bno > 99)
+    str3 = "\033[1;31m爆\033[m";
+  else if (bno > 0)
+    sprintf(str3 = buf, "%2d", bno);
+  else
+    str3 = "  ";
+
+
+    /*smiler.070724: 看板配色,人氣 */
+    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD"\033[1;36m%-13s\033[m"COLORBAR_BRD,num, token, str1, brd->brdname);
+
+    if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
+        prints("\033[1;31m");
+    else if(strcmp(brd->class,"地方")==0 || strcmp(brd->class,"體育")==0)
+        prints("\033[1;32m");
+    else if(strcmp(brd->class,"個人")==0)
+        prints("\033[1;33m");
+    else if(strcmp(brd->class,"清華")==0 || strcmp(brd->class,"資訊")==0 || strcmp(brd->class,"校隊")==0)
+        prints("\033[1;34m");
+    else if(strcmp(brd->class,"Comp")==0 || strcmp(brd->class,"電腦")==0)
+        prints("\033[1;36m");
+    else if(strcmp(brd->class,"社團")==0)
+	    prints("\033[33m");
+    else if(strcmp(brd->class,"嗜好")==0)
+        prints("\033[35m");
+    else
+        prints("\033[1;3%dm",brd->class[3] & 7);
+    prints("%-5s\033[m"COLORBAR_BRD"%s%s ",brd->class,str2,COLORBAR_BRD);
+
+
+  /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
+  str1 = brd->title;
+  num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
+  prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
+  /* smiler.070724: 獨立處理看板人氣 */
+  prints(COLORBAR_BRD);
+  if(bno>60)
+      prints("\033[1;35m爆了\033[m"COLORBAR_BRD" ");
+  else if(bno>40)
+      prints("\033[1;31m熱門\033[m"COLORBAR_BRD" ");
+  else if(bno>20)
+      prints("\033[1;33m有勁\033[m"COLORBAR_BRD" ");
+  else if(bno>10)
+      prints("\033[1;31m%4d\033[m"COLORBAR_BRD" ", bno);
+  else if(bno>5)
+      prints("\033[1;33m%4d\033[m"COLORBAR_BRD" ", bno);
+  else if(bno>0)
+      prints("%4d ", bno);
+  else
+      prints("     ");
+
+  if(strlen(brd->BM)<12)
+  {
+  strncpy(tmp_bm,tmp_space,12-strlen(brd->BM));
+  tmp_bm[12-strlen(brd->BM)]='\0';
+  }
+  else
+	  tmp_bm[0]='\0';
+
+  prints(COLORBAR_BRD);
+  prints("%.*s",d_cols - (d_cols >> 1) + 12, brd->BM);
+  prints("%s\033[m",tmp_bm);
+
+}
+
+                                                                                
+static int
+class_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  short *chp;
+  BRD *brd;
+  int chn, cnt, brdpost;
+
+  int pbno;  //smiler 1107
+                                                                                
+  cnt = xo->pos + 1;
+  chp = (short *) xo->xyz + xo->pos;
+  chn = *chp;
+  brd = bshm->bcache + chn;
+  brdpost = class_flag & UFO_BRDPOST;
+
+
+
+  if (chn >= 0)         /* 一般看板 */
+  {
+    pbno = bshm->mantime[chn]; //smiler 1107
+    if (mode)
+	{
+		if(in_favor(brd->brdname))
+			class_mf_item_bar(brd, cnt, chn, brdpost ,pbno);  //smiler 1107
+		else
+            class_item_bar(brd, cnt, chn, brdpost ,pbno);  //smiler 1107
+	}
+    else
+	{
+		if(in_favor(brd->brdname))
+			class_mf_item(cnt, chn, brdpost);
+		else
+            class_item(cnt, chn, brdpost);
+	}
+  }
+  else
+  {
+    short *chx;
+    char *img, *str;
+                                                                                
+    img = class_img;
+    chx = (short *) img + (CH_END - chn);
+    str = img + *chx;
+    prints("%s%6d%c  %-13.13s\033[33m%5.5s\033[37m%-51s%s",
+      mode ? COLORBAR_BRD : "",
+      cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
+      str, str + BNLEN + 1, str + BNLEN + 1 + BCLEN + 1,
+      mode ? "\033[m" : "");
+  }
+                                                                                
+   return XO_NONE;
+}
+#endif
+
+
 
 static int
 class_body(xo)
@@ -2209,6 +2503,12 @@ class_addMF(xo)
     strncpy(mf.class, str + BNLEN + 1, BCLEN);
     strcpy(mf.title, str + BNLEN + 1 + BCLEN + 1);
 
+    if(!strcmp(mf.xname,"HOT"))
+	{
+		vmsg("熱門分類看板不可加入我的最愛");  /* smiler.071111 */
+		return XO_NONE;
+	}
+
     mf_fpath(fpath, cuser.userid, FN_MF);
     rec_add(fpath, &mf, sizeof(MF));
     vmsg("已將此分類加入我的最愛");
@@ -2366,6 +2666,9 @@ XoAuthor(xo)
 
 static KeyFunc class_cb[] =
 {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, class_bar,
+#endif
   XO_INIT, class_head,
   XO_LOAD, class_body,
   XO_HEAD, class_head,

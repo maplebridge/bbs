@@ -198,6 +198,7 @@ bmw_display(max)	/* itoc.010313: display 玡瞴 */
   move(1, 0);
   clrtoeol();
   outs("\033[1;36m\033[37;44m [Ctrl-T]┕ち传 \033[36;40mⅰ\033[m");
+//  outs("\033[1;36m\033[37;44m   [◆]  ┕ち传 \033[36;40mⅰ\033[m");
 
   i = 2;
   for (; max >= 0; max--)
@@ -211,6 +212,7 @@ bmw_display(max)	/* itoc.010313: display 玡瞴 */
 
   move(i, 0);
   clrtoeol();
+//  outs("\033[1;36mⅱ\033[37;44m   [□]  ┕ち传 \033[36;40mⅲ\033[m");
   outs("\033[1;36mⅱ\033[37;44m [Ctrl-R]┕ち传 \033[36;40mⅲ\033[m");
 }
 #endif
@@ -253,6 +255,7 @@ bmw_edit(up, hint, bmw)
     }
 
     if (ch != Ctrl('R') && ch != Ctrl('T'))	/* ЧΘ瞴块 */
+	//if (ch != KEY_DOWN && ch != KEY_UP)
       break;
 
     /* Τ穝瞴秈ㄓ酶瞴臮盢 bmw_pos ㄓê瞴 */
@@ -466,9 +469,9 @@ bmw_reply_CtrlRT(key)
 
   pos = bmw_pos;	/* 侣 bmw_pos */
 
-  if (key == Ctrl('R'))
+  if (key == Ctrl('R'))  /* KEY_DOWN */
     bmw_up = bmw_lastslot(pos == 0 ? max : pos - 1);	/* パヘ玡┮ pos ┕т瞴癸禜 */
-  else /* if (key == Ctrl('T')) */
+  else /* if (key == Ctrl('T')) KEY_UP */
     bmw_up = bmw_firstslot(pos == max ? 0 : pos + 1);	/* パヘ玡┮ pos ┕т瞴癸禜 */
 
   if (!bmw_up)		/* тぃ瞴 */
@@ -681,6 +684,37 @@ bmw_item(num, bmw)
       num, tag_char(bmw->btime), bmw->userid, d_cols + 53, d_cols + 53, bmw->msg, ptime->tm_hour, ptime->tm_min);
   }
 }
+
+#ifdef HAVE_LIGHTBAR
+static int
+bmw_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:次  0:次 */
+{
+  BMW *bmw;
+  struct tm *ptime;
+                                                                                
+  bmw = (BMW *) xo_pool + (xo->pos - xo->top);
+  ptime = localtime(&bmw->btime);
+                                                                                
+  if (bmw->sender == cuser.userno)  /* 癳瞴 */
+  {
+    prints("%s%6d%c\033[33m%-13s\033[36m%-53.53s\033[33m%02d:%02d\033[m",
+      mode ? COLORBAR_BMW : "",
+      xo->pos + 1, tag_char(bmw->btime),
+      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
+  }
+  else                              /* Μ瞴 */
+  {
+    prints("%s%6d%c%-13s\033[32m%-53.53s\033[37m%02d:%02d%s",
+      mode ? COLORBAR_BMW : "",
+      xo->pos + 1, tag_char(bmw->btime),
+      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min,
+      mode ? "\033[m" : "");
+  }                                                                                
+  return XO_NONE;
+}
+#endif
 
 
 static int
@@ -996,6 +1030,9 @@ bmw_help(xo)
 
 KeyFunc bmw_cb[] =
 {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, bmw_item_bar,
+#endif
   XO_INIT, bmw_init,
   XO_LOAD, bmw_load,
   XO_HEAD, bmw_head,

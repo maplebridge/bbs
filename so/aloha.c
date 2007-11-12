@@ -116,6 +116,37 @@ aloha_item(num, aloha)
 #endif
 }
 
+#ifdef HAVE_LIGHTBAR
+static int
+aloha_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+  ALOHA *aloha;
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#else
+  int online = 0;
+#endif
+                                                                                
+  aloha = (ALOHA *) xo_pool + xo->pos - xo->top;
+                                                                                
+#ifdef CHECK_ONLINE
+  online = utmp_get(aloha->userno, NULL);
+#endif
+                                                                                
+  prints("%s%6d%c   %s%-14s%s%54s%s",
+    mode ? COLORBAR_ALOHA : "",         //這裡是光棒的顏色，可以自己改
+    xo->pos + 1, tag_char(aloha->userno),
+    online ? "\033[33m" : "",
+    aloha->userid, "",
+    online ? "\033[37m" : "",
+    mode ? "\033[m" : "");
+                                                                                
+  return XO_NONE;
+}
+#endif
+
 
 static int
 aloha_body(xo)
@@ -406,6 +437,9 @@ aloha_help(xo)
 
 static KeyFunc aloha_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, aloha_item_bar,
+#endif
   XO_INIT, aloha_init,
   XO_LOAD, aloha_load,
   XO_HEAD, aloha_head,

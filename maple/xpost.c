@@ -131,8 +131,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
     head = (HDR *) fimage + locus;
 
 #ifdef HAVE_REFUSEMARK
-    if ((head->xmode & POST_RESTRICT) && 
-      strcmp(head->owner, cuser.userid) && !(bbstate & STAT_BM))
+    if ((head->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
       continue;
 #endif
 
@@ -673,37 +672,6 @@ xpost_load(xo)
 }
 
 
-static void
-xpost_history(xo, fhdr)		/* 將 fhdr 這篇加入 brh */
-  XO *xo;
-  HDR *fhdr;
-{
-  time_t prev, chrono, next;
-  int pos;
-  char *dir;
-  HDR buf;
-
-  chrono = fhdr->chrono;
-  if (!brh_unread(chrono))	/* 如果已在 brh 中，就無需動作 */
-    return;
-
-  dir = xo->dir;
-  pos = fhdr->xid;
-
-  if (!rec_get(dir, &buf, sizeof(HDR), pos - 1))
-    prev = buf.chrono;
-  else
-    prev = chrono;
-
-  if (!rec_get(dir, &buf, sizeof(HDR), pos + 1))
-    next = buf.chrono;
-  else
-    next = chrono;
-
-  brh_add(prev, chrono, next);
-}
-
-
 int
 xpost_browse(xo)
   XO *xo;
@@ -736,7 +704,7 @@ xpost_browse(xo)
     comebackPos = hdr->xid; 
     /* Thor.980911: 從串接模式回來時要回到看過的那篇文章位置 */
 
-    xpost_history(xo, hdr);
+    post_history(xo, hdr);
     strcpy(currtitle, str_ttl(hdr->title));
 
 re_key:

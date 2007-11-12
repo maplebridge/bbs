@@ -39,7 +39,7 @@
 #define MYHOSTNAME      "bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 
 #define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, "nthucs.twbbs.org",\
-                         "nthucs.twbbs.org.tw",\
+                         "bbs.iMaple.tw", \
                          NULL}
 
 #define MYCHARSET	"big5"			/* BBS 所使用的字集 */
@@ -180,6 +180,11 @@
 #undef	COLOR_HEADER            /* lkchu.981201: 變換彩色標頭 */
 
 #undef	CURSOR_BAR		/* itoc.010113: 選單光棒，若開啟選單光棒，選單就不能有顏色控制碼 */
+#ifndef CURSOR_BAR
+#define CURSOR_BAR
+#endif
+
+#define HAVE_LIGHTBAR         /* xover 整行光棒 */
 
 #define	HAVE_DECLARE		/* 使 title 中有 [] 更明顯，且日期上色 */
 

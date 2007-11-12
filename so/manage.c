@@ -32,6 +32,12 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
   HDR *hdr;
   char keyOwner[80], keyTitle[TTLEN + 1], buf[80];
 
+
+  /* smiler.1111 在Deletelog 以及 Editlog 板 不接受 post_terminator(xo) */
+ if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
+   return XO_NONE;
+
+
   if (!HAS_PERM(PERM_ALLBOARD))
     return XO_FOOT;
 
@@ -85,9 +91,16 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       char fpath[64], fnew[64], fold[64];
       HDR *hdr;
 
+      char Deletelog_folder[64],Deletelog_title[64],copied[64]; /* smiler.1111: 若有啟動editlog_use deletelog_use */
+      HDR  Deletelog_hdr;                                       /* 則將被砍的資料移至 Deletelog 板備份 */
+
       xmode = head->battr;
       if ((type == '1' && (xmode & BRD_NOTRAN)) || (type == '2' && !(xmode & BRD_NOTRAN)))
 	continue;
+
+	  /* smiler.1111: 保護Editlog Deletelog此兩記錄看板不被刪除資料 */
+	  if((!strcmp(head->brdname,"Deletelog")) || (!strcmp(head->brdname,"Editlog")))
+          continue;
 
       /* Thor.980616: 更改 currboard，以 cancel post */
       strcpy(currboard, head->brdname);
@@ -130,8 +143,26 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
 	  /* 砍文並連線砍信 */
 
 	  cancel_post(hdr);
+
+	  /* smiler.1111: 若deletelog_use有啟動,則將這筆被刪的資料備份至Deletelog板 */
+      if(deletelog_use)
+	  {
+         hdr_fpath(copied, fpath, hdr);
+         brd_fpath(Deletelog_folder,"Deletelog", FN_DIR);
+         hdr_stamp(Deletelog_folder, HDR_COPY | 'A', &Deletelog_hdr, copied);
+         strcpy(Deletelog_hdr.title , hdr->title);
+         strcpy(Deletelog_hdr.owner , cuser.userid);
+         strcpy(Deletelog_hdr.nick  , cuser.username);
+         Deletelog_hdr.xmode = POST_OUTGO;
+         rec_bot(Deletelog_folder, &Deletelog_hdr, sizeof(HDR));
+         btime_update(brd_bno("Deletelog"));
+	  }
+
 	  hdr_fpath(fold, fpath, hdr);
 	  unlink(fold);
+      if (xmode & POST_RESTRICT)
+        RefusePal_kill(currboard, hdr);
+
 	}
       }
       close(fdr);
@@ -258,6 +289,73 @@ post_battr_noscore(xo)
 }
 #endif	/* HAVE_SCORE */
 
+static int
+post_rlock(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+
+  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+    return XO_FOOT; 
+
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("開放鎖文 (1)允許\ (2)不許\ (Q)取消？[Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOL;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOL;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+static int
+post_vpal(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+
+  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+    return XO_FOOT; 
+
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("開放觀看板友名單 (1)允許\ (2)不許\ (Q)取消？[Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_SHOWPAL;
+    break;
+  case '2':
+    newbrd.battr |= BRD_SHOWPAL;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
 
 /* ----------------------------------------------------- */
 /* 板主功能 : 修改板主名單				 */
@@ -474,6 +572,8 @@ post_manage(xo)
 #  ifdef HAVE_SCORE
     "Score   設定可否評分",
 #  endif
+	"RLock   板友可否鎖文",
+	"VPal    可否觀看板友名單",
 #  ifdef HAVE_MODERATED_BOARD
     "Level   公開/好友/秘密",
     "OPal    板友名單",
@@ -513,6 +613,10 @@ post_manage(xo)
   case 's':
     return post_battr_noscore(xo);
 #endif
+  case 'r':
+	  return post_rlock(xo);
+  case 'v':
+	  return post_vpal(xo);
 
 #ifdef HAVE_MODERATED_BOARD
   case 'l':

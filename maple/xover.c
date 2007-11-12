@@ -71,7 +71,7 @@ xo_get_post(path, brd)		/* itoc.010910: °Ñ¦Ò xover.c xo_get()¡A¬° XoPost ¶q¨­¥´³
   BRD *brd;
 {
   XO *xo;
-  time_t chrono;
+  HDR hdr;
   int fd;
   int pos, locus, mid;	/* locus:¥ª«ü¼Ð mid:¤¤«ü¼Ð pos:¥k«ü¼Ð */
 
@@ -104,9 +104,9 @@ xo_get_post(path, brd)		/* itoc.010910: °Ñ¦Ò xover.c xo_get()¡A¬° XoPost ¶q¨­¥´³
 
     mid = locus + ((pos - locus) >> 1);
     lseek(fd, (off_t) (sizeof(HDR) * mid), SEEK_SET);
-    if (read(fd, &chrono, sizeof(time_t)) == sizeof(time_t))
+    if (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
     {
-      if (brh_unread(chrono))
+      if (brh_unread(BMAX(hdr.chrono, hdr.stamp)))
 	pos = mid;
       else
 	locus = mid;
@@ -122,9 +122,9 @@ xo_get_post(path, brd)		/* itoc.010910: °Ñ¦Ò xover.c xo_get()¡A¬° XoPost ¶q¨­¥´³
   {
     /* ÀË¬d²Ä¤@½g¬O§_¤wÅª */
     lseek(fd, (off_t) 0, SEEK_SET);
-    if (read(fd, &chrono, sizeof(time_t)) == sizeof(time_t))
+    if (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
     {
-      if (brh_unread(chrono))	/* ­Y³s²Ä¤@½g¤]¥¼Åª¡Apos ½Õ¦^¥h²Ä¤@½g */
+      if (brh_unread(BMAX(hdr.chrono, hdr.stamp)))	/* ­Y³s²Ä¤@½g¤]¥¼Åª¡Apos ½Õ¦^¥h²Ä¤@½g */
 	pos = 0;
     }
   }
@@ -1029,7 +1029,8 @@ xo_thread(xo, op)
 
     if (op & RS_UNREAD)
     {
-#define UNREAD_FUNC()   (op & RS_BOARD ? brh_unread(hdr->chrono) : !(hdr->xmode & MAIL_READ))
+#define UNREAD_FUNC()  (op & RS_BOARD ? brh_unread(BMAX(hdr->chrono, hdr->stamp)) : !(hdr->xmode & MAIL_READ))
+
       if (op & RS_FIRST)	/* ­º½g¥¼Åª */
       {
 	if (UNREAD_FUNC())
@@ -1317,6 +1318,18 @@ xover(cmd)
 	else
 	{
 	  move(3 + cmd - num, 0);
+#ifdef HAVE_LIGHTBAR
+      /* verit.030129 : xover ¥ú´Î */
+      if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
+      {
+        int tmp = xo->pos;
+        clrtoeol();
+        xo->pos = cmd - num + xo->top;
+        (*(xcmd[0].func)) (xo, 0);
+        xo->pos = tmp;
+      }
+      else
+#endif
 	  outc(' ');
 
 	  break;		/* ¥u²¾°Ê´å¼Ð */
@@ -1379,6 +1392,15 @@ xover(cmd)
     {
       num = 3 + pos - xo->top;
       move(num, 0);
+#ifdef HAVE_LIGHTBAR
+      /* verit.20030129 : xover ¥ú´Î */
+      if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
+      {
+        clrtoeol();
+        (*(xcmd[0].func)) (xo, 1);
+      }
+      else
+#endif
       outc('>');
     }
 
@@ -1497,6 +1519,18 @@ xover(cmd)
 	  if (cmd < 0)		/* ¦b¥»­¶§ä¨ì match */
 	  {
 	    move(num, 0);
+#ifdef HAVE_LIGHTBAR
+        /* verit.030129 : xover ¥ú´Î */
+        if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
+        {
+           int tmp = xo->pos;
+           clrtoeol();
+           xo->pos = num + xo->top - 3;
+           (*(xcmd[0].func)) (xo, 0);
+           xo->pos = tmp;
+		}
+        else
+#endif
 	    outc(' ');
 	    /* cmd = XO_NONE; */
 	    /* itoc.010913: ¬Y¨Ç·j´M­n§â b_lines ¶ñ¤W feeter */

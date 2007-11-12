@@ -145,9 +145,12 @@ void pal_edit(int key, PAL *pal, int echo);
 int pal_find(char *fpath, int userno);
 int t_pal(void);
 int t_list(void);
+int belong_pal(int *pool, int max, int userno);
 
 /* post.c */
 int cmpchrono(HDR *hdr);
+void RefusePal_kill(char *board, HDR *hdr);   /* redfox:加密文章可見名單 */
+int RefusePal_belong(char *board, HDR *hdr);  /* redfox:加密文章可見名單 */
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
 int do_reply(XO *xo, HDR *hdr);
@@ -159,6 +162,8 @@ int post_cross(XO *xo);
 int post_forward(XO *xo);
 int post_write(XO *xo);
 int post_score(XO *xo);
+void hdr_outs_bar(HDR *hdr, int cc);
+void post_history(XO *xo, HDR *hdr);
 
 /* talk.c */
 char *bmode(UTMP *up, int simple);

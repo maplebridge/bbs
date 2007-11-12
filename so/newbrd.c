@@ -141,10 +141,30 @@ nbrd_item(num, nbrd)
   int num;
   NBRD *nbrd;
 {
-  prints("%6d %c %-5s %-13s [%s] %.*s\n", 
+  prints("%6d %c %-5s %-13s [%-13s] %.*s\n", 
     num, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner, 
     (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m", d_cols + 20, nbrd->title);
 }
+
+#ifdef HAVE_LIGHTBAR
+static int
+nbrd_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+  NBRD *nbrd;
+                                                                                
+  nbrd = (NBRD *) xo_pool + xo->pos - xo->top;
+                                                                                
+  prints("%s%6d %c %-5s %-13s [%-13s%s]:%-22.22s%s%s",
+    mode ? COLORBAR_NBRD : "",         //這裡是光棒的顏色，可以自己改
+    xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
+    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m",mode ? COLORBAR_NBRD : "", nbrd->title,
+    "                ",mode ? "\033[m" : "");
+                                                                                
+  return XO_NONE;
+}
+#endif
 
 
 static int
@@ -852,6 +872,9 @@ nbrd_help(xo)
 
 static KeyFunc nbrd_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, nbrd_item_bar,
+#endif
   XO_INIT, nbrd_init,
   XO_LOAD, nbrd_load,
   XO_HEAD, nbrd_head,

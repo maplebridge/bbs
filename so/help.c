@@ -32,7 +32,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
   cur = 0;
   pal = NULL;
 
-  sprintf(fpath_help_all, "etc/help/help.all");  //smiler.070927
+  sprintf(fpath_help_all, "gem/@/@help.all");  //smiler.070927
   more(fpath_help_all, NULL);                    //smiler.070927
 
   do

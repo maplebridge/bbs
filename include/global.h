@@ -172,6 +172,7 @@
 
 #define FN_ETC_VALID	"etc/valid"		/* 身分認證信函 (Email 認證時，寄去給站外信箱) */
 #define FN_ETC_JUSTIFIED "etc/justified"	/* 認證通過通知 (認證通過時，寄到站內信箱) */
+#define FN_ETC_SYSMAIL  "etc/SYSMAIL"       /* 站務寄給使用者的通知信 */
 #define FN_ETC_REREG	"etc/re-reg"		/* 重新認證通知 (認證過期時，寄到站內信箱) */
 
 #define FN_ETC_CROSSPOST "etc/cross-post"	/* 跨貼停權通知 (Cross-Post 時，寄到站內信箱) */
@@ -494,6 +495,17 @@ VAR char *str_site	INI(BBSNAME);
 VAR char *str_line	INI(STR_LINE);
 
 VAR char *str_ransi	INI("\033[m");
+
+/* 站務工作區設定 */
+
+VAR int host_sight_number;      /* 站簽個數設定 */
+VAR int host_sight_select;      /* 站簽全站指定 */
+VAR int model_number;           /* 站簽娃個數設定 */
+VAR int model_select;           /* 站簽娃使用全站指定 */           
+VAR int editlog_use;            /* 是否啟用Editlog功能? */
+VAR int deletelog_use;          /* 是否啟用Deletelog功能? */
+VAR int mail_to_newone;         /* 是否寄信給新申請者? */
+
 
 #undef	VAR
 #undef	INI

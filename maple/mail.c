@@ -1337,6 +1337,41 @@ mbox_item(num, hdr)
   hdr_outs(hdr, d_cols + 47);
 }
 
+#ifdef HAVE_LIGHTBAR
+static int
+mbox_item_bar(xo, mode)
+  XO *xo;                       /* sequence number */
+  int mode;
+{
+  HDR *hdr;
+#ifdef OVERDUE_MAILDEL
+  int xmode;
+#endif
+                                                                                
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+                                                                                
+#ifdef OVERDUE_MAILDEL
+  xmode = hdr->xmode;
+  prints(xmode & MAIL_DELETE ?
+    (mode ? COLORBAR_MAIL"%6d \033[5;37;41m%c\033[0;1;44m"COLORBAR_MAIL" " :
+      "%6d \033[1;5;37;41m%c\033[m ") :
+    (mode ? COLORBAR_MAIL"%6d %c " :
+      "%6d %c "),
+    xo->pos + 1, mbox_attr(xmode));
+#else
+  prints("%s%6d %c ",
+    mode ? COLORBAR_MAIL : "", xo->pos + 1, mbox_attr(hdr->xmode));
+#endif
+                                                                                
+  if (mode)
+    hdr_outs_bar(hdr, 47);
+  else
+    hdr_outs(hdr, 47);
+                                                                                
+  return XO_NONE;
+}
+#endif
+
 
 static int
 mbox_body(xo)
@@ -1853,6 +1888,9 @@ mbox_help(xo)
 
 static KeyFunc mbox_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, mbox_item_bar,
+#endif
   XO_INIT, mbox_init,
   XO_LOAD, mbox_load,
   XO_HEAD, mbox_head,
@@ -1908,6 +1946,9 @@ mbox_main()
 
 KeyFunc xmbox_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, mbox_item_bar,
+#endif
   XO_INIT, xpost_init,
   XO_LOAD, xpost_load,
   XO_HEAD, xpost_head,

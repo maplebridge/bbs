@@ -8,11 +8,14 @@
 /* syntax : snap2maplecsgem [board]			 */
 /*-------------------------------------------------------*/
 
-
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
 #include "snap.h"
 #include <netinet/in.h>
-#define FN_GEM      ".GEM"
+
 #define FN_GEM_TMP	".GEM.tmp"
+#define FN_GEM      ".GEM"
 
 char bufini[64];    /* 暫存路徑 */
 int lora=1;
@@ -24,12 +27,87 @@ char global_buf[64];
 #define XNAME_SIZE 32            /* 檔名長度 */
 #define usekey  0                /* 是否使用key */
 
+typedef struct t_node *t_pointer;
+typedef struct t_node{
+	char name[64];
+	t_pointer next;
+}t_node;
+
+static t_pointer head=NULL;
+static t_pointer tail=NULL;
+static t_pointer trace=NULL;
+
+t_pointer create_t(void)
+{
+	t_pointer root;
+	root = (t_pointer) malloc(sizeof (t_node));
+    root->name[0]='\0';
+	root->next=NULL;
+	return root;
+}
+
+void add_t(char *name)
+{
+	if(!head)
+	{
+       head=create_t();
+	   strcpy(head->name,name);
+	   tail=head;
+	}
+	else
+	{
+		tail->next=create_t();
+		tail=tail->next;
+		strcpy(tail->name,name);
+	}
+}
+
+void clear_t()  //smiler 1014
+{
+	trace=head;
+	while(1)
+	{
+		if(trace==tail)
+		{
+			free(tail);
+			head=NULL;
+			tail=NULL;
+			trace=NULL;
+			break;
+		}
+		else
+		{
+			trace=head->next;
+			free(head);
+			head=trace;
+		}
+	}
+}
+
+int Is_inside(char *name)
+{
+	trace=head;
+	while(1)
+	{
+		if(strcmp(trace->name,name))
+		{
+			if(trace==tail)
+				return 0;
+			else
+				trace=trace->next;
+		}
+		else
+			return 1;
+	}
+}
+
 typedef struct{
 #if usekey
 	int key;
 #endif
 	char xname[XNAME_SIZE];
 }element;
+
 
 element stack[MAX_STACK_SIZE];
 int top=-1;
@@ -143,13 +221,46 @@ int boardnumber=0;
 /* ----------------------------------------------------- */
 
 
-static void
+int
 trans_hdr(old, new , name)
   MAPLECS_HDR *old;
   HDR *new;
   char name[32];
 {
-  memset(new, 0, sizeof(HDR));
+    memset(new, 0, sizeof(HDR));
+#if 0
+	if(head)
+	{
+	  if(Is_inside(old->xname))
+	  {
+          new->chrono=old->chrono;
+		  new->xmode=old->xmode;
+          new->xid=old->xid;
+		  str_ncpy(new->xname, old->xname, sizeof(new->xname));
+          str_ncpy(new->owner, old->owner, sizeof(new->owner));
+          str_ncpy(new->nick, old->nick, sizeof(new->nick));
+		  new->score=' ';
+          str_ncpy(new->date, old->date, sizeof(new->date));
+          str_ncpy(new->title, old->title, sizeof(new->title));
+		  
+          strcpy(name,new->xname);
+		  printf("======>now %s\n",name);
+		  return 0;
+	  }
+	  else
+		  add_t(old->xname);
+	}
+	else
+		add_t(old->xname);
+#endif
+	//if(Is_inside(old->xname))
+	if(0)
+	{
+		printf("=========>now  %s\n",old->xname);
+		getchar();
+	}
+	//printf("%s\n",old->xname);
+
 
   new->chrono = ntohl(old->chrono);
   new->xmode  = ntohl(old->xmode);
@@ -202,11 +313,24 @@ trans_hdr(old, new , name)
   if(isopen)
     getchar();
 
+  if(head)
+  {
+	  if(Is_inside(old->xname))
+	  {
+		  printf("======>now %s\n",old->xname);
+		  return 0;
+	  }
+	  else
+		  add_t(old->xname);
+  }
+  else
+	add_t(old->xname);
+  return 1;
                                                                     
 }
 
 
-static void
+int
 trans_gem(name ,oxmode)
   char name[32];
   int oxmode;
@@ -214,6 +338,7 @@ trans_gem(name ,oxmode)
     FILE *fp;
     FILE *fps;
 	FILE *f_turned;
+	FILE *f_tex;
     HDR hdr;
     MAPLECS_HDR old;
     char bufs[64];
@@ -221,12 +346,15 @@ trans_gem(name ,oxmode)
     char bufs2[64];
     char buf_turned[64];
     char buftmp1[64];
-    char buftmp2[64];
+    //char buftmp2[64];
+	char tex[64];
     int notopen=0;
+	int t_continue=0;
+
 
 	sprintf(buf_turned,"%s/%s.tmp",bufini,name);
-
-	if( !(f_turned = fopen(buf_turned,"r")) )  //偵測是否已對相同檔案trans過
+    f_turned = fopen(buf_turned,"r");
+	if(f_turned ==NULL)  //偵測是否已對相同檔案trans過
 	{
 	   if(name[0]=='@')
 	   {
@@ -252,7 +380,9 @@ trans_gem(name ,oxmode)
 		  {
              char sname[32];
              int sxmode;
-             trans_hdr(&old, &hdr ,sname);		 
+             //if(!trans_hdr(&old, &hdr ,sname))
+			 //	 continue;
+			 t_continue=trans_hdr(&old, &hdr ,sname);
 		     if(sname[0]=='@')
                  sprintf(bufs, "%s/%c/%s", bufini, sname[0], sname);
              else
@@ -274,7 +404,8 @@ trans_gem(name ,oxmode)
 				 {
 					 if(isopen)
 						 printf("do something\n");
-				    trans_gem(sname,sxmode);
+					 if(t_continue)  //smiler 1014
+				      trans_gem(sname,sxmode);
 			        fclose(fps);
 				 }
 			 }
@@ -400,7 +531,13 @@ main(argc, argv)
 		   {
 
               char name[32];
-              trans_hdr(&old, &hdr ,name);
+			  int t_continue=0;
+              //if(!trans_hdr(&old, &hdr ,name))
+			  //	  continue;
+			  t_continue=trans_hdr(&old, &hdr ,name);
+			  //printf("%s\n",hdr.title);
+			  //printf("t_continue=%d\n",t_continue);
+			  //getchar();
               if(isopen)
 			  {
                  printf("1.%s = \n\n",name);
@@ -421,7 +558,9 @@ main(argc, argv)
                   rec_add(buf2, &hdr, sizeof(HDR));
 		          if(fps = fopen(bufs, "r"))
 				  {
-                     trans_gem(name,0x00010000);
+                     //if(!Is_inside(name))  //smiler 1014
+					  if(t_continue)
+                        trans_gem(name,0x00010000);
 			         fclose(fps);
 				  }
 			  }
@@ -437,6 +576,7 @@ main(argc, argv)
            /*刪除舊的,把新的更名*/
            unlink(buf);
            rename(buf2, buf);
+           clear_t();          //smiler 1014
            while(top > (-1))
 		   {
               char buftmp[64];

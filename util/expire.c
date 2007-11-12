@@ -226,6 +226,16 @@ sync_check(flog, fname)
   } while (--xtail >= xpool);
 }
 
+static void
+RefusePal_fpath(fpath, board, mode, hdr)
+  char *fpath;
+  char *board;
+  char mode;       /* 'C':Cansee  'R':Refimage */
+  HDR *hdr;
+{
+  sprintf(fpath, "%s/RefusePal_DIR/%s_%s",
+    board, mode == 'C' ? "Cansee" : "Refimage", hdr->xname);
+}
 
 static void
 expire(flog, life, sync)
@@ -325,6 +335,14 @@ expire(flog, life, sync)
       *str = hdr.xname[7];
       strcpy(fname, hdr.xname);
       unlink(fpath);
+      if (hdr.xmode & POST_RESTRICT)
+      {
+        char fpath[64];
+        RefusePal_fpath(fpath, bname, 'C', &hdr);
+        unlink(fpath);
+        RefusePal_fpath(fpath, bname, 'R', &hdr);
+        unlink(fpath);
+      }
       fprintf(flog, "\t%s\n", fname);
       total--;
     }

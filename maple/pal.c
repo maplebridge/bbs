@@ -23,7 +23,7 @@ static int *pal_pool = NULL;	/* §Y cutmp->pal_spool¡A¦]¬°¤Ó±`ÀË¬dªB¤Í¦W³æ¡A©Ò¥H°
 /* ----------------------------------------------------- */
 
 
-static int			/* 1: userno ¦b pool ¦W³æ¤W */
+int			/* 1: userno ¦b pool ¦W³æ¤W */
 belong_pal(pool, max, userno)
   int *pool;
   int max;
@@ -350,6 +350,39 @@ pal_item(num, pal)
     pal->userid, pal->ship);
 #endif
 }
+
+#ifdef HAVE_LIGHTBAR
+static int
+pal_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:¤W¥ú´Î  0:¥h¥ú´Î */
+{
+  PAL *pal;
+#ifdef CHECK_ONLINE
+  UTMP *online;
+#else
+  int online = 0;
+#endif
+                                                                                
+  pal = (PAL *) xo_pool + xo->pos - xo->top;
+                                                                                
+#ifdef CHECK_ONLINE
+  online = utmp_get(pal->userno, NULL);
+#endif
+                                                                                
+  prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
+    mode ? COLORBAR_PAL : "",         //³o¸Ì¬O¥ú´ÎªºÃC¦â¡A¥i¥H¦Û¤v§ï¡C
+    xo->pos + 1, tag_char(pal->userno),
+    pal->ftype & PAL_BAD ? "¢æ" : "",
+    online ? "\033[33m" : "",
+    pal->userid,
+    online ? "\033[31m" : "",
+    pal->ship,
+    mode ? "\033[m" : "");
+                                                                                
+  return XO_NONE;
+}
+#endif
 
 
 static int
@@ -798,6 +831,9 @@ pal_help(xo)
 
 KeyFunc pal_cb[] =
 {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, pal_item_bar,
+#endif
   XO_INIT, pal_init,
   XO_LOAD, pal_load,
   XO_HEAD, pal_head,

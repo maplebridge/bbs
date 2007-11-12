@@ -101,6 +101,79 @@ mf_item(num, mf)
   }
 }
 
+#ifdef HAVE_LIGHTBAR
+static int
+mf_item_bar(xo, mode)
+  XO *xo;
+  int mode;
+{
+  int num;
+  MF *mf;
+  int mftype, brdpost, invalid;
+                                                                                
+  num = xo->pos + 1;
+  mf = (MF *) xo_pool + xo->pos - xo->top;
+  mftype = mf->mftype;
+  brdpost = cuser.ufo & UFO_BRDPOST;
+                                                                                
+  if (mftype & MF_FOLDER)
+  {
+    if (brdpost)
+    {
+      struct stat st;
+      char fpath[64];
+                                                                                
+      mf_fpath(fpath, cuser.userid, mf->xname);
+      stat(fpath, &st);
+      num = st.st_size / sizeof(MF);
+    }
+    prints("%s%6d%c  %s %-66.54s\033[m", mode ? "\033[1;42m" : "",
+      num, mftype & MF_MARK ? ')' : ' ', "◆", mf->title);
+  }
+  else if (mftype & MF_BOARD)
+  {
+    BRD *bhead, *btail;
+    int chn;
+	int pbno;
+                                                                                
+    chn = 0;
+    invalid = 1;
+    bhead = bshm->bcache;
+    btail = bhead + bshm->number;
+                                                                                
+    do
+    {
+      if (!strcmp(mf->xname, bhead->brdname))
+      {
+		pbno = bshm->mantime[chn];
+        if (mode)
+          class_mf_item_bar(bhead, num, chn, brdpost, pbno);
+        else
+          class_mf_item(num, chn, brdpost);
+        invalid = 0;
+        break;
+      }
+      chn++;
+    } while (++bhead < btail);
+                                                                                
+    if (invalid)        /* itoc.010821: 被砍的看板要另外印 */
+    {
+      prints("%s         \033[36m%-13s%-56s\033[m", mode ?
+        "\033[1;42m" : "", mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
+    }  /* 長度好難調 乾脆自己改了= =*/
+  }
+  else /* if (mftype & MF_GEM) */
+  {
+    prints("%s%6d%c  %s %-66.54s\033[m",
+      mode ? "\033[1;42m" : "",
+      brdpost ? 0 : num,
+      mftype & MF_MARK ? ')' : ' ', "■", mf->title);
+  }
+  return XO_NONE;
+}
+#endif
+
+
 
 static int
 mf_body(xo)
@@ -773,6 +846,9 @@ mf_help(xo)
 
 static KeyFunc mf_cb[] =
 {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, mf_item_bar,
+#endif
   XO_INIT, mf_init,
   XO_LOAD, mf_load,
   XO_HEAD, mf_head,

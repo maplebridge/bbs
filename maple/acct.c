@@ -16,6 +16,21 @@
 extern BCACHE *bshm;
 
 
+void
+str_lower_acct(dst, src)
+  char *dst, *src;
+{
+  int ch;
+
+  do
+  {
+    ch = *src++;
+    if (ch >= 'A' && ch <= 'Z')
+      ch |= 0x20;
+    *dst++ = ch;
+  } while (ch);
+}
+
 /* ----------------------------------------------------- */
 /* (.ACCT) 使用者帳號 (account) subroutines		 */
 /* ----------------------------------------------------- */
@@ -395,6 +410,16 @@ acct_setup(u, adm)
   ACCT x;
   int i, num;
   char *str, buf[80], pass[PSWDLEN + 1];
+  FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
+  char helloworld[37];
+  char user_hello_path[256];
+
+  FILE *file_host;      /* smiler.071110: 個人選擇站簽 */
+  char host_path_name[64];
+  char host_choice_char[3];
+  int  host_choice_int;
+  char userid_tmp[64];
+
 
   acct_show(u, adm);
   
@@ -482,6 +507,76 @@ acct_setup(u, adm)
     if (vget(i, 0, "暱    稱：", str, UNLEN + 1, GCARRY))
       break;
   };
+
+  str_lower_acct(userid_tmp,x.userid);
+  /* smiler.071030: 輸入使用者想對大家說的話 */
+  i++;
+  sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
+  hello = fopen(user_hello_path,"r");
+  if(hello)
+      fgets(helloworld,38,hello);
+  else
+      sprintf(helloworld,"\0");
+  if(!vget(i, 0, "想對大家說的話：", helloworld, 37+1, GCARRY))
+  {
+      if(hello)
+      {
+          fclose(hello);
+          unlink(user_hello_path);
+      }
+      else
+      {
+        hello = fopen(user_hello_path,"w");
+        fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+        fclose(hello);
+      }
+  }
+  else
+  {
+      if(hello)
+      {
+          fclose(hello);
+          unlink(user_hello_path);
+      }
+      hello = fopen(user_hello_path,"w");
+      fputs(helloworld,hello);
+      fclose(hello);
+  }
+
+  i++;
+  sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+  file_host=fopen(host_path_name,"r");
+  if(file_host)
+  {
+      fgets(host_choice_char,3,hello);
+	  fclose(file_host);
+  }
+  vget(i, 0, "站簽個人指定：", host_choice_char, 3, GCARRY);
+  host_choice_int=atoi(host_choice_char);
+  if(host_choice_int)
+  {
+    if(host_choice_int < 0)
+    {
+  	  vmsg("指定站簽數不得小於等於0,更改指定為 1 ");
+	  host_choice_int=1;
+    }
+    sprintf(host_path_name,"gem/@/@host_%d",host_choice_int-1);
+    file_host=fopen(host_path_name,"r");
+    if(file_host)
+	  fclose(file_host);
+    else
+    {
+	  vmsg("指定站簽不存在,更改指定為 1 ");
+	  host_choice_int=1;
+    }
+  }
+  sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+  file_host=fopen(host_path_name,"w");
+  if(file_host)
+  {
+	  fprintf(file_host,"%d",host_choice_int);
+	  fclose(file_host);
+  }
 
   /* itoc.010408: 新增生日/性別欄位，不強迫使用者填 (允許填 0) */
   i++;

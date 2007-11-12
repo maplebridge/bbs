@@ -203,6 +203,53 @@ song_item(num, hdr, level)
     prints("%.*s\n", d_cols + 64, hdr->title);
 }
 
+#ifdef HAVE_LIGHTBAR
+static int
+song_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+  HDR *hdr;
+  int xmode, gtype;
+  char tmp_space[80]="                                                                                ";
+                   // 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+  char tmp_buf[64];
+ 
+  hdr = (HDR *) xo_pool + xo->pos - xo->top;
+  xmode = hdr->xmode;
+  gtype = (char) 0xba;
+                                                                                
+  /* 目錄用實心，不是目錄用空心 */
+  if (xmode & GEM_FOLDER)               /* 文章:◇ 卷宗:◆ */
+    gtype += 1;
+                                                                                
+  if (hdr->xname[0] == '@')             /* 資料:☆ 分類:★ */
+    gtype -= 2;
+  else if (xmode & GEM_BOARD)           /*         看板:■ */
+    gtype += 2;
+
+  if((xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT))
+  {
+	  strncpy(tmp_buf,tmp_space,67-strlen(MSG_DATA_CLOAK));
+	  tmp_buf[67-strlen(MSG_DATA_CLOAK)]='\0';
+  }
+  else
+  {
+	  strncpy(tmp_buf,tmp_space,67-strlen(hdr->title));
+	  tmp_buf[67-strlen(hdr->title)]='\0';
+  }
+
+  prints("%s%6d%c \241%c %-.*s%s%s",
+    mode ? COLORBAR_SONG : "",         //這裡是光棒的顏色，可以自己改
+    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 64,
+    (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK :
+    hdr->title,tmp_buf,
+    mode ? "\033[m" : "");
+                                                                                
+  return XO_NONE;
+}
+#endif
+
 
 static int
 song_body(xo)
@@ -623,7 +670,7 @@ song_title(xo)
 
   memcpy(&mhdr, fhdr, sizeof(HDR));
 
-  vget(b_lines, 0, "標題：", mhdr.title, TTLEN + 1, GCARRY);
+  vget(b_lines, 0, "標題：", mhdr.title, TTLEN + 1-5, GCARRY);
 
   if (xo->key & GEM_X_BIT)
   {
@@ -659,6 +706,9 @@ song_help(xo)
 
 static KeyFunc song_cb[] =
 {
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, song_item_bar,
+#endif
   XO_INIT, song_init,
   XO_LOAD, song_load,
   XO_HEAD, song_head,

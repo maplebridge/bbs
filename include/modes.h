@@ -216,6 +216,7 @@ static char *ModeTypeTable[] =
 #define XO_FOOT		(XO_MODE + 6)	/* itoc.µù¸Ñ: ²M°£ b_lines */
 #define XO_LAST		(XO_MODE + 7)
 #define	XO_QUIT		(XO_MODE + 8)
+#define XO_ITEM		(XO_MODE + 9)
 
 
 #define	XO_RSIZ		256		/* max record length */

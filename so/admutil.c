@@ -13,6 +13,7 @@
 extern BCACHE *bshm;
 extern UCACHE *ushm;
 
+//extern void setuploader();
 
 /* ----------------------------------------------------- */
 /* 站務指令						 */
@@ -35,6 +36,177 @@ a_user()
   }
   return 0;
 }
+
+/* smiler.071110: 站務系統設定:控制設定 */
+int
+a_system_setup()
+{
+  int i;
+  char buf[64];
+  char set_path[64],set_tmp[64],tmp_space[64];
+  FILE *fp;
+  FILE *f_tmp;
+  int ans;
+
+
+  int host_sight_number_tmp=0;      /* 站簽個數設定 */
+  int host_sight_select_tmp=0;      /* 站簽全站指定 */
+  int model_number_tmp=0;           /* 站簽娃個數設定 */
+  int model_select_tmp=0;           /* 站簽娃使用全站指定 */           
+  int editlog_use_tmp=0;            /* 是否啟用Editlog功能? */
+  int deletelog_use_tmp=0;          /* 是否啟用Deletelog功能? */
+  int mail_to_newone_tmp=0;         /* 是否寄信給新申請者? */
+
+
+  move(i=1, 0);
+  clrtobot();
+
+  /* 站簽個數設定 */  
+  sprintf(buf, "%d", host_sight_number);
+  vget(++i, 0, "站簽個數設定：", buf, 10, GCARRY);
+  host_sight_number_tmp=atoi(buf);
+  if(host_sight_number_tmp <= 0)
+  {
+	  vmsg("最大站簽數不得小於等於0,更改數目為 1 ");
+	  host_sight_number_tmp=1;
+  }
+  sprintf(tmp_space,"gem/@/@host_%d",host_sight_number_tmp-1);
+  if(f_tmp=fopen(tmp_space,"r"))
+	  fclose(f_tmp);
+  else
+  {
+	  vmsg("最大站簽數目不存在,更改數目為 1 ");
+	  host_sight_number_tmp=1;
+  }
+
+  /* 站簽全站指定 */
+  sprintf(buf, "%d", host_sight_select);
+  vget(++i, 0, "站簽全站指定(按0取消指定)：", buf, 10, GCARRY);
+  host_sight_select_tmp=atoi(buf);
+  if(host_sight_select_tmp !=0)
+  {
+    if(host_sight_select_tmp < 0)
+	{
+	    vmsg("指定站簽數不得小於等於0,更改指定為 1 ");
+	    host_sight_select_tmp=1;
+	}
+    sprintf(tmp_space,"gem/@/@host_%d",host_sight_select_tmp-1);
+    if(f_tmp=fopen(tmp_space,"r"))
+	    fclose(f_tmp);
+    else
+	{
+	    vmsg("指定站簽不存在,更改指定為 1 ");
+	    host_sight_select_tmp=1;
+	}
+  }
+
+
+  /* 站簽娃個數設定 */
+  sprintf(buf, "%d", model_number);
+  vget(++i, 0, "站簽娃個數設定：", buf, 10, GCARRY);
+  model_number_tmp=atoi(buf);
+  if(model_number_tmp <= 0)
+  {
+	  vmsg("站簽娃個數不得小於等於0,更改數目為 1 ");
+	  model_number_tmp=1;
+  }
+  sprintf(tmp_space,"gem/@/@model_%d",model_number_tmp-1);
+  if(f_tmp=fopen(tmp_space,"r"))
+	  fclose(f_tmp);
+  else
+  {
+	  vmsg("最大站簽娃個數不存在,更改數目為 1 ");
+	  model_number_tmp=1;
+  }
+
+
+
+  /* 站簽娃全站指定 */
+  sprintf(buf, "%d", model_select);
+  vget(++i, 0, "站簽娃使用全站指定(按0取消指定)：", buf, 10, GCARRY);
+  model_select_tmp=atoi(buf);
+  if(model_select_tmp !=0)
+  {
+   if(model_select_tmp < 0)
+   {
+ 	  vmsg("站簽娃指定編號不得小於等於0,更改指定為 1 ");
+	  model_select_tmp=1;
+   }
+   sprintf(tmp_space,"gem/@/@model_%d",model_select_tmp-1);
+   if(f_tmp=fopen(tmp_space,"r"))
+ 	  fclose(f_tmp);
+   else
+   {
+	  vmsg("指定站簽娃不存在,更改指定為 1 ");
+	  model_select_tmp=1;
+   }
+  }
+
+
+  /* 啟用Editlog功能 */
+  sprintf(buf, "%d", editlog_use);
+  vget(++i, 0, "是否啟用Editlog功\能?(是:1 否:0)：", buf, 10, GCARRY);
+  if(buf[0]=='1' || buf[0]=='0')
+    editlog_use_tmp=atoi(buf);
+  else
+	  editlog_use_tmp=0;
+
+  sprintf(buf, "%d", deletelog_use);
+  vget(++i, 0, "是否啟用Deletelog功\能?(是:1 否:0)：", buf, 10, GCARRY);
+  if(buf[0]=='1' || buf[0]=='0')
+    deletelog_use_tmp=atoi(buf);
+  else
+	  deletelog_use_tmp=0;
+
+  sprintf(buf, "%d", mail_to_newone);
+  vget(++i, 0, "是否寄信給新申請者?(是:1 否:0)：", buf, 10, GCARRY);
+  if(buf[0]=='1' || buf[0]=='0')
+    mail_to_newone_tmp=atoi(buf);
+  else
+	  mail_to_newone=0;
+
+
+  ans = vans("設定 1)確定 Q)取消 [Q] ");
+  {
+	  if(ans=='1')
+	  {
+        sprintf(set_path,".SET");
+        sprintf(set_tmp,".SET.TMP");
+
+		/* 將上述的修改寫回 .USR 以及對全站做同步更新 */
+        fp=fopen(set_tmp,"w");
+		{
+          host_sight_number=host_sight_number_tmp;
+          fprintf(fp,"%d\n",host_sight_number_tmp);
+
+          host_sight_select=host_sight_select_tmp;
+          fprintf(fp,"%d\n",host_sight_select_tmp);
+
+          model_number=model_number_tmp;
+          fprintf(fp,"%d\n",model_number_tmp);
+
+          model_select=model_select_tmp;
+		  fprintf(fp,"%d\n",model_select_tmp);
+
+          editlog_use=editlog_use_tmp;
+          fprintf(fp,"%d\n",editlog_use_tmp);
+
+          deletelog_use=deletelog_use_tmp;
+          fprintf(fp,"%d\n",deletelog_use_tmp);
+
+          mail_to_newone=mail_to_newone_tmp;
+          fprintf(fp,"%d\n",mail_to_newone_tmp);
+
+		  fclose(fp);
+		}
+        unlink(set_path);              /* smiler.071110: 上述設定保存一份於 .USR */
+        rename(set_tmp, set_path);     /* 修改站務設定設定選項時,記得要順便改  */
+		                               /* bbsd.c 內的 setuploader() */
+	  }
+  }
+  return 0;
+}
+
 
 
 int
@@ -153,7 +325,7 @@ a_xfile()		/* 設定系統檔案 */
     "接受連線名單",    /* smiler.070724 */
     "拒絕連線名單",
 #endif
-
+    "站務的情書",
     NULL
   };
 
@@ -201,7 +373,8 @@ a_xfile()		/* 設定系統檔案 */
     BBS_ACPFILE,
     BBS_DNYFILE,
 #endif
-    
+    FN_ETC_SYSMAIL,
+	NULL
   };
 
   x_file(M_XFILES, desc, path);
