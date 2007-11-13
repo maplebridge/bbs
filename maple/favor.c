@@ -127,7 +127,7 @@ mf_item_bar(xo, mode)
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
     }
-    prints("%s%6d%c  %s %-66.54s\033[m", mode ? "\033[1;42m" : "",
+    prints("%s%6d%c  %s %-66.54s\033[m", mode ? COLORBAR_BRD : "",
       num, mftype & MF_MARK ? ')' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
@@ -159,15 +159,31 @@ mf_item_bar(xo, mode)
     if (invalid)        /* itoc.010821: 被砍的看板要另外印 */
     {
       prints("%s         \033[36m%-13s%-56s\033[m", mode ?
-        "\033[1;42m" : "", mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
+        COLORBAR_BRD : "", mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
     }  /* 長度好難調 乾脆自己改了= =*/
   }
-  else /* if (mftype & MF_GEM) */
+  else if (mftype & MF_GEM)
   {
     prints("%s%6d%c  %s %-66.54s\033[m",
-      mode ? "\033[1;42m" : "",
+      mode ? COLORBAR_BRD : "",
       brdpost ? 0 : num,
       mftype & MF_MARK ? ')' : ' ', "■", mf->title);
+  }
+  else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
+  {
+    prints("%s%6d%c  %-69.54s\033[m",
+      mode ? COLORBAR_BRD : "",
+      brdpost ? 0 : num,
+      mftype & MF_MARK ? ')' : ' ', mf->title);
+  }
+  else /* if (mftype & MF_CLASS) */	/* LHD.051007: 分類群組 */
+  {
+    char cname[BNLEN + 2];
+
+    sprintf(cname, "%s/", mf->xname);
+    prints("%s%6d   %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
+      mode ? COLORBAR_BRD : "",num, cname, mf->class[3] & 7, mf->class,mode ? COLORBAR_BRD : "",
+	  mf->title);
   }
   return XO_NONE;
 }
