@@ -36,5 +36,8 @@ main()
     }
   }
 
+  sprintf(cmd, "cp %s/.USR %s/.SET %s/.BRD %s/", BBSHOME, BBSHOME, BBSHOME, bakpath);
+  system(cmd);
+
   exit(0);
 }
