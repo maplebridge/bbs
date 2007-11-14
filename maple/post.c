@@ -1097,6 +1097,8 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
   int ch, len;
   int in_chi;		/* 1: 在中文字中 */
   char title_tmp[64];  //smiler 1108
+  int chi_detect;      //smiler 071114
+  int i;               //smiler 071114
 #ifdef HAVE_DECLARE
   int square;		/* 1: 要處理方括 */
 #endif
@@ -1168,11 +1170,25 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
   /* 印出標題的種類					 */
   /* --------------------------------------------------- */
 
-  strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
-
   /* len: 標題是 type[] 裡面的那一種 */
-  if((hdr->xmode & POST_RESTRICT) && !(hdr->xmode & POST_FRIEND)) //smiler 1108
-       title = str_ttl(mark = title_tmp);
+  if((hdr->xmode & POST_RESTRICT)) //smiler 1108
+  {
+      strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
+      title = str_ttl(mark = title_tmp);
+  }
+  else if(strlen(hdr->title) >= cc)
+  {
+	  strncpy(title_tmp,hdr->title,cc-2);
+      chi_detect=0;
+	  for(i=0;i<(cc-2);i++)
+	  {
+         if(chi_detect || IS_ZHC_HI(title_tmp[i]))
+			 chi_detect ^= 1;
+	  }
+	  if(chi_detect)
+		  strncpy(title_tmp,hdr->title,cc-3);
+      title = str_ttl(mark = title_tmp);
+  }
   else
      title = str_ttl(mark = hdr->title);
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
@@ -1238,72 +1254,174 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   HDR *hdr;
   int cc;               /* 印出最多 cc - 1 個字 */
 {
-  static char *type[4] = {"Re", "◇", "\033[33m=>", "\033[32m◆"};
+
+  /* 回覆/轉錄/原創/閱讀中的同主題回覆/閱讀中的同主題轉錄/閱讀中的同主題原創 */
+  static char *type[6] = {"Re", "Fw", "◇", "\033[1;33m=>", "\033[1;33m=>", "\033[1;32m◆"};
   uschar *title, *mark;
   int ch, len;
-  char title_tmp[64];
-                                                                                
+  int in_chi;		/* 1: 在中文字中 */
+  char title_tmp[64];  //smiler 1108
+  int chi_detect;      //smiler 071114
+  int i;               //smiler 071114
+#ifdef HAVE_DECLARE
+  int square;		/* 1: 要處理方括 */
+#endif
 #ifdef CHECK_ONLINE
   UTMP *online;
 #endif
-                                                                                
-  if (cc)
-  {
-	  cc=cc-1;
-#ifdef HAVE_DECLARE     /* itoc.010117: 日期上色 */
-    prints(COLORBAR_POST" \033[3%dm%s\033[37;44m"COLORBAR_POST" ", cal_day(hdr->date) + 1, hdr->date + 3);
+
+   cc=cc-1; /*smiler.070724: 標題少需印一格 */
+  /* --------------------------------------------------- */
+  /* 印出日期						 */
+  /* --------------------------------------------------- */
+
+#ifdef HAVE_DECLARE
+  /* itoc.010217: 改用星期幾來上色 */
+  /*smiler.070724: 日期印出前,多空一格*/
+  prints(COLORBAR_POST" \033[1;3%dm%s\033[m"COLORBAR_POST" ", cal_day(hdr->date) + 1, hdr->date + 3);
+
 #else
-    outs(hdr->date + 3);
-    outc(' ');
+  prints(COLORBAR_POST" \033[m%s\033[m"COLORBAR_POST" ",hdr->date + 3);
 #endif
-                                                                                
-    mark = hdr->owner;
-    len = 13;
-                                                                                
+
+  /* --------------------------------------------------- */
+  /* 印出作者						 */
+  /* --------------------------------------------------- */
+
 #ifdef CHECK_ONLINE
-    if (online = utmp_get(0,mark))
-      prints("\033[37;44m"COLORBAR_POST);
+  if (online = utmp_seek(hdr))
+    outs(COLOR7);
 #endif
-                                                                                
-    while (ch = *mark)
-    {
-      if ((--len == 0) || (ch == '@'))
-        ch = '.';
-      outc(ch);
-                                                                                
-      if (ch == '.')
-        break;
-                                                                                
-      mark++;
-    }
-                                                                                
-    while (len--)
-    {
-      outc(' ');
-    }
-  }
-  else
+
+  mark = hdr->owner;
+  len = IDLEN + 1;
+  in_chi = 0;
+
+  while (ch = *mark)
   {
-    cc = 64;
+    if (--len <= 0)
+    {
+      /* 把超過 len 長度的部分直接切掉 */
+      /* itoc.060604.註解: 如果剛好切在中文字的一半就會出現亂碼，不過這情況很少發生，所以就不管了 */
+      ch = '.';
+    }
+    else
+    {
+      /* 站外的作者把 '@' 換成 '.' */
+      if (in_chi || IS_ZHC_HI(ch))	/* 中文字尾碼是 '@' 的不算 */
+	in_chi ^= 1;
+      else if (ch == '@')
+	ch = '.';
+    }
+      
+    outc(ch);
+
+    if (ch == '.')
+      break;
+
+    mark++;
   }
-                                                                                
+
+  while (len--)
+    outc(' ');
+
 #ifdef CHECK_ONLINE
   if (online)
-  {
     outs(str_ransi);
-	prints(COLORBAR_POST);
-  }
 #endif
-  strcpy(title_tmp,"<< 文章保密 >>");         //smiler 1108
-  if ((hdr->xmode & POST_RESTRICT)  && !(hdr->xmode & POST_FRIEND))
-	  title = str_ttl(mark = title_tmp);
+
+  /* --------------------------------------------------- */
+  /* 印出標題的種類					 */
+  /* --------------------------------------------------- */
+
+  /* len: 標題是 type[] 裡面的那一種 */
+  if((hdr->xmode & POST_RESTRICT)) //smiler 1108
+  {
+      strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
+      title = str_ttl(mark = title_tmp);
+  }
+  else if(strlen(hdr->title) >= cc)
+  {
+	  strncpy(title_tmp,hdr->title,cc-2);
+      chi_detect=0;
+	  for(i=0;i<(cc-2);i++)
+	  {
+         if(chi_detect || IS_ZHC_HI(title_tmp[i]))
+			 chi_detect ^= 1;
+	  }
+	  if(chi_detect)
+		  strncpy(title_tmp,hdr->title,cc-3);
+      title = str_ttl(mark = title_tmp);
+  }
   else
      title = str_ttl(mark = hdr->title);
-  ch = title == mark;
+  len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
-    ch += 2;
-                                                                                
-  prints("%s %-*.*s\033[m", type[ch], cc, cc, title);
+    len += 3;
+  prints(COLORBAR_POST);
+  outs(type[len]);
+  prints(COLORBAR_POST);
+  outc(' ');
+
+  /* --------------------------------------------------- */
+  /* 印出標題						 */
+  /* --------------------------------------------------- */
+
+  mark = title + cc;
+
+#ifdef HAVE_DECLARE	/* Thor.980508: Declaration, 嘗試使某些title更明顯 */
+  square = in_chi = 0;
+  if (len < 3)
+  {
+    if (*title == '[')
+    {
+      outs("\033[1m");
+      square = 1;
+    }
+  }
+#endif
+
+  prints(COLORBAR_POST);
+
+  /* 把超過 cc 長度的部分直接切掉 */
+  /* itoc.060604.註解: 如果剛好切在中文字的一半就會出現亂碼，不過這情況很少發生，所以就不管了 */
+  while ((ch = *title++) && (title < mark))
+  {
+#ifdef HAVE_DECLARE
+    if (square)
+    {
+      if (in_chi || IS_ZHC_HI(ch))	/* 中文字的第二碼若是 ']' 不算是方括 */
+      {
+	in_chi ^= 1;
+      }
+      else if (ch == ']')
+      {
+	outs("]\033[m"COLORBAR_POST);
+	square = 0;			/* 只處理一組方括，方括已經處理完了 */
+	continue;
+      }
+    }
+#endif
+
+    outc(ch);
+  }
+#if 1
+  while(title <= mark)
+  {
+	  prints(" ");
+	  title++;
+  }
+#endif
+
+#ifdef HAVE_DECLARE
+  if (square || len >= 3)	/* Thor.980508: 變色還原用 */
+#else
+  if (len >= 3)
+#endif
+    outs("\033[m");
+
+  prints("\033[m");
+  //outc('\n');
 }
 #endif
 
@@ -1854,8 +1972,8 @@ post_cross(xo)
   char xboard[BNLEN + 1], xfolder[64];
   HDR xpost;
 
-  HDR *hdr_org;              //smiler 1108
-  int pos, cur;              //smiler 1108
+  HDR *hdr_org;              
+  int pos, cur;              
 
   int tag, rc, locus, finish;
   int method;		/* 0:原文轉載 1:從公開看板/精華區/信箱轉錄文章 2:從秘密看板轉錄文章 */
@@ -1863,6 +1981,19 @@ post_cross(xo)
   char tmpboard[BNLEN + 1];
   char fpath[64], buf[ANSILINELEN];
   FILE *fpr, *fpw;
+
+  /*  解決信箱轉寄問題 */
+  int comefrom;          // 0: 從信箱轉寄 1: 從看板轉寄
+  char mail_path_tmp[64];
+  char userid_tmp[15];
+
+  str_lower_tmp(userid_tmp,cuser.userid);
+  sprintf(mail_path_tmp,"usr/%c/%s/.DIR",userid_tmp[0],userid_tmp);
+  if(!strcmp(mail_path_tmp,xo->dir))
+	  comefrom=0;
+  else
+	  comefrom=1;
+
 
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
@@ -1954,6 +2085,8 @@ post_cross(xo)
 	strcpy(ve_title, hdr->title);
     }
 
+	if(comefrom)                    /* smiler.071114: 需為處在看板,下面幾行才需作判斷 */
+	{
     if (hdr->xmode & GEM_FOLDER)	/* 非 plain text 不能轉 */
       continue;
 
@@ -1963,7 +2096,7 @@ post_cross(xo)
 #endif
     if (hdr->xmode & POST_NOFORWARD)
       continue;
-
+	}
     hdr_fpath(fpath, dir, hdr);
 
 #ifdef HAVE_DETECT_CROSSPOST
@@ -3020,6 +3153,117 @@ post_help(xo)
   return XO_HEAD;		/* itoc.001029: 與 xpost_help 共用 */
 }
 
+static int
+post_state(xo)
+  XO *xo;
+{
+  HDR *ghdr;
+  char fpath[64], *dir;
+  struct stat st;
+  
+
+  
+  if (!HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+                                                                                
+  ghdr = (HDR *) xo_pool + (xo->pos - xo->top);
+                                                                                
+  dir = xo->dir;
+
+  hdr_fpath(fpath, dir, ghdr);
+                                                                                
+  move(3, 0);
+  clrtobot();
+
+  prints("========  基本資料 ========\n");
+  if (!stat(fpath, &st))
+    prints("\n時間戳記 : %s\n檔案大小 : %d\n", Btime(&st.st_mtime), st.st_size);
+
+  prints("DIR 位置 : %s\n",dir);
+  prints("檔案名稱 : %s\n",ghdr->xname);
+  prints("檔案位置 : %s\n",fpath);
+  prints("作者     : %s\n",ghdr->owner);
+  prints("暱稱     : %s\n",ghdr->nick);
+  prints("發文日期 : %s\n",ghdr->date);
+  prints("文章標題 : %s\n",ghdr->title);
+  prints("========  文章屬性 ========\n");
+
+  
+  prints("文章標記 : ");
+  if(ghdr->xmode & POST_MARKED)
+	  prints("有");
+  else
+	  prints("無");
+
+  prints("    可否轉寄 : ");
+  if(ghdr->xmode & POST_NOFORWARD)
+	  prints("否\n");
+  else
+	  prints("可\n");
+
+  prints("可否評分 : ");
+  if(ghdr->xmode & POST_NOSCORE)
+	  prints("否");
+  else
+	  prints("可");
+
+  prints("    置底文 ? : ");
+  if(ghdr->xmode & POST_BOTTOM)
+	  prints("是\n");
+  else
+	  prints("否\n");
+
+
+  prints("標記待砍 : ");
+  if(ghdr->xmode & POST_DELETE)
+	  prints("是");
+  else
+	  prints("否");
+
+
+  prints("    轉信進來 : ");
+  if(ghdr->xmode & POST_INCOME)
+	  prints("是\n");
+  else
+	  prints("否\n");
+
+
+  prints("初級限制 : ");
+  if(ghdr->xmode & POST_FRIEND)
+	  prints("是");
+  else
+	  prints("否");
+
+
+  prints("    可轉站外 : ");
+  if(ghdr->xmode & POST_OUTGO)
+	  prints("是\n");
+  else
+	  prints("否\n");
+
+  prints("中級限制 : ");
+  if(ghdr->xmode & POST_RESTRICT)
+	  prints("是");
+  else
+	  prints("否");
+
+  prints("    最高限制 : ");
+  if(ghdr->xmode & POST_RESERVED)
+	  prints("是\n");
+  else
+	  prints("否\n");
+
+  prints("已被評分 : ");
+  if(ghdr->xmode & POST_SCORE)
+	  prints("是\n");
+  else
+	  prints("否\n");
+                                                                                
+  vmsg(NULL);
+                                                                                
+  return post_body(xo);
+}
+
 
 KeyFunc post_cb[] =
 {
@@ -3068,6 +3312,7 @@ KeyFunc post_cb[] =
   'O', XoBM_Refuse_pal,
   Ctrl('g'), post_viewpal,
   Ctrl('b'), post_showbm,
+  Ctrl('S'), post_state,
 #ifdef HAVE_REFUSEMARK
   'L', post_refuse,
   'l', post_friend,
