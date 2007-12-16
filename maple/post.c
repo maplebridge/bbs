@@ -2267,6 +2267,22 @@ post_mark(xo)
 }
 
 
+/*ryancid: reset parent_chrono*/
+static void
+reset_parent_chrono(hdd, ram)
+  HDR *hdd, *ram;
+{
+  hdd->parent_chrono=0;
+}
+
+/*ryancid: set parent_chrono*/
+static void
+set_parent_chrono(hdd, ram)
+  HDR *hdd, *ram;
+{
+  hdd->parent_chrono=1;
+}
+
 static int
 post_bottom(xo)
   XO *xo;
@@ -2283,6 +2299,10 @@ post_bottom(xo)
   
   if(!(hdr->xmode & POST_BOTTOM))
   {
+    /*Allow only one bottom post per article*/	
+    if(hdr->parent_chrono!=0)
+      return post_load(xo);
+
     hdr_fpath(fpath, xo->dir, hdr);
     hdr_stamp(xo->dir, HDR_LINK | 'A', &post, fpath);
 	post.parent_chrono = hdr->chrono;
@@ -2291,14 +2311,33 @@ post_bottom(xo)
 #else
     post.xmode = POST_BOTTOM;
 #endif
+    /*ryancid: copy the score*/
+    if(hdr->xmode & POST_SCORE)
+    {
+      post.xmode |= POST_SCORE;
+      post.score = hdr->score;
+    }
+    /**/
+
     strcpy(post.owner, hdr->owner);
     strcpy(post.nick, hdr->nick);
     strcpy(post.title, hdr->title);
 
     rec_add(xo->dir, &post, sizeof(HDR));
+    /**/
+    currchrono = hdr -> chrono;
+    rec_ref(xo->dir, hdr, sizeof(HDR), \
+	xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono ,\
+	set_parent_chrono);/*ryancid: set the parent_chrono*/
   }
   else
   {
+    /**/
+    currchrono = hdr->parent_chrono;
+    rec_ref(xo->dir, hdr, sizeof(HDR), \
+	xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono ,\
+	reset_parent_chrono);/*reset the original chrono*/
+
     currchrono = hdr->chrono;
     
     if (!rec_del(xo->dir, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono))
