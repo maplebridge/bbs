@@ -2373,7 +2373,7 @@ ve_key:
       case Ctrl('Z'):
 
 	cutmp->status |= STATUS_EDITHELP;
-	xo_help("post");
+	xo_help("edit");
 	cutmp->status ^= STATUS_EDITHELP;
 	ve_mode = mode | VE_REDRAW;
 	continue;

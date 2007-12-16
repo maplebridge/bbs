@@ -3337,7 +3337,7 @@ KeyFunc post_cb[] =
   '/', XoXtitle,		/* itoc.001220: 搜尋標題 */
   'f', XoXfull,			/* itoc.030608: 全文搜尋 */
   'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
-  Ctrl('L'), XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+  'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
 
 #ifdef HAVE_XYNEWS
   'u', XoNews,			/* itoc.010822: 新聞閱讀模式 */
@@ -3386,7 +3386,7 @@ KeyFunc xpost_cb[] =
   '/', XoXtitle,
   'f', XoXfull,
   'G', XoXmark,
-  'L', XoXlocal,
+  'K', XoXlocal,
 
   Ctrl('P'), post_add,
   Ctrl('D'), post_prune,

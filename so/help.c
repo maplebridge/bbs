@@ -32,7 +32,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
   cur = 0;
   pal = NULL;
 
-  sprintf(fpath_help_all, "gem/@/@help.all");  //smiler.070927
+  sprintf(fpath_help_all, "etc/help/%s/%s.hlp", path, path);
   more(fpath_help_all, NULL);                    //smiler.070927
 
   do
@@ -148,7 +148,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     case 'E':
-      if (!HAS_STATUS(STATUS_EDITHELP))	/* 若是從 vedit 時進來 help 則不能再 vedit */
+      if (HAS_PERM(PERM_ALLADMIN))
       {
 	i = cur + pageno * XO_TALL;
 	strcpy(str, pal[i].userid);

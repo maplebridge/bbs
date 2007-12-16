@@ -715,7 +715,7 @@ re_key:
       memcpy(tmp_block, block, sizeof(tmp_block));
 
       vs_save(slt);
-      xo_help("post");
+      xo_help("more");
       vs_restore(slt);
 
       fimage = tmp_fimage;
