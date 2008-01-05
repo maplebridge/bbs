@@ -926,8 +926,8 @@ static MENU menu_tool[] =
   menu_other, 0, M_XMENU,
   "Other      【 雜七雜八 】",
 
-  "bin/xyz.so:x_sysinfo", 0, M_XMENU,
-  "Info       【 系統資訊 】",
+  "bin/xyz.so:x_sysinfo", 0, - M_XMODE,
+  "SysInfo    【 系統資訊 】",
 
   menu_main, PERM_MENU + Ctrl('A'), M_XMENU,	/* itoc.020829: 怕 guest 沒選項 */
   "個人工具"
