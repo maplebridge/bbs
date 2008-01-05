@@ -9,6 +9,8 @@
 
 #include "bbs.h"
 
+extern UCACHE *ushm;
+extern char * const compile_time;
 
 #ifdef HAVE_TIP
 
@@ -128,6 +130,25 @@ x_loveletter()
 }
 #endif	/* HAVE_LOVELETTER */
 
+/* ----------------------------------------------------- */
+/* 顯示系統資訊                                          */
+/* ----------------------------------------------------- */
+
+int
+x_sysinfo()
+{
+  vmsg("當其他使用者忘記密碼時，重送新密碼至該使用者的信箱");
+  vs_bar("系統資訊");
+  move(2, 0);
+  prints("您現在位於 \033[1;37;41m【\033[1;33m " BBSNAME " \033[1;37;41m】\033[40m (" MYIPADDR ")\n"
+         "線上服務人數: %d/%d\n"
+	 "編譯時間:     %s\n",
+	 ushm->count, MAXACTIVE,
+	 compile_time );
+
+  vmsg(NULL);
+  return 0;
+}
 
 /* ----------------------------------------------------- */
 /* 密碼忘記，重設密碼					 */

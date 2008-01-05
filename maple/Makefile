@@ -14,11 +14,11 @@
 
 SRC =	acct.c bbsd.c bmw.c board.c cache.c edit.c favor.c \
 	gem.c mail.c menu.c more.c pal.c post.c talk.c ulist.c \
-	user.c visio.c window.c xover.c xpost.c
+	user.c visio.c window.c xover.c xpost.c vers.c
 
 OBJ =	acct.o bbsd.o bmw.o board.o cache.o edit.o favor.o \
 	gem.o mail.o menu.o more.o pal.o post.o talk.o ulist.o \
-	user.o visio.o window.o xover.o xpost.o
+	user.o visio.o window.o xover.o xpost.o vers.o
 
 EXE =	bbsd
 
@@ -46,6 +46,7 @@ sol-x86:
 	@$(MAKE) CC=gcc CFLAGS="-DSOLARIS -DSYSV -O2 -fomit-frame-pointer -Wunused -I../include" LDFLAGS="-s -L../lib -ldao -ltermcap -lsocket -lnsl -lresolv -lelf -ldl" $(EXE)
 
 freebsd:
+	@sh ./newvers.sh
 	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include" LDFLAGS="-s -L../lib -ldao -lcrypt -export-dynamic" $(EXE)
 
 bsd:
