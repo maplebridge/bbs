@@ -87,7 +87,7 @@ dns_smtp(host)
 
 #ifdef HAVE_RELAY_SERVER
   /* 如果有自定的 relay server，先 try 它試試 */
-  if ((sock = dns_open(RELAY_SERVER, 25)) >= 0)
+  if ((sock = dns_open(RELAY_SERVER, RELAY_SERVER_PORT)) >= 0)
     return sock;
 #endif
 

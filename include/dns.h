@@ -24,7 +24,8 @@
 #define	HAVE_RELAY_SERVER	/* 採用 relay server 來外寄信件 */
 
 #ifdef HAVE_RELAY_SERVER
-#define	RELAY_SERVER	"smtp.oz.nthu.edu.tw"	/* outbound mail server */
+#define	RELAY_SERVER	"127.0.0.1"	/* outbound mail server */
+#define RELAY_SERVER_PORT 25		/*outbound mail server port*/
 #endif
 
 
