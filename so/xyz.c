@@ -137,10 +137,9 @@ x_loveletter()
 int
 x_sysinfo()
 {
-  vmsg("當其他使用者忘記密碼時，重送新密碼至該使用者的信箱");
   vs_bar("系統資訊");
   move(2, 0);
-  prints("您現在位於 \033[1;37;41m【\033[1;33m " BBSNAME " \033[1;37;41m】\033[40m (" MYIPADDR ")\n"
+  prints("您現在位於 \033[1;37;41m【\033[1;33m " BBSNAME " \033[1;37;41m】\033[m (" MYIPADDR ")\n"
          "線上服務人數: %d/%d\n"
 	 "編譯時間:     %s\n",
 	 ushm->count, MAXACTIVE,
