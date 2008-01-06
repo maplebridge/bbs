@@ -609,7 +609,8 @@ x_file(mode, xlist, flist)
   char *fpath, *desc;
   char buf[64];
 
-  move(MENU_XPOS, 0);
+  //move(MENU_XPOS, 0);
+  move(1, 0);
   clrtobot();
   n = 0;
   while (desc = xlist[n])

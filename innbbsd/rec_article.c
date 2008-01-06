@@ -205,6 +205,52 @@ bbspost_topic_add(board, addr, nick ,board_from)
 
 }
 
+/* smiler.080101: 確定是否為title MI5 的轉信文 */
+int
+IS_MI5(s)
+  char *s;
+{
+    char * find_M;
+    int  FIND_MI5;
+    int i;
+    FIND_MI5=0;
+	if((strchr(s,'M') || strchr(s,'m')) && (strchr(s,'I') || strchr(s,'i')) && strchr(s,'5'))
+    {
+	 find_M=strchr(s,'M');
+	   //find_m=strchr(s,'m');
+	 for(i=0;i<=1;i++)
+	 {
+	   
+	   if(find_M)
+	   {
+		   while(1)
+		   {
+		     find_M++;
+			 if(( (*find_M) == 'I') || ( (*find_M) == 'i'))
+			 {
+				 while(1)
+				 {
+					 find_M++;
+					 if((*find_M) == '5')
+						 FIND_MI5=1;
+                     if( (( (*find_M) <='Z') && ((*find_M) >= 'A')) || (((*find_M) <='z') && ((*find_M) >= 'a')) )
+				         break;
+			         else if((*find_M)=='\0')
+				         break;
+				 }
+			 }
+			 else if( (( (*find_M) <='Z') && ((*find_M) >= 'A')) || (((*find_M) <='z') && ((*find_M) >= 'a')) )
+				 break;
+			 else if((*find_M)=='\0')
+				 break;
+		   }
+	   }
+       find_M=strchr(s,'m');
+	 }
+    }
+	return FIND_MI5;
+}
+
 static void
 bbspost_add(board, addr, nick)
   char *board, *addr, *nick;
@@ -586,8 +632,8 @@ receive_article()
 
       firstboard = 0;
     }
-
-    bbspost_add(nf->board, myaddr, mynick);
+    if(! IS_MI5(SUBJECT) )
+      bbspost_add(nf->board, myaddr, mynick);
   }		/* for board1,board2,... */
 
   return 0;
