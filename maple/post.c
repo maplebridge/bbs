@@ -1176,26 +1176,15 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
   }
-  else if(strlen(hdr->title) >= cc)
-  {
-	  strncpy(title_tmp,hdr->title,cc-2);
-      chi_detect=0;
-	  for(i=0;i<(cc-2);i++)
-	  {
-         if(chi_detect || IS_ZHC_HI(title_tmp[i]))
-			 chi_detect ^= 1;
-	  }
-	  if(chi_detect)
-		  strncpy(title_tmp,hdr->title,cc-3);
-      title = str_ttl(mark = title_tmp);
-  }
   else
      title = str_ttl(mark = hdr->title);
+
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
     len += 3;
   outs(type[len]);
   outc(' ');
+
 
   /* --------------------------------------------------- */
   /* 印出標題						 */
@@ -1217,7 +1206,7 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
 
   /* 把超過 cc 長度的部分直接切掉 */
   /* itoc.060604.註解: 如果剛好切在中文字的一半就會出現亂碼，不過這情況很少發生，所以就不管了 */
-  while ((ch = *title++) && (title < mark))
+  while ((ch = *title++) && (title < mark-3))
   {
 #ifdef HAVE_DECLARE
     if (square)
@@ -1236,6 +1225,17 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
 #endif
 
     outc(ch);
+  }
+
+  if(title == mark-3){
+
+    if(strlen(title) < 4){
+      outc(ch);
+      while (ch = *title++)
+	outc(ch);
+    }
+    else
+      outs(" ...");
   }
 
 #ifdef HAVE_DECLARE
@@ -1340,21 +1340,9 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
   }
-  else if(strlen(hdr->title) >= cc)
-  {
-	  strncpy(title_tmp,hdr->title,cc-2);
-      chi_detect=0;
-	  for(i=0;i<(cc-2);i++)
-	  {
-         if(chi_detect || IS_ZHC_HI(title_tmp[i]))
-			 chi_detect ^= 1;
-	  }
-	  if(chi_detect)
-		  strncpy(title_tmp,hdr->title,cc-3);
-      title = str_ttl(mark = title_tmp);
-  }
   else
      title = str_ttl(mark = hdr->title);
+
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
     len += 3;
@@ -1385,7 +1373,7 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
 
   /* 把超過 cc 長度的部分直接切掉 */
   /* itoc.060604.註解: 如果剛好切在中文字的一半就會出現亂碼，不過這情況很少發生，所以就不管了 */
-  while ((ch = *title++) && (title < mark))
+  while ((ch = *title++) && (title < mark-3))
   {
 #ifdef HAVE_DECLARE
     if (square)
@@ -1404,6 +1392,19 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
 #endif
 
     outc(ch);
+  }
+
+  if(title == mark-3){
+
+    if(strlen(title) < 4){
+      outc(ch);
+      while (ch = *title++)
+        outc(ch);
+     }  
+     else{
+        outs(" ...");
+        title += 4;
+	    }
   }
 #if 1
   while(title <= mark)
