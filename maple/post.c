@@ -2575,7 +2575,7 @@ post_delete(xo)
   cur = pos - xo->top;
   hdr = (HDR *) xo_pool + cur;
 
-  if ((hdr->xmode & POST_MARKED) ||
+  if ((hdr->xmode & POST_BOTTOM) || (hdr->xmode & POST_MARKED) ||
     (!(bbstate & STAT_BOARD) && strcmp(hdr->owner, cuser.userid)))
     return XO_NONE;
 
@@ -2636,7 +2636,7 @@ static int
 chkpost(hdr)
   HDR *hdr;
 {
-  return (hdr->xmode & POST_MARKED);
+  return ((hdr->xmode & POST_MARKED) || (hdr->xmode & POST_BOTTOM));
 }
 
 
@@ -2658,9 +2658,9 @@ delpost(xo, hdr)
   char Deletelog_folder[64],Deletelog_title[64],copied[64];
   HDR  Deletelog_hdr;
 
-  /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
- if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
-   return XO_NONE;
+//  /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
+// if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
+//   return XO_NONE;
 
   if(deletelog_use)
   {
@@ -2691,6 +2691,10 @@ post_rangedel(xo)
   if (!(bbstate & STAT_BOARD))
     return XO_NONE;
 
+  /* smiler.071111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
+  if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
+    return XO_NONE;
+
   btime_update(currbno);
 
   return xo_rangedel(xo, sizeof(HDR), chkpost, delpost);
@@ -2703,10 +2707,10 @@ post_prune(xo)
 {
   int ret;
 
-  /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
-  if((!strcmp(xo->dir,"Deletelog")) || (!strcmp(xo->dir,"Editlog")))
+  /* smiler.071111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
+  if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
 	  return XO_NONE;
-
+  
   if (!(bbstate & STAT_BOARD))
     return XO_NONE;
 
@@ -2789,7 +2793,7 @@ post_edit(xo)
   char Editlog_folder[64],Editlog_title[64],copied[64];
   HDR  Editlog_hdr;
 
-  /* smiler.1111 保護 Editlog 以及 Deletelog 板的備份資料 */
+  /* smiler.071111 保護 Editlog 以及 Deletelog 板的備份資料 */
  if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
    return XO_NONE;
 
