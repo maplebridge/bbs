@@ -35,7 +35,6 @@ main(argc, argv)
     while (de = readdir(dirp))
     {
       ACCT acct;
-      int fd;
       char *str;
 
       str = de->d_name;
@@ -46,14 +45,15 @@ main(argc, argv)
         continue;
       
       sprintf(buf, "%s/" FN_ACCT, str);
-      if (rec_get(fpath, &acct, sizeof(ACCT), 0) < 0)
+      if (rec_get(buf, &acct, sizeof(ACCT), 0) < 0)
       {
         printf("%s: read error (maybe no such id?)\n", str);
         continue;
       }
       
-      printf("%-15s %-60s\n", acct->userid, acct->email);
-
+      printf("%-15s %-60s\n", acct.userid, acct.email);
+    }
+  }
  
   return 0;
 }
