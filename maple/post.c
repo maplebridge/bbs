@@ -331,7 +331,8 @@ post_viewpal(xo)
   if (!cuser.userlevel)
     return XO_NONE;
   
-  if((!(bbstate & STAT_BM)) && (!(currbattr & BRD_SHOWPAL)))
+  //if((currbattr & BRD_SHOWPAL))
+  if((!(bbstate & STAT_BM)) && (currbattr & BRD_SHOWPAL)) //smiler.080203
     return XO_NONE;
 
   sprintf(fpath_org,"brd/%s/friend",currboard);
