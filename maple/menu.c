@@ -200,14 +200,26 @@ goodbye()
   bmw_log();			/* lkchu.981201: 水球記錄處理 */
 #endif
 
-  if (!(cuser.ufo & UFO_MOTD))	/* itoc.000407: 離站畫面一併簡化 */
+  //if (!(cuser.ufo & UFO_MOTD))	/* itoc.000407: 離站畫面一併簡化 */
+  if(1)
   {  
     clear();
     prints("親愛的 \033[32m%s(%s)\033[m，別忘了再度光臨【 %s 】\n"
       "以下是您在站內的註冊資料：\n",
       cuser.userid, cuser.username, str_site);
     acct_show(&cuser, 0);
-    vmsg(NULL);
+//    vmsg(NULL);
+	/* smiler.080201: 離站倒數 */
+    int i=3;
+    char buf[100];
+    while(i)
+    {
+        sprintf(buf,"資料將於 %d 秒後自動銷毀..",i);
+        delay_msg(buf,5);
+        i--;
+    }
+    clear();
+    delay_msg("Bye Bye!!",9);
   }
   
   u_exit("EXIT ");
@@ -895,7 +907,8 @@ static MENU menu_other[] =
   "bin/calendar.so:main_calendar", 0, - M_XMODE,
   "YCalendar  【 萬年月曆 】",
 #endif
-
+  "bin/dictd.so:main_dictd", 0, - M_XMODE,
+  "Dictd      【 英漢字典 】",
   menu_tool, PERM_MENU + Ctrl('A'), M_XMENU,	/* itoc.020829: 怕 guest 沒選項 */
   "其他功\能"
 };
@@ -1163,6 +1176,11 @@ menu()
     case Ctrl('U'):
       every_U(0);
       goto every_key;
+
+	case Ctrl('W'):
+      DL_func("bin/dictd.so:main_dictd");
+      goto every_key;
+
 #endif
 
     /* itoc.010911: Select everywhere，不再限制是在 M_0MENU */
@@ -1242,7 +1260,7 @@ default_key:
     if (cc != cx)	/* 若游標移動位置 */
     {
 //#ifdef CURSOR_BAR
-	if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
+	if(cuser.ufo & UFO_LIGHTBAR)
 	{
       if (cx >= 0)
       {

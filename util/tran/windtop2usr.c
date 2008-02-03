@@ -68,8 +68,8 @@ trans_ufo(oldufo, oldufo2)
   if (oldufo2 & OLDUFO2_VEDIT)
     ufo |= UFO_VEDIT;
 
-  if (oldufo2 & OLDUFO2_MOTD)
-    ufo |= UFO_MOTD;
+//  if (oldufo2 & OLDUFO2_MOTD)
+//    ufo |= UFO_MOTD;
 
   if (oldufo & OLDUFO_PAGER)
     ufo |= UFO_PAGER;
@@ -87,11 +87,11 @@ trans_ufo(oldufo, oldufo2)
 
   /* ufo |= UFO_BMWDISPLAY; */	/* 預設不要 */
 
-  if (oldufo2 & OLDUFO2_NWLOG)
-    ufo |= UFO_NWLOG;
+//  if (oldufo2 & OLDUFO2_NWLOG)
+//    ufo |= UFO_NWLOG;
 
-  if (oldufo2 & OLDUFO2_NTLOG)
-    ufo |= UFO_NTLOG;
+//  if (oldufo2 & OLDUFO2_NTLOG)
+//    ufo |= UFO_NTLOG;
 
   ufo |= UFO_NOSIGN;		/* 預設 */
 

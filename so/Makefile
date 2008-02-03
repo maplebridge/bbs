@@ -13,7 +13,7 @@
 # ------------------------------------------------------ #
 
 
-SO =	admutil.so aloha.so bank.so chat.so help.so innbbs.so manage.so newbrd.so \
+SO =	admutil.so aloha.so bank.so chat.so dictd.so help.so innbbs.so manage.so newbrd.so \
 	song.so vote.so xyz.so \
 	calendar.so classtable.so credit.so todo.so
 
@@ -22,7 +22,7 @@ SO =	admutil.so aloha.so bank.so chat.so help.so innbbs.so manage.so newbrd.so \
 .SUFFIXES: .c .o .so
 
 .c.o:	;  $(CC) $(CFLAGS) -c $*.c
-.o.so:	;  ld -s -G $*.o -o $*.so -L../lib -ldao
+.o.so:	;  ld -s -G $*.o -o $*.so -L/usr/local/lib -liconv -L../lib -ldao
 
 
 all: 
@@ -48,7 +48,7 @@ sol-x86:
 	@$(MAKE) CC=gcc CFLAGS="-DSOLARIS -DSYSV -O2 -fomit-frame-pointer -Wunused -I../include" $(SO)
 
 freebsd:
-	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include" $(SO)
+	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I/usr/local/include -I../include" $(SO)
 
 bsd:
 	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include" $(SO)

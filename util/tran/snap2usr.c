@@ -34,8 +34,8 @@ transfer_ufo(oldufo)
   if (oldufo & HABIT_VEDIT)
     ufo |= UFO_VEDIT;
 
-  if (oldufo & HABIT_MOTD)
-    ufo |= UFO_MOTD;
+//  if (oldufo & HABIT_MOTD)
+//    ufo |= UFO_MOTD;
 
   if (oldufo & HABIT_PAGER)
     ufo |= UFO_PAGER;

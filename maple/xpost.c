@@ -131,7 +131,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
     head = (HDR *) fimage + locus;
 
 #ifdef HAVE_REFUSEMARK
-    if ((head->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    if ((head->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, head))
       continue;
 #endif
 
@@ -141,6 +141,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
 
     list[count++] = locus;
   }
+
 
   munmap(fimage, fsize);
 
@@ -222,6 +223,7 @@ filter_select(head, hdr)
   HDR *hdr;	/* 條件 */
 {
   char *title;
+  char *xname;
   usint str4;
 
   /* 借用 hdr->xid 當 strlen(hdr->owner) */
@@ -238,6 +240,13 @@ filter_select(head, hdr)
       title += 4;
     if (!str_sub(title, hdr->title))
       return 0;
+  }
+
+  if (hdr->xname[0])
+  {
+     xname = head->xname;
+     if(strcmp(xname, hdr->xname))
+       return 0;
   }
 
   return 1;
@@ -322,6 +331,39 @@ XoXauthor(xo)
   hdr.title[0] = '\0';
   str_lower(author, author);
   hdr.xid = strlen(author);
+
+  return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
+}
+
+  /* --------------------------------------------------- */
+  /* 搜尋檔名                        */
+  /* --------------------------------------------------- */
+
+
+int
+XoXxname(xo)
+  XO *xo;
+{
+  HDR hdr;
+  char *xname;
+
+#ifdef EVERY_Z
+  if (z_status && xz[XZ_XPOST - XO_ZONE].xo)    /* itoc.020308: 不得累積進入二次 */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+#endif
+
+  xname = hdr.xname;
+  if (!vget(b_lines, 0, "標題關鍵字：", xname, 30, DOECHO))
+    return XO_FOOT;
+
+  strcpy(HintWord, xname);
+  HintAuthor[0] = '\0';
+
+  //str_lowest(title, title);
+  hdr.xid = 0;
 
   return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
 }
@@ -541,10 +583,8 @@ XoXmark(xo)
     return XO_FOOT;
   }
 #endif
-
   strcpy(HintWord, "\033[1;33m所有 mark 文章\033[m");
   HintAuthor[0] = '\0';
-
   return XoXpost(xo, NULL, 0, INT_MAX, filter_mark);
 }
 
@@ -585,6 +625,45 @@ XoXlocal(xo)
   HintAuthor[0] = '\0';
 
   return XoXpost(xo, NULL, 0, INT_MAX, filter_local);
+}
+
+
+/* smiler.080201: 整合搜尋功能 */
+int
+XOXpost_search_all(xo)
+  XO *xo;
+{
+  int ans;
+  switch (ans = vans("◎搜尋 1)作者標題 2)相同標題 3)作者 4)標題 5)全文 6)mark 7)local 8)檔名 [Q] "))
+  {
+    case '1':
+      return XoXselect(xo);  /* itoc.001220: 搜尋作者/標題 */
+      break;
+    case '2':
+      return XoXsearch(xo);  /* itoc.001220: 搜尋相同標題文章 */
+      break;
+	case '3':
+	  return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
+	  break;
+	case '4':
+	  return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
+	  break;
+	case '5':
+	  return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
+	  break;
+	case '6':
+	  return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
+	  break;
+	case '7':
+	  return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
+	  break;
+	case '8':
+	  return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
+	  break;
+    default:
+      return XO_FOOT;
+      break;
+  }
 }
 
 

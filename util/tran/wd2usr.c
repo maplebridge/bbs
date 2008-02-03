@@ -185,10 +185,10 @@ trans_acct_ufo(oldufo)
   else
     ufo &= ~UFO_MOVIE;
 
-  if (oldufo & OLDUFO_NOTE)
-    ufo &= ~UFO_MOTD;
-  else
-    ufo |= UFO_MOTD;
+//  if (oldufo & OLDUFO_NOTE)
+//    ufo &= ~UFO_MOTD;
+//  else
+//    ufo |= UFO_MOTD;
 
   return ufo;
 }

@@ -323,7 +323,8 @@ talk_save()
   /* lkchu.981201: 放進私人信箱內/清除 */
   usr_fpath(fpath, cuser.userid, FN_TALK_LOG);
 
-  if (!(cuser.ufo & UFO_NTLOG) && vans("本次聊天紀錄處理 (M)備忘錄 (C)清除？[M] ") != 'c')
+  //if (!(cuser.ufo & UFO_NTLOG) && vans("本次聊天紀錄處理 (M)備忘錄 (C)清除？[M] ") != 'c')
+  if (!(0) && vans("本次聊天紀錄處理 (M)備忘錄 (C)清除？[M] ") != 'c')
     mail_self(fpath, cuser.userid, "[備 忘 錄] 聊天紀錄", MAIL_READ | MAIL_NOREPLY);
 
   unlink(fpath);

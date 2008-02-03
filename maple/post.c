@@ -331,8 +331,7 @@ post_viewpal(xo)
   if (!cuser.userlevel)
     return XO_NONE;
   
-  //if((currbattr & BRD_SHOWPAL))
-  if((!(bbstate & STAT_BM)) && (currbattr & BRD_SHOWPAL)) //smiler.080203
+  if((!(bbstate & STAT_BM)) && (currbattr & BRD_SHOWPAL))
     return XO_NONE;
 
   sprintf(fpath_org,"brd/%s/friend",currboard);
@@ -1507,32 +1506,41 @@ post_item(num, hdr)
   HDR *hdr;
 {
 #ifdef HAVE_SCORE
-  
-  if(hdr->xmode & POST_BOTTOM)
-    prints("  \033[1;33m重要  \033[m");
-  else
-    prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-  if (hdr->xmode & POST_SCORE)
-  {
-    num = hdr->score;
-    if (num <= 99 && num >= -99)
-      prints("\033[%c;3%cm%2d\033[m", num == 0 ? '0' : '1', num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
-    else
-      prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
+  if(!(cuser.ufo & UFO_FILENAME))
+  {  
+   if(hdr->xmode & POST_BOTTOM)
+     prints("  \033[1;33m重要  \033[m");
+   else
+     prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+   if (hdr->xmode & POST_SCORE)
+   {
+     num = hdr->score;
+     if (num <= 99 && num >= -99)
+       prints("\033[%c;3%cm%2d\033[m", num == 0 ? '0' : '1', num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
+     else
+       prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
+   }
+   else
+   {
+     outs("  ");
+   }
   }
   else
-  {
-    outs("  ");
-  }
+   prints("%10s",hdr->xname);
+
   hdr_outs(hdr, d_cols + 46);	/* 少一格來放分數 */
 #else
-  /*ckm.070325: 置底文沒有編號*/
-  if(hdr->xmode & POST_BOTTOM)
-    prints("  \033[1;33m重要\033[m  ");
-  else
-    prints("%6d%c%c ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-    
-  hdr_outs(hdr, d_cols + 47);
+ if(!(cuser.ufo & UFO_FILENAME))
+ {
+   /*ckm.070325: 置底文沒有編號*/
+   if(hdr->xmode & POST_BOTTOM)
+     prints("  \033[1;33m重要\033[m  ");
+   else
+     prints("%6d%c%c ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+ }
+ else
+   prints("%10s",hdr->xname);    
+ hdr_outs(hdr, d_cols + 47);
 #endif
 }
 
@@ -1556,37 +1564,42 @@ post_item_bar(xo, mode)
                                                                                 
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
+
+ if(!(cuser.ufo & UFO_FILENAME))
+ {
   
-  if(hdr->xmode & POST_BOTTOM)
-  {
-  prints("%s%s%s%c%c",
-    mode ? COLORBAR_POST : "",
-    "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
-    tag_char(hdr->chrono), post_attr(hdr));
-  }
-  else
-  {
-  prints("%s%6d%c%c",
-    mode ? COLORBAR_POST : "",
-    num,
-    tag_char(hdr->chrono), post_attr(hdr));
-  }
+   if(hdr->xmode & POST_BOTTOM)
+   {
+   prints("%s%s%s%c%c",
+     mode ? COLORBAR_POST : "",
+     "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
+     tag_char(hdr->chrono), post_attr(hdr));
+   }
+   else
+   {
+   prints("%s%6d%c%c",
+     mode ? COLORBAR_POST : "",
+     num,
+     tag_char(hdr->chrono), post_attr(hdr));
+   } 
 
 
-  if (hdr->xmode & POST_SCORE)
-  {
-    //num = hdr->score;
-
-    num = hdr->score;
-    if (num <= 99 && num >= -99)
-        prints("%s\033[%c;3%cm%s%2d\033[m%s",mode ? COLORBAR_POST : "", '1', num > 0 ? '1' : num < 0 ? '2' : '7' ,mode ? COLORBAR_POST : num > 0 ? "\033[m\033[1;31m" : num < 0 ? "\033[m\033[1;32m" : "\033[m\033[1;37m" , abs(num),mode ? COLORBAR_POST : "");
-    else
-      prints("%s\033[1;3%s\033[m%s",mode ? COLORBAR_POST : "", num >= 0 ? "1m爆" : "2m噓",mode ? COLORBAR_POST : "");
-  }
-  else
-  {
-    outs("  ");
-  }
+   if (hdr->xmode & POST_SCORE)
+   {
+     //num = hdr->score;
+     num = hdr->score;
+     if (num <= 99 && num >= -99)
+         prints("%s\033[%c;3%cm%s%2d\033[m%s",mode ? COLORBAR_POST : "", '1', num > 0 ? '1' : num < 0 ? '2' : '7' ,mode ? COLORBAR_POST : num > 0 ? "\033[m\033[1;31m" : num < 0 ? "\033[m\033[1;32m" : "\033[m\033[1;37m" , abs(num),mode ? COLORBAR_POST : "");
+     else
+       prints("%s\033[1;3%s\033[m%s",mode ? COLORBAR_POST : "", num >= 0 ? "1m爆" : "2m噓",mode ? COLORBAR_POST : "");
+   }
+   else
+   {
+     outs("  ");
+   }
+ }
+ else
+   prints("%s%10s",mode ? COLORBAR_POST : "",hdr->xname);
                                                                                 
   if (mode)
     hdr_outs_bar(hdr, 46);    /* 少一格來放分數 */
@@ -1595,20 +1608,25 @@ post_item_bar(xo, mode)
 #else
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
-  if(hdr->xmode & POST_BOTTOM)
+  if(!(cuser.ufo & UFO_FILENAME))
   {
-    prints("%s%s%s%c%c ",
-    mode ? COLORBAR_POST : "",
-    "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
-    tag_char(hdr->chrono), post_attr(hdr));
+   if(hdr->xmode & POST_BOTTOM)
+   {
+     prints("%s%s%s%c%c ",
+     mode ? COLORBAR_POST : "",
+     "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
+     tag_char(hdr->chrono), post_attr(hdr));
+   }
+   else
+   {
+     prints("%s%6d%c%c ",
+     mode ? COLORBAR_POST : "",
+     num,
+     tag_char(hdr->chrono), post_attr(hdr));
+   }
   }
   else
-  {
-    prints("%s%6d%c%c ",
-    mode ? COLORBAR_POST : "",
-    num,
-    tag_char(hdr->chrono), post_attr(hdr));
-  }
+    prints("%s%10s",mode ? COLORBAR_POST : "",hdr->xname);
                                                                                 
   if (mode)
     hdr_outs_bar(hdr, 47);
@@ -3309,6 +3327,86 @@ post_state(xo)
   return post_body(xo);
 }
 
+/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
+static int
+post_filename(xo)
+  XO *xo;
+{
+  cuser.ufo ^= UFO_FILENAME;
+  cutmp->ufo = cuser.ufo;
+  return XO_INIT;
+}
+
+static int
+post_sub()
+{
+  char name[IDLEN + 1];
+  char url[30], fpath[80];
+  int bm;
+  FILE *fp;
+  
+  bm = bbstate & STAT_BOARD;
+  
+  if (bm)
+  {
+    if (!vget(b_lines - 1, 0, "*bookmark* : ", name, IDLEN + 1, DOECHO))
+      return XO_INIT;
+    if (!vget(b_lines - 1, 0, "*url* : ", url, 70, DOECHO))
+      return XO_INIT;
+
+    brd_fpath(fpath, currboard, "rss");
+
+    if(fp = fopen(fpath, "r"))
+	{
+		vmsg("已有RSS");
+		return XO_INIT;
+	}
+    else
+      fp = fopen(fpath, "w");
+    fprintf(fp, "%s\n%s", name, url);
+    fclose(fp);   
+  }  
+  return XO_INIT;
+}
+
+static int
+post_sub_delete()
+{
+  char fpath[80];
+  int bm; 
+  bm = bbstate & STAT_BOARD;
+  
+  if (bm)
+  {
+    brd_fpath(fpath, currboard, "rss");
+    unlink(fpath);
+  }  
+  return XO_INIT;
+}
+
+static int
+post_rss(xo)
+  XO *xo;
+{
+  int bm;
+  int ans;
+  bm = bbstate & STAT_BOARD;  
+  if (bm)
+  {
+     switch (ans = vans("◎RSS 1)新增 2)刪除 [Q] "))
+	 {
+       case '1':
+		   return post_sub();
+		   break;
+	   case '2':
+		   return post_sub_delete();
+		   break;
+	   default:
+		   return XO_INIT;
+	}
+  }
+  return XO_INIT;
+}
 
 KeyFunc post_cb[] =
 {
@@ -3325,7 +3423,7 @@ KeyFunc post_cb[] =
   KEY_TAB, post_gem,
   'z', post_gem,
   'o', post_noforward,
-
+  'f', post_filename,
   'y', post_reply,
   'd', post_delete,
   'v', post_visit,
@@ -3337,7 +3435,7 @@ KeyFunc post_cb[] =
   'm', post_mark,
   '_', post_bottom,
   'D', post_rangedel,
-
+//'S', post_rss,
 #ifdef HAVE_SCORE
   '%', post_score,
 #endif
@@ -3376,13 +3474,16 @@ KeyFunc post_cb[] =
   Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
 #endif
 
-  '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
-  'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
-  'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
-  '/', XoXtitle,		/* itoc.001220: 搜尋標題 */
-  'f', XoXfull,			/* itoc.030608: 全文搜尋 */
-  'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
-  'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+  '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
+
+  //'~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
+  //'~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
+  //'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
+  //'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
+  //'/', XoXtitle,		/* itoc.001220: 搜尋標題 */
+  //'f', XoXfull,			/* itoc.030608: 全文搜尋 */
+  //'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
+  //'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
 
 #ifdef HAVE_XYNEWS
   'u', XoNews,			/* itoc.010822: 新聞閱讀模式 */
@@ -3425,13 +3526,14 @@ KeyFunc xpost_cb[] =
   'n', post_label,
 #endif
 
-  '~', XoXselect,
-  'S', XoXsearch,
-  'a', XoXauthor,
-  '/', XoXtitle,
-  'f', XoXfull,
-  'G', XoXmark,
-  'K', XoXlocal,
+    '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
+//  '~', XoXselect,
+//  'S', XoXsearch,
+//  'a', XoXauthor,
+//  '/', XoXtitle,
+//  'f', XoXfull,
+//  'G', XoXmark,
+//  'K', XoXlocal,
 
   Ctrl('P'), post_add,
   Ctrl('D'), post_prune,

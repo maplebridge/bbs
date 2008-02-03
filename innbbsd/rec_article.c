@@ -251,6 +251,63 @@ IS_MI5(s)
 	return FIND_MI5;
 }
 
+/* smiler.080203: 各板自訂擋信機制 */
+static int
+belong_spam(filelist, addr, nick)
+  char *filelist, *addr, *nick;
+{
+  FILE *fp;
+  char buf[80];
+  char user[80], *host;
+  char *type, *spam;
+  int rc, checknum;
+
+  rc = 0;
+  if (fp = fopen(filelist, "r"))
+  {
+    str_ncpy(user, addr, sizeof(user));  /* 防止字串太長蓋過頭 */
+    if (host = (char *) strchr(user, '@'))
+    {
+      *host = '\0';
+      host++;
+    }
+
+    checknum = 0;
+    while (fgets(buf, 80, fp))
+    {
+      if (buf[0] == '#')        /* 加 # 是註解 */
+        continue;
+
+      if (++checknum >= 100)    /* 限 100 條 rule */
+        break;
+
+      type = (char *) strtok(buf, " \t\r\n");
+      if (type && *type)
+      {
+        spam = (char *) strtok(NULL, " \t\r\n");
+        if (spam && *spam)
+        {
+          /* nick、host 可以是 NULL，故要檢查 */
+          str_lowest(spam, spam);
+          if ((!strcmp(type, "user") && str_sub(user, spam)) ||
+            (!strcmp(type, "host") && host && str_sub(host, spam)) ||
+            (!strcmp(type, "nick") && nick && str_sub(nick, spam)) ||
+            (!strcmp(type, "subj") && str_sub(SUBJECT, spam)) ||
+            (!strcmp(type, "site") && str_sub(SITE, spam)) ||
+            (!strcmp(type, "from") && str_sub(FROM, spam)) ||
+            (!strcmp(type, "msgi") && str_str(MSGID, spam)))
+          {
+            rc = 1;
+            break;
+          }
+        }
+      }
+    }
+    fclose(fp);
+  }
+  return rc;
+}
+
 static void
 bbspost_add(board, addr, nick)
   char *board, *addr, *nick;
@@ -261,6 +318,13 @@ bbspost_add(board, addr, nick)
 
   char board2[30];                // smiler.070916
   strcpy(board2,"nthu.forsale");  // smiler.070916
+
+  /* smiler.080203: 各板自訂擋信機制 */
+  brd_fpath(fpath, board, "spam");                /* 每個板自己的 spam */
+  if (belong_spam(fpath, addr, nick))
+  {
+      board = "deleted";                          // 把有濾掉的信送去 deleted 板
+  }
 
   /* 寫入文章內容 */
 

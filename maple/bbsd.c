@@ -1075,7 +1075,8 @@ tn_motd()
 
   ufo = cuser.ufo;
 
-  if (!(ufo & UFO_MOTD))
+  //if (!(ufo & UFO_MOTD))
+  if(1)
   {
     more("gem/@/@-day", NULL);	/* 今日熱門話題 */
     pad_view();

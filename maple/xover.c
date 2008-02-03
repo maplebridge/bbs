@@ -1467,6 +1467,12 @@ xover(cmd)
     {
       cmd = every_U(zone);
     }
+    else if (cmd == Ctrl('W'))
+    {
+      DL_func("bin/dictd.so:main_dictd");
+      cmd = XO_INIT;
+    }
+
 #endif
 
     /* ------------------------------------------------- */

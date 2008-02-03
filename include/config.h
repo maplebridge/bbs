@@ -359,7 +359,7 @@
 /* visio.c bguard.c 自動踢人 */
 
 #ifdef TIME_KICKER
-#define IDLE_TIMEOUT	30		/* visio.c bguard.c 發呆過久自動簽退(分) */
+#define IDLE_TIMEOUT	1440	/* visio.c bguard.c 發呆過久自動簽退(分) */
 #define IDLE_WARNOUT	3		/* visio.c 發呆過久提醒(分) -- 自動簽退前三分鐘前 */
 #endif
 

@@ -263,7 +263,8 @@ bmw_edit(up, hint, bmw)
     {
       bmw_request = 0;
       bmw_pos = bmw_locus - 1;
-      if (cuser.ufo & UFO_BMWDISPLAY)
+      //if (cuser.ufo & UFO_BMWDISPLAY)
+	  if(1)
 	bmw_display(bmw_pos);
       bmw_reply_CtrlRT(ch);
       continue;
@@ -481,7 +482,8 @@ bmw_reply_CtrlRT(key)
   }
 
 #ifdef BMW_DISPLAY
-  if (cuser.ufo & UFO_BMWDISPLAY)
+  //if (cuser.ufo & UFO_BMWDISPLAY)
+  if(1)
   {
     move(2 + max - pos, 0);
     outc(' ');
@@ -525,7 +527,8 @@ bmw_reply()
   utmp_mode(M_BMW_REPLY);
 
 #ifdef BMW_DISPLAY
-  display = cuser.ufo & UFO_BMWDISPLAY;
+  //display = cuser.ufo & UFO_BMWDISPLAY;
+  display = 1;
   if (display)
   {
     vs_save(slt);	/* itoc.010313: 記錄 bmd_display 之前的 screen */
@@ -1116,7 +1119,8 @@ bmw_log()
   {
     usr_fpath(buf, cuser.userid, fn_amw);
 
-    if ((cuser.ufo & UFO_NWLOG) || !st.st_size)	/* itoc.000512: 不儲存水球記錄 */
+    //if ((cuser.ufo & UFO_NWLOG) || !st.st_size)	/* itoc.000512: 不儲存水球記錄 */
+	if ((0) || !st.st_size)	/* itoc.000512: 不儲存水球記錄 */
     {						/* itoc.020711: 如果 bmw size 是 0 就清除 */
       op = 'c';
     }

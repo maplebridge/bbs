@@ -1329,7 +1329,8 @@ igetch()
 	  /* Thor.990201.註解: 除了talk_rqst、chat之外，需要在動一動之後，重設tv_sec為60秒嗎? (預設值) */
 
 #ifdef TIME_KICKER
-    if(cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
+//    if(cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
+	if(1)
     {
 	  if (idle > IDLE_TIMEOUT)
 	  {

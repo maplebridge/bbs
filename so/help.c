@@ -20,6 +20,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
   char fpath_help_all[64];                       //smiler.070927
   int num, pageno, pagemax, redraw, reload;
   int ch, cur, i;
+  int j;                                         //smiler.080201
   struct stat st;
   PAL *pal;
 
@@ -76,7 +77,15 @@ do_help(path)	/* itoc.021122: 說明文件 */
 
       outf(FEETER_HELP);
       move(3 + cur, 0);
-      outc('>');
+      if(cuser.ufo & UFO_LIGHTBAR)
+      {
+        j = pageno * XO_TALL + cur;
+        clrtoeol();
+        prints("\033[1;42m%6d    %-14s%-54s\033[m", j+1,
+        pal[j].userid, pal[j].ship);
+      }
+      else
+        outc('>');
       redraw = 0;
     }
 
@@ -196,7 +205,24 @@ do_help(path)	/* itoc.021122: 說明文件 */
       pal = NULL;
       break;
     default:
+      if(cuser.ufo & UFO_LIGHTBAR)
+      {
+         move(3 + cur, 0); //smiler.071220
+         j = pageno * XO_TALL + cur;
+         clrtoeol();
+         prints("%6d    %-14s%s\n", j+1, pal[j].userid, pal[j].ship);
+      }
+
       ch = xo_cursor(ch, pagemax, num, &pageno, &cur, &redraw);
+
+      if(cuser.ufo & UFO_LIGHTBAR)
+      {
+        move(3 + cur, 0);
+        j = pageno * XO_TALL + cur;
+        clrtoeol();
+        prints("\033[1;42m%6d    %-14s%-54s\033[m", j+1,
+                 pal[j].userid, pal[j].ship);
+      }
       break;
     }
   } while (ch != 'q');

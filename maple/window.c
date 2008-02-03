@@ -434,6 +434,78 @@ pmsg(msg)
   vs_restore(slt);
   return x;
 }
+
+/* smiler.080201: 彈出式視窗，不需按按鍵，即會在delay一下後消失 */
+int
+delay_msg(msg,delay)
+  char *msg;int delay;      /* 不可為 NULL */
+{
+  int len, x, y, i;
+  char buf[80];
+
+  x_roll = vs_save(slt);
+
+  len = strlen(msg);
+  if (len < 16)     /* 取 msg title 其中較長者為 len */
+    len = 16;
+  if (len % 2)      /* 變成偶數 */
+    len++;
+  x = (b_lines - 4) >> 1;   /* 置中 */
+  y = (b_cols - 8 - len) >> 1;
+
+  strcpy(buf, "╭");
+  for (i = -4; i < len; i += 2)
+    strcat(buf, "─");
+  strcat(buf, "╮");
+  draw_line(x++, y, buf);
+  sprintf(buf, "│" COLOR4 "  %-*s  \033[m│", len, "From 楓橋驛站:  ");
+  draw_line(x++, y, buf);
+
+  strcpy(buf, "├");
+  for (i = -4; i < len; i += 2)
+    strcat(buf, "─");
+   strcat(buf, "┤");
+  draw_line(x++, y, buf);
+
+  sprintf(buf, "│\033[30;47m  %-*s  \033[m│", len, msg);
+  draw_line(x++, y, buf);
+
+  strcpy(buf, "╰");
+  for (i = -4; i < len; i += 2)
+    strcat(buf, "─");
+  strcat(buf, "╯");
+  draw_line(x++, y, buf);
+
+  move(b_lines, 0);
+
+  //x = vkey();
+
+  int ch;
+  int slideshow=delay;
+  struct timeval tv[9] =
+  {
+    {4, 0}, {3, 0}, {2, 0}, {1, 500000}, {1, 0},
+    {0, 800000}, {0, 600000}, {0, 400000}, {0, 200000}
+  };
+
+  refresh();
+  ch = 1;
+  //if (select(1, (fd_set *) &ch, NULL, NULL, tv + slideshow - 1) > 0)
+  if (select(1, NULL, NULL, NULL, tv + slideshow - 1) > 0)
+  {
+      /* 若播放中按任意鍵，則停止播放 */
+      slideshow = 0;
+      ch = vkey();
+      vmsg("1");
+  }
+  else
+  {
+      vs_restore(slt);
+  }
+  //return x;
+  return 1;
+}
+
 #endif	/* POPUP_MESSAGE */
 
 #endif	/* HAVE_POPUPMENU */

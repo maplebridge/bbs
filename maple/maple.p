@@ -233,6 +233,7 @@ int vkey(void);
 /* window.c */
 int pans(int x, int y, char *title, char **desc);
 int pmsg(char *msg);
+int delay_msg(char *msg,int delay);
 
 /* xover.c */
 XO *xo_new(char *path);
@@ -270,3 +271,4 @@ int news_head(XO *xo);
 int news_init(XO *xo);
 int news_load(XO *xo);
 int XoNews(XO *xo);
+int XOXpost_search_all(XO *xo);

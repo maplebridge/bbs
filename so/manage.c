@@ -251,6 +251,36 @@ post_memo_edit(xo)
   return XO_FOOT;
 }
 
+/* smiler.080203: 各板自訂擋信機制 */
+static int
+post_spam_edit(xo)
+  XO *xo;
+{
+  int mode;
+  char fpath[64];
+
+  mode = vans("擋信列表 (D)刪除 (E)修改 (Q)取消？[E] ");
+
+  if (mode != 'q')
+  {
+    brd_fpath(fpath, currboard, "spam");
+
+    if (mode == 'd')
+    {
+      unlink(fpath);
+      return XO_FOOT;
+    }
+    else
+    {
+	  more("etc/help/post/post_spam_ed",NULL); 
+      if (vedit(fpath, 0))      /* Thor.981020: 注意被talk的問題 */
+        vmsg(msg_cancel);
+    }
+
+    return XO_HEAD;
+  }
+  return XO_FOOT;
+}
 
 /* ----------------------------------------------------- */
 /* 板主功能 : 看板屬性					 */
@@ -568,6 +598,7 @@ post_manage(xo)
     "BQ",
     "BTitle  修改看板主題",
     "WMemo   編輯進板畫面",
+	"ASpam   看板擋信列表",
     "Manager 增減副板主",
 #  ifdef HAVE_SCORE
     "Score   設定可否評分",
@@ -581,10 +612,11 @@ post_manage(xo)
     NULL
   };
 #else
-  char *menu = "◎ 板主選單 (B)主題 (W)進板 (M)副板"
+  char *menu = "◎ 板主選單 (B)主題 (W)進板 (S)擋信 (M)副板"
 #  ifdef HAVE_SCORE
     " (S)評分"
 #  endif
+	" (R)鎖文 (V)名單"
 #  ifdef HAVE_MODERATED_BOARD
     " (L)權限 (O)板友"
 #  endif
@@ -605,6 +637,9 @@ post_manage(xo)
 
   case 'w':
     return post_memo_edit(xo);
+
+  case 'a':
+    return post_spam_edit(xo);
 
   case 'm':
     return post_changeBM(xo);
