@@ -3435,7 +3435,7 @@ KeyFunc post_cb[] =
   'm', post_mark,
   '_', post_bottom,
   'D', post_rangedel,
-//'S', post_rss,
+  'S', post_rss,
 #ifdef HAVE_SCORE
   '%', post_score,
 #endif

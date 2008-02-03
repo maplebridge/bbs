@@ -16,7 +16,7 @@ EXE =	brd2gem transacct transbrd \
 	ats2bmw ats2brd ats2gem ats2mf ats2pal ats2usr \
 	cola2brd cola2gem cola2post cola2usr \
 	fb2brd fb2gem fb2pal fb2usr \
-	mag2brd mag2gem mag2usr \
+	mag2brd mag2gem mag2usr rss_feed \
 	snap2usr snap2brd snap2hdr snap2MF snap2gem snap2gem2 snap2class snap2class2 \
 	sob2brd sob2gem sob2pal sob2usr \
 	wd2bmw wd2brd wd2gem wd2list wd2mf wd2pal wd2pip wd2usr \
