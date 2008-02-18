@@ -646,6 +646,8 @@ bmw_rqst()
     cutmp->bmw_count++;
 #endif
   }
+  else
+	  bit_rqst();
 }
 
 

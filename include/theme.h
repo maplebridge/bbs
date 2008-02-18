@@ -223,6 +223,8 @@ COLOR1 " »¡©ú¤å¥ó " COLOR2 " (¡ô/¡õ)¤W¤U (PgUp/PgDn)¤W¤U­¶ (Home/End)­º§À (¡÷r)Â
 #define FEETER_INNBBS	\
 COLOR1 " Âà«H³]©w " COLOR2 " (¡ô/¡õ)¤W¤U (PgUp/PgDn)¤W¤U­¶ (Home/End)­º§À (¡ö)(q)Â÷¶}           "
 
+#define FEETER_BITLBEE \
+COLOR1 " §Y®É³q   " COLOR2 " (^P/a/f)·s¼W/¤å³¹/¥Ø¿ý (E)½s¿è (T)¼ÐÃD (m)²¾°Ê (c)½Æ»s (p^V)¶K¤W   "
 
 /* ----------------------------------------------------- */
 /* ¯¸¥x¨Ó·½Ã±¦W						 */

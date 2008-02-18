@@ -250,5 +250,6 @@ static char *ModeTypeTable[] =
 #define	XZ_MBOX		(XO_ZONE + 11)	/* 信箱 */
 #define	XZ_POST		(XO_ZONE + 12)	/* 看板 */
 #define XZ_GEM		(XO_ZONE + 13)	/* 精華區 */
+#define XZ_BITLBEE	(XO_ZONE + 14)	/* BITLBEE */
 
 #endif				/* _MODES_H_ */

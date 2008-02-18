@@ -417,6 +417,8 @@ typedef struct
 
 static MENU menu_main[];
 static MENU menu_system[];
+static MENU menu_hala[];
+static MENU menu_msn[];
 
 /* ----------------------------------------------------- */
 /* administrator's maintain menu			 */
@@ -600,10 +602,29 @@ static MENU menu_talk[] =
   t_bmw, PERM_BASIC, M_BMW,
   "Write      【 回顧水球 】",
 
-  menu_main, PERM_MENU + 'U', M_TMENU,
-  "休閒聊天"
+  menu_hala, PERM_MENU + 'U', M_TMENU,
+  "楓人楓語"
 };
 
+static MENU menu_msn[] =
+{
+  bit_main,   PERM_BASIC, M_LUSERS,
+  "MSN     【 MSN Messenger 】",
+  bit_recall, PERM_BASIC, M_LUSERS,
+  "Log     【 回顧 msn 訊息 】",
+  menu_hala, PERM_MENU + 'M', M_TMENU,
+  "即時通訊"
+};
+
+static MENU menu_hala[] =
+{
+  menu_talk, PERM_BASIC, M_TMENU,
+  "TALK         【 楓人楓語 】 ",
+  menu_msn,  PERM_BASIC, M_TMENU,
+  "MSN          【 即時通訊 】 ",
+  menu_main, PERM_MENU + 'T', M_TMENU,
+  "休閒聊天"
+};
 
 /* ----------------------------------------------------- */
 /* user menu						 */
@@ -985,8 +1006,8 @@ static MENU menu_main[] =
   menu_mail, 0, M_MMENU, 
   "Mail      【 信件工具區 】",
 
-  menu_talk, 0, M_TMENU,
-  "Talk      【 休閒聊天區 】",
+  menu_hala, 0, M_TMENU,
+  "Hala      【 休閒聊天區 】",
 
   menu_user, 0, M_UMENU,
   "User      【 個人工具區 】",

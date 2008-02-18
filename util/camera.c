@@ -372,6 +372,11 @@ main()
 
   /* itoc.註解: 動態看板及點歌本合計只有 MOVIE_MAX - FILM_MOVIE - 1 篇才會被收進 movie */
 
+  mirror("gem/@/@-day", 1);         /* 本日十大熱門話題 */
+  mirror("gem/@/@-topmoney", 1);    /* 銀幣富翁封神榜 */
+  mirror("gem/@/@-topbrd", 1);      /* 熱門看板排行榜 */
+
+
   sprintf(fpath, "gem/brd/%s/@/@note", BN_CAMERA);	/* 動態看板的群組檔案名稱應命名為 @note */
   do_gem(fpath);					/* 把 [note] 精華區收進 movie */
 

@@ -22,6 +22,12 @@ void blog(char *mode, char *msg);
 void u_exit(char *mode);
 void abort_bbs(void);
 
+/* bitlbee.c */
+int bit_main(void);
+void bit_rqst(void);
+void bit_abort(void);
+int bit_recall (void);
+
 /* bmw.c */
 int can_override(UTMP *up);
 int can_see(UTMP *my, UTMP *up);

@@ -145,6 +145,7 @@ u_exit(mode)
   if (currbno >= 0 && bshm->mantime[currbno] > 0)
     bshm->mantime[currbno]--;	/* 退出最後看的那個板 */
 
+  bit_abort();          /* 登出 msn */
   utmp_free(cutmp);		/* 釋放 UTMP shm */
 
   diff = (time(&cuser.lastlogin) - ap_start) / 60;

@@ -712,4 +712,16 @@ typedef struct
   char blank[18];	/* «O¯d */
 } spamrule_t;
 
+/* ----------------------------------------------------- */
+/* bitlbee ªº user                                       */
+/* ----------------------------------------------------- */
+                                                                                
+typedef struct
+{
+  time_t btime;
+  char nick[20];
+  char addr[56];
+  char status[10];
+}   BITUSR;
+
 #endif				/* _STRUCT_H_ */
