@@ -7,6 +7,7 @@
 /* create : 05/06/08                                     */
 /* update : 08/02/18                                     */
 /*-------------------------------------------------------*/
+
 #include "bbs.h"
 
 extern XZ xz[];
@@ -159,7 +160,7 @@ bit_head (xo)
   vs_head ("MSN 列表", str_site);
   move (1, 0);
   prints
-    (" [w]傳訊 [^r]回訊 [c]改暱稱 [e]改別人暱稱 [^k]斷線 [s]儲存設定 [l]msn紀錄\n"
+	(" [w]傳訊 [c]改暱稱 [^k]斷線 [a]增刪聯絡人 [d]刪除聯絡人 [l]msn紀錄 [h]說明   \n"
     "\033[30;47m 編號   代   號             信          箱                     狀  態         \033[m");
 
   return bit_body (xo);
@@ -180,14 +181,14 @@ bit_load (xo)
   return bit_head (xo);
 }
 
-#if 0
+
 static int
-bit_help ()
+bit_help (xo)
+  XO *xo;
 {
-  film_out (FILM_MSN, -1);
-  return XO_INIT;
+  xo_help("msn");
+  return XO_HEAD;
 }
-#endif
 
 static int
 bit_write (xo)
@@ -260,7 +261,7 @@ bit_block (xo)
   return XO_FOOT;
 }
 
-
+#if 0
 static int
 bit_save (xo)
      XO *xo;
@@ -270,6 +271,7 @@ bit_save (xo)
   vmsg ("不過我還沒寫好啦 ^^;;");
   return XO_FOOT;
 }
+#endif
 
 static int
 bit_remv (xo)
@@ -418,13 +420,12 @@ static KeyFunc bit_cb[] = {
   'a', bit_add,
   'd', bit_remv,
   'l', bit_recall,
-  's', bit_save,
-  'e', bit_onick,
+//  's', bit_save,
+//  'n', bit_onick,
   'c', bit_mynick,
   'w', bit_write,
   Ctrl ('K'), bit_close,
-  'h', bit_test
-//  'h', bit_help
+  'h', bit_help
 };
 
 void

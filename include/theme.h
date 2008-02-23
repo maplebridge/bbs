@@ -15,13 +15,15 @@
 /* °ò¥»ÃC¦â©w¸q¡A¥H§Q¤¶­±­×§ï				 */
 /* ----------------------------------------------------- */
 
-#define COLOR1		"\033[34;46m"	/* footer/feeter ªº«e¬qÃC¦â */
-#define COLOR2		"\033[30;47m"	/* footer/feeter ªº«á¬qÃC¦â */
+//#define COLOR1		"\033[34;46m"	/* footer/feeter ªº«e¬qÃC¦â */
+#define COLOR1		"\033[m\033[1;33;44m"	/* footer/feeter ªº«e¬qÃC¦â */
+#define COLOR2		"\033[m\033[30;47m"	/* footer/feeter ªº«á¬qÃC¦â */
 #define COLOR3		"\033[30;47m"	/* neck ªºÃC¦â */
 #define COLOR4		"\033[1;44m"	/* ¥ú´Î ªºÃC¦â */
 #define COLOR5		"\033[34;47m"	/* more ÀÉÀYªº¼ÐÃDÃC¦â */
 #define COLOR6		"\033[37;44m"	/* more ÀÉÀYªº¤º®eÃC¦â */
 #define COLOR7		"\033[1m"	/* §@ªÌ¦b½u¤WªºÃC¦â */
+#define COLOR8      "\033[1;34;47m"	/* feeter ¥[±j¼Ðµù */
 
 #define COLORBAR_MENU   "\033[0;30;47m" /*  menu.c ¿ï³æ¥ú´Î */
 #define	COLORBAR_BRD	"\033[1;41m"	/*  board.c, favor.c ¿ï³æ¥ú´Î */
@@ -112,6 +114,9 @@
 #define NECKER_POST	"[¡ö]Â÷¶} [¡÷]¾\\Åª [^P]µoªí [b]¶iªOµe­± [d]§R°£ [V]§ë²¼ [TAB]ºëµØ°Ï [h]»¡©ú\n" \
 			COLOR3 "  ½s¸¹     ¤é ´Á §@  ªÌ       ¤å  ³¹  ¼Ð  ÃD%*s                 µû:%s  ¤H®ð:%-4d \033[m"
 
+#define NECKER_POST_FILE	"[¡ö]Â÷¶} [¡÷]¾\\Åª [^P]µoªí [b]¶iªOµe­± [d]§R°£ [V]§ë²¼ [TAB]ºëµØ°Ï [h]»¡©ú\n" \
+			COLOR3 "  ÀÉ¦W(f)  ¤é ´Á §@  ªÌ       ¤å  ³¹  ¼Ð  ÃD%*s                 µû:%s  ¤H®ð:%-4d \033[m"
+
 #define NECKER_GEM	"[¡ö]Â÷¶} [¡÷]ÂsÄý [B]¼Ò¦¡ [C]¼È¦s [F]Âà±H [d]§R°£ [h]»¡©ú  %s\n" \
 			COLOR3 "  ½s¸¹     ¥D              ÃD%*s                            [½s      ¿ï] [¤é  ´Á]\033[m"
 
@@ -158,8 +163,11 @@ COLOR1 " ¥æ½Í¼Ò¦¡ " COLOR2 " (^C,^D)µ²§ô¥æ½Í (^T)¤Á´«©I¥s¾¹ (^Z)§Ö±¶¦Cªí (^G)¹Í¹
 #define FOOTER_COSIGN	\
 COLOR1 " ³s¸p¾÷¨î " COLOR2 " (ry)¥[¤J³s¸p (kj)¤W¤U½g (¡ô¡õ¡ö)¤W¤UÂ÷¶} (h)»¡©ú                   " 
 
+//#define FOOTER_MORE	\
+//COLOR1 " ÂsÄý P.%d (%d%%) " COLOR2 " (h)»¡©ú [PgUp][PgDn][0][$]²¾°Ê (/n)·j´M (C)¼È¦s (¡öq)µ²§ô "
+
 #define FOOTER_MORE	\
-COLOR1 " ÂsÄý P.%d (%d%%) " COLOR2 " (h)»¡©ú [PgUp][PgDn][0][$]²¾°Ê (/n)·j´M (C)¼È¦s (¡öq)µ²§ô "
+COLOR1 " ÂsÄý P.%d (%d%%) " COLOR2 " (h)»¡©ú \033[m" COLOR8 "(@)°Êµe¼½©ñ\033[m" COLOR2 " (¡ô¡õ0$)²¾°Ê (/n)·j´M (C)¼È¦s (¡öq)µ²§ô  \033[m"
 
 #define FOOTER_VEDIT	\
 COLOR1 " %s " COLOR2 " (^Z)»¡©ú (^W)²Å¸¹ (^L)­«Ã¸ (^X)ÀÉ®×³B²z ùø%s¢x%sùø%5d:%3d    \033[m"
@@ -209,7 +217,7 @@ COLOR1 " ¦ê¦C·j´M " COLOR2 " (y)¦^À³ (x)Âà¿ý (m)¼Ð°O (d)§R°£ (^P)µoªí (^Q)¬d¸ß§@
 COLOR1 " «H«H¬Û±¤ " COLOR2 " (y)¦^«H (F/X/x)Âà±H/Âà¹F/Âà¿ý (d)§R°£ (D)°Ï¬q§R°£ (m)¼Ð°O (E)½s¿è  "
 
 #define FEETER_POST	\
-COLOR1 " ¤å³¹¦Cªí " COLOR2 " (ry)¦^«H (S/a)·j´M/¼ÐÃD/§@ªÌ (~G)¦ê¦C·j´M (x)Âà¿ý (V)§ë²¼ (u)·s»D  "
+COLOR1 " ¤å³¹¦Cªí \033[m" COLOR8 " (f)½s¸¹/ÀÉ¦W¤Á´«\033[m" COLOR2 " (ry)¦^«H " COLOR8 "(/)·j´M\¥\\¯à¾ã¦XÁä\033[m" COLOR2 " (x)Âà¿ý (V)§ë²¼ (u)·s»D"
 
 #define FEETER_GEM	\
 COLOR1 " ¬ÝªOºëµØ " COLOR2 " (^P/a/f)·s¼W/¤å³¹/¥Ø¿ý (E)½s¿è (T)¼ÐÃD (m)²¾°Ê (c)½Æ»s (p^V)¶K¤W   "

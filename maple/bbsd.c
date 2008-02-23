@@ -1079,6 +1079,8 @@ tn_motd()
   //if (!(ufo & UFO_MOTD))
   if(1)
   {
+	more("gem/@/@-Announce", NULL);  /* 近期公告 */
+	more("gem/@/@-goodboard", NULL); /* 推薦看板 */
     more("gem/@/@-day", NULL);	/* 今日熱門話題 */
     pad_view();
   }

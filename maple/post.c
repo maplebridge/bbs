@@ -1685,7 +1685,10 @@ post_head(xo)
   XO *xo;
 {
   vs_head(currBM, xo->xyz);
-  prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
+  if(!(cuser.ufo & UFO_FILENAME))
+    prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
+  else
+    prints(NECKER_POST_FILE, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
   return post_body(xo);
 }
 
@@ -2853,7 +2856,7 @@ post_edit(xo)
     btime_update(brd_bno("Editlog"));
 
   }
-  else if (cuser.userlevel && !strcmp(hdr->owner, cuser.userid))	/* 原作者修改 */
+  else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BOARD))	/* 板主/原作者修改 */
   {
 
 	/* smiler 1031 */

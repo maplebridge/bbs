@@ -1203,6 +1203,9 @@ menu()
       goto every_key;
 
 #endif
+    case 'h':                 /* smiler.080222: menu 的 help 選單 */
+	  xo_help("menu");
+      goto every_key;
 
     /* itoc.010911: Select everywhere，不再限制是在 M_0MENU */
     case 's':
