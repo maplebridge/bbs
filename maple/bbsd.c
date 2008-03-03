@@ -991,7 +991,7 @@ board_mail_to_user()
 		 { 
             strcpy(hdr.title, "楓橋站務寄給您的情書");
             strcpy(hdr.owner, STR_SYSOP);
-            hdr.xmode = MAIL_NOREPLY;
+            hdr.xmode = 0; 
             rec_add(fpath_mail, &hdr, sizeof(HDR));
             cutmp->status |= STATUS_BIFF;
 		 }
