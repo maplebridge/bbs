@@ -160,7 +160,7 @@ nbrd_item_bar(xo, mode)
     mode ? COLORBAR_NBRD : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
     (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m",mode ? COLORBAR_NBRD : "", nbrd->title,
-    "                ",mode ? "\033[m" : "");
+    (nbrd->mode & NBRD_NEWBOARD) ? "           " :"                ",mode ? "\033[m" : "");
                                                                                 
   return XO_NONE;
 }
