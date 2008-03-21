@@ -637,7 +637,7 @@ static MENU menu_msn[] =
 
 static MENU menu_thala[] =
 {
-  menu_talk, PERM_BASIC, M_TMENU,
+  menu_talk, 0, M_TMENU,
   "TALK         【 楓人楓語 】 ",
   menu_msn,  PERM_BASIC, M_TMENU,
   "MSN          【 即時通訊 】 ",
