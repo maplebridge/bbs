@@ -1296,7 +1296,7 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   mark = hdr->owner;
   len = IDLEN + 1;
   in_chi = 0;
-
+ 
   while (ch = *mark)
   {
     if (--len <= 0)
@@ -1509,7 +1509,7 @@ post_item(num, hdr)
   if(!(cuser.ufo & UFO_FILENAME))
   {  
    if(hdr->xmode & POST_BOTTOM)
-     prints("  \033[1;33m重要  \033[m");
+     prints("  \033[1;33m重要\033[m%c%c", tag_char(hdr->chrono), post_attr(hdr));
    else
      prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
    if (hdr->xmode & POST_SCORE)
@@ -1534,7 +1534,7 @@ post_item(num, hdr)
  {
    /*ckm.070325: 置底文沒有編號*/
    if(hdr->xmode & POST_BOTTOM)
-     prints("  \033[1;33m重要\033[m  ");
+     prints("  \033[1;33m重要\033[m%c%c", tag_char(hdr->chrono), post_attr(hdr));
    else
      prints("%6d%c%c ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
  }
