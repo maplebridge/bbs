@@ -657,6 +657,8 @@ pal_broadcast(xo)
   PAL *pal;
   UTMP *up;
 
+  bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+
   if (!HAS_PERM(PERM_PAGE))
     return XO_NONE;
 

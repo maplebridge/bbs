@@ -187,6 +187,8 @@ aloha()
   FRIENZ *frienz;
   int userno;
 
+  bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+
   usr_fpath(fpath, cuser.userid, FN_FRIENZ);
 
   if ((fd = open(fpath, O_RDONLY)) >= 0)
@@ -264,6 +266,8 @@ loginNotify()
   BENZ *benz;
   int userno;
   int row, col;		/* ­pºâ¦L¨ì­þ */
+
+  bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
 
   usr_fpath(fpath, cuser.userid, FN_BENZ);
 

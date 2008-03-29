@@ -838,6 +838,8 @@ ulist_broadcast(xo)
   UTMP *up;
   BMW bmw;
 
+  bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+
   num = cuser.userlevel;
   sysop = num & PERM_ALLADMIN;
   if (!sysop && (!(num & PERM_PAGE) || !(cuser.ufo & UFO_PAL)))

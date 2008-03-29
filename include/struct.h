@@ -228,6 +228,7 @@ typedef struct
   int recver;			/* called userno */
   char userid[IDLEN + 1 + 2];	/* itoc.010529: 保留 2 byte 給廣播符號 > */
   char msg[69];			/* 水球 */
+  char nick[20];        /* msn 傳送所需的nick */
 }      BMW;			/* bbs message write */
 
 

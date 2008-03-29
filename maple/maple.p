@@ -27,12 +27,14 @@ int bit_main(void);
 void bit_rqst(void);
 void bit_abort(void);
 int bit_recall (void);
+void bit_reply (char *nick, char *msg);
 
 /* bmw.c */
 int can_override(UTMP *up);
 int can_see(UTMP *my, UTMP *up);
 int bmw_send(UTMP *callee, BMW *bmw);
 void bmw_edit(UTMP *up, char *hint, BMW *bmw);
+void bit_bmw_edit(UTMP *up, char *hint, BMW *bmw);
 int bmw_reply_CtrlRT(int ch);
 void bmw_reply(void);
 void bmw_rqst(void);

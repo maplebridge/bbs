@@ -294,7 +294,7 @@ vs_head(title, mid)
 /* ------------------------------------- */
 
 
-static char feeter[160];
+static char feeter[300];
 
 
 /* itoc.010403: 把 feeter 的 status 獨立出來，預備供其他 function 叫用 */
@@ -307,7 +307,7 @@ status_foot()
   static int orig_money = -1;
   static int orig_gold = -1;
   static char flagmsg[100];
-  static char coinmsg[20];
+  static char coinmsg[100];
 
   int ufo;
   time_t now;
@@ -381,10 +381,11 @@ status_foot()
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
     coinmsg[7] = ' ';
   }
+
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg + 8, "金%4d%c ", 
+    sprintf(coinmsg + 8, "金"COLOR11"%4d%c "COLOR2, 
       (orig_gold & 0x7FF00000) ? (orig_gold >> 20) : (orig_gold & 0x7FFFFC00) ? (orig_gold >> 10) : orig_gold, 
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
   }
@@ -397,7 +398,7 @@ status_foot()
   /* itoc.010717: 改一下 feeter 使長度和 FEETER_XXX 一致 */
 //  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2 " 人數 %-4d 我是 %-12s %s [呼叫]%-9s  ",
 //    fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
-  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2 " 人數 %-4d 我是%-12s %s[呼叫]%-4s\033[m" COLOR2 " " COLOR8 "(h)說明",
+  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2 " 人數 "COLOR11"%-4d"COLOR2" 我是"COLOR11"%-12s"COLOR2" %s[呼叫]%-4s\033[m" COLOR2 " " COLOR8 "(h)說明",
     fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
   outf(feeter);
 }

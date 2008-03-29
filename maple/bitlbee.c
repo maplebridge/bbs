@@ -35,61 +35,107 @@ bit_fgets ()
     }
 }
 
+static void
+bit_item(num, pp)
+  int num;
+  BITUSR *pp;
+{
+
+	  (strstr (pp->status, "Online")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;36m線上\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Away")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;33m離開\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Busy")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;31m忙碌\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Idle")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;34m閒置\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Right")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;35m馬上回來\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Phone")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;32m電話中\033[m ",
+	    num, pp->nick, pp->addr) : 
+	  (strstr (pp->status,"Lunch")) ?
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m 外出吃飯 ",
+	    num, pp->nick, pp->addr) :
+	    prints
+	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m %-15.14s ",
+	    num, pp->nick, pp->addr, pp->status);
+		prints("\n");
+
+}
+
+#ifdef HAVE_LIGHTBAR
+static int
+bit_item_bar(xo, mode)
+  XO *xo;
+  int mode;     /* 1:上光棒  0:去光棒 */
+{
+	BITUSR *pp;
+                                                                                
+    pp = bit_pool + xo->pos - xo->top;
+
+    prints("%s%5d   \033[1;37m%-18.17s\033[m%s  \033[30;1m%-34.33s\033[m%s ",
+	    mode ? COLORBAR_PAL : "",
+		xo->pos + 1,
+		pp->nick,
+		mode ? COLORBAR_PAL : "",
+		pp->addr,
+		mode ? COLORBAR_PAL : ""
+		);
+                                                                                
+      (strstr (pp->status, "Online")) ?
+	    prints("\033[1;36m線上           \033[m") : 
+	  (strstr (pp->status,"Away")) ?
+	    prints("\033[1;33m離開           \033[m") : 
+	  (strstr (pp->status,"Busy")) ?
+	    prints("\033[1;31m忙碌           \033[m") : 
+	  (strstr (pp->status,"Idle")) ?
+	    prints("\033[1;34m閒置           \033[m") : 
+	  (strstr (pp->status,"Right")) ?
+	    prints("\033[1;35m馬上回來       \033[m") : 
+	  (strstr (pp->status,"Phone")) ?
+	    prints("\033[1;32m電話中         \033[m") : 
+	  (strstr (pp->status,"Lunch")) ?
+	              prints("外出吃飯       \033[m") :
+	              prints("               \033[m") ;
+
+
+    return XO_NONE;
+}
+#endif
+
+
 static int
 bit_body (xo)
      XO *xo;
 {
   BITUSR *pp;
-  int cnt, n = 2, max;
-
-  cnt = xo->top;
+  int num, max, tail;
+  pp = bit_pool;
   max = xo->max;
-  pp = &bit_pool[cnt];
-
-  while (++n < b_lines)
-    {
-      move (n, 0);
-      if (cnt++ < max)
-	{
-	  (strstr (pp->status, "Online")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;36m線上\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Away")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;33m離開\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Busy")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;31m忙碌\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Idle")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;34m閒置\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Right")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;35m馬上回來\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Phone")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;32m電話中\033[m ",
-	    cnt, pp->nick, pp->addr) : (strstr (pp->status,
-	      "Lunch")) ?
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m 外出吃飯 ",
-	    cnt, pp->nick,
-	    pp->
-	    addr) :
-	    prints
-	    ("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m %-15.14s ",
-	    cnt, pp->nick, pp->addr, pp->status);
-	}
-      else
-	clrtoeol ();
-
-      *pp++;
-    };
+  num = xo->top;
+  tail = num + XO_TALL;
+  if (max > tail)
+    max = tail;
+  
+  move(3, 0);
+  do
+  {
+    bit_item(++num, pp++);
+  } while (num < max);
+  clrtobot();
   return XO_NONE;
 }
 
@@ -219,6 +265,29 @@ bit_write (xo)
 
   vs_restore (sl);
   return XO_INIT;
+}
+
+
+/* smiler.080319: 回覆水球 */
+void
+bit_reply (nick, msg)
+     char *nick;
+     char *msg;
+{
+  char hint[30]; 
+  char str[65], file[128];
+  FILE *fp;
+
+  sprintf (hint, "★<%s> ", nick);
+
+  usr_fpath (file, cuser.userid, FN_MSN);
+  fp = fopen (file, "a");
+  fprintf (fp, "To %s (@msn)：%s\n", nick, msg);
+  fclose (fp);
+
+  fprintf (fw, "PRIVMSG %s :%s\r\n", nick, msg);
+  fflush (fw);
+
 }
 
 static int
@@ -367,9 +436,7 @@ bit_recall ()
   char fpath[80];
 
   usr_fpath (fpath, cuser.userid, FN_MSN);
-//  more (fpath, (char *) -1);
-more (fpath, NULL);
-
+  more (fpath, NULL);
   return XO_INIT;
 }
 
@@ -410,6 +477,9 @@ bit_test ()
 }
 
 static KeyFunc bit_cb[] = {
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, bit_item_bar,
+#endif
   XO_INIT, bit_init,
   XO_LOAD, bit_load,
   XO_HEAD, bit_head,
@@ -431,7 +501,7 @@ static KeyFunc bit_cb[] = {
 void
 bit_rqst ()
 {
-  char *nick, *msg, send[100], file[128];
+  char *nick, *msg, send[600], file[128];
   FILE *fp;
 
   while (fgets (buf, sizeof (buf), fr))
@@ -448,12 +518,33 @@ bit_rqst ()
 	  fp = fopen (file, "a");
 	  fprintf (fp, "\033[1;33;46m★%s (@msn) \033[m：%s", nick, msg);
 	  fclose (fp);
-
 	  cursor_save ();
-	  outz (send);
+
+	  /***  smiler.080319:送至bmw介面  ***/
+
+      UTMP *up;
+      BMW bmw;
+      char buf[20];
+	  char bmw_msg[49];
+
+
+      up = utmp_find(cuser.userno);
+      sprintf(buf, "★<%s>", up->userid);
+      if(strlen(msg) < 49)
+		  strcpy(bmw_msg,msg);
+	  else
+		  strncpy(bmw_msg,msg,48);
+
+	  bmw_msg[strlen(bmw_msg)-1]='\0';  /* smiler.080319:處理bmw_msg結尾有 '\n' */
+	  strcpy(bmw.nick,nick);       /* smiler.080319: 用於 bmw介面 reply msn*/
+      strcpy(bmw.msg,bmw_msg);
+      bit_bmw_edit(up,buf,&bmw);
+      /***********************************/
 	  cursor_restore ();
 	  refresh ();
 	  bell ();
+	  if(strlen(msg) >= 49)   /* 長度超過水球容許範圍,才印出 */
+		  vmsg("MSN訊息過長，請至【 回顧 msn 訊息 】觀看完整訊息 !!");
 	  break;
 	}
     }
