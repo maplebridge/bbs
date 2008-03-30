@@ -136,7 +136,7 @@ bit_body (xo)
     bit_item(++num, pp++);
   } while (num < max);
   clrtobot();
-  return XO_NONE;
+  return XO_FOOT;
 }
 
 static int

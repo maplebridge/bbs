@@ -235,7 +235,7 @@ COLOR1 " 說明文件 " COLOR9 " (↑/↓)"COLOR2"上下 "COLOR9"(PgUp/PgDn)"COLOR2"上下
 COLOR1 " 轉信設定 " COLOR9 " (↑/↓)"COLOR2"上下 "COLOR9"(PgUp/PgDn)"COLOR2"上下頁 "COLOR9"(Home/End)"COLOR2"首尾 "COLOR9"(←)(q)"COLOR2"離開           "
 
 #define FEETER_BITLBEE \
-COLOR1 " 即時通   " COLOR9 " (^P/a/f)"COLOR2"新增/文章/目錄 "COLOR9"(E)"COLOR2"編輯 "COLOR9"(T)"COLOR2"標題 "COLOR9"(m)"COLOR2"移動 "COLOR9"(c)"COLOR2"複製 "COLOR9"(p^V)"COLOR2"貼上   "
+COLOR1 "  即時通  "COLOR9" (w)"COLOR2"傳送訊息 " COLOR9 "(^r)"COLOR2"回覆訊息 " COLOR9 "(a/d)"COLOR2"增/刪聯絡人 " COLOR9 "(b/B)"COLOR2"封鎖/解除 "COLOR9"(^k)"COLOR2"斷線  " 
 
 /* ----------------------------------------------------- */
 /* 站台來源簽名						 */
