@@ -625,7 +625,7 @@ post_manage(xo)
     "OPal    板友名單",
 #  endif
 #  ifdef POST_PREFIX
-    "Prefix  自訂文章類別",
+//    "Prefix  自訂文章類別",
 #  endif    
     NULL
   };
@@ -639,7 +639,7 @@ post_manage(xo)
     " (L)權限 (O)板友"
 #  endif
 #  ifdef POST_PREFIX
-    " (P)類別"
+//    " (P)類別"
 #  endif    
     "？[Q] ";
 #endif
