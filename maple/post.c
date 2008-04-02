@@ -805,8 +805,9 @@ do_post(xo, title)
   }
   else		/* itoc.020113: 新文章選擇標題分類 */
   {
-#define NUM_PREFIX 6
-    char *prefix[NUM_PREFIX] = {"[公告] ", "[新聞] ", "[閒聊] ", "[文件] ", "[問題] ", "[測試] "};
+#define NUM_PREFIX 8 
+    char *prefix[NUM_PREFIX] = {"[問題] ", "[建議] ", "[討論] ", "[心得] ",
+    				"[閒聊] ", "[請益] ", "[公告] ", "[情報] "};
 
     move(21, 0);
     outs("類別：");

@@ -234,7 +234,7 @@
 
 #define	HAVE_LABELMARK		/* itoc.020307: 提供看板文章加待砍標記 */
 
-#undef	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
+#define	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
 
 #define	MULTI_MAIL		/* 群組寄信功能 */
 
