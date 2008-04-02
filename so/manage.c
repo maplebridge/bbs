@@ -487,6 +487,21 @@ post_changeBM(xo)
 }
 
 
+#ifdef POST_PREFIX
+/* ----------------------------------------------------- */
+/* 板主功能 : 自訂文章類別                               */
+/* ----------------------------------------------------- */
+
+
+static int
+post_prefix(xo)
+  XO *xo;
+{
+  vmsg("近期開放，敬請期待");
+  return XO_FOOT;
+}
+#endif /* POST_PREFIX */
+
 #ifdef HAVE_MODERATED_BOARD
 /* ----------------------------------------------------- */
 /* 板主功能 : 看板權限					 */
@@ -609,6 +624,9 @@ post_manage(xo)
     "Level   公開/好友/秘密",
     "OPal    板友名單",
 #  endif
+#  ifdef POST_PREFIX
+    "Prefix  自訂文章類別",
+#  endif    
     NULL
   };
 #else
@@ -620,6 +638,9 @@ post_manage(xo)
 #  ifdef HAVE_MODERATED_BOARD
     " (L)權限 (O)板友"
 #  endif
+#  ifdef POST_PREFIX
+    " (P)類別"
+#  endif    
     "？[Q] ";
 #endif
 
@@ -660,6 +681,11 @@ post_manage(xo)
   case 'o':
     return XoBM(xo);
 #endif
+
+#ifdef POST_PREFIX
+  case 'p':
+    return post_prefix(xo);
+#endif    
   }
 
   return XO_FOOT;
