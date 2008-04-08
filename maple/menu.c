@@ -376,8 +376,9 @@ status_foot()
   if (cuser.money != orig_money)
   {
     orig_money = cuser.money;
-    sprintf(coinmsg, "»È%4d%c", 
-      (orig_money & 0x7FF00000) ? (orig_money >> 20) : (orig_money & 0x7FFFFC00) ? (orig_money >> 10) : orig_money, 
+    sprintf(coinmsg, "»È%4d%c",
+       (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
+      (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,       
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
     coinmsg[7] = ' ';
   }
@@ -385,8 +386,9 @@ status_foot()
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg + 8, "ª÷"COLOR11"%4d%c "COLOR2, 
-      (orig_gold & 0x7FF00000) ? (orig_gold >> 20) : (orig_gold & 0x7FFFFC00) ? (orig_gold >> 10) : orig_gold, 
+    sprintf(coinmsg + 8, "ª÷"COLOR11"%4d%c "COLOR2,
+      (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
+      (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,      
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
   }
 
