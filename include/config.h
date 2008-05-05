@@ -289,7 +289,7 @@
 
 #define MAXBOARD	1024		/* 程秨狾计 */
 
-#define MAXACTIVE	512		/* 程计 */
+#define MAXACTIVE	5120		/* 程计 */
 
 /* ----------------------------------------------------- */
 /* ╰参把计；ㄤ盽ノ把计                                */
