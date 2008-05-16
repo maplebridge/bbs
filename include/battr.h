@@ -26,6 +26,7 @@
 #define BRD_PUBLIC	0x80	/* 公眾板 */
 #define BRD_NOL		0x00000100	/* 不可鎖文 */
 #define	BRD_SHOWPAL	0x00000200	/* 顯示板友名單 */
+#define BRD_PREFIX	0x00000400	/* 是否啟動看板 POST_PREFIX 功能:0 啟動 :1 關閉 */
 
 /* ----------------------------------------------------- */
 /* 各種旗標的中文意義					 */
@@ -50,6 +51,7 @@ static char *battr_tbl[NUMBATTRS] =
   "公眾板",			/* BRD_PUBLIC */
   "不可鎖文",		/* BRD_NOL */
   "顯示板友名單",	/* BRD_SHOWPAL */
+  "啟動POST_PREFIX" /* ~BRD_PREFIX */
 };
 
 #endif

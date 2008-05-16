@@ -282,6 +282,121 @@ post_spam_edit(xo)
   return XO_FOOT;
 }
 
+#ifdef POST_PREFIX
+/* ----------------------------------------------------- */
+/* 板主功能 : 修改發文類別                               */
+/* ----------------------------------------------------- */
+                                                                                                                                                                
+static int
+post_prefix_edit(xo)
+  XO *xo;
+{
+#define NUM_PREFIX      8
+  int i;
+  FILE *fp;
+  char fpath[64], buf[20], prefix[NUM_PREFIX][20], *menu[NUM_PREFIX + 3];
+  char *prefix_def[NUM_PREFIX] =   /* 預設的類別 */
+  {
+	  "[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "
+   // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
+  };
+                                                                                
+  if (!(bbstate & STAT_BOARD))
+    return XO_NONE;
+  
+  i = vans("類別 (D)刪除 (E)修改 (Q)取消？[E] ");
+                                                                                
+  if (i == 'q')
+    return XO_FOOT;
+                                                                                
+  brd_fpath(fpath, currboard, "prefix");
+                                                                                
+  if (i == 'd')
+  {
+    unlink(fpath);
+    return XO_FOOT;
+  }
+                                                                                
+  i = 0;
+                                                                                
+  if (fp = fopen(fpath, "r"))
+  {
+    for (; i < NUM_PREFIX; i++)
+    {
+      if (fscanf(fp, "%10s", buf) != 1)
+        break;
+      sprintf(prefix[i], "%d.%s", i + 1, buf);
+    }
+    fclose(fp);
+  }
+                                                                                
+  /* 填滿至 NUM_PREFIX 個 */
+  for (; i < NUM_PREFIX; i++)
+    sprintf(prefix[i], "%d.%s", i + 1, prefix_def[i]);
+                                                                                
+  menu[0] = "10";
+  for (i = 1; i <= NUM_PREFIX; i++)
+    menu[i] = prefix[i - 1];
+  menu[NUM_PREFIX + 1] = "0.離開";
+  menu[NUM_PREFIX + 2] = NULL;
+                                                                                
+  do
+  {
+    /* 在 popupmenu 裡面按 左鍵 離開 */
+    i = pans(3, 20, "文章類別", menu) - '0';
+    if (i >= 1 && i <= NUM_PREFIX)
+    {
+      strcpy(buf, prefix[i - 1] + 2);
+      if (vget(b_lines, 0, "類別：", buf, 10, GCARRY))
+        strcpy(prefix[i - 1] + 2, buf);
+    }
+  } while (i);
+                                                                                
+  if (fp = fopen(fpath, "w"))
+  {
+    for (i = 0; i < NUM_PREFIX; i++)
+      fprintf(fp, "%s ", prefix[i] + 2);
+    fclose(fp);
+  }
+                                                                                
+  return XO_FOOT;
+}
+#endif      /* POST_PREFIX */
+
+
+static int
+post_brd_prefix(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+                                                                                
+  oldbrd = bshm->bcache + currbno;
+                                                                                
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+                                                                                
+  switch (vans("使用文章類別 (1)使用\ (2)不使用\ (3)設定類別 (Q)取消？[Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_PREFIX;
+    break;
+  case '2':
+    newbrd.battr |= BRD_PREFIX;
+    break;
+  case '3':
+    post_prefix_edit(xo);
+  default:
+    return XO_FOOT;
+  }
+                                                                                
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+	  memcpy(oldbrd, &newbrd, sizeof(BRD));
+      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
 /* ----------------------------------------------------- */
 /* 板主功能 : 看板屬性					 */
 /* ----------------------------------------------------- */
@@ -486,7 +601,7 @@ post_changeBM(xo)
   return XO_BODY;
 }
 
-
+#if 0
 #ifdef POST_PREFIX
 /* ----------------------------------------------------- */
 /* 板主功能 : 自訂文章類別                               */
@@ -501,6 +616,7 @@ post_prefix(xo)
   return XO_FOOT;
 }
 #endif /* POST_PREFIX */
+#endif
 
 #ifdef HAVE_MODERATED_BOARD
 /* ----------------------------------------------------- */
@@ -625,7 +741,7 @@ post_manage(xo)
     "OPal    板友名單",
 #  endif
 #  ifdef POST_PREFIX
-//    "Prefix  自訂文章類別",
+    "Prefix  設定文章類別",
 #  endif    
     NULL
   };
@@ -639,7 +755,7 @@ post_manage(xo)
     " (L)權限 (O)板友"
 #  endif
 #  ifdef POST_PREFIX
-//    " (P)類別"
+    " (P)類別"
 #  endif    
     "？[Q] ";
 #endif
@@ -684,7 +800,8 @@ post_manage(xo)
 
 #ifdef POST_PREFIX
   case 'p':
-    return post_prefix(xo);
+	  post_brd_prefix(xo);
+    //return post_prefix_edit(xo);
 #endif    
   }
 

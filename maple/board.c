@@ -2277,6 +2277,26 @@ hdr_cmp(a, b)
 }
 
 
+static void
+add_class(brd,class_name)
+  BRD *brd;
+  char *class_name;
+{
+  HDR hdr;
+  char fpath[64];
+  
+  sprintf(fpath,"gem/@/@%s",class_name);
+
+  /* 加入適當的分類 */
+                                                                                
+  brd2gem(brd, &hdr);
+  rec_add(fpath, &hdr, sizeof(HDR));
+  rec_sync(fpath, sizeof(HDR), hdr_cmp, NULL);
+                                                                                
+//  vmsg("新板成立，程式自動加入 Class 群組成功\");
+}
+
+
 static int
 class_newbrd(xo)
   XO *xo;
@@ -2322,6 +2342,8 @@ class_newbrd(xo)
   {
     vmsg("新板成立，記著加入分類群組");
   }
+
+  add_class(&newboard,"NewBoard"); /* smiler.080516: 新開看板加入NewBoard群組內 */
 
   return class_init(xo);
 }

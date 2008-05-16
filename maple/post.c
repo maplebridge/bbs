@@ -233,14 +233,14 @@ XoBM_Refuse_pal(xo)
   ans=ans2=ans3=0;
 
   if((bbstate & STAT_BM))
-      ans3 = vans("◎選擇 好友:1 板友:2 任意編輯名單:3 [Q] ");
+      ans3 = vans("◎選擇 1)好友 2)板友 3)任意編輯名單 [Q] ");
   else
 	  ans3 = 49;
   
   switch (ans3)
   {
   case 49:
-    ans2 = vans("◎選擇 好友群組名單:1~5 任意編輯名單:6 [Q] ");
+    ans2 = vans("◎選擇 1~5)好友群組名單 6)任意編輯名單 [Q] ");
 	if(ans2==54)
 		ans=57;
 	else if(ans2> 54 || ans2<49)
@@ -248,7 +248,7 @@ XoBM_Refuse_pal(xo)
     break;
 
   case 50:
-    ans = vans("◎選擇 板友名單:0 板友特別名單:1~8 任意編輯名單:9 [Q] ");
+    ans = vans("◎選擇 0)板友名單 1~8)板友特別名單 9)任意編輯名單 [Q] ");
 	if(ans>57 || ans<48)
 		ans=-1;
     break;
@@ -805,20 +805,39 @@ do_post(xo, title)
   }
   else		/* itoc.020113: 新文章選擇標題分類 */
   {
-#define NUM_PREFIX 8 
-    char *prefix[NUM_PREFIX] = {"[問題] ", "[建議] ", "[討論] ", "[心得] ",
-    				"[閒聊] ", "[請益] ", "[公告] ", "[情報] "};
+#define NUM_PREFIX 8
+	if(!(currbattr & BRD_PREFIX))
+	{
+       FILE *fp;
+       char prefix[NUM_PREFIX][10];
+       char *prefix_default[NUM_PREFIX] = {"[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "};
 
-    move(21, 0);
-    outs("類別：");
-    for (mode = 0; mode < NUM_PREFIX; mode++)
-      prints("%d.%s", mode + 1, prefix[mode]);
+	   for (mode = 0; mode < NUM_PREFIX; mode++)
+       strcpy(prefix[mode], prefix_default[mode]);
+       brd_fpath(fpath, currboard, "prefix");
+       if (fp = fopen(fpath, "r"))
+	   {
+         for (mode = 0; mode < NUM_PREFIX; mode++)
+		 {
+          if (fscanf(fp, "%9s", fpath) != 1)
+            break;
+          strcpy(prefix[mode], fpath);
+		 }
+	   }
 
-    mode = vget(20, 0, "請選擇文章類別（按 Enter 跳過）：", fpath, 3, DOECHO) - '1';
-    if (mode >= 0 && mode < NUM_PREFIX)		/* 輸入數字選項 */
-      rcpt = prefix[mode];
-    else					/* 空白跳過 */
-      rcpt = NULL;
+    
+       move(21, 0);
+       outs("類別：");
+       for (mode = 0; mode < NUM_PREFIX; mode++)
+         prints("%d.%s", mode + 1, prefix[mode]);
+       mode = vget(20, 0, "請選擇文章類別（按 Enter 跳過）：", fpath, 3, DOECHO) - '1';
+       if (mode >= 0 && mode < NUM_PREFIX)		/* 輸入數字選項 */
+         rcpt = prefix[mode];
+       else					/* 空白跳過 */
+         rcpt = NULL;
+	}
+	else
+		rcpt = NULL;
   }
 
   if (!ve_subject(21, title, rcpt))
@@ -3362,7 +3381,7 @@ post_sub()
 
     if(fp = fopen(fpath, "r"))
 	{
-		vmsg("已有RSS");
+		vmsg("已有檔案，請先將舊的RSS檔案刪除後再重新新增 !!");
 		return XO_INIT;
 	}
     else

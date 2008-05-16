@@ -84,7 +84,8 @@ bit_item_bar(xo, mode)
 {
 	BITUSR *pp;
                                                                                 
-    pp = bit_pool + xo->pos - xo->top;
+    //pp = bit_pool + xo->pos - xo->top;
+    pp = bit_pool + xo->pos;
 
     prints("%s%5d   \033[1;37m%-18.17s\033[m%s  \033[30;1m%-34.33s\033[m%s ",
 	    mode ? COLORBAR_PAL : "",
@@ -123,7 +124,7 @@ bit_body (xo)
 {
   BITUSR *pp;
   int num, max, tail;
-  pp = bit_pool;
+  pp = &bit_pool[xo->top]; //
   max = xo->max;
   num = xo->top;
   tail = num + XO_TALL;

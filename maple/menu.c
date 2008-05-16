@@ -208,21 +208,23 @@ goodbye()
       "以下是您在站內的註冊資料：\n",
       cuser.userid, cuser.username, str_site);
     acct_show(&cuser, 0);
-//    vmsg(NULL);
+    vmsg(NULL);
 	/* smiler.080201: 離站倒數 */
-    int i=3;
-    char buf[100];
-    while(i)
-    {
-        sprintf(buf,"資料將於 %d 秒後自動銷毀..",i);
-        delay_msg(buf,5);
-        i--;
-    }
+//    int i=3;
+//    char buf[100];
+//    while(i)
+//    {
+//        sprintf(buf,"資料將於 %d 秒後自動銷毀..",i);
+//        delay_msg(buf,5);
+//        i--;
+//    }
     clear();
-    delay_msg("Bye Bye!!",9);
+//    delay_msg("Bye Bye!!",9);
   }
   
   u_exit("EXIT ");
+  clear();    //
+  refresh(); //080515
   exit(0);
 }
 
