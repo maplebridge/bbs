@@ -46,12 +46,12 @@
 
 //#define BBSHOME		"/home/bbs"		/* BBS 的家 */
 //#define BAKPATH		"/home/bbs/bak"		/* 備份檔的路徑 */
-#define BBSHOME	"/home/maple"		/* BBS 的家 */
-#define BAKPATH	"/bak/maple"		/* 備份檔的路徑 */
+#define BBSHOME	"/home/bbs"		/* BBS 的家 */
+#define BAKPATH	"/bak/bbs"		/* 備份檔的路徑 */
 
 
 #define BBSUID		10000
-#define BBSGID		100			/* Linux 請設為 999 */
+#define BBSGID		999			/* Linux 請設為 999 */
 
 
 /* ----------------------------------------------------- */
@@ -381,9 +381,10 @@
 
 /* camera.c 動態看板 */
 
-#define	MOVIE_MAX	180		/* 動畫張數 */
-#define	MOVIE_SIZE	(108 * 1024)	/* 動畫 cache size */
-
+#define	MOVIE_MAX	200		/* 動畫張數 */
+#define	MOVIE_SIZE	(200 * 2048)	/* 動畫 cache size */
+/* showyou@2008/05/24: MOVIE_MAX 180 -> 200; 
+ *                     MOVIE_SIZE (108 * 1024) -> (200 * 2048) */
 
 /* ----------------------------------------------------- */
 /* chat.c & xchatd.c 中採用的 protocol			 */
