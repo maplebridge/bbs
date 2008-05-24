@@ -787,6 +787,37 @@ gem_link(brdname)	/* 檢查連結去其他看板精華區的權限 */
   return level;
 }
 
+static int
+is_sbm(title,userid)
+char *title;
+char *userid;
+{
+   char *start;
+   char *end;
+   char *pch;
+
+   if( ( start=strrchr(title,'[') ) && ( end=strrchr(title,']') ) )
+   {
+	   if(start < end)
+       {
+		   if(pch=strstr(title,userid))
+		   {
+			   if((start<pch) && (pch<end))
+			   {
+				   pch--;
+				   if((*pch=='[') || (*pch=='/'))
+				   {
+					   pch=pch+1+strlen(userid);
+					   if((*pch==']') || (*pch=='/'))
+						   return 1;
+				   }
+			   }
+		   }
+	   }
+   }
+   return 0;
+
+}
 
 static int
 gem_browse(xo)
@@ -810,23 +841,24 @@ gem_browse(xo)
     if (xmode & GEM_FOLDER)
     {
       strcpy(title, hdr->title);
-
       if (xmode & GEM_BOARD)
       {
-	if ((op = gem_link(hdr->xname)) < 0)
-	{
-	  vmsg("對不起，此板精華區只准板友進入，請向板主申請入境許\可");
-	  return XO_FOOT;
-	}
-      }
+	     if ((op = gem_link(hdr->xname)) < 0)
+		 {
+	       vmsg("對不起，此板精華區只准板友進入，請向板主申請入境許\可");
+	       return XO_FOOT;
+		 }
+	  }
       else			/* 一般卷宗才有小板主 */
       {
-	op = xo->key;		/* 繼承母卷宗的權限 */
+	       op = xo->key;		/* 繼承母卷宗的權限 */
 
-	/* itoc.011217: [userA/userB 的多位小板主模式也適用 */
-	if ((ptr = strrchr(title, '[')) && is_bm(ptr + 1, cuser.userid))
-	  op |= GEM_W_BIT | GEM_M_BIT;
-      }
+	      /* itoc.011217: [userA/userB 的多位小板主模式也適用 */
+	      //if ((ptr = strrchr(title, '[')) && is_bm(ptr + 1, cuser.userid))
+	      //    op |= GEM_W_BIT | GEM_M_BIT;
+          if(is_sbm(title,cuser.userid))
+			  op |= GEM_W_BIT | GEM_M_BIT;
+	  }
 
       XoGem(fpath, title, op);
       return gem_init(xo);
