@@ -46,12 +46,12 @@
 
 //#define BBSHOME		"/home/bbs"		/* BBS 的家 */
 //#define BAKPATH		"/home/bbs/bak"		/* 備份檔的路徑 */
-#define BBSHOME	"/home/bbs"		/* BBS 的家 */
-#define BAKPATH	"/bak/bbs"		/* 備份檔的路徑 */
+#define BBSHOME	"/home/maple"		/* BBS 的家 */
+#define BAKPATH	"/bak/maple"		/* 備份檔的路徑 */
 
 
 #define BBSUID		10000
-#define BBSGID		999			/* Linux 請設為 999 */
+#define BBSGID		100			/* Linux 請設為 999 */
 
 
 /* ----------------------------------------------------- */
