@@ -287,7 +287,7 @@
 /* ╰参把计；繦 BBS 砏家Θτ耎糤		         */
 /* ----------------------------------------------------- */
 
-#define MAXBOARD	1024		/* 程秨狾计 */
+#define MAXBOARD	8192		/* 程秨狾计 */
 
 #define MAXACTIVE	5120		/* 程计 */
 
