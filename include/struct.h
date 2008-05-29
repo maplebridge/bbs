@@ -378,7 +378,7 @@ typedef struct
 #define CLASS_IMGFILE_TITLE	"run/classtitle.img"
 
 
-#define CH_MAX		100	/* 程だ摸计ヘ */
+#define CH_MAX		10000	/* 程だ摸计ヘ */
 #define	CH_END		-1
 #define	CH_TTLEN	64
 
