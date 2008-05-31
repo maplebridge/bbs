@@ -26,6 +26,9 @@ static void XoSong();
 #define SONG_SAY	"<~Say~>"
 #define SONG_END	"<~End~>"
 
+/* showyou@20080531: 把設定改成 define，未來方便修改 */
+#define	ORDER_MAX	3
+#define ORDER_MONEY	500
 
 #ifdef LOG_SONG_USIES
 static int			/* -1:沒找到  >=0:pos */
@@ -162,6 +165,9 @@ song_check(xo, fpath, op)
     return NULL;
 
   if ((op & GEM_FILE) && (gtype & GEM_FOLDER))
+    return NULL;
+
+  if((gtype & GEM_LINE)||(gtype & GEM_RESERVED))
     return NULL;
 
   if (fpath)
@@ -422,7 +428,7 @@ count_ktv()	/* itoc.021102: ktv 板裡面已有幾篇的點歌記錄 */
     if (!strcmp(hdr->owner + IDLEN + 1, cuser.userid) &&
       hdr->chrono > yesterday)
     {
-      if (++count >= 3)		/* 限制點三首 */
+      if (++count >= ORDER_MAX)		/* showyou@20080531:限制點歌次數 */
 	break;
     }
   }
@@ -439,9 +445,11 @@ song_order(xo)
 #ifdef HAVE_ANONYMOUS
   int annoy;
 #endif
-  char fpath[64], des[20], say[57], buf[64];
+  int rc;
+  char fpath[64], des[20], say[57], buf[64], rcpt[48], msg_tmp[64];
   HDR *hdr, xpost;
   FILE *fpr, *fpw;
+  ACCT acct;
 
   /* itoc.註解: song_order 視同 post */
   if (!HAS_PERM(PERM_POST))
@@ -454,24 +462,27 @@ song_order(xo)
     return XO_FOOT;
   }
 
-  if (count_ktv() >= 3)		/* 限制點三首 */
+  if (count_ktv() >= ORDER_MAX)		/* showyou@20080531:限制點歌次數 */
   {
     vmsg("過去二十四小時內您已點選過多歌曲");
     return XO_FOOT;
   }
 
-  if (cuser.money < 1000)
+  if (cuser.money < ORDER_MONEY)	/* 點歌花費的金錢 */
   {
-    vmsg("要 1000 銀幣才能點歌到看板喔");
+    sprintf(msg_tmp, "要 %d 銀幣才能點歌到看板喔", ORDER_MONEY);
+    // vmsg("要 1000 銀幣才能點歌到看板喔");
+    vmsg(msg_tmp);
+
     return XO_FOOT;
   }
 
   if (!(hdr = song_check(xo, fpath, GEM_FILE)))
     return XO_NONE;
 
-  if (!vget(b_lines, 0, "點歌給誰：", des, sizeof(des), DOECHO))
+  if (!vget(b_lines, 0, "點歌給誰(可匿名)：", des, sizeof(des), DOECHO))
     return XO_FOOT;
-  if (!vget(b_lines, 0, "想說的話：", say, sizeof(say), DOECHO))
+  if (!vget(b_lines, 0, "對他(她)想說的話：", say, sizeof(say), DOECHO))
     return XO_FOOT;
 
 #ifdef HAVE_ANONYMOUS
@@ -484,7 +495,7 @@ song_order(xo)
   if (!(fpr = fopen(fpath, "r")))
     return XO_FOOT;
 
-  cuser.money -= 1000;
+  cuser.money -= ORDER_MONEY; /* showyou@20080531: 修改成 ORDER_MONEY */
 
 #ifdef LOG_SONG_USIES
   song_usies_log(hdr->chrono, hdr->title);
@@ -521,6 +532,77 @@ song_order(xo)
 
   btime_update(brd_bno(BN_KTV));
 
+/* showyou@20080531: 詢問是否要一併寄給對方(Add-On) */
+  strcpy(rcpt, des);
+  if (vans("是否要寄到對方信箱(Y/N)？[N] ") == 'y'){
+    if (!vget(b_lines, 0, "寄到誰的信箱(真實 ID 或 E-mail)?", rcpt, sizeof(rcpt), DOECHO))
+      return XO_FOOT;
+
+    song_check(xo, fpath, GEM_FILE); /* get fpath */
+
+    if (!strchr(rcpt, '@')){
+      /* 站內的寄信處理.... */ 
+      /* 加入文章檔案 */
+
+      if(acct_load(&acct, rcpt) < 1){
+        /* 不存在這個帳號，就無法站內寄信 */
+        return XO_FOOT;
+      }
+
+      if (!(fpr = fopen(fpath, "r")))
+        return XO_FOOT;   /* acct 可能會 clear，所以要重繪 */
+
+      usr_fpath(fpath, acct.userid, fn_dir);
+
+      if (fpw = fdopen(hdr_stamp(fpath, 0, &xpost, buf), "w"))
+      {
+
+#ifdef HAVE_ANONYMOUS
+        song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
+#else
+        song_quote(fpr, fpw, cuser.userid, des, say);
+#endif
+        fclose(fpw);
+      }
+
+      fclose(fpr);
+
+      /* 加入 .DIR record */
+
+      strcpy(xpost.owner, cuser.userid);
+      strcpy(xpost.nick, cuser.username);
+      sprintf(xpost.title, "%s 點歌給您", cuser.userid);
+      rec_add(fpath, &xpost, sizeof(HDR));
+
+      mail_hold(buf, acct.userid, xpost.title, 0);
+      m_biff(acct.userno);   /* 若對方在線上，則要通知有新信 */
+
+      return XO_FOOT;
+    }
+    else{ /* 站外 internet 信箱 */
+        if (!(fpr = fopen(fpath, "r")))
+          return XO_FOOT;
+
+        sprintf(fpath, "tmp/song_internet.%s", cuser.userid);
+        fpw = fopen(fpath, "w");
+
+#ifdef HAVE_ANONYMOUS
+        song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
+#else
+        song_quote(fpr, fpw, cuser.userid, des, say);
+#endif
+        
+        fclose(fpr);
+        fclose(fpw);
+
+        rc = bsmtp(fpath, "點歌給您", rcpt, 0);
+        vmsg(rc >= 0 ? msg_sent_ok : "信件無法寄達，底稿備份在信箱");
+ 
+        mail_hold(fpath, rcpt, hdr->title, rc);
+        unlink(fpath);
+     }
+   }
+
   return XO_FOOT;
 }
 
@@ -544,7 +626,7 @@ song_send(xo)
   if (acct_get("點歌給誰：", &acct) < 1)	/* acct_get 可能會 clear，所以要重繪 */
     return song_head(xo);
 
-  if (!vget(b_lines, 0, "想說的話：", say, sizeof(say), DOECHO))
+  if (!vget(b_lines, 0, "對他(她)想說的話：", say, sizeof(say), DOECHO))
     strcpy(say, ".........");
 
   if (vans("確定點歌嗎(Y/N)？[Y] ") == 'n')
@@ -579,7 +661,7 @@ song_send(xo)
   mail_hold(buf, acct.userid, xpost.title, 0);
   m_biff(acct.userno);		/* 若對方在線上，則要通知有新信 */
 
-  return song_head(xo);				/* acct_get 可能會 clear，所以要重繪 */
+  return song_head(xo); 	/* acct_get 可能會 clear，所以要重繪 */
 }
 
 
