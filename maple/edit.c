@@ -728,7 +728,7 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
   usr_fpath(fpath, cuser.userid, buf);	/* itoc.020123: 各個簽名檔檔案分開 */
   len = strlen(fpath) - 1;
 
-  for (ch = '1'; ch <= '3'; ch++)	/* 三個簽名檔 */
+  for (ch = '1'; ch <= '9'; ch++)	/* 九個簽名檔 */
   {
     fpath[len] = ch;
 
@@ -1115,7 +1115,7 @@ ve_quote(this)
   FILE *fp;
   textline *next;
   char *str, buf[ANSILINELEN];
-  static char msg[] = "選擇簽名檔 (1/2/3 0=不加 r=亂數)[0]：";
+  static char msg[] = "選擇簽名檔 (1...9 0=不加 r=亂數)[0]：";
 
   next = this->next;
 
@@ -1204,7 +1204,7 @@ ve_quote(this)
     msg[33] = op = cuser.signature + '0';
     if (fd = vget(b_lines, 0, msg, buf, 3, DOECHO))
     {
-      if (op != fd && ((fd >= '0' && fd <= '3') || fd == 'r'))
+      if (op != fd && ((fd >= '0' && fd <= '9') || fd == 'r'))
       {
 	cuser.signature = fd - '0';
 	op = fd;
@@ -1212,7 +1212,7 @@ ve_quote(this)
     }
 
     if (op == 'r')
-      op = (time(0) % 3) + '1';
+      op = (time(0) % 9) + '1';
 
     if (op != '0')
     {
@@ -1509,9 +1509,11 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 		  select_devide=host_sight_number;
 	  }
   }
- //select_devide=4;
+
+ //select_devide=4;
   select=(int) (t->tm_sec) % (select_devide);  /* smiler.071030: select witch 站簽 */
- 
+
+ 
                                                                                 
                                                                                
   if(cuser.sex==0)      /* smiler.071030: 由使用者性別設定要load的站簽娃娃 */
