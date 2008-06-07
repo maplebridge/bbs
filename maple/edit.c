@@ -1715,7 +1715,8 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
   }
   else
   {
-    fprintf(fp, MODIFY_BANNER, cuser.userid, fromhost, Now());
+    //fprintf(fp, MODIFY_BANNER, cuser.userid, fromhost, Now());
+      fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), fromhost);
   }
 }
 
