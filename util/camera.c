@@ -15,6 +15,13 @@ static char *list[] = 		/* src/include/struct.h */
   "opening.0",			/* FILM_OPENING0 */
   "opening.1",			/* FILM_OPENING1 */
   "opening.2",			/* FILM_OPENING2 */
+  "opening.3",			/* FILM_OPENING3 */
+  "opening.4",			/* FILM_OPENING4 */
+  "opening.5",			/* FILM_OPENING5 */
+  "opening.6",			/* FILM_OPENING6 */
+  "opening.7",			/* FILM_OPENING7 */
+  "opening.8",			/* FILM_OPENING8 */
+  "opening.9",			/* FILM_OPENING9 */
   "goodbye", 			/* FILM_GOODBYE  */
   "notify",			/* FILM_NOTIFY   */
   "mquota",			/* FILM_MQUOTA   */
@@ -353,7 +360,7 @@ main()
 
   for (i = 0; str = list[i]; i++)
   {
-    if (i >= FILM_OPENING0 && i <= FILM_OPENING2 && feast[0])	/* 若是節日，開頭畫面用該節日的畫面 */
+    if (i >= FILM_OPENING0 && i <= FILM_OPENING9 && feast[0])	/* 若是節日，開頭畫面用該節日的畫面 */
     {
       mirror(feast, 0);
     }

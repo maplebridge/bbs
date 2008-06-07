@@ -95,7 +95,7 @@ void mf_main(void);
 /* gem.c */
 int gem_link(char *brdname);
 void brd2gem(BRD *brd, HDR *gem);
-void gem_buffer(char *dir, HDR *hdr, int (*fchk)());
+void gem_buffer(char *dir, HDR *hdr, int (*fchk)(), int gem_mode);
 int gem_gather(XO *xo);
 void XoGem(char *folder, char *title, int level);
 void gem_main(void);
@@ -169,6 +169,9 @@ void header_replace(XO *xo, HDR *fhdr);
 int post_cross(XO *xo);
 int post_forward(XO *xo);
 int post_write(XO *xo);
+int post_t_score(XO *xo,char *reason_input,HDR *hdr_in);
+int post_x_score(XO *xo,char *reason_input);
+int post_e_score(XO *xo);
 int post_score(XO *xo);
 void hdr_outs_bar(HDR *hdr, int cc);
 void post_history(XO *xo, HDR *hdr);

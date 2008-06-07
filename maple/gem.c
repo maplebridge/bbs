@@ -1068,10 +1068,11 @@ gbuf_malloc(num)
 
 
 void
-gem_buffer(dir, hdr, fchk)
+gem_buffer(dir, hdr, fchk ,gem_mode)
   char *dir;
   HDR *hdr;			/* NULL 代表放入 TagList, 否則將傳入的放入 */
-  int (*fchk)();		/* 允許放入 gbuf 的條件 */
+  int (*fchk)();	/* 允許放入 gbuf 的條件 */
+  int gem_mode;     /* 0:其他 1:gem_gather() */
 {
   int max, locus, num;
   HDR *gbuf, buf;
@@ -1096,6 +1097,12 @@ gem_buffer(dir, hdr, fchk)
     {
       memcpy(gbuf, hdr, sizeof(HDR));
       num++;
+	  if(gem_mode)
+	  {
+	    hdr->xmode |= POST_GEM;
+	    currchrono = hdr->chrono;
+        rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
+	  }
     }
   }
   else
@@ -1110,6 +1117,14 @@ gem_buffer(dir, hdr, fchk)
 	memcpy(gbuf + num, &buf, sizeof(HDR));
 	num++;
       }
+
+	  if(strstr(dir,"brd/") && gem_mode)
+	  {
+		  buf.xmode |= POST_GEM;
+		  currchrono = buf.chrono;
+          rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
+	  }
+
     } while (++locus < max);
   }
 
@@ -1146,7 +1161,7 @@ gem_copy(xo)
     return XO_FOOT;
 
   IamBM = (xo->key & GEM_M_BIT);
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict ,0);
 
   zmsg("拷貝完成。[注意] 貼上後才能刪除原文！");
   /* return XO_FOOT; */
@@ -1488,7 +1503,7 @@ gem_gather(xo)
 
   /* gather 視同 copy，可準備作 paste */
   dir = xo->dir;
-  gem_buffer(dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkgather);
+  gem_buffer(dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkgather, 1);
 
   if (!GemBufferNum)
   {

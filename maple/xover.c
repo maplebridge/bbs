@@ -597,6 +597,15 @@ xo_forward(xo)
   if (!cuser.userlevel || HAS_PERM(PERM_DENYMAIL))
     return XO_NONE;
 
+  if(strstr(xo->dir,"brd/"))
+  {
+   if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
+   {
+	   vmsg("本看板禁止轉錄 !!");
+       return XO_NONE;
+   }
+  }
+
   tag = AskTag("轉寄");
   if (tag < 0)
     return XO_FOOT;
@@ -620,12 +629,12 @@ xo_forward(xo)
     else
     {
       if (!HAS_PERM(PERM_LOCAL))
-	return XO_FOOT;
+	     return XO_FOOT;
 
       if ((userno = acct_userno(rcpt)) <= 0)
       {
-	zmsg(err_uid);
-	return XO_FOOT;
+	     zmsg(err_uid);
+	     return XO_FOOT;
       }
       method = -1;
     }
@@ -656,6 +665,8 @@ xo_forward(xo)
   locus = 0;
   cc = -1;
 
+  char str_tag_score[50];
+
   do
   {
     if (tag)
@@ -677,31 +688,39 @@ xo_forward(xo)
 
       if (method)		/* 轉寄站內 */
       {
-	HDR mhdr;
+	    HDR mhdr;
 
-	if ((cc = hdr_stamp(folder, HDR_COPY, &mhdr, fpath)) < 0)
-	  break;
+	    if ((cc = hdr_stamp(folder, HDR_COPY, &mhdr, fpath)) < 0)
+	       break;
 
-	if (method > 0)		/* 轉寄自己 */
-	{
-	  strcpy(mhdr.owner, "[精 選 集]");
-	  mhdr.xmode = MAIL_READ | MAIL_NOREPLY;
-	}
-	else			/* 轉寄其他使用者 */
-	{
-	  strcpy(mhdr.owner, userid);
-	}
-	strcpy(mhdr.nick, cuser.username);
-	strcpy(mhdr.title, title);
-	if ((cc = rec_add(folder, &mhdr, sizeof(HDR))) < 0)
-	  break;
-      }
+	    if (method > 0)		/* 轉寄自己 */
+		{
+	       strcpy(mhdr.owner, "[精 選 集]");
+	       mhdr.xmode = MAIL_READ | MAIL_NOREPLY;
+	       sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",cuser.userid);
+		}
+	    else			/* 轉寄其他使用者 */
+		{
+	       strcpy(mhdr.owner, userid);
+	       sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",rcpt);
+		}
+	    strcpy(mhdr.nick, cuser.username);
+	    strcpy(mhdr.title, title);
+	    if ((cc = rec_add(folder, &mhdr, sizeof(HDR))) < 0)
+	       break;
+	  }
       else			/* 轉寄站外 */
       {
-	if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)
-	  break;
+	    if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)
+	       break;
+	    sprintf(str_tag_score," 轉寄至站外 ");
       }
     }
+	if(strstr(xo->dir,"brd/"))
+	{
+	  if(currbattr & BRD_SHOWTURN)
+	    post_t_score(xo,str_tag_score,hdr);
+	}
   } while (++locus < tag);
 
   if (userno > 0 && cc >= 0)
@@ -1413,7 +1432,7 @@ xover(cmd)
     /* 基本的游標移動 routines				 */
     /* ------------------------------------------------- */
 
-    if (cmd == KEY_LEFT || cmd == 'e')
+    if (cmd == KEY_LEFT)
     {
       TagNum = 0;	/* itoc.050413: 從精華區回到文章列表時要清除 tag */
       return;
@@ -1422,19 +1441,19 @@ xover(cmd)
     {
       continue;
     }
-    else if (cmd == KEY_UP || cmd == 'k')
+    else if (cmd == KEY_UP)
     {
       cmd = pos - 1 + XO_MOVE + XO_WRAP;
     }
-    else if (cmd == KEY_DOWN || cmd == 'j')
+    else if (cmd == KEY_DOWN)
     {
       cmd = pos + 1 + XO_MOVE + XO_WRAP;
     }
-    else if (cmd == ' ' || cmd == KEY_PGDN || cmd == 'N')
+    else if (cmd == ' ' || cmd == KEY_PGDN)
     {
       cmd = pos + XO_TALL + XO_MOVE;
     }
-    else if (cmd == KEY_PGUP || cmd == 'P')
+    else if (cmd == KEY_PGUP)
     {
       cmd = pos - XO_TALL + XO_MOVE;
     }
@@ -1739,7 +1758,7 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_UP:
-  case 'k':
+//  case 'k':
     if (*cur == 0)
     {
       if (*pageno != 0)
@@ -1765,7 +1784,7 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_DOWN:
-  case 'j':
+//  case 'j':
     if (*cur == XO_TALL - 1)
     {
       *cur = 0;
@@ -1796,7 +1815,7 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_END:
-  case '$':
+//  case '$':
     *pageno = pagemax;
     *cur = num % XO_TALL;
     *redraw = 1;

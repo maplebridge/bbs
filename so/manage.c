@@ -397,6 +397,7 @@ post_brd_prefix(xo)
   return XO_FOOT;
 }
 
+
 /* ----------------------------------------------------- */
 /* 板主功能 : 看板屬性					 */
 /* ----------------------------------------------------- */
@@ -488,6 +489,66 @@ post_vpal(xo)
     break;
   case '2':
     newbrd.battr |= BRD_SHOWPAL;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+static int
+post_noforward(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("轉錄文章 (1)允許\ (2)禁止\ (Q)取消？[Q] "))
+  {
+  case '1':
+    newbrd.battr &= ~BRD_NOFORWARD;
+    break;
+  case '2':
+    newbrd.battr |= BRD_NOFORWARD;
+    break;
+  default:
+    return XO_FOOT;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_FOOT;
+}
+
+static int
+post_showreturn(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("轉錄記錄 (1)打開\ (2)關閉\ (Q)取消？[Q] "))
+  {
+  case '1':
+    newbrd.battr |= BRD_SHOWTURN;
+    break;
+  case '2':
+	newbrd.battr &= ~BRD_SHOWTURN;
     break;
   default:
     return XO_FOOT;
@@ -729,20 +790,22 @@ post_manage(xo)
     "BQ",
     "BTitle  修改看板主題",
     "WMemo   編輯進板畫面",
-	"ASpam   看板擋信列表",
     "Manager 增減副板主",
+#  ifdef HAVE_MODERATED_BOARD
+    "Level   公開/好友/秘密",
 #  ifdef HAVE_SCORE
+#  ifdef POST_PREFIX
+    "Prefix  設定文章類別",
+#  endif
+	"ASpam   看板擋信列表",
+    "OPal    板友名單",
+#  endif
+	"VPal    可否觀看板友名單",
     "Score   設定可否評分",
 #  endif
 	"RLock   板友可否鎖文",
-	"VPal    可否觀看板友名單",
-#  ifdef HAVE_MODERATED_BOARD
-    "Level   公開/好友/秘密",
-    "OPal    板友名單",
-#  endif
-#  ifdef POST_PREFIX
-    "Prefix  設定文章類別",
-#  endif    
+    "Nfward  看板禁止轉錄",
+	"Fshow   轉錄記錄開啟",
     NULL
   };
 #else
@@ -802,7 +865,11 @@ post_manage(xo)
   case 'p':
 	  post_brd_prefix(xo);
     //return post_prefix_edit(xo);
-#endif    
+#endif
+  case 'n':
+	  return post_noforward(xo);
+  case 'f':
+	  return post_showreturn(xo);
   }
 
   return XO_FOOT;

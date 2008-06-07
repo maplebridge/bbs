@@ -1502,6 +1502,10 @@ post_attr(hdr)
   }
   else
 #endif
+  if ((bbstate & STAT_BOARD) && (mode & POST_GEM))      /* 板主才看得到 G/B */
+       attr |= (mode & POST_MARKED ? 'B' : 'G');        /* 若有 mark+gem，顯示 B */
+  else
+
 #ifdef HAVE_LABELMARK
   if (mode & POST_DELETE)
     attr |= 'T';
@@ -2041,6 +2045,20 @@ post_cross(xo)
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
 
+
+  int can_showturn=0;
+  if(strstr(xo->dir,"brd/"))
+  {
+    if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
+	{
+		vmsg("本看板禁止轉錄 !!");
+        return XO_NONE;
+	}
+
+	if(currbattr & BRD_SHOWTURN)
+      can_showturn=1;
+  }
+
 #ifdef HAVE_REFUSEMARK
   pos = xo->pos;             //smiler 1108
   cur = pos - xo->top;       //smiler 1108
@@ -2210,6 +2228,16 @@ post_cross(xo)
 
     if (rc == 's')
       outgo_post(&xpost, xboard);
+
+
+	char str_tag_score[50];
+    sprintf(str_tag_score," 轉錄至 %s 看板 ",xboard);
+	if(strstr(xo->dir,"brd/"))
+	{
+	  if(can_showturn)
+        post_t_score(xo,str_tag_score,hdr);
+	}
+
   } while (++locus < tag);
 
   btime_update(xbno);
@@ -2258,6 +2286,15 @@ post_forward(xo)
   }
 #endif
 
+  if(strstr(xo->dir,"brd/"))
+  {
+    if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
+	{
+		vmsg("本看板禁止轉錄 !!");
+	    return XO_NONE;
+	}
+  }
+
   if (acct_get("轉達信件給：", &muser) > 0)
   {
     strcpy(quote_user, hdr->owner);
@@ -2270,6 +2307,15 @@ post_forward(xo)
 
     mail_send(muser.userid);
     *quote_file = '\0';
+
+	char str_tag_score[50];
+    sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",muser.userid);
+	if(strstr(xo->dir,"brd/"))
+	{
+	   if(currbattr & BRD_SHOWTURN)
+         post_t_score(xo,str_tag_score,hdr);
+	}
+
   }
   return XO_HEAD;
 }
@@ -2793,9 +2839,9 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
     return XO_FOOT;
 
 #ifdef HAVE_REFUSEMARK
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict,0);
 #else
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL,0);
 #endif
 
   if (bbstate & STAT_BOARD)
@@ -2980,7 +3026,7 @@ post_title(xo)
   fhdr = (HDR *) xo_pool + cur;
   memcpy(&mhdr, fhdr, sizeof(HDR));
 
-  if (strcmp(cuser.userid, mhdr.owner) && !HAS_PERM(PERM_ALLBOARD))
+  if ((strcmp(cuser.userid, mhdr.owner) && (!(bbstate & STAT_BM))) && !HAS_PERM(PERM_ALLBOARD))
     return XO_NONE;
 
   vget(b_lines, 0, "標題：", mhdr.title, TTLEN + 1, GCARRY);
@@ -3053,6 +3099,437 @@ addscore(hdd, ram)
     if (hdd->score > -128)
       hdd->score--;
   }
+}
+
+int
+post_x_score(xo,reason_input)
+  XO *xo;
+  char *reason_input;
+{
+  HDR *hdr;
+  int pos, cur, ans, vtlen, maxlen;
+  char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  FILE *fp;
+#ifdef HAVE_ANONYMOUS
+  char uid[IDLEN + 1];
+#endif
+
+  if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+  
+  if (hdr->xmode & POST_NOSCORE)
+    return XO_NONE;
+
+#ifdef HAVE_REFUSEMARK
+  if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    return XO_NONE;
+#endif
+
+//  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
+//  {
+//  case '1':
+//    verb = "1m△";
+//    vtlen = 2;
+//    break;
+//
+//  case '2':
+//    verb = "2m▽";
+//    vtlen = 2;
+//    break;
+//
+//  case '3':
+//    verb = "7m─";
+//    vtlen = 2;
+//    break;
+//    /* songsongboy.070124:lexel version*/
+//    /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
+//      return XO_FOOT;
+//    vtlen = strlen(fpath);
+//    sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
+//    break;*/
+
+//  default:
+    ans='3';
+    verb = "0m==";
+    vtlen = 2;
+//  }
+
+#ifdef HAVE_ANONYMOUS
+  if (currbattr & BRD_ANONYMOUS)
+    maxlen = 64 - IDLEN - vtlen;
+  else
+#endif
+    maxlen = 64 - strlen(cuser.userid) - vtlen;
+
+//  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
+//    return XO_FOOT;
+
+//#ifdef HAVE_ANONYMOUS
+//  if (currbattr & BRD_ANONYMOUS)
+//  {
+//    userid = uid;
+//    if (!vget(b_lines, 0, "請輸入您想用的ID，也可直接按[Enter]，或是按[r]用真名：", userid, IDLEN, DOECHO))
+//      userid = STR_ANONYMOUS;
+//    else if (userid[0] == 'r' && userid[1] == '\0')
+//      userid = cuser.userid;
+//    else
+//      strcat(userid, ".");		/* 自定的話，最後加 '.' */
+//    maxlen = 64 - strlen(userid) - vtlen;
+//  }
+//  else
+//#endif
+
+  userid = cuser.userid;
+  if(strlen(reason_input) >= 79)
+  {
+	  strncpy(reason,reason_input,79);
+	  reason[79]='\0';
+  }
+  else
+  {
+	  strncpy(reason,reason_input,strlen(reason_input));
+	  reason[strlen(reason_input)]='\0';
+  }
+
+  dir = xo->dir;
+  hdr_fpath(fpath, dir, hdr);
+
+  if (fp = fopen(fpath, "a"))
+  {
+    time_t now;
+    struct tm *ptime;
+
+    time(&now);
+    ptime = localtime(&now);
+
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\n", 
+      verb, userid, maxlen, reason, 
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+    fclose(fp);
+  }
+
+    curraddscore = ans;
+    currchrono = hdr->chrono;
+    change_stamp(xo->dir, hdr);
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
+    if (hdr->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
+    {
+      currchrono = hdr->parent_chrono;
+      rec_ref(dir, hdr, sizeof(HDR), 0, cmpchrono, addscore);
+    }
+    else                           /* 若是評分一般文章，去找謄本來連動分數 */
+    {
+      /* currchrono = hdr->chrono; */ /* 前面有了 */
+      rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
+    }
+    post_history(xo, hdr);
+    btime_update(currbno);
+
+    return XO_LOAD;
+
+  return XO_FOOT;
+}
+
+int
+post_t_score(xo,reason_input,hdr_in)
+  XO *xo;
+  char *reason_input;
+  HDR *hdr_in;
+{
+  HDR *hdr;
+  int pos, cur, ans, vtlen, maxlen;
+  char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  FILE *fp;
+#ifdef HAVE_ANONYMOUS
+  char uid[IDLEN + 1];
+#endif
+
+  if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  if(!strcmp(hdr->xname,hdr_in->xname))
+  {
+    if (hdr->xmode & POST_NOSCORE)
+      return XO_NONE;
+  }
+  else
+  {
+    if (hdr_in->xmode & POST_NOSCORE)
+      return XO_NONE;
+  }
+
+#ifdef HAVE_REFUSEMARK
+  if(!strcmp(hdr->xname,hdr_in->xname))
+  {
+    if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+      return XO_NONE;
+  }
+  else
+  {
+	if ((hdr_in->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr_in))
+      return XO_NONE;
+  }
+#endif
+
+//  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
+//  {
+//  case '1':
+//    verb = "1m△";
+//    vtlen = 2;
+//    break;
+//
+//  case '2':
+//    verb = "2m▽";
+//    vtlen = 2;
+//    break;
+//
+//  case '3':
+//    verb = "7m─";
+//    vtlen = 2;
+//    break;
+//    /* songsongboy.070124:lexel version*/
+//    /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
+//      return XO_FOOT;
+//    vtlen = strlen(fpath);
+//    sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
+//    break;*/
+
+//  default:
+    ans='3';
+    verb = "0m==";
+    vtlen = 2;
+//  }
+
+#ifdef HAVE_ANONYMOUS
+  if (currbattr & BRD_ANONYMOUS)
+    maxlen = 64 - IDLEN - vtlen;
+  else
+#endif
+    maxlen = 64 - strlen(cuser.userid) - vtlen;
+
+//  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
+//    return XO_FOOT;
+
+//#ifdef HAVE_ANONYMOUS
+//  if (currbattr & BRD_ANONYMOUS)
+//  {
+//    userid = uid;
+//    if (!vget(b_lines, 0, "請輸入您想用的ID，也可直接按[Enter]，或是按[r]用真名：", userid, IDLEN, DOECHO))
+//      userid = STR_ANONYMOUS;
+//    else if (userid[0] == 'r' && userid[1] == '\0')
+//      userid = cuser.userid;
+//    else
+//      strcat(userid, ".");		/* 自定的話，最後加 '.' */
+//    maxlen = 64 - strlen(userid) - vtlen;
+//  }
+//  else
+//#endif
+
+  userid = cuser.userid;
+  if(strlen(reason_input) >= 79)
+  {
+	  strncpy(reason,reason_input,79);
+	  reason[79]='\0';
+  }
+  else
+  {
+	  strncpy(reason,reason_input,strlen(reason_input));
+	  reason[strlen(reason_input)]='\0';
+  }
+
+  dir = xo->dir;
+  if(!strcmp(hdr->xname,hdr_in->xname))
+    hdr_fpath(fpath, dir, hdr);
+  else
+    hdr_fpath(fpath, dir, hdr_in);
+
+  if (fp = fopen(fpath, "a"))
+  {
+    time_t now;
+    struct tm *ptime;
+
+    time(&now);
+    ptime = localtime(&now);
+
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\n", 
+      verb, userid, maxlen, reason, 
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+    fclose(fp);
+  }
+
+    curraddscore = ans;
+	if(!strcmp(hdr->xname,hdr_in->xname))
+	{
+      currchrono = hdr->chrono;
+      change_stamp(xo->dir, hdr);
+      rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
+      if (hdr->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
+	  {
+        currchrono = hdr->parent_chrono;
+        rec_ref(dir, hdr, sizeof(HDR), 0, cmpchrono, addscore);
+	  }
+      else                           /* 若是評分一般文章，去找謄本來連動分數 */
+	  {
+        /* currchrono = hdr->chrono; */ /* 前面有了 */
+        rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
+	  }
+      post_history(xo, hdr);
+	}
+	else
+	{
+	  currchrono = hdr_in->chrono;
+      change_stamp(xo->dir, hdr_in);
+      rec_ref(dir, hdr_in, sizeof(HDR), xo->key == XZ_XPOST ? hdr_in->xid : pos, cmpchrono, addscore);
+      if (hdr_in->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
+	  {
+        currchrono = hdr_in->parent_chrono;
+        rec_ref(dir, hdr_in, sizeof(HDR), 0, cmpchrono, addscore);
+	  }
+      else                           /* 若是評分一般文章，去找謄本來連動分數 */
+	  {
+        /* currchrono = hdr->chrono; */ /* 前面有了 */
+        rec_ref(dir, hdr_in, sizeof(HDR), 0, cmpparent, addscore);
+	  }
+      post_history(xo, hdr_in);
+	}
+
+
+
+    btime_update(currbno);
+
+    return XO_LOAD;
+
+  return XO_FOOT;
+}
+
+
+int
+post_e_score(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int pos, cur, ans, vtlen, maxlen;
+  char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  FILE *fp;
+#ifdef HAVE_ANONYMOUS
+  char uid[IDLEN + 1];
+#endif
+
+  if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+  
+  if (hdr->xmode & POST_NOSCORE)
+    return XO_NONE;
+
+#ifdef HAVE_REFUSEMARK
+  if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    return XO_NONE;
+#endif
+
+//  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
+//  {
+//  case '1':
+//    verb = "1m△";
+//    vtlen = 2;
+//    break;
+//
+//  case '2':
+//    verb = "2m▽";
+//    vtlen = 2;
+//    break;
+//
+//  case '3':
+//    verb = "7m─";
+//    vtlen = 2;
+//    break;
+//    /* songsongboy.070124:lexel version*/
+//    /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
+//      return XO_FOOT;
+//    vtlen = strlen(fpath);
+//    sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
+//    break;*/
+
+//  default:
+    ans='3';
+    verb = "7m─";
+    vtlen = 2;
+//  }
+
+#ifdef HAVE_ANONYMOUS
+  if (currbattr & BRD_ANONYMOUS)
+    maxlen = 64 - IDLEN - vtlen;
+  else
+#endif
+    maxlen = 64 - strlen(cuser.userid) - vtlen;
+
+  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
+    return XO_FOOT;
+
+#ifdef HAVE_ANONYMOUS
+  if (currbattr & BRD_ANONYMOUS)
+  {
+    userid = uid;
+    if (!vget(b_lines, 0, "請輸入您想用的ID，也可直接按[Enter]，或是按[r]用真名：", userid, IDLEN, DOECHO))
+      userid = STR_ANONYMOUS;
+    else if (userid[0] == 'r' && userid[1] == '\0')
+      userid = cuser.userid;
+    else
+      strcat(userid, ".");		/* 自定的話，最後加 '.' */
+    maxlen = 64 - strlen(userid) - vtlen;
+  }
+  else
+#endif
+    userid = cuser.userid;
+
+  dir = xo->dir;
+  hdr_fpath(fpath, dir, hdr);
+
+  if (fp = fopen(fpath, "a"))
+  {
+    time_t now;
+    struct tm *ptime;
+
+    time(&now);
+    ptime = localtime(&now);
+
+    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s\033[1;30m%02d/%02d/%02d\n", 
+      verb, userid, maxlen, reason, 
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+    fclose(fp);
+  }
+
+    curraddscore = ans;
+    currchrono = hdr->chrono;
+    change_stamp(xo->dir, hdr);
+    rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
+    if (hdr->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
+    {
+      currchrono = hdr->parent_chrono;
+      rec_ref(dir, hdr, sizeof(HDR), 0, cmpchrono, addscore);
+    }
+    else                           /* 若是評分一般文章，去找謄本來連動分數 */
+    {
+      /* currchrono = hdr->chrono; */ /* 前面有了 */
+      rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
+    }
+    post_history(xo, hdr);
+    btime_update(currbno);
+
+    return XO_LOAD;
+
+  return XO_FOOT;
 }
 
 
@@ -3461,6 +3938,7 @@ KeyFunc post_cb[] =
   'S', post_rss,
 #ifdef HAVE_SCORE
   '%', post_score,
+  'e', post_e_score,
 #endif
 
   'w', post_write,
@@ -3540,6 +4018,7 @@ KeyFunc xpost_cb[] =
   'T', post_title,
 #ifdef HAVE_SCORE
   '%', post_score,
+  'e', post_e_score,
 #endif
   'w', post_write,
 #ifdef HAVE_REFUSEMARK

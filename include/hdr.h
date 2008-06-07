@@ -56,7 +56,7 @@ typedef struct
 #define POST_NOFORWARD	0x00000004	/* 不能轉寄 */
 #define POST_NOSCORE	0x00000008	/* 不能評分 */
 #define POST_5		0x00000010
-#define POST_6		0x00000020
+#define POST_GEM	0x00000020	/* 收錄精華區標記 */
 #define POST_BOTTOM	0x00000040	/* 置底 */
 #define POST_DELETE	0x00000080	/* 標記待砍的 */
 #define	POST_INCOME	0x00000100	/* 轉信進來的 */

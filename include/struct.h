@@ -484,20 +484,27 @@ typedef struct
 #define FILM_OPENING0	0	/* 開頭畫面(０) */
 #define FILM_OPENING1	1	/* 開頭畫面(１) */
 #define FILM_OPENING2	2	/* 開頭畫面(２) */
-#define FILM_GOODBYE	3	/* 再見畫面 */
-#define FILM_NOTIFY	4	/* 尚未通過認證通知 */
-#define FILM_MQUOTA	5	/* 信件超過保存期限通知 */
-#define FILM_MAILOVER	6	/* 信件封數過多通知 */
-#define FILM_MGEMOVER	7	/* 個人精華區過多通知 */
-#define FILM_BIRTHDAY	8	/* 生日當天的上站畫面 */
-#define FILM_APPLY	9	/* 註冊提示畫面 */
-#define FILM_JUSTIFY	10	/* 身份認證的方法 */
-#define FILM_REREG	11	/* 重新認證說明 */
-#define FILM_EMAIL	12	/* 郵件信箱認證說明 */
-#define FILM_NEWUSER	13	/* 新手上路須知 */
-#define FILM_TRYOUT	14	/* 密碼錯誤 */
-#define FILM_POST	15	/* 文章發表綱領 */
-#define FILM_MOVIE	16	/* 動態看板 FILM_MOVIE 要放在最後面 */
+#define FILM_OPENING3	3	/* 開頭畫面(３) */
+#define FILM_OPENING4	4	/* 開頭畫面(４) */
+#define FILM_OPENING5	5	/* 開頭畫面(５) */
+#define FILM_OPENING6	6	/* 開頭畫面(６) */
+#define FILM_OPENING7	7	/* 開頭畫面(７) */
+#define FILM_OPENING8	8	/* 開頭畫面(８) */
+#define FILM_OPENING9	9	/* 開頭畫面(９) */
+#define FILM_GOODBYE	10	/* 再見畫面 */
+#define FILM_NOTIFY	11	/* 尚未通過認證通知 */
+#define FILM_MQUOTA	12	/* 信件超過保存期限通知 */
+#define FILM_MAILOVER	13	/* 信件封數過多通知 */
+#define FILM_MGEMOVER	14	/* 個人精華區過多通知 */
+#define FILM_BIRTHDAY	15	/* 生日當天的上站畫面 */
+#define FILM_APPLY	16	/* 註冊提示畫面 */
+#define FILM_JUSTIFY	17	/* 身份認證的方法 */
+#define FILM_REREG	18	/* 重新認證說明 */
+#define FILM_EMAIL	19	/* 郵件信箱認證說明 */
+#define FILM_NEWUSER	20	/* 新手上路須知 */
+#define FILM_TRYOUT	21	/* 密碼錯誤 */
+#define FILM_POST	22	/* 文章發表綱領 */
+#define FILM_MOVIE	23	/* 動態看板 FILM_MOVIE 要放在最後面 */
 
 
 typedef struct
