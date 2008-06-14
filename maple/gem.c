@@ -1072,10 +1072,15 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
   char *dir;
   HDR *hdr;			/* NULL 代表放入 TagList, 否則將傳入的放入 */
   int (*fchk)();	/* 允許放入 gbuf 的條件 */
-  int gem_mode;     /* 0:其他 1:gem_gather() */
+  int gem_mode;     /* 0:其他 1:from 看板 */
 {
   int max, locus, num;
   HDR *gbuf, buf;
+
+  /* smiler.080614 : 收錄精華記錄，但因對folder無效，目前取消掉 */
+  int can_show=1;  
+  char fpath[64];
+  FILE *fp;
 
   if (hdr)
   {
@@ -1099,9 +1104,38 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
       num++;
 	  if(gem_mode)
 	  {
-	    hdr->xmode |= POST_GEM;
-	    currchrono = hdr->chrono;
-        rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
+		  if(strstr(dir,"brd/"))
+		  {
+	         hdr->xmode |= POST_GEM;
+	         currchrono = hdr->chrono;
+             rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
+		  }
+
+#if 0
+
+		  if(strstr(dir,"gem/brd/"))
+			  if((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
+			      can_show=0;
+
+		  if(can_show)
+		  {
+		    hdr_fpath(fpath, dir, hdr);
+	        if (fp = fopen(fpath, "a"))
+			{
+              time_t now;
+              struct tm *ptime;
+
+              time(&now);
+              ptime = localtime(&now);
+
+              fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
+              "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+              ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+              fclose(fp);
+			}
+		  }
+#endif
+
 	  }
     }
   }
@@ -1118,11 +1152,42 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	num++;
       }
 
-	  if(strstr(dir,"brd/") && gem_mode)
+	  if(gem_mode)
 	  {
-		  buf.xmode |= POST_GEM;
-		  currchrono = buf.chrono;
-          rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
+	    if(strstr(dir,"brd/"))
+		{
+		    buf.xmode |= POST_GEM;
+		    currchrono = buf.chrono;
+            rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
+		}
+
+#if 0
+
+		if(strstr(dir,"gem/brd/"))
+			  if((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
+			      can_show=0;
+		
+		if(can_show)
+		{
+	      hdr_fpath(fpath, dir, &buf);
+		  vmsg(fpath);
+	      if (fp = fopen(fpath, "a"))
+		  {
+            time_t now;
+            struct tm *ptime;
+
+            time(&now);
+            ptime = localtime(&now);
+
+            fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
+              "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+              ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+            fclose(fp);
+		  }
+		}
+
+#endif
+
 	  }
 
     } while (++locus < max);
@@ -1161,7 +1226,14 @@ gem_copy(xo)
     return XO_FOOT;
 
   IamBM = (xo->key & GEM_M_BIT);
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict ,0);
+
+  /* smiler.080614 : 僅板主及小板主可複製精華區 */
+  int level;
+  level = xo->key;
+  if (!(level & GEM_W_BIT))
+    return XO_NONE;
+  
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict ,1);
 
   zmsg("拷貝完成。[注意] 貼上後才能刪除原文！");
   /* return XO_FOOT; */

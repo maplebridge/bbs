@@ -108,7 +108,12 @@ do_query(acct)
   UTMP *up;
   int userno, rich;
   char *userid;
-  char fortune[4][9] = {"赤貧乞丐", "一般個體", "家境小康", "財閥地主"};
+//  char fortune[4][9] = {"赤貧乞丐", "一般個體", "家境小康", "財閥地主"};
+  char fortune[19][9] = {"赤貧乞丐", "一袋長老", "二袋長老", "三袋長老", "四袋長老",
+	                    "五袋長老", "六袋長老", "七袋長老", "八袋長老", "丐幫幫主", 
+	                    "一般個體", "夜市攤販", "飲料店長", "雞排店長",
+						"地方角頭", "鄉鎮代表", "縣市議員", "國會議員", 
+						"財閥地主"};
 
   utmp_mode(M_QUERY);
 
@@ -117,7 +122,57 @@ do_query(acct)
   strcpy(cutmp->mateid, userid);
 
   up = utmp_find(userno);
-  rich = acct->money >= 1000000 ? (acct->gold >= 100 ? 3 : 2) : (acct->money >= 50000 ? 1 : 0);
+  
+  //rich = acct->money >= 1000000 ? (acct->gold >= 100 ? 3 : 2) : (acct->money >= 50000 ? 1 : 0);
+  
+  if((acct->gold < 1) && (acct->money < 10000))
+  {
+	  if(acct->money < 1000)
+		  rich=0;
+	  else if(acct->money < 2000)
+		  rich=1;
+	  else if(acct->money < 3000)
+		  rich=2;
+	  else if(acct->money < 4000)
+		  rich=3;
+	  else if(acct->money < 5000)
+		  rich=4;
+	  else if(acct->money < 6000)
+		  rich=5;
+	  else if(acct->money < 7000)
+		  rich=6;
+	  else if(acct->money < 8000)
+		  rich=7;
+	  else if(acct->money < 9000)
+		  rich=8;
+	  else
+		  rich=9;
+  }
+  else if(acct->gold < 10)
+  {
+	  if(acct->gold < 3)
+		  rich=10;
+	  else if(acct->gold < 5)
+		  rich=11;
+	  else if(acct->gold < 7)
+		  rich=12;
+	  else
+		  rich=13;
+  }
+  else if(acct->gold < 100)
+  {
+	  if(acct->gold < 25)
+		  rich=14;
+	  else if(acct->gold < 50)
+		  rich=15;
+	  else if(acct->gold < 75)
+		  rich=16;
+	  else
+		  rich=17;
+  }
+  else
+	  rich=18;
+
 
   prints("[帳號] %-12s [暱稱] %-16.16s [上站] %5d 次 [文章] %5d 篇\n",
     userid, acct->username, acct->numlogins, acct->numposts);

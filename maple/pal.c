@@ -830,6 +830,22 @@ pal_help(xo)
   return pal_head(xo);
 }
 
+static int
+f_pal_help(xo)
+  XO *xo;
+{
+
+  move(12, 0);
+  clrtobot();
+  outs("\n本名單僅供瀏覽\n");
+  outs("(↑↓→←) : 移動\n");
+  outs("(m)        : 寄信給板友\n");
+  outs("(w)        : 丟水球給板友\n");
+  outs("(r)(ctrl^Q): 查詢板友動態\n");
+  outs("(h)        : help選單\n");
+  vmsg(NULL);
+  return pal_body(xo);
+}
 
 KeyFunc pal_cb[] =
 {
@@ -861,6 +877,36 @@ KeyFunc pal_cb[] =
   'h', pal_help
 };
 
+
+KeyFunc f_pal_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, pal_item_bar,
+#endif
+  XO_INIT, pal_init,
+  XO_LOAD, pal_load,
+  XO_HEAD, pal_head,
+  XO_BODY, pal_body,
+
+//  'a', pal_add,
+//  'c', pal_change,
+//  'd', pal_delete,
+//  'D', pal_rangedel,
+  'm', pal_mail,
+  'w', pal_write,
+//  'B', pal_broadcast,
+  'r', pal_query,
+  Ctrl('Q'), pal_query,
+//  's', pal_sort,
+//  't', pal_tag,
+//  Ctrl('D'), pal_prune,
+
+#if (defined(HAVE_MODERATED_BOARD) || defined(HAVE_LIST))
+//  'f', pal_cite,
+#endif
+
+  'h', f_pal_help
+};
 
 int
 t_pal()

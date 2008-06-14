@@ -341,9 +341,9 @@ post_viewpal(xo)
   {
 	  fclose(fp);
 	  system(tmp);
-      xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath_new);
+      xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath_new);
       xt->key = PALTYPE_BPAL;
-      xover(XZ_PAL);
+      xover(XZ_FAKE_PAL);
       free(xt);
 	  unlink(fpath_new);
 	  return XO_INIT;
@@ -2838,10 +2838,13 @@ post_copy(xo)	   /* itoc.010924: ¨ú¥N gem_gather */
   if (tag < 0)
     return XO_FOOT;
 
+  if (!(bbstate & STAT_BM))
+    return XO_NONE;
+
 #ifdef HAVE_REFUSEMARK
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict,0);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict,1);
 #else
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL,0);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL,1);
 #endif
 
   if (bbstate & STAT_BOARD)

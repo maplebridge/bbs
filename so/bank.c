@@ -107,8 +107,8 @@ x_give()
 }
 
 
-#define GOLD2MONEY	900000	/* 金幣→銀幣 匯率 */
-#define MONEY2GOLD	1100000	/* 銀幣→金幣 匯率 */
+#define GOLD2MONEY	90000	/* 金幣→銀幣 匯率 */
+#define MONEY2GOLD	110000	/* 銀幣→金幣 匯率 */
 
 static void
 x_exchange()
@@ -298,14 +298,15 @@ b_invis()
     }
     else
     {
-      if (cuser.gold < 10)
-      {
-	vmsg("要 10 金幣才能隱形喔");
-	return XEASY;
-      }
-      if (vans("是否花 10 金幣隱形(Y/N)？[N] ") != 'y')
-	return XEASY;
-      cuser.gold -= 10;
+      //if (cuser.gold < 10)    /* smiler.080613: 將花費10金改為5000銀 */
+		if(cuser.money < 5000)
+		{
+			vmsg("要 5000 銀幣才能隱形喔");
+			return XEASY;
+		}
+        if (vans("是否花 5000 銀幣隱形(Y/N)？[N] ") != 'y')
+			return XEASY;
+		cuser.money -= 5000;
     }
   }
 
@@ -358,13 +359,13 @@ b_cloak()
   }
   else
   {
-    if (cuser.gold < 1000)
+    if (cuser.gold < 60)               /* smiler.080613:原本1000金改為60金 */
     {
-      vmsg("要 1000 金幣才能購買無限隱形權限喔");
+      vmsg("要 60 金幣才能購買無限隱形權限喔");
     }
-    else if (vans("是否花 1000 金幣購買無限隱形權限(Y/N)？[N] ") == 'y')
+    else if (vans("是否花 60 金幣購買無限隱形權限(Y/N)？[N] ") == 'y')
     {
-      cuser.gold -= 1000;
+      cuser.gold -= 60;
       buy_level(PERM_CLOAK);
     }
   }
@@ -388,13 +389,13 @@ b_mbox()
   }
   else
   {
-    if (cuser.gold < 1000)
+    if (cuser.gold < 99)                /* smiler.080613: 修改原本花費1000金為99金 */
     {
-      vmsg("要 1000 金幣才能購買信箱無限權限喔");
+      vmsg("要 99 金幣才能購買信箱無限權限喔");
     }
-    else if (vans("是否花 1000 金幣購買信箱無限權限(Y/N)？[N] ") == 'y')
+    else if (vans("是否花 99 金幣購買信箱無限權限(Y/N)？[N] ") == 'y')
     {
-      cuser.gold -= 1000;
+      cuser.gold -= 99;
       buy_level(PERM_MBOX);
     }
   }

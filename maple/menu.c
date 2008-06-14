@@ -241,6 +241,8 @@ vs_head(title, mid)
   char buf[40], ttl[60];
   int spc, len;
 
+  char tmp[100];
+
   if (mid)	/* xxxx_head() 都是用 vs_head(title, str_site); */
   {
     clear();
@@ -263,7 +265,7 @@ vs_head(title, mid)
   {
     if ((spc = strlen(mid)) > len)
     {
-      spc = len;
+      spc = len -7;                  /* smiler.080614 : 原版計算長度有誤，誤差為7 */
       memcpy(ttl, mid, spc);
       mid = ttl;
       mid[spc] = '\0';

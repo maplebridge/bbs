@@ -251,5 +251,6 @@ static char *ModeTypeTable[] =
 #define	XZ_POST		(XO_ZONE + 12)	/* 看板 */
 #define XZ_GEM		(XO_ZONE + 13)	/* 精華區 */
 #define XZ_BITLBEE	(XO_ZONE + 14)	/* BITLBEE */
+#define XZ_FAKE_PAL	(XO_ZONE + 15)	/* post.c內觀看板友名單 */
 
 #endif				/* _MODES_H_ */
