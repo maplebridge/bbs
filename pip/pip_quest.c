@@ -322,7 +322,7 @@ pip_quest_query(quest)	/* 查詢舊任務 */
 }
 
 
-int			/* 1:取得新任務  0:取消取得或已有任務 */
+static int			/* 1:取得新任務  0:取消取得或已有任務 */
 pip_quest_new()		/* 取得新任務 */
 {
   if (ians(b_lines - 1, 0, "您已達升級標準，願意接受長老指派任務嗎(Y/N)？[N] ") == 'y')
