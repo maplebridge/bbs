@@ -3209,7 +3209,7 @@ post_x_score(xo,reason_input)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m¡G\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\n", 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m¡G\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\033[m\n", 
       verb, userid, maxlen, reason, 
       ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
     fclose(fp);
