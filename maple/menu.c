@@ -282,9 +282,9 @@ vs_head(title, mid)
   prints("\033[1;4%cm【%s】%s\033[33m%s\033[1;37;4%cm%s《%s》\033[m\n",
     spc, title, buf, mid, spc, buf + len, currboard);
 #else
-  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s看板《%s》\033[m\n",
+  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s 《%s》\033[m\n",
     title, buf, mid, buf + len+4, currboard);
-
+/*20080625  移除"看板"字樣*/
 /*20070325	dexter:buf + len  modified to buf+len+2	*/
 /*		not knowing why it works. :p		*/  
 
