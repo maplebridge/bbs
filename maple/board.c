@@ -2377,6 +2377,13 @@ class_browse(xo)
     else class_hot = 0;
     /*=====================================*/
 
+	if (!strncmp(str, "IM_CREATE/", 10))
+    {
+		char fpath[64];
+        sprintf(fpath,BBSHOME"/gem/@/@IAS_CREATE");
+        more(fpath, NULL);
+	}
+
     if (!XoClass(chn))
       return XO_NONE;
   }
