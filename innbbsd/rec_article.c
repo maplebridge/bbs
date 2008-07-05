@@ -317,7 +317,8 @@ bbspost_add(board, addr, nick)
   FILE *fp;
 
   char board2[30];                // smiler.070916
-  strcpy(board2,"nthu.forsale");  // smiler.070916
+  //strcpy(board2,"nthu.forsale");  // smiler.070916
+  strcpy(board2,"forsale");  // smiler.080705:依站務要求改轉錄至 forsale
 
   /* smiler.080203: 各板自訂擋信機制 */
   brd_fpath(fpath, board, "spam");                /* 每個板自己的 spam */
@@ -336,7 +337,7 @@ bbspost_add(board, addr, nick)
   if(strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清"))
   {
 	  if( (!strstr(board,"P_")) && (!strstr(board,"R_")) && 
-		  (!strstr(board,"LAB_")) && (!strstr(board,"G_")) )
+		  (!strstr(board,"LAB_")) && (!strstr(board,"G_")) && (strcmp(board,board2)) )
       bbspost_topic_add(board2, addr, nick , board);
   }
   if(!( (strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清")) 

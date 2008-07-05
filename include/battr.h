@@ -29,15 +29,16 @@
 #define BRD_PREFIX	0x00000400	/* 是否啟動看板 POST_PREFIX 功能:0 啟動 :1 關閉 */
 #define BRD_NOFORWARD	0x00000800  /* 是否看板可轉錄  0:可  1:否 */
 #define BRD_SHOWTURN	0x00001000	/* 是否看板要show轉錄記錄  0:否  1:要 */
+#define BRD_IAS		0x00002000	/* 藝文館看板 */
 
 /* ----------------------------------------------------- */
 /* 各種旗標的中文意義					 */
 /* ----------------------------------------------------- */
 
 
-#define NUMBATTRS	13
+#define NUMBATTRS	14
 
-#define STR_BATTR	"zTcsvA%PLGpFR"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
+#define STR_BATTR	"zTcsvA%PLGpFRI"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -55,7 +56,8 @@ static char *battr_tbl[NUMBATTRS] =
   "顯示板友名單",	/* BRD_SHOWPAL */
   "停止POST_PREFIX", /* BRD_PREFIX */
   "看板禁轉",		/* BRD_NOFORWARD */
-  "轉錄記錄"        /* BRD_SHOWTURN */
+  "轉錄記錄",       /* BRD_SHOWTURN */
+  "藝文館看板"		/* BRD_IAS */
 };
 
 #endif

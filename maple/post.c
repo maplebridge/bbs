@@ -765,6 +765,31 @@ do_unanonymous(fpath)
 }
 #endif
 
+static void
+copy_post(hdr, fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char folder[64];
+  HDR post;
+  BRD *brdp, *bend;
+
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+
+  while (brdp < bend)
+  {
+    if (brdp->battr & BRD_IAS)   // 分類
+    {
+      brd_fpath(folder, brdp->brdname, fn_dir);
+      hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
+      memcpy(post.owner, hdr->owner, TTLEN + 140);
+      rec_bot(folder, &post, sizeof(HDR));
+    }
+    brdp++;
+  }
+}
+
 
 static int
 do_post(xo, title)
@@ -777,7 +802,7 @@ do_post(xo, title)
   int mode;
   time_t spendtime;
   char buf_filepath[50];                       /* smiler.070914: for post_filter */
-  HDR  hdr2;                                   /* smiler.070916: for 轉文至 nthu.forsale */
+  HDR  hdr2;                                   /* smiler.080705: 依站務要求改轉文至 forsale */ /* smiler.070916: for 轉文至 nthu.forsale */
   char fpath2[64], folder2[64];                // smiler.070916
   char board_from[30];                         // smiler.070916
 
@@ -877,7 +902,8 @@ do_post(xo, title)
   strcpy(fpath2,fpath);                               // smiler.070916
   strcpy(folder2,folder);                             // smiler.070916
   folder2[4]='\0';                                    // smiler.070916
-  strcat(folder2,"nthu.forsale/.DIR");                // smiler.070916 
+  //strcat(folder2,"nthu.forsale/.DIR");                // smiler.070916 
+  strcat(folder2,"forsale/.DIR");                     // smiler.080705
   hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);  // smiler.070916
   strcpy(board_from,folder+4);                        // smiler.070916
   board_from[strlen(board_from)-5]='\0';              // smiler.070916
@@ -934,13 +960,14 @@ do_post(xo, title)
   btime_update(currbno);
 
   /* smiler 0916 */
-  if(strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清"))
+  if((strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清")) && (strcmp(currboard,"forsale")))
   {
 	 if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
 	   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) )
 	 {
           rec_bot(folder2, &hdr2, sizeof(HDR));
-          btime_update(brd_bno("nthu.forsale"));
+          //btime_update(brd_bno("nthu.forsale"));
+		  btime_update(brd_bno("forsale"));
 	 }
   }
 
@@ -978,6 +1005,9 @@ do_post(xo, title)
 
     outs(mode >= 0 ? "\n\n成功\回應至作者信箱" : "\n\n作者無法收信");
   }
+
+  if (HAS_PERM(PERM_ALLADMIN) && !strcmp(currboard, "IAS_Announce"))  /* smiler.080705:自動貼文至各藝文館 */
+	  copy_post(&hdr, fpath);
 
   unlink(fpath);
 
@@ -1196,8 +1226,23 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
   }
+  else if(strlen(hdr->title) == 45)
+  {
+	  strcpy(title_tmp,hdr->title);
+	  title_tmp[45]='X';            /* smiler->強迫增45增加至46長度 */
+	  title_tmp[46]='\0';
+      title = str_ttl(mark = title_tmp);
+  }
+  else if((hdr->title[0]=='R') && (hdr->title[1]=='e') && (hdr->title[2]==':') && (hdr->title[3]==' ') && (strlen(hdr->title)==49))
+  {
+      strcpy(title_tmp,hdr->title);
+	  title_tmp[49]='X';            /* smiler->強迫增49增加至50長度 */
+	  title_tmp[50]='\0';
+      title = str_ttl(mark = title_tmp);
+  }
   else
-     title = str_ttl(mark = hdr->title);
+	  title = str_ttl(mark = hdr->title);
+
 
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
@@ -1247,12 +1292,13 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
     outc(ch);
   }
 
-  if(title == mark-3){
-
-    if(strlen(title) < 4){
+  if(title == mark-3)
+  {
+    if(strlen(title) < 4)
+	{
       outc(ch);
       while (ch = *title++)
-	outc(ch);
+	  outc(ch);
     }
     else
       outs(" ...");
@@ -1360,8 +1406,22 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
   }
+  else if(strlen(hdr->title) == 45)
+  {
+      strcpy(title_tmp,hdr->title);
+	  title_tmp[45]='X';            /* smiler->強迫增45增加至46長度 */
+	  title_tmp[46]='\0';
+      title = str_ttl(mark = title_tmp);
+  }
+  else if((hdr->title[0]=='R') && (hdr->title[1]=='e') && (hdr->title[2]==':') && (hdr->title[3]==' ') && (strlen(hdr->title)==49))
+  {
+      strcpy(title_tmp,hdr->title);
+	  title_tmp[49]='X';            /* smiler->強迫增49增加至50長度 */
+	  title_tmp[50]='\0';
+      title = str_ttl(mark = title_tmp);
+  }
   else
-     title = str_ttl(mark = hdr->title);
+	  title = str_ttl(mark = hdr->title);
 
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
@@ -1414,17 +1474,20 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
     outc(ch);
   }
 
-  if(title == mark-3){
+  if(title == mark-3)
+  {
 
-    if(strlen(title) < 4){
+    if(strlen(title) < 4)
+	{
       outc(ch);
       while (ch = *title++)
         outc(ch);
-     }  
-     else{
-        outs(" ...");
-        title += 4;
-	    }
+    }  
+    else
+	{
+      outs(" ...");
+      title += 4;
+	}
   }
 #if 1
   while(title <= mark)

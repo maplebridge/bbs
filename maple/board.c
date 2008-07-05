@@ -2380,7 +2380,7 @@ class_browse(xo)
 	if (!strncmp(str, "IM_CREATE/", 10))
     {
 		char fpath[64];
-        sprintf(fpath,BBSHOME"/gem/@/@IAS_CREATE");
+        sprintf(fpath,BBSHOME"/brd/IAS_Announce/note");
         more(fpath, NULL);
 	}
 

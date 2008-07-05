@@ -697,6 +697,12 @@ post_brdlevel(xo)
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
     return XO_FOOT;
 
+  if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
+  {
+	  vmsg("藝文館看板如需更動屬性請向館務申請!!");
+	  return XO_FOOT;
+  }
+
   switch (vans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
   {
   case '1':				/* 公開看板 */
@@ -756,6 +762,15 @@ static int
 XoBM(xo)
   XO *xo;
 {
+  BRD *oldbrd;
+  oldbrd = bshm->bcache + currbno;
+
+  if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
+  {
+	  vmsg("藝文館看板如需更動板友名單請向館務申請!!");
+	  return XO_FOOT;
+  }
+
   XO *xt;
   char fpath[64];
 

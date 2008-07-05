@@ -12,8 +12,8 @@
 # ------------------------------------------------------ #
 
 
-EXE =	account acl-sort bbsmail bquota brdmail camera counter expire \
-	gem-index hdr-dump mailpost mergebrd outgo poststat reaper redir setperm setusr \
+EXE =	account acl-sort appendbrd bbsmail bquota brdmail camera counter expire \
+	gem-index hdr-dump mailpost mergebrd outgo pid2user poststat reaper redir setperm setusr \
 	showACCT showBRD showDIR showUSR showNUM topgem topsong topusr reload_pal \
 	showACCTlist
 

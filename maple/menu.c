@@ -243,6 +243,8 @@ vs_head(title, mid)
 
   char tmp[100];
 
+  int broken=0;
+
   if (mid)	/* xxxx_head() 都是用 vs_head(title, str_site); */
   {
     clear();
@@ -263,12 +265,13 @@ vs_head(title, mid)
   }
   else
   {
-    if ((spc = strlen(mid)) > len)
+    if ((spc = strlen(mid)) >= (len-7))
     {
       spc = len -7;                  /* smiler.080614 : 原版計算長度有誤，誤差為7 */
       memcpy(ttl, mid, spc);
       mid = ttl;
       mid[spc] = '\0';
+      broken=1;
     }
   }
 
@@ -282,9 +285,17 @@ vs_head(title, mid)
   prints("\033[1;4%cm【%s】%s\033[33m%s\033[1;37;4%cm%s《%s》\033[m\n",
     spc, title, buf, mid, spc, buf + len, currboard);
 #else
-  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s 《%s》\033[m\n",
+  if(!broken)
+  {
+  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s看板《%s》\033[m\n",
     title, buf, mid, buf + len+4, currboard);
-/*20080625  移除"看板"字樣*/
+  }
+  else
+  {
+  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m看板《%s》\033[m\n",
+    title, buf, mid, currboard);
+  }
+
 /*20070325	dexter:buf + len  modified to buf+len+2	*/
 /*		not knowing why it works. :p		*/  
 

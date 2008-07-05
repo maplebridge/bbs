@@ -50,6 +50,7 @@ trans_hdr(old, new, src, dst)
   if(fd = fopen(dst_f,"r"))
   {
 	  new->xname[0]='X';
+	  fclose(fd);
   }
   sprintf(cmd,"cp "BBSHOME"/brd/%s/%c/%s "BBSHOME"/brd/%s/%c/%s",src,old->xname[7],old->xname,dst,new->xname[7],new->xname);
   system(cmd);
