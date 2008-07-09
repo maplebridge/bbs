@@ -111,7 +111,7 @@ RefusePal_level(board, hdr)       //smiler 1108
      return 0;
   else
   {
-    RefusePal_fpath(fpath, board, 'C', hdr);
+    RefusePal_fpath(fpath, board, 'R', hdr);     //0709
     if(fp=fopen(fpath,"r"))
     {
        fclose(fp);
@@ -121,11 +121,13 @@ RefusePal_level(board, hdr)       //smiler 1108
        {
         fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
         free(fimage);
-        return fsize;
+        //return fsize;                          //0709
+		if(fsize)
+			return fsize;
        }
     }
-    else
-     return -1;
+    //else                                       //0709
+    return -1;
   }
 }
 
@@ -141,7 +143,8 @@ RefusePal_belong(board, hdr)
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
     return 1;
                                                                                 
-  RefusePal_fpath(fpath, board, 'C', hdr);  //smiler 1109
+  //RefusePal_fpath(fpath, board, 'C', hdr);  //smiler 1109
+  RefusePal_fpath(fpath, board, 'R', hdr);  //smiler 1109
   if (fimage = f_img(fpath, &fsize))
   {
     fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
@@ -1062,7 +1065,9 @@ post_reply(xo)
     hdr = (HDR *) xo_pool + (xo->pos - xo->top);
 
 #ifdef HAVE_REFUSEMARK
-    if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))  //0709
+    //  return XO_NONE;
+    if (!chkrestrict(hdr))
       return XO_NONE;
 #endif
 
@@ -1874,7 +1879,8 @@ post_browse(xo)
     xmode = hdr->xmode;
 
 #ifdef HAVE_REFUSEMARK
-    if ((xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    //if ((xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+	if (!chkrestrict(hdr))
       break;
 #endif
 
@@ -2884,8 +2890,9 @@ static int
 chkrestrict(hdr)
   HDR *hdr;
 {
-  return !(hdr->xmode & POST_RESTRICT) || 
-    !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
+  //return !(hdr->xmode & POST_RESTRICT) || 
+  //  !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
+	return !((hdr->xmode & POST_RESTRICT)) || RefusePal_belong(currboard, hdr);
 }
 #endif
 
@@ -2963,7 +2970,8 @@ post_edit(xo)
   if (HAS_PERM(PERM_ALLBOARD))			/* ¯¸ªø­×§ï */
   {
 #ifdef HAVE_REFUSEMARK
-    if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+    //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+	if (!chkrestrict(hdr))
       return XO_NONE;
 #endif
 
