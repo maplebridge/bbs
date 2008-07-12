@@ -1328,6 +1328,14 @@ igetch()
 	  vio_to.tv_sec = cc + 60;	/* Thor.980806: 每次timeout都增加60秒，所以片子愈換愈慢，好懶:p */
 	  /* Thor.990201.註解: 除了talk_rqst、chat之外，需要在動一動之後，重設tv_sec為60秒嗎? (預設值) */
 
+	  if (idle >= 3 && !cutmp)  /* 登入時 idle 超過 3 分鐘就斷線 */
+	  {
+		  outz("登入逾時，請重新上站");
+		  refresh();
+		  abort_bbs();
+	  }
+
+
 #ifdef TIME_KICKER
 //    if(cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
 	if(1)

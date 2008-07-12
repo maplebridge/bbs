@@ -1334,6 +1334,11 @@ class_item(num, bno, brdpost)
   else
     token = ' ';
 
+  /* smiler.080712:處理隱板可見 */
+  int post_read_secret=1;
+  if( ((brd->readlevel == PERM_SYSOP) || (brd->readlevel == PERM_BOARD)) && (!(brd_bits[bno] & BRD_R_BIT)) )
+	  post_read_secret=0;
+
   /* 處理 已讀/未讀 */
 #ifdef ENHANCED_VISIT
   /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
@@ -1359,8 +1364,19 @@ class_item(num, bno, brdpost)
     str3 = "  ";
 
 
-    /*smiler.070724: 看板配色,人氣 */
-    prints("%6d%c%s%-13s",num, token, str1, brd->brdname);
+    /* smiler.070724: 看板配色,人氣 */
+    prints("%6d%c%s",num, token, str1);
+
+	/* smiler.080712: 處理隱板可見顯色 */   
+    if( (brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP) )
+	{
+		if(post_read_secret)
+            prints("\033[m\033[1;32m%-13s\033[m", brd->brdname);
+		else
+			prints("\033[m\033[1;30m%-13s\033[m", brd->brdname);
+	}
+	else
+		prints("%-13s", brd->brdname);
 
     if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
         prints("\033[1;31m");
@@ -1535,6 +1551,10 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
   else
     token = ' ';
 
+  /* smiler.080712:處理隱板可見 */
+  int post_read_secret=1;
+  if( ((brd->readlevel == PERM_SYSOP) || (brd->readlevel == PERM_BOARD)) && (!(brd_bits[chn] & BRD_R_BIT)) )
+      post_read_secret=0;
 
   /* 處理 已讀/未讀 */
 #ifdef ENHANCED_VISIT
@@ -1563,7 +1583,18 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
 
 
     /*smiler.070724: 看板配色,人氣 */
-    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD"%-13s",num, token, str1, brd->brdname);
+    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD,num, token, str1);
+
+	/* smiler.080712: 處理隱板可見顯色 */    
+    if( (brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP) )
+	{
+		if(post_read_secret)
+            prints("\033[1;32m%-13s\033[m"COLORBAR_BRD, brd->brdname);
+		else
+			prints("\033[1;30m%-13s\033[m"COLORBAR_BRD, brd->brdname);
+	}
+	else
+		prints("%-13s", brd->brdname);
 
     if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
         prints("\033[1;31m");

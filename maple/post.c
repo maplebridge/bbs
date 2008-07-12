@@ -1053,6 +1053,16 @@ do_reply(xo, hdr)
   return do_post(xo, hdr->title);
 }
 
+#ifdef HAVE_REFUSEMARK
+static int
+chkrestrict(hdr)
+  HDR *hdr;
+{
+  //return !(hdr->xmode & POST_RESTRICT) || 
+  //  !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
+	return !((hdr->xmode & POST_RESTRICT)) || RefusePal_belong(currboard, hdr);
+}
+#endif
 
 static int
 post_reply(xo)
@@ -1226,7 +1236,7 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
   /* --------------------------------------------------- */
 
   /* len: 標題是 type[] 裡面的那一種 */
-  if((hdr->xmode & POST_RESTRICT)) //smiler 1108
+  if(!chkrestrict(hdr))
   {
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
@@ -1406,7 +1416,7 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   /* --------------------------------------------------- */
 
   /* len: 標題是 type[] 裡面的那一種 */
-  if((hdr->xmode & POST_RESTRICT)) //smiler 1108
+  if(!chkrestrict(hdr))
   {
       strcpy(title_tmp,"<< 文章保密 >>"); //smiler 1108
       title = str_ttl(mark = title_tmp);
@@ -2884,19 +2894,6 @@ post_prune(xo)
   return ret;
 }
 
-
-#ifdef HAVE_REFUSEMARK
-static int
-chkrestrict(hdr)
-  HDR *hdr;
-{
-  //return !(hdr->xmode & POST_RESTRICT) || 
-  //  !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
-	return !((hdr->xmode & POST_RESTRICT)) || RefusePal_belong(currboard, hdr);
-}
-#endif
-
-
 static int
 post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
   XO *xo;
@@ -3234,10 +3231,10 @@ post_x_score(xo,reason_input)
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 64 - IDLEN - vtlen;
+    maxlen = 63 - IDLEN - vtlen - 6;
   else
 #endif
-    maxlen = 64 - strlen(cuser.userid) - vtlen;
+    maxlen = 63 - strlen(cuser.userid) - vtlen - 6;
 
 //  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
 //    return XO_FOOT;
@@ -3280,9 +3277,9 @@ post_x_score(xo,reason_input)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\033[m\n", 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d %02d:%02d:%02d\033[m\n", 
       verb, userid, maxlen, reason, 
-      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
     fclose(fp);
   }
 
@@ -3384,10 +3381,10 @@ post_t_score(xo,reason_input,hdr_in)
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 64 - IDLEN - vtlen;
+    maxlen = 63 - IDLEN - vtlen - 6;
   else
 #endif
-    maxlen = 64 - strlen(cuser.userid) - vtlen;
+    maxlen = 63 - strlen(cuser.userid) - vtlen - 6;
 
 //  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
 //    return XO_FOOT;
@@ -3433,9 +3430,9 @@ post_t_score(xo,reason_input,hdr_in)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s \033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d\n", 
+	fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d %02d:%02d:%02d\033[m\n", 
       verb, userid, maxlen, reason, 
-      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
     fclose(fp);
   }
 
@@ -3543,10 +3540,10 @@ post_e_score(xo)
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 64 - IDLEN - vtlen;
+    maxlen = 63 - IDLEN - vtlen;
   else
 #endif
-    maxlen = 64 - strlen(cuser.userid) - vtlen;
+    maxlen = 63 - strlen(cuser.userid) - vtlen;
 
   if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
     return XO_FOOT;
@@ -3561,7 +3558,7 @@ post_e_score(xo)
       userid = cuser.userid;
     else
       strcat(userid, ".");		/* 自定的話，最後加 '.' */
-    maxlen = 64 - strlen(userid) - vtlen;
+    maxlen = 63 - strlen(userid) - vtlen;
   }
   else
 #endif
@@ -3578,9 +3575,9 @@ post_e_score(xo)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s\033[1;30m%02d/%02d/%02d\n", 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s\033[m：\033[0;33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n", 
       verb, userid, maxlen, reason, 
-      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     fclose(fp);
   }
 
@@ -3665,10 +3662,10 @@ post_score(xo)
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 64 - IDLEN - vtlen;
+    maxlen = 63 - IDLEN - vtlen;
   else
 #endif
-    maxlen = 64 - strlen(cuser.userid) - vtlen;
+    maxlen = 63 - strlen(cuser.userid) - vtlen;
 
   if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
     return XO_FOOT;
@@ -3683,7 +3680,7 @@ post_score(xo)
       userid = cuser.userid;
     else
       strcat(userid, ".");		/* 自定的話，最後加 '.' */
-    maxlen = 64 - strlen(userid) - vtlen;
+    maxlen = 63 - strlen(userid) - vtlen;
   }
   else
 #endif
@@ -3700,9 +3697,13 @@ post_score(xo)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s\033[1;30m%02d/%02d/%02d\n", 
+//    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s \033[m：\033[0;33m%-*s\033[1;30m%02d/%02d/%02d\n%02d/%02d/%02d\n", 
+//      verb, userid, maxlen, reason, 
+//      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+//    fclose(fp);
+	fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s\033[m：\033[0;33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n", 
       verb, userid, maxlen, reason, 
-      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     fclose(fp);
   }
 
