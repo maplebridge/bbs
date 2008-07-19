@@ -607,6 +607,16 @@ utmp_setup(mode)
   pal_cache();
 }
 
+char *
+get_my_ip(void)
+{
+    uschar *addr;
+	addr = (uschar *) &tn_addr;
+	static char my_ip[15];
+	sprintf(my_ip, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+	return my_ip;
+}
+
 
 /* ----------------------------------------------------- */
 /* user login						 */
@@ -1147,7 +1157,7 @@ tn_main()
 
 #ifdef HAVE_LOGIN_DENIED
   char tn_addr_buf[15];           /* smiler.070719: ip address of string form */
-  ip_to_str(tn_addr_buf,tn_addr);
+  sprintf(tn_addr_buf,"%s",get_my_ip());
   if(acl_has(BBS_ACPFILE, "","") != -1) /* BBS_ACLFILE¤£¦s¦b*/
   {
     if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf))) /* smiler.070724 */
@@ -1628,7 +1638,8 @@ main(argc, argv)
     argc = *totaluser;
 
     //if(argc<=1)
-    if(argc>0)
+    //if(argc>0)
+	if(1)
 	{
       setuploader();
 	}

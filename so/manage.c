@@ -765,12 +765,12 @@ XoBM(xo)
   BRD *oldbrd;
   oldbrd = bshm->bcache + currbno;
 
-  if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
-  {
+  /*if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
+  /*{
 	  vmsg("藝文館看板如需更動板友名單請向館務申請!!");
 	  return XO_FOOT;
   }
-
+  */
   XO *xt;
   char fpath[64];
 

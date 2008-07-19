@@ -17,6 +17,7 @@
 
 #define MORE_BUFSIZE	4096
 
+static int more_width;	/* more screen 的寬度 */
 
 static uschar more_pool[MORE_BUFSIZE];
 static int more_base;		/* more_pool[more_base ~ more_base+more_size] 有值 */
@@ -30,7 +31,8 @@ static int more_size;
 
 /* itoc.041226.註解: mgets() 和 more_line() 不一樣的部分有
    1. mgets 直接用 more_pool 的空間；more_line 則是會把值寫入一塊 buffer
-   2. mgets 不會自動斷行；more_line 則是會自動斷行在 b_cols
+   //2. mgets 不會自動斷行；more_line 則是會自動斷行在 b_cols
+   2. mgets 不會自動斷行；more_line 則是會自動斷行在 more_width
    所以 mgets 是拿用在一些系統檔處理或是 edit.c，而 more_line 只用在 more()
  */
 
@@ -151,7 +153,7 @@ more_line(buf)
     /* weiyu.040802: 如果這碼是中文字的首碼，但是只剩下一碼的空間可以印，那麼不要印這碼 */
     if (in_chi || IS_ZHC_HI(ch))
       in_chi ^= 1;
-    if (in_chi && (len >= b_cols - 1 || bytes >= ANSILINELEN - 2))
+	if (in_chi && (len >= more_width - 1 || bytes >= ANSILINELEN - 2))
       break;
 
     foff++;
@@ -181,14 +183,14 @@ more_line(buf)
 
     *buf++ = ch;
 
-    /* 若不含控制碼的長度已達 b_cols 字，或含控制碼的長度已達 ANSILINELEN-1，那麼離開迴圈 */
-    if (len >= b_cols || bytes >= ANSILINELEN - 1)
+    /* 若不含控制碼的長度已達 more_width 字，或含控制碼的長度已達 ANSILINELEN-1，那麼離開迴圈 */
+    if (len >= more_width || bytes >= ANSILINELEN - 1)
     {
-      /* itoc.031123: 如果是控制碼，即使不含控制碼的長度已達 b_cols 了，還可以繼續吃 */
+      /* itoc.031123: 如果是控制碼，即使不含控制碼的長度已達 more_width 了，還可以繼續吃 */
       if ((in_ansi || (foff < fend && *foff == KEY_ESC)) && bytes < ANSILINELEN - 1)
 	continue;
 
-      /* itoc.031123: 再檢查下一個字是不是 '\n'，避免恰好是 b_cols 或 ANSILINELEN-1 時，會多跳一列空白 */
+      /* itoc.031123: 再檢查下一個字是不是 '\n'，避免恰好是 more_width 或 ANSILINELEN-1 時，會多跳一列空白 */
       if (foff < fend && *foff == '\n')
       {
 	foff++;
@@ -290,13 +292,13 @@ outs_header(str, header_len)	/* 印出檔頭 */
     if ((ptr = strstr(word, str_post1)) || (ptr = strstr(word, str_post2)))
     {
       ptr[-1] = ptr[4] = '\0';
-        prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m\n", 
+        prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m", 
         	header1[0], d_cols + 53, d_cols + 53, word, ptr, ptr + 5);
     }
     else
     {
       /* 少看板這欄 */
-      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m\n", 
+      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m", 
 	header1[0], d_cols + 72, d_cols + 72, word);
     }
 
@@ -310,21 +312,14 @@ outs_header(str, header_len)	/* 印出檔頭 */
     {
       /* 其他檔頭都只有一欄 */
       word = str + header_len;
-      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m\n", 
+      prints(COLOR5 " %s " COLOR6 "%-*.*s\033[m", 
 	header1[i], d_cols + 72, d_cols + 72, word);
-
-
-    //if(i==(LINE_HEADER-1))
-     //prints("\n");
-
-/*dexter:水藍色分隔線*/
-
       return;
     }
   }
 
   /* 如果不是檔頭，就當一般文字印出 */
-    //outs_line(str);  
+  outs_line(str);  
   //20070410 smiler : 其餘不印出,避免標線顯示混亂
   //"其餘"部分,只會有轉信路徑的結尾而已
 }
@@ -420,6 +415,8 @@ more(fpath, footer)
   char *fpath;
   char *footer;
 {
+  #define MSG_SEPERATE    "\033[36m"MSG_SEPERATOR"\033[m\n"
+  uschar *fnew;
   char buf[ANSILINELEN];
   int i;
 
@@ -440,9 +437,11 @@ more(fpath, footer)
   foff = fimage;
   fend = fimage + fsize;
 
-  /* 找檔頭結束的地方 
-     ckm.Apr1207: 檔頭包括空白的那一行*/
-  for (i = 0; i <= LINE_HEADER; i++)
+  /* more_width = b_cols - 1; */	/* itoc.070517.註解: 若用這個，每列最大字數會和 header 及 footer 對齊 (即會有留白二格) */
+  more_width = b_cols + 1;		/* itoc.070517.註解: 若用這個，每列最大字數與螢幕同寬 */
+
+  /* 找檔頭結束的地方 */
+  for (i = 0; i < LINE_HEADER; i++)
   {
     if (!more_line(buf))
       break;
@@ -461,6 +460,31 @@ more(fpath, footer)
       break;
   }
   headend = foff;
+
+#if 1
+  if (header_len && footer)     /* 一般文章，在檔頭與本文之間加入分隔線 */
+  {
+    lino = strlen(MSG_SEPERATE);
+
+    if (!(fnew = malloc(fsize + lino)))
+    {
+      free(fimage);
+      return -1;
+    }
+
+    shift = foff - fimage - 1;
+    memcpy(fnew, fimage, shift);
+    memcpy(fnew + shift, MSG_SEPERATE, lino);
+	memcpy(fnew + shift + lino, "\n", strlen("\n"));
+    memcpy(fnew + shift + lino + strlen("\n"), foff, fsize - shift);
+
+    free(fimage);
+    fsize += lino;
+    fimage = fnew;
+    fend = fimage + fsize;
+    headend = fimage + shift;
+  }
+#endif
 
   /* 歸零 */
   foff = fimage;
@@ -491,54 +515,12 @@ more(fpath, footer)
     /* ------------------------------------------------- */
 
     /* 首頁前幾列才需要處理檔頭 */
-    
-/*smiler:修正顯示直線的部份bug 20070410
-  當foff<headend 時,先看是否有header_len
-  (目前是依照header部分,是否有"作者"或是"發信人"字樣,
-   當作是否有header的依據),
-   若header_len為0,表示無作者及發信人字樣,亦即沒header,
-   當一般內容印出,反之,若為0,則改為由outs_header負責印出
-   
-   又,foff==headend 且有 header時,結尾要多印出 一直線,
-   當foff>headend時,直接當一般檔案印出
-  */
-
-    if ((foff < headend))
-    {
-      if((header_len != 0))
-      {
-        outs_header(buf, header_len);
-      }
-      else
-      {
-        outs_line(buf);
-        outc('\n');
-      }
-    }
-
-/*dexter:水藍色分隔線*/
-/*
-upon "foff==headend", function outs_header(...) prints nothing because of the content of "buf" is '\0'.
-therefore, by replacing original function  outc('\n')  with   prints("a hor. cyan line") did the work.
-*/
-    if ((foff == headend))
-    {
-      if(header_len != 0)
-      {
-        outs_header(buf, header_len);
-	prints("\033[36m───────────────────────────────────────\033[m\n");
-      }
-      else
-      {
-        outs_line(buf);
-        outc('\n');
-      }
-    }
-    if (foff > headend )    
-    {  
+    if (foff <= headend)
+      outs_header(buf, header_len);
+    else
       outs_line(buf);
-      outc('\n');
-    }
+
+    outc('\n');
 
     
     /* ------------------------------------------------- */

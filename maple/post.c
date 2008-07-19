@@ -1930,6 +1930,9 @@ re_key:
       break;
 
 #ifdef HAVE_SCORE
+	case 'e':
+	  post_e_score(xo);
+	  return post_init(xo);
     case '%':
       post_score(xo);
       return post_init(xo);
@@ -3896,7 +3899,13 @@ post_state(xo)
 	  prints("是\n");
   else
 	  prints("否\n");
-                                                                                
+
+  prints("    收錄精華 : ");
+  if(ghdr->xmode & POST_GEM)
+  	  prints("是");
+  else
+          prints("否");
+  
   vmsg(NULL);
                                                                                 
   return post_body(xo);

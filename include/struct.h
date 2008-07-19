@@ -14,11 +14,11 @@
 /* screen control */
 
 #define STRLEN		80	/* Length of most string data */
-#define ANSILINELEN	250	/* Maximum Screen width in chars */
+#define ANSILINELEN	900	/* Maximum Screen width in chars */
 
 /* itoc.031123: 螢幕的寬度設為 80 也無妨，只是有些 telnet term 在貼上文字太長時，
                 會自動斷行在 79，所以在此就從其設定 */
-#define SCR_WIDTH	79	/* edit/more/talk/visio screen width */
+#define SCR_WIDTH	78	/* edit/more/talk/visio screen width */
 
 #define TAB_STOP	4	/* 按 TAB 換成幾格空白 (要是 2 的次方) */
 #define TAB_WIDTH	(TAB_STOP - 1)
@@ -548,14 +548,14 @@ typedef struct
 
 typedef struct screenline
 {
-  uschar oldlen;		/* previous line length */
-  uschar len;			/* current length of line */
-  uschar width;			/* padding length of ANSI codes */
-  uschar smod;			/* start of modified data */
-  uschar emod;			/* end of modified data */
-  uschar sso;			/* start of standout data */
-  uschar eso;			/* end of standout data */
-  uschar mode;			/* status of line, as far as update */
+  int oldlen;		/* previous line length */
+  int len;			/* current length of line */
+  int width;			/* padding length of ANSI codes */
+  int smod;			/* start of modified data */
+  int emod;			/* end of modified data */
+  int sso;			/* start of standout data */
+  int eso;			/* end of standout data */
+  uschar mode;			/* status of line, as far as update */ /* 由於 SL_* 的 mode 不超過八個，故用 uschar 即可 */
   uschar data[ANSILINELEN];
 }          screenline;
 

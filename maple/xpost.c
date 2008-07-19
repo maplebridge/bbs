@@ -853,6 +853,9 @@ re_key:
       break;
 
 #ifdef HAVE_SCORE
+	case 'e':
+	  post_e_score(xo);
+	  return xpost_init(xo);
     case '%': 
       post_score(xo);
       return xpost_init(xo);

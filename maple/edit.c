@@ -1633,8 +1633,13 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 	  }
   }
 
+  char my_ip[15];
+  sprintf(my_ip,"%s",get_my_ip());
+  char my_space[20];
+
   if (!modify)
   {
+
     if(select==0)
     {
     fprintf(fp, EDIT_BANNER,
@@ -1645,8 +1650,112 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 #ifdef HAVE_ANONYMOUS
            (curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
 #endif
-          fromhost);
+          my_ip);
     }
+	else if(select==1)
+	{
+		if((curredit & EDIT_ANONYMOUS))
+		  str_ncpy(my_space,space,33-strlen(STR_ANONYMOUS)-strlen("納美克星")-2-1);
+		else
+          str_ncpy(my_space,space,33-strlen(cuser.userid)-strlen(my_ip)-2-1);
+/*
+　: ffffffa1 ffffff40
+◤: ffffffa2 ffffffab
+楓: ffffffb7 ffffffac
+橋: ffffffbe fffffff4
+驛: ffffffc5 ffffffe6
+站: ffffffaf ffffffb8
+˙: ffffffa3 ffffffbb
+◢: ffffffa2 ffffffa8
+▅: ffffffa2 00000066
+▌: ffffffa2 0000006d
+◆: ffffffa1 ffffffbb
+◣: ffffffa2 ffffffa9
+●: ffffffa1 ffffffb4
+◥: ffffffa2 ffffffaa
+
+*/
+		fprintf(fp,
+"\033[m\n--\n\033[m"
+"              \033[30m%c\033[47m%c \033[m◣  \033[31m─\033[1;37m 楓橋藝文站正式開張！\033[;31m─\033[1;31m%c\033[;31m%c─\033[1;31m%c\033[;31m%c─\033[30;41m▍   \033[m \033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[37m         \n"
+"   \033[1;37m竟然不是 ‵\033[m \033[30;45m◣\033[47m︹\033[m▉ \033[1;36m　　　　　　　　　　\033[m            \033[30;41m▋ │\033[31;40m▉▄▅▆\033[37m             \n"
+"   \033[1;37m紅蘿蔔！\033[m▄▅▇\033[1;30;47m \033[m;\033[47m \033[;30;47m \033[m \033[1;36m快來尋找你愛的作家。\033[m       \033[1;31m▃▆\033[41m◤\033[;30;41m ／＼\033[31m     \033[36m◢\033[46m    \033[30;47m◥\033[m       \n"
+"          \033[30m \033[47m◣▃\033[45m%c\033[37;47m%c \033[1;31m%c\033[41m%c\033[;30;47m%c\033[40m%c\033[36m為你嘔心瀝血的作品找個窩。\033[37m \033[30;41m◣       \033[31m%c\033[36m%c\033[30m   \033[31m◢\033[30;46m＝＝＝\033[47m \033[37m%c\033[33;40m%c\033[37m      \n"
+"                 \033[30;47m ◥\033[m  \033[1;36m文學版＋美工板，強烈邀請您。\033[m \033[30;41m◣▁▂  \033[36;46m \033[41m▆\033[46m         \033[30;47m◢\033[m       \n"
+"      \033[30;42m%c\033[32m%c     \033[37m   %c\033[47m%c\033[30m.\033[37m%c\033[42m%c %s從%s%s\033[30m \033[37m \033[31m◢\033[32;41m◢\033[42m          %c\033[30m%c\033[m         \033[m\n",
+
+/*◤*/0xffffffa2,0xffffffab,/*˙*/0xffffffa3,0xffffffbb,/*˙*/0xffffffa3,0xffffffbb,/*楓*/0xffffffb7,0xffffffac,/*橋*/0xffffffbe,0xfffffff4,/*驛*/0xffffffc5,0xffffffe6,/*站*/0xffffffaf,0xffffffb8,/*˙*/0xffffffa3,0xffffffbb,
+/*▅*/0xffffffa2,0x00000066,/*　*/0xffffffa1,0x00000040,/*◢*/0xffffffa2,0xffffffa8,/*◣*/0xffffffa2,0xffffffa9,/*◆*/0xffffffa1,0xffffffbb,
+/*◣*/0xffffffa2,0xffffffa9,/*●*/0xffffffa1,0xffffffb4,/*●*/0xffffffa1,0xffffffb4,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
+#endif
+           cuser.userid,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? "納美克星" :
+#endif
+          my_ip,
+          my_space,
+/*◥*/0xffffffa2,0xffffffaa);
+	}
+	else if(select==2)
+	{
+		if((curredit & EDIT_ANONYMOUS))
+		  str_ncpy(my_space,space,35-strlen(STR_ANONYMOUS)-strlen("納美克星")-2-1);
+		else
+          str_ncpy(my_space,space,35-strlen(cuser.userid)-strlen(my_ip)-2-1);
+	    fprintf(fp,
+"\033[m\n--\n\033[m"
+"  ▄       ◢ ▄▄▄ ▄▄▄ ▄     ▄▄▄ \033[1;37m 清大資工\033[m                             \n"
+"\033[1;37;44m  █ █◣◢█ █▄█ █▄█ █     █▄▄  \033[33m%s\033[37m 從\033[33m %s%s\033[m  \n"
+"  █ █◥◤█ █  █ █     █▄▄ █▄▄ \033[1;37m【楓橋驛站】 telnet://imaple.tw\033[m       \033[m",
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
+#endif
+           cuser.userid,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? "納美克星" :
+#endif
+          my_ip,
+          my_space
+			);
+	}
+	else
+	{
+/*
+▂ 0xffffffa2,0x00000063
+＿ 0xffffffa1,0xffffffc4
+◣ 0xffffffa2,0xffffffa9
+◢ 0xffffffa2,0xffffffa8
+。 0xffffffa1,0x00000043
+． 0xffffffa1,0x00000044
+◆ 0xffffffa1,0xffffffbb
+▁ 0xffffffa2,0x00000062
+￣ 0xffffffa1,0xffffffc3
+川 0xffffffa4,0x00000074
+◤ 0xffffffa2,0xffffffab
+兀 0xffffffa4,0x00000061
+。 0xffffffa1,0x00000043
+人 0xffffffa4,0x00000048
+*/
+		fprintf(fp,
+"\033[m\n--\n\033[m"
+"\033[30m%c\033[44m%c_%c\033[1;30m%cˍ\033[33m（_\033[;34m▇▆\033[1;31;44m' * \033[;34;44m%c\033[31m%c_ \033[34;41m%c\033[31;44m%c%c\033[41m%c\033[34;40m▆▇\033[30;44m \033[37m▁_\033[30m ▄▆▇\033[m%c\033[33m%c\033[31m.\033[1;34m楓橋驛站%c\033[37m%c\033[30mtelnet://imaple.tw\033[;30m%c\033[41m%c\033[31;40m%c\033[41m%c\033[40m}\033[37m   \n"
+" \033[34m=\033[37m%c\033[44m%c  ▔﹊\033[30m%c\033[34m%c   \033[31m*\033[33m.   \033[34;41m▆\033[1;30;44m%c\033[;30;41m%c@\033[31;44m▋ \033[30m▃\033[m▔   \033[1;35m▂~\033[5m+\033[;33m                                  \033[30m%c\033[31m%c\033[1;31m%c\033[;30m%c\033[37m   \n"
+"   ￣\033[30;44m▃▂▁▂%c\033[31m%c\033[30m▁▂ˍ\033[31m_%c\033[41m%c\033[30m〢\033[44m_▇\033[33;40m.\033[31m*   \033[1;35m├=rom：\033[37m%s\033[m    \n"
+"   \033[31m﹊￣﹊￣￣﹊﹊￣￣﹊￣﹊￣￣﹊\033[35m@%c\033[30m%c\033[31m￣￣﹊￣﹊￣￣﹊﹊￣￣﹊﹊￣￣﹊﹊￣﹊￣\033[37m    \033[m\n",
+/*▂*/0xffffffa2,0x00000063,/*＿*/0xffffffa1,0xffffffc4,/*◣*/0xffffffa2,0xffffffa9,/*◣*/0xffffffa2,0xffffffa9,/*◢*/0xffffffa2,0xffffffa8,/*。*/0xffffffa1,0x00000043,/*．*/0xffffffa1,0x00000044,/*◆*/0xffffffa1,0xffffffbb,/*◣*/0xffffffa2,0xffffffa9,
+/*▁*/0xffffffa2,0x00000062,/*￣*/0xffffffa1,0xffffffc3,/*川*/0xffffffa4,0x00000074,/*◤*/0xffffffa2,0xffffffab,/*兀*/0xffffffa4,0x00000061,
+/*。*/0xffffffa1,0x00000043,/*◢*/0xffffffa2,0xffffffa8,
+#ifdef HAVE_ANONYMOUS
+           (curredit & EDIT_ANONYMOUS) ? "納美克星" :
+#endif
+          my_ip,
+/*人*/0xffffffa4,0x00000048
+);
+	}
+
+#if 0  /* smiler.080719:用過的站簽 */
     else if(select==1)
     {
         fprintf(fp,"\033[m\n--\n\033[0m\033[47m      \033[31m◢\033[37m     \033[32;4m清大資工˙楓橋驛站\033[0;32;47m \033[4mtelnet://"MYHOSTNAME"\033[m\033[0;47m%s |\033[0m%s\033[0m\033[47m  \033[31;41;1m╲\033[0;41m    \033[47m      \033[30m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[37m  |\033[0m%s\033[0m\033[47m  \033[31;41;1m  ╲╱  \033[0;41m◢\033[47m \033[40m▌  \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[31;47m◢\033[41;1m  ─╲\033[0;41m◢\033[47m   \033[40m▌     \033[1m%s\033[0m\033[30;47m▌\033[37m |\033[0m%s\033[0m\033[47m    \033[31;41;1m  \033[0;41m◢\033[31;47;1m╲\033[0;47m    \033[40m▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄\033[47m  |\033[0m%s\033[0m\033[47m    \033[31m◤\033[37m    \033[31;1m╲\033[0;47m \033[32mFrom:%s\033[37m|\033[0m%s\n",hello_hostspace,m[0],m[1],
@@ -1712,11 +1821,14 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
           fromhost);
 	}
 
+#endif
+
+
   }
   else
   {
     //fprintf(fp, MODIFY_BANNER, cuser.userid, fromhost, Now());
-      fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), fromhost);
+      fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), my_ip);
   }
 }
 

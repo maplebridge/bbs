@@ -103,7 +103,7 @@ is_loopback(path, token, len)
   for (;;)
   {
     cc = path[len];
-    if ((!cc || cc == '!') && !memcmp(path, token, len))
+    if ((!cc || cc == '!') && !str_ncmp(path, token, len))
       return 1;
 
     for (;;)

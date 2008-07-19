@@ -394,11 +394,8 @@ channelreader(client)
 
 	if (used == '.')
 	{
-	  used = dest[-1];
-	  if (used == '\n')
+	  if (dest[-1] == '\n')
 	    break;		/* end of article body */
-	  if (used == '.' && dest[-2] == '\n')
-	    *dest = ' ';	/* strip leading ".." to ". " */
 	}
 	else
 	{
