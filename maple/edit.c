@@ -1708,7 +1708,7 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 "\033[m\n--\n\033[m"
 "  ▄       ◢ ▄▄▄ ▄▄▄ ▄     ▄▄▄ \033[1;37m 清大資工\033[m                             \n"
 "\033[1;37;44m  █ █◣◢█ █▄█ █▄█ █     █▄▄  \033[33m%s\033[37m 從\033[33m %s%s\033[m  \n"
-"  █ █◥◤█ █  █ █     █▄▄ █▄▄ \033[1;37m【楓橋驛站】 telnet://imaple.tw\033[m       \033[m",
+"  █ █◥◤█ █  █ █     █▄▄ █▄▄ \033[1;37m【楓橋驛站】 telnet://imaple.tw\033[m       \033[m\n",
 #ifdef HAVE_ANONYMOUS
            (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
 #endif

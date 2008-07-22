@@ -174,14 +174,14 @@ deal_sover(bntp)
   {
     mtime = bntp->chrono;
     str_ncpy(sover.title, bntp->title, sizeof(sover.title));
-    sprintf(sover.msgid, "%s$%s@" MYHOSTNAME, board, filename);
+    sprintf(sover.msgid, "%s$%s@" MYHOSTNAME, filename, board);
   }
   else				/* cancel */
   {
     time(&mtime);
-    sprintf(buf, "%s$%s@" MYHOSTNAME, board, filename);		/* 欲砍文章的 Message-ID */
+    sprintf(buf, "%s$%s@" MYHOSTNAME, filename, board);		/* 欲砍文章的 Message-ID */
     sprintf(sover.title, "cmsg cancel <%s>", buf);
-    sprintf(sover.msgid, "C%s$%s@" MYHOSTNAME, board, filename);/* LHD.030628: 在原 msgid 加任意字串當作 cmsg 的 Message-ID */
+    sprintf(sover.msgid, "C%s$%s@" MYHOSTNAME, filename, board);/* LHD.030628: 在原 msgid 加任意字串當作 cmsg 的 Message-ID */
     sprintf(sover.control, "cancel <%s>", buf);
   }
 
@@ -457,8 +457,8 @@ send_outgoing(node, sover)
   nodelist_t *node;
   soverview_t *sover;
 {
-  int cc, status;
-  char *msgid, *str;
+  int status;
+  char *msgid, *body, *bodyp;
 
   msgid = sover->msgid;
 
@@ -511,22 +511,20 @@ send_outgoing(node, sover)
   fputs("\r\n", SERVERwfp);	/* 檔頭和內文空一行 */
 
   /* 寫入文章的內容 */
-  for (str = BODY; cc = *str; str++)
+  for (body = BODY, bodyp = strchr(body, '\n'); body && *body; bodyp = strchr(body, '\n'))
   {
-    if (cc == '\n')
-    {
-      /* itoc.030127.註解: 把 "\n" 換成 "\r\n" */
-      fputc('\r', SERVERwfp);
-    }
-    else if (cc == '.')
-    {
-      /* If the text contained a period as the first character of the text 
-         line in the original, that first period is doubled. */
-      if (str == BODY || str[-1] == '\n')
-        fputc('.', SERVERwfp);
-    }
-      
-    fputc(cc, SERVERwfp);
+    /* itoc.030127.註解: 之所以要一行一行寫入，是因為要把 \n 換成 \r\n */
+
+    if (bodyp)
+      *bodyp = '\0';
+    if (body[0] == '.' && body[1] == '\0')
+      fputs(".", SERVERwfp);
+    fputs(body, SERVERwfp);
+    fputs("\r\n", SERVERwfp);
+    if (!bodyp)
+      break;
+    *bodyp = '\n';
+    body = bodyp + 1;
   }
 
   /* IHAVE/POST 結束 */
@@ -549,37 +547,27 @@ send_outgoing(node, sover)
 /*-------------------------------------------------------*/
 
 
-static int		/* 1:成功 0:失敗 */
-NNRPgroup(newsgroup, low, high)	/* 切換 group，並傳回 low-number 及 high-number */
+static int
+NNRPgroup(newsgroup)	/* 切換 group，並傳回 high number */
   char *newsgroup;
-  int *low, *high;
 {
-  int i;
+  int high;
   char *ptr;
 
   if (tcpcommand("GROUP %s", newsgroup) != NNTP_GROUPOK_VAL)
-    return 0;
+    return -1;
 
   ptr = SERVERbuffer;
-
-  /* 找 SERVERbuffer 的第二個 ' ' */
-  for (i = 0; i < 2; i++)
+  for (high = 0; high < 3; high++)	/* 找第三個 ' ' */
   {
     ptr++;
     if (!*ptr || !(ptr = strchr(ptr, ' ')))
-      return 0;
+      return -1;
   }
-  if ((i = atoi(ptr + 1)) >= 0)
-    *low = i;
 
-  /* 找 SERVERbuffer 的第三個 ' ' */
-  ptr++;
-  if (!*ptr || !(ptr = strchr(ptr, ' ')))
-    return 0;
-  if ((i = atoi(ptr + 1)) >= 0)
-    *high = i;
-
-  return 1;
+  if ((high = atoi(ptr + 1)) >= 0)
+    return high;
+  return -1;
 }
 
 
@@ -639,11 +627,8 @@ my_post()
     size = read(rel, data, size);
     close(rel);
 
-    if (size >= 2)
-    {
-      if (data[size - 2] == '\n')	/* 把最後重覆的 '\n' 換成 '\0' */
-        size--;
-    }
+    if (data[size - 2] == '\n')	/* 把最後重覆的 '\n' 換成 '\0' */
+      size--;
     data[size] = '\0';		/* 補上 '\0' */
 
     rel = readlines(data - 1);
@@ -687,7 +672,7 @@ my_post()
 
 
 /*-------------------------------------------------------*/
-/* 更新 high-number					 */
+/* 更新 high number					 */
 /*-------------------------------------------------------*/
 
 
@@ -703,15 +688,7 @@ static void
 changehigh(hdd, ram)
   newsfeeds_t *hdd, *ram;
 {
-  if (ram->high >= 0)
-  {
-    hdd->high = ram->high;
-    hdd->xmode &= ~INN_ERROR;
-  }
-  else
-  {
-    hdd->xmode |= INN_ERROR;
-  }
+  hdd->high = ram->high;
 }
 
 
@@ -719,7 +696,7 @@ static void
 updaterc(nf, pos, high)
   newsfeeds_t *nf;
   int pos;			/* 於 newsfeeds.bbs 裡面的位置 */
-  int high;			/* >=0:目前抓到哪一篇 <0:error */
+  int high;
 {
   nf->high = high;
   GROUP = nf->newsgroup;
@@ -736,7 +713,7 @@ static void
 readnews(node)
   nodelist_t *node;
 {
-  int i, low, high, artcount, artno;
+  int i, high, artcount, artno;
   char *name, *newsgroup;
   newsfeeds_t *nf;
 
@@ -753,36 +730,28 @@ readnews(node)
 
     DEBUG(("│┌<readnews> 進入 %s\n", newsgroup));
 
-    /* 取得 news server 上的 low-number 及 high-number */
-    if (!NNRPgroup(newsgroup, &low, &high))
+    /* 取得 news server 上的 high */
+    if ((high = NNRPgroup(newsgroup)) < 0)
     {
-      updaterc(nf, i, -1);
-      DEBUG(("│└<readnews> 無法取得此群組的 low-number 及 high-number 或此群組不存在\n"));
-      continue;		/* 此群組不存在，輪下一個群組 */
+      DEBUG(("│└<readnews> 無法取得此群組的 high-number 或此群組不存在\n"));
+      continue;
     }
 
     if (ResetActive)
     {
-      if (nf->high != high || nf->xmode & INN_ERROR)
+      if (nf->high != high)
         updaterc(nf, i, high);
-      DEBUG(("│└<readnews> 結束 %s，此群組之 high-number 已與伺服器同步\n", newsgroup));
+      DEBUG(("│└<readnews> 結束 %s，此群組之 high-number 已更新\n", newsgroup));
       continue;		/* 若 ResetActive 則不取信，輪下一個群組 */
     }
 
     if (nf->high >= high)
     {
-      if (nf->high > high || nf->xmode & INN_ERROR)	/* server re-number */
+      if (nf->high > high)	/* server re-number */
 	updaterc(nf, i, high);
 
       DEBUG(("│└<readnews> 結束 %s，此群組已沒有新文章\n", newsgroup));
       continue;		/* 這群組已沒有新文章，輪下一個群組 */
-    }
-
-	if (nf->high < low - 1)				/* server re-number */
-    {
-      updaterc(nf, i, high);
-      DEBUG(("│└<readnews> 結束 %s，此群組之 high-number 因伺服器異動而更新\n", newsgroup));
-      continue;		/* 這群組變更過 low-number，輪下一個群組 */
     }
 
     /* 取回群組上第 nf->high + 1 開始的 MaxArts 篇的文章 */
