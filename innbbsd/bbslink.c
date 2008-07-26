@@ -16,6 +16,7 @@
 #include <stdarg.h>
 
 
+
 #if 0	/* itoc.030122.註解: 程式流程 */
 
   0. bbsd 會把新文章的檔頭記錄在 out.bntp
