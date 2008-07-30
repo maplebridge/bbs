@@ -1811,10 +1811,12 @@ class_bar(xo, mode)
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
-    prints("%s%6d%c  %-13.13s\033[33m%5.5s\033[37m%-51s%s",
+	prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s%s%-51s%s",
       mode ? COLORBAR_BRD : "",
       cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
-      str, str + BNLEN + 1, str + BNLEN + 1 + BCLEN + 1,
+      str, str[BNLEN + 4] & 7,str + BNLEN + 1,
+	  mode ? "\033[m"COLORBAR_BRD : "\033[m",
+	  str + BNLEN + 1 + BCLEN + 1,
       mode ? "\033[m" : "");
   }
                                                                                 

@@ -410,6 +410,7 @@ acct_setup(u, adm)
   ACCT x;
   int i, num;
   char *str, buf[80], pass[PSWDLEN + 1];
+#if 0
   FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
   char helloworld[37];
   char user_hello_path[256];
@@ -419,7 +420,7 @@ acct_setup(u, adm)
   char host_choice_char[3];
   int  host_choice_int;
   char userid_tmp[64];
-
+#endif
 
   acct_show(u, adm);
   
@@ -508,6 +509,7 @@ acct_setup(u, adm)
       break;
   };
 
+#if 0/*ikulan.080726:將站簽設定獨立出來*/
   str_lower_acct(userid_tmp,x.userid);
   /* smiler.071030: 輸入使用者想對大家說的話 */
   i++;
@@ -577,6 +579,7 @@ acct_setup(u, adm)
 	  fprintf(file_host,"%d",host_choice_int);
 	  fclose(file_host);
   }
+#endif
 
   /* itoc.010408: 新增生日/性別欄位，不強迫使用者填 (允許填 0) */
   i++;

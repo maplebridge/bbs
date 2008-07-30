@@ -56,7 +56,7 @@ gem_item(num, hdr, level)
   prints("%6d%c%c\241%c ", num, tag_char(hdr->chrono), xmode & GEM_RESTRICT ? ')' : ' ', gtype);
 
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
-    outs(MSG_DATA_CLOAK);				/* itoc.000319: 限制級文章保密 */
+    prints("%s\n",MSG_DATA_CLOAK);				/* itoc.000319: 限制級文章保密 */
   else if (gem_way == 0)
     prints("%.*s\n", d_cols + 64, hdr->title);
   else

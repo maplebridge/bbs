@@ -697,14 +697,24 @@ static MENU menu_register[] =
   "註冊選單"
 };
 
+static MENU menu_user_set[] =
+{
+   u_setup, 0, M_UFILES,
+   "Habit      【 喜好模式 】",
+   u_sign_set, 0, M_UFILES,
+   "Sign       【 站簽設定 】",
+   menu_user, PERM_MENU + 'H', M_UMENU,
+   "喜好模式"
+};
+
 
 static MENU menu_user[] =
 {
   u_info, PERM_BASIC, M_XMODE,
   "Info       【 個人資料 】",
 
-  u_setup, 0, M_UFILES,
-  "Habit      【 喜好模式 】",
+  menu_user_set, 0, M_UMENU,
+  "Set        【 喜好模式 】",
 
   menu_register, PERM_BASIC, M_UMENU,
   "Register   【 註冊選單 】",
@@ -725,7 +735,7 @@ static MENU menu_user[] =
   u_log, PERM_BASIC, M_UFILES,
   "ViewLog    【 上站記錄 】",
 
-  menu_main, PERM_MENU + 'H', M_UMENU,
+  menu_main, PERM_MENU + 'S', M_UMENU,
   "個人設定"
 };
 

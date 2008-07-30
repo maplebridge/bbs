@@ -204,7 +204,7 @@ song_item(num, hdr, level)
   prints("%6d%c \241%c ", num, xmode & GEM_RESTRICT ? ')' : ' ', gtype);
 
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
-    outs(MSG_DATA_CLOAK);
+	prints("%s\n",MSG_DATA_CLOAK);
   else
     prints("%.*s\n", d_cols + 64, hdr->title);
 }

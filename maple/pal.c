@@ -374,9 +374,9 @@ pal_item_bar(xo, mode)
     mode ? COLORBAR_PAL : "",         //這裡是光棒的顏色，可以自己改。
     xo->pos + 1, tag_char(pal->userno),
     pal->ftype & PAL_BAD ? "Ｘ" : "",
-    online ? "\033[33m" : "",
+    online ? COLOR7 : "",
     pal->userid,
-    online ? "\033[31m" : "",
+    online ? COLOR7 : "",
     pal->ship,
     mode ? "\033[m" : "");
                                                                                 

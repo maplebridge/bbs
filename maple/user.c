@@ -519,6 +519,114 @@ u_info()
   return 0;
 }
 
+u_sign_set()/*ikulan.080726:將改站簽功能獨立出來*/
+{
+   FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
+   char helloworld[37];
+   char user_hello_path[256];
+   FILE *file_host;      /* smiler.071110: 個人選擇站簽 */
+   char host_path_name[64];
+   char host_choice_char[3];
+   int  host_choice_int;
+   char userid_tmp[64];
+   char ans;
+
+   /*ikulan.080727: 印出站簽*/
+   FILE *host_sign;
+   int host_sign_num = 4; /*ikulan.080727: 站簽的數目，此有四個站簽*/
+   int host_sign_id;
+   char host_sign_path[64];
+   char host_sign_temp[999];
+
+   move(1, 0);
+   clrtobot();
+   int i=8;
+
+   str_lower_acct(userid_tmp,cuser.userid);   /* smiler.071030: 輸入使用者想對大家說的話 */
+   i++;
+   sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
+   hello = fopen(user_hello_path,"r");
+   if(hello)
+     fgets(helloworld,38,hello);
+   else
+     sprintf(helloworld,"\0");
+   if(!vget(i, 0, "想對大家說的話：", helloworld, 37+1, GCARRY))
+   {
+     if(hello)
+     {
+       fclose(hello);
+       unlink(user_hello_path);
+     }
+     else
+     {
+       hello = fopen(user_hello_path,"w");
+       fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+       fclose(hello);
+     }
+   }
+   else
+   {
+     if(hello)
+     {
+       fclose(hello);
+       unlink(user_hello_path);
+     }
+     hello = fopen(user_hello_path,"w");
+     fputs(helloworld,hello);
+     fclose(hello);
+   }
+   sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+   file_host=fopen(host_path_name,"r");
+   if(file_host)
+   {
+     fgets(host_choice_char,3,hello);
+     fclose(file_host);
+   }
+
+   vmsg(NULL);
+   move(1,0);
+   clrtobot();
+
+
+   for(host_sign_id=1; host_sign_id<=host_sign_num; host_sign_id++)
+   {
+     prints("%d號站簽：\n", host_sign_id);
+     sprintf(host_sign_path,"gem/@/@host_%d",host_sign_id-1);
+     host_sign=fopen(host_sign_path,"r");
+     if(host_sign)
+     {
+       while(fgets(host_sign_temp, 999, host_sign))
+         prints("%s", host_sign_temp);
+
+      prints("\n");
+     }
+   }
+   
+   switch (ans = vans("◎ 選擇 0)任意 1~4)選擇站簽 [Q] "))
+   {
+     case '0': host_choice_int = 0;
+		       break;
+     case '1': host_choice_int = 1;
+               break;
+     case '2': host_choice_int = 2;
+               break;
+     case '3': host_choice_int = 3;
+               break;
+     case '4': host_choice_int = 4;
+               break;
+     default:
+               return 0;
+   }
+   sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+   file_host=fopen(host_path_name,"w");
+   if(file_host)
+   {
+     fprintf(file_host,"%d",host_choice_int%4);
+     fclose(file_host);
+   }
+
+}/*ikulan.080726:(end of function)將改站簽功能獨立出來*/
+
 
 int
 u_setup()

@@ -203,6 +203,7 @@ int u_verify(void);
 int u_deny(void);
 int u_info(void);
 int u_setup(void);
+int u_sign_set(void);
 int u_lock(void);
 int u_log(void);
 int u_xfile(void);

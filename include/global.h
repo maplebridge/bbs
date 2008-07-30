@@ -407,7 +407,7 @@ KEY_BKSP == Ctrl('H') == 0x08
 #define MSG_REG_VALID	"您已經通過身分認證，請重新上站"
 
 #define	MSG_LL		"\033[32m[群組名單]\033[m\n"
-#define MSG_DATA_CLOAK	"<資料保密>\n"
+#define MSG_DATA_CLOAK	"<資料保密>"
 
 #define MSG_CHKDATA	"★ 資料整理稽核中，請稍候 \033[5m...\033[m"
 #define MSG_QUITGAME	"不玩了啊？下次再來哦！ ^_^"
