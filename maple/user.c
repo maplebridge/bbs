@@ -519,6 +519,7 @@ u_info()
   return 0;
 }
 
+int
 u_sign_set()/*ikulan.080726:將改站簽功能獨立出來*/
 {
    FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
