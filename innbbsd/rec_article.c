@@ -151,6 +151,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
+  short posted=0; /* HBrian.080801: 文章是否有寫入(下面那個大if) */
 
   /* 寫入文章內容 */
 
@@ -158,6 +159,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
 
   if (fp = fdopen(hdr_stamp(folder, 'A', &hdr, fpath), "w"))
   {
+    posted = 1;
     fprintf(fp, "發信人: %.50s 看板: %s\n", FROM, board);
     fprintf(fp, "標  題: %.70s\n", SUBJECT);
     if (SITE)
@@ -202,6 +204,10 @@ bbspost_topic_add(board, addr, nick ,board_from)
   update_btime(board);
 
   HISadd(MSGID, board, hdr.xname);
+  
+  /* HBrian.080801 : 紀錄文章 */
+  bbslog("topic_add: posted:%d MSGID:%s SUBJ:%s\n",
+    posted, MSGID, SUBJECT);
 
 }
 
@@ -315,6 +321,7 @@ bbspost_add(board, addr, nick)
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
+  short posted=0; /* HBrian.080801 : 紀錄文章是否有被此func發出 */
 
   char board2[30];                // smiler.070916
   //strcpy(board2,"nthu.forsale");  // smiler.070916
@@ -345,6 +352,7 @@ bbspost_add(board, addr, nick)
   {
     if (fp = fdopen(hdr_stamp(folder, 'A', &hdr, fpath), "w"))
 	{
+      posted = 1; /* HBrian.080801 */
       fprintf(fp, "發信人: %.50s 看板: %s\n", FROM, board);
       fprintf(fp, "標  題: %.70s\n", SUBJECT);
       if (SITE)
@@ -372,6 +380,11 @@ bbspost_add(board, addr, nick)
     update_btime(board);
 
     HISadd(MSGID, board, hdr.xname);
+    
+    /* HBrian.080801 : 紀錄文章 */
+    bbslog("bbspost_add: posted:%d MSGID:%s SUBJ:%s\n",
+      posted, MSGID, SUBJECT);
+
   } // smiler.070916                                  
 }
 
