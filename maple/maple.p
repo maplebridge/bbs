@@ -22,6 +22,7 @@ void alog(char *mode, char *msg);
 void blog(char *mode, char *msg);
 void u_exit(char *mode);
 void abort_bbs(void);
+int tn_user_set_bar(char *barname);
 
 /* bitlbee.c */
 int bit_main(void);
@@ -196,6 +197,18 @@ void talk_rqst(void);
 void talk_main(void);
 
 /* user.c */
+int u_menu_bar(void);
+int u_brd_bar(void);
+int u_post_bar(void);
+int u_gem_bar(void);
+int u_pal_bar(void);
+int u_usr_bar(void);
+int u_bmw_bar(void);
+int u_mail_bar(void);
+int u_aloha_bar(void);
+int u_vote_bar(void);
+int u_newbrd_bar(void);
+int u_song_bar(void);
 void justify_log(char *userid, char *justify);
 int u_addr(void);
 int u_register(void);

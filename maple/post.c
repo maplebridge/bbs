@@ -1359,10 +1359,10 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
 #ifdef HAVE_DECLARE
   /* itoc.010217: 改用星期幾來上色 */
   /*smiler.070724: 日期印出前,多空一格*/
-  prints(COLORBAR_POST" \033[1;3%dm%s\033[m"COLORBAR_POST" ", cal_day(hdr->date) + 1, hdr->date + 3);
+  prints("%s \033[1;3%dm%s\033[m%s ",USR_COLORBAR_POST, cal_day(hdr->date) + 1, hdr->date + 3, USR_COLORBAR_POST);
 
 #else
-  prints(COLORBAR_POST" \033[m%s\033[m"COLORBAR_POST" ",hdr->date + 3);
+  prints("%s \033[m%s\033[m%s ",USR_COLORBAR_POST, hdr->date + 3, USR_COLORBAR_POST);
 #endif
 
   /* --------------------------------------------------- */
@@ -1441,9 +1441,9 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
   if (!strcmp(currtitle, title))
     len += 3;
-  prints(COLORBAR_POST);
+  prints("%s",USR_COLORBAR_POST);
   outs(type[len]);
-  prints(COLORBAR_POST);
+  prints("%s",USR_COLORBAR_POST);
   outc(' ');
 
   /* --------------------------------------------------- */
@@ -1464,7 +1464,7 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   }
 #endif
 
-  prints(COLORBAR_POST);
+  prints("%s",USR_COLORBAR_POST);
 
   /* 把超過 cc 長度的部分直接切掉 */
   /* itoc.060604.註解: 如果剛好切在中文字的一半就會出現亂碼，不過這情況很少發生，所以就不管了 */
@@ -1479,7 +1479,7 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
       }
       else if (ch == ']')
       {
-	outs("]\033[m"COLORBAR_POST);
+	prints("]\033[m%s",USR_COLORBAR_POST);
 	square = 0;			/* 只處理一組方括，方括已經處理完了 */
 	continue;
       }
@@ -1673,14 +1673,14 @@ post_item_bar(xo, mode)
    if(hdr->xmode & POST_BOTTOM)
    {
    prints("%s%s%s%c%c",
-     mode ? COLORBAR_POST : "",
-     "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
+     mode ? USR_COLORBAR_POST : "",
+     "  \033[1;33m重要\033[m",mode ? USR_COLORBAR_POST : "",
      tag_char(hdr->chrono), post_attr(hdr));
    }
    else
    {
    prints("%s%6d%c%c",
-     mode ? COLORBAR_POST : "",
+     mode ? USR_COLORBAR_POST : "",
      num,
      tag_char(hdr->chrono), post_attr(hdr));
    } 
@@ -1691,9 +1691,9 @@ post_item_bar(xo, mode)
      //num = hdr->score;
      num = hdr->score;
      if (num <= 99 && num >= -99)
-         prints("%s\033[%c;3%cm%s%2d\033[m%s",mode ? COLORBAR_POST : "", '1', num > 0 ? '1' : num < 0 ? '2' : '7' ,mode ? COLORBAR_POST : num > 0 ? "\033[m\033[1;31m" : num < 0 ? "\033[m\033[1;32m" : "\033[m\033[1;37m" , abs(num),mode ? COLORBAR_POST : "");
+         prints("%s\033[%c;3%cm%s%2d\033[m%s",mode ? USR_COLORBAR_POST : "", '1', num > 0 ? '1' : num < 0 ? '2' : '7' ,mode ? USR_COLORBAR_POST : num > 0 ? "\033[m\033[1;31m" : num < 0 ? "\033[m\033[1;32m" : "\033[m\033[1;37m" , abs(num),mode ? USR_COLORBAR_POST : "");
      else
-       prints("%s\033[1;3%s\033[m%s",mode ? COLORBAR_POST : "", num >= 0 ? "1m爆" : "2m噓",mode ? COLORBAR_POST : "");
+       prints("%s\033[1;3%s\033[m%s",mode ? USR_COLORBAR_POST : "", num >= 0 ? "1m爆" : "2m噓",mode ? USR_COLORBAR_POST : "");
    }
    else
    {
@@ -1701,7 +1701,7 @@ post_item_bar(xo, mode)
    }
  }
  else
-   prints("%s%10s",mode ? COLORBAR_POST : "",hdr->xname);
+   prints("%s%10s",mode ? USR_COLORBAR_POST : "",hdr->xname);
                                                                                 
   if (mode)
     hdr_outs_bar(hdr, 46);    /* 少一格來放分數 */
@@ -1715,20 +1715,20 @@ post_item_bar(xo, mode)
    if(hdr->xmode & POST_BOTTOM)
    {
      prints("%s%s%s%c%c ",
-     mode ? COLORBAR_POST : "",
-     "  \033[1;33m重要\033[m",mode ? COLORBAR_POST : "",
+     mode ? USR_COLORBAR_POST : "",
+     "  \033[1;33m重要\033[m",mode ? USR_COLORBAR_POST : "",
      tag_char(hdr->chrono), post_attr(hdr));
    }
    else
    {
      prints("%s%6d%c%c ",
-     mode ? COLORBAR_POST : "",
+     mode ? USR_COLORBAR_POST : "",
      num,
      tag_char(hdr->chrono), post_attr(hdr));
    }
   }
   else
-    prints("%s%10s",mode ? COLORBAR_POST : "",hdr->xname);
+    prints("%s%10s",mode ? USR_COLORBAR_POST : "",hdr->xname);
                                                                                 
   if (mode)
     hdr_outs_bar(hdr, 47);

@@ -90,7 +90,7 @@ gem_item_bar(xo, mode)
   else if (xmode & GEM_BOARD)           /*         ¬ÝªO:¡½ */
     gtype += 2;
                                                                                 
-  prints("%s%6d%c%c\241%c ", mode ? COLORBAR_GEM : "\033[m",
+  prints("%s%6d%c%c\241%c ", mode ? USR_COLORBAR_GEM : "\033[m",
     num, TagNum && !Tagger(hdr->chrono, num - 1, TAG_NIN) ? '*' : ' ',xmode & GEM_RESTRICT ? ')' : ' ' ,gtype);
                                                                                 
   gtype = gem_way;

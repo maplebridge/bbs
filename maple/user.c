@@ -12,7 +12,300 @@
 
 extern char *ufo_tbl[];
 
+/* ----------------------------------------------------- */
+/* 設定個人光棒                      */
+/* ----------------------------------------------------- */
 
+
+static int
+u_set_bar(barname)
+  char *barname;
+{
+	int i=0;
+	char bright[2];
+	char flash[2];
+	char front[3];
+	char back[3];
+	char imaplecolor[32];
+	char orgcolor[32];
+	char color_write[32];
+	char ans;
+
+#if 0
+	/* BBSHOME/src/include/theme.h */
+	#define COLORBAR_MENU   "\033[0;30;47m" /*  menu.c 選單光棒 */
+    #define	COLORBAR_BRD	"\033[1;41m"	/*  board.c, favor.c 選單光棒 */
+    #define COLORBAR_POST	"\033[1;43m"	/*  post.c 選單光棒 */
+    #define COLORBAR_GEM	"\033[1;42m"	/*  gem.c  選單光棒 */
+    #define COLORBAR_PAL	"\033[1;45m"	/*  pal.c  選單光棒 */
+    #define COLORBAR_USR	"\033[1;45m"	/*  ulist.c 選單光棒 */
+    #define COLORBAR_BMW	"\033[1;43m"	/*  bmw.c 選單光棒 */
+    #define COLORBAR_MAIL	"\033[1;42m"	/*  mail.c 選單光棒 */
+    #define COLORBAR_ALOHA	"\033[1;41m"	/*  aloha.c 選單光棒 */
+    #define COLORBAR_VOTE	"\033[0;30;43m"	/*  vote.c 選單光棒 */
+    #define COLORBAR_NBRD	"\033[1;46m"	/*	newbrd.c 選單光棒 */
+    #define COLORBAR_SONG	"\033[1;42m"	/*  song.c 選單光棒 */
+#endif
+
+	/* load 楓橋原始光棒 */
+	char colorbar[][32]=
+	{
+	  "COLORBAR_MENU",COLORBAR_MENU,
+      "COLORBAR_BRD",COLORBAR_BRD,
+      "COLORBAR_POST",COLORBAR_POST,
+      "COLORBAR_GEM",COLORBAR_GEM,
+      "COLORBAR_PAL",COLORBAR_PAL,
+      "COLORBAR_USR",COLORBAR_USR,
+      "COLORBAR_BMW",COLORBAR_BMW,
+      "COLORBAR_MAIL",COLORBAR_MAIL,
+      "COLORBAR_ALOHA",COLORBAR_ALOHA,
+      "COLORBAR_VOTE",COLORBAR_VOTE,
+      "COLORBAR_NBRD",COLORBAR_NBRD,
+      "COLORBAR_SONG",COLORBAR_SONG
+	};
+
+	for(i=0;i<12;i++)
+	{
+		if(strstr(colorbar[2*i],barname))
+			break;
+	}
+	if(i >= 12)
+		strcpy(imaplecolor,"\033[m");
+	else
+	{
+		strcpy(imaplecolor,colorbar[2*i+1]);
+
+		/* load 使用者自定光棒 */
+		if(i==0)
+			strcpy(orgcolor,USR_COLORBAR_MENU);
+		else if(i==1)
+			strcpy(orgcolor,USR_COLORBAR_BRD);
+		else if(i==2)
+			strcpy(orgcolor,USR_COLORBAR_POST);
+		else if(i==3)
+			strcpy(orgcolor,USR_COLORBAR_GEM);
+		else if(i==4)
+			strcpy(orgcolor,USR_COLORBAR_PAL);
+		else if(i==5)
+			strcpy(orgcolor,USR_COLORBAR_USR);
+		else if(i==6)
+			strcpy(orgcolor,USR_COLORBAR_BMW);
+		else if(i==7)
+			strcpy(orgcolor,USR_COLORBAR_MAIL);
+		else if(i==8)
+			strcpy(orgcolor,USR_COLORBAR_ALOHA);
+		else if(i==9)
+			strcpy(orgcolor,USR_COLORBAR_VOTE);
+		else if(i==10)
+			strcpy(orgcolor,USR_COLORBAR_NBRD);
+		else if(i==11)
+			strcpy(orgcolor,USR_COLORBAR_SONG);		
+
+	}
+
+#if 0
+	
+	COLOR mycolorbar[]=
+	{
+		{USR_COLORBAR_MENU ,"COLORBAR_MENU" },
+		{USR_COLORBAR_BRD  ,"COLORBAR_BRD"  },
+		{USR_COLORBAR_POST ,"COLORBAR_POST" },
+		{USR_COLORBAR_GEM  ,"COLORBAR_GEM"  },
+		{USR_COLORBAR_PAL  ,"COLORBAR_PAL"  },
+		{USR_COLORBAR_USR  ,"COLORBAR_USR"  },
+		{USR_COLORBAR_BMW  ,"COLORBAR_BMW"  },
+		{USR_COLORBAR_MAIL ,"COLORBAR_MAIL" },
+        {USR_COLORBAR_ALOHA,"COLORBAR_ALOHA"},
+		{USR_COLORBAR_VOTE ,"COLORBAR_VOTE" },
+		{USR_COLORBAR_NBRD ,"COLORBAR_NBRD" },
+		{USR_COLORBAR_SONG ,"COLORBAR_SONG" }
+	};
+#endif
+
+    move(i = 1, 0);
+    clrtobot();
+	move(2,0);
+	prints("\033[1;37m亮   : \033[m\033[1;31m31\033[32m32\033[33m33\033[34m34\033[35m35\033[36m36\033[37m37\033[m\n");
+    prints("\033[0;37m暗   : \033[m\033[31m31\033[32m32\033[33m33\033[34m34\033[35m35\033[36m36\033[37m37\033[m\n");
+	prints("\033[0m底色 : \033[m\033[41m41\033[42m42\033[43m43\033[44m44\033[45m45\033[46m46\033[47m47\033[m\n");
+	prints("\033[m楓橋設定 : %s測試\033[m\n",imaplecolor);
+	prints("\033[m目前設定 : \033[m%s測試\033[m",orgcolor);
+	i=8;
+	vget(i, 0, "前景：亮(1)/暗(0)/略過(Enter)", bright, 2, DOECHO);
+	if((bright[0]!='\0') && (bright[0]<'0' || bright[0]>'1'))
+	{
+		vmsg("輸入錯誤 !!");
+		return 0;
+	}
+
+	sprintf(color_write,"\033[m\033[%s%s",
+			(bright[0]=='\0') ? "" : bright,(bright[0]=='\0') ? "" : ";");
+	color_write[strlen(color_write)-1]='m';
+    prints("\033[m目前設定 : \033[m%s%s測試\033[m",orgcolor,color_write);
+
+	i=i+2;
+	
+	vget(i, 0, "前景：閃爍(5)/略過(Enter)", flash, 2, DOECHO);
+	if((flash[0]!='\0') && (flash[0]!='5'))
+	{
+		vmsg("輸入錯誤 !!");
+		return 0;
+	}
+
+	sprintf(color_write,"\033[m\033[%s%s%s%s",
+			(bright[0]=='\0') ? "" : bright,(bright[0]=='\0') ? "" : ";",
+			(flash[0]=='\0')  ? "" : flash ,(flash[0]=='\0')  ? "" : ";");
+	color_write[strlen(color_write)-1]='m';
+	prints("\033[m目前設定 : \033[m%s%s測試\033[m",orgcolor,color_write);
+	
+	i=i+2;
+    
+	vget(i, 0, "前景：色碼(31~37)/略過(Enter)", front, 3, DOECHO);
+    if((front[0]!='\0') && ((front[0]!='3') && (front[1]<'1' || front[1]>'7')))
+	{
+		vmsg("輸入錯誤 !!");
+		return 0;
+	}
+    sprintf(color_write,"\033[m\033[%s%s%s%s%s%s",
+			(bright[0]=='\0') ? "" : bright,(bright[0]=='\0') ? "" : ";",
+			(flash[0]=='\0')  ? "" : flash ,(flash[0]=='\0')  ? "" : ";",
+			(front[0]=='\0')  ? "" : front ,(front[0]=='\0')  ? "" : ";");
+	color_write[strlen(color_write)-1]='m';
+	prints("\033[m目前設定 : \033[m%s%s測試\033[m",orgcolor,color_write);
+
+	i=i+2;
+
+    vget(i, 0, "背景：色碼(41~47)/略過(Enter)", back, 3, DOECHO);
+    if((back[0]!='\0') && ((back[0]!='4') && (back[1]<'1' || back[1]>'7')))
+	{
+		vmsg("輸入錯誤 !!");
+		return 0;
+	}
+
+    sprintf(color_write,"\033[m\033[%s%s%s%s%s%s%s%s",
+			(bright[0]=='\0') ? "" : bright,(bright[0]=='\0') ? "" : ";",
+			(flash[0]=='\0')  ? "" : flash ,(flash[0]=='\0')  ? "" : ";",
+			(front[0]=='\0')  ? "" : front ,(front[0]=='\0')  ? "" : ";",
+			(back[0]=='\0')   ? "" : back  ,(back[0]=='\0')   ? "" : ";");
+	color_write[strlen(color_write)-1]='m';
+	prints("\033[m目前設定 : \033[m%s%s測試\033[m",orgcolor,color_write);
+
+	if(bright[0]=='\0' && flash[0]=='\0' && front[0]=='\0' && back[0]=='\0')
+	{
+		vmsg("取消更動 !!");
+		return 0;
+	}
+
+	char colorpath[64];
+	sprintf(colorpath,BBSHOME"/usr/%c/%s/%s.bar",cuser.userid[0],cuser.userid,barname);
+
+    switch (ans = vans("◎ 選擇 Y)確定 N)取消 D)預設 [Q] "))
+    {
+	    case 'd' :
+	    case 'D' :
+			unlink(colorpath);
+            vmsg("重上站即可恢復預設 !!");
+			return 0;
+	    case 'Y' :
+	    case 'y' :
+		    break;
+	    default :
+		    return 0;
+	}
+
+	FILE *fcolor;
+	if(fcolor = fopen(colorpath,"w"))
+	{
+		fprintf(fcolor,"%s",color_write);
+		fclose(fcolor);
+		tn_user_set_bar(barname);
+	}
+    return 0;
+}
+
+int
+u_menu_bar()
+{
+	u_set_bar("_MENU");
+	return 0;
+}
+
+int
+u_brd_bar()
+{
+	u_set_bar("_BRD");
+	return 0;
+}
+
+int
+u_post_bar()
+{
+	u_set_bar("_POST");
+	return 0;
+}
+
+int
+u_gem_bar()
+{
+	u_set_bar("_GEM");
+	return 0;
+}
+
+int
+u_pal_bar()
+{
+	u_set_bar("_PAL");
+	return 0;
+}
+
+int
+u_usr_bar()
+{
+	u_set_bar("_USR");
+	return 0;
+}
+
+int
+u_bmw_bar()
+{
+	u_set_bar("_BMW");
+	return 0;
+}
+
+int
+u_mail_bar()
+{
+	u_set_bar("_MAIL");
+	return 0;
+}
+
+int
+u_aloha_bar()
+{
+	u_set_bar("_ALOHA");
+	return 0;
+}
+
+int
+u_vote_bar()
+{
+	u_set_bar("_VOTE");
+	return 0;
+}
+
+int
+u_newbrd_bar()
+{
+	u_set_bar("_NBRD");
+	return 0;
+}
+
+int
+u_song_bar()
+{
+	u_set_bar("_SONG");
+	return 0;
+}
 /* ----------------------------------------------------- */
 /* 認證用函式						 */
 /* ----------------------------------------------------- */

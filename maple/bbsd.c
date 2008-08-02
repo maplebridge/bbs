@@ -1080,6 +1080,111 @@ tn_login()
 }
 
 
+int
+tn_user_set_bar(barname)
+  char *barname;
+{
+	char filepath[64];
+	char color[32];
+	int i;
+	
+	char colorbar[][32]=
+	{
+	  "USR_COLORBAR_MENU" ,"COLORBAR_MENU" ,
+      "USR_COLORBAR_BRD"  ,"COLORBAR_BRD"  ,
+      "USR_COLORBAR_POST" ,"COLORBAR_POST" ,
+      "USR_COLORBAR_GEM"  ,"COLORBAR_GEM"  ,
+      "USR_COLORBAR_PAL"  ,"COLORBAR_PAL"  ,
+      "USR_COLORBAR_USR"  ,"COLORBAR_USR"  ,
+      "USR_COLORBAR_BMW"  ,"COLORBAR_BMW"  ,
+      "USR_COLORBAR_MAIL" ,"COLORBAR_MAIL" ,
+      "USR_COLORBAR_ALOHA","COLORBAR_ALOHA",
+      "USR_COLORBAR_VOTE" ,"COLORBAR_VOTE" ,
+      "USR_COLORBAR_NBRD" ,"COLORBAR_NBRD" ,
+      "USR_COLORBAR_SONG" ,"COLORBAR_SONG"
+	};
+
+
+	for(i=0;i<12;i++)
+	{
+		if(strstr(colorbar[2*i+1],barname))
+			break;
+	}
+
+	if(i >= 12)
+		return 0;
+	else
+    {
+	  sprintf(filepath,BBSHOME"/usr/%c/%s/%s.bar",cuser.userid[0],cuser.userid,barname);
+	  FILE *fp;
+	  if(fp=fopen(filepath,"r"))
+	  {
+		if(fgets(color,32,fp))
+		{
+		  if(color[0]!='\0' && color[0]!=' ')
+		  {
+	         if(i==0)
+				 strcpy(USR_COLORBAR_MENU,color);
+			 else if(i==1)
+				 strcpy(USR_COLORBAR_BRD,color);
+			 else if(i==2)
+				 strcpy(USR_COLORBAR_POST,color);
+			 else if(i==3)
+				 strcpy(USR_COLORBAR_GEM,color);
+			 else if(i==4)
+				 strcpy(USR_COLORBAR_PAL,color);
+			 else if(i==5)
+				 strcpy(USR_COLORBAR_USR,color);
+			 else if(i==6)
+				 strcpy(USR_COLORBAR_BMW,color);
+			 else if(i==7)
+				 strcpy(USR_COLORBAR_MAIL,color);
+			 else if(i==8)
+				 strcpy(USR_COLORBAR_ALOHA,color);
+			 else if(i==9)
+				 strcpy(USR_COLORBAR_VOTE,color);
+			 else if(i==10)
+				 strcpy(USR_COLORBAR_NBRD,color);
+			 else if(i==11)
+				 strcpy(USR_COLORBAR_SONG,color);
+		  }
+		}
+		fclose(fp);
+	  } 
+	}
+	return 0;
+
+}
+
+static void
+tn_user_setup()
+{
+	strcpy(USR_COLORBAR_MENU ,COLORBAR_MENU );
+    strcpy(USR_COLORBAR_BRD  ,COLORBAR_BRD  );
+    strcpy(USR_COLORBAR_POST ,COLORBAR_POST );
+    strcpy(USR_COLORBAR_GEM  ,COLORBAR_GEM  );
+    strcpy(USR_COLORBAR_PAL  ,COLORBAR_PAL  );
+    strcpy(USR_COLORBAR_USR  ,COLORBAR_USR  );
+    strcpy(USR_COLORBAR_BMW  ,COLORBAR_BMW  );
+    strcpy(USR_COLORBAR_MAIL ,COLORBAR_MAIL );
+    strcpy(USR_COLORBAR_ALOHA,COLORBAR_ALOHA);
+    strcpy(USR_COLORBAR_VOTE ,COLORBAR_VOTE );
+    strcpy(USR_COLORBAR_NBRD ,COLORBAR_NBRD );
+    strcpy(USR_COLORBAR_SONG ,COLORBAR_SONG );
+    tn_user_set_bar("_MENU");
+	tn_user_set_bar("_BRD");
+	tn_user_set_bar("_POST");
+	tn_user_set_bar("_GEM");
+	tn_user_set_bar("_PAL");
+	tn_user_set_bar("_USR");
+	tn_user_set_bar("_BMW");
+	tn_user_set_bar("_MAIL");
+	tn_user_set_bar("_ALOHA");
+	tn_user_set_bar("_VOTE");
+	tn_user_set_bar("_NBRD");
+	tn_user_set_bar("_SONG");
+}
+
 static void
 tn_motd()
 {
@@ -1204,6 +1309,8 @@ tn_main()
   talk_main();
 
   tn_motd();
+
+  tn_user_setup();
 
   menu();
   abort_bbs();	/* to make sure it will terminate */

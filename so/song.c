@@ -246,7 +246,7 @@ song_item_bar(xo, mode)
   }
 
   prints("%s%6d%c \241%c %-.*s%s%s",
-    mode ? COLORBAR_SONG : "",         //這裡是光棒的顏色，可以自己改
+    mode ? USR_COLORBAR_SONG : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 64,
     (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK :
     hdr->title,tmp_buf,

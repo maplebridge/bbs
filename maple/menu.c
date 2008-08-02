@@ -669,7 +669,8 @@ static MENU menu_thala[] =
 
 
 static MENU menu_user[];
-
+static MENU menu_user_set[];
+static MENU menu_color_bar[];
 
   /* --------------------------------------------------- */
   /* register menu                                      */
@@ -697,12 +698,77 @@ static MENU menu_register[] =
   "註冊選單"
 };
 
+static MENU menu_bpg_color_bar[] =
+{
+	u_brd_bar, PERM_BASIC, M_UFILES,
+    "Brd        【 看板列表 】",
+	u_post_bar, PERM_BASIC, M_UFILES,
+    "Post       【 文章列表 】",
+	u_gem_bar, PERM_BASIC, M_UFILES,
+    "Gem        【 看板精華 】",
+	menu_color_bar, PERM_MENU + 'B', M_UMENU,
+    "光棒設定"
+};
+
+static MENU menu_pl_color_bar[] =
+{
+	u_pal_bar, PERM_BASIC, M_UFILES,
+    "Pal        【 板友好友 】",
+	u_usr_bar, PERM_BASIC, M_UFILES,
+    "Usr        【 網友列表 】",
+	menu_color_bar, PERM_MENU + 'P', M_UMENU,
+    "光棒設定"
+};
+
+static MENU menu_wma_color_bar[] =
+{
+	u_bmw_bar, PERM_BASIC, M_UFILES,
+    "Bmw        【 回顧水球 】",
+	u_mail_bar, PERM_BASIC, M_UFILES,
+    "Mail       【 個人信箱 】",
+	u_aloha_bar, PERM_BASIC, M_UFILES,
+    "Aloha      【 上站通知 】",
+	menu_color_bar, PERM_MENU + 'B', M_UMENU,
+    "光棒設定"
+};
+
+static MENU menu_vns_color_bar[] =
+{
+	u_vote_bar, PERM_BASIC, M_UFILES,
+    "Vote       【 投票選單 】",
+	u_newbrd_bar, PERM_BASIC, M_UFILES,
+    "Newbrd     【 看板連署 】",
+	u_song_bar, PERM_BASIC, M_UFILES,
+    "Song       【 點歌選單 】",
+	menu_color_bar, PERM_MENU + 'V', M_UMENU,
+    "光棒設定"
+};
+
+static MENU menu_color_bar[] =
+{
+    u_menu_bar, PERM_BASIC, M_UFILES,
+    "Menu   【   選單光棒   】",
+	menu_bpg_color_bar, 0, M_UMENU,
+	"Bpg    【 看板文章精華 】",
+	menu_pl_color_bar, 0, M_UMENU,
+    "Pl     【 板友好友網友 】",
+	menu_wma_color_bar, 0, M_UMENU,
+	"Wma    【 水球信件上站 】",
+	menu_vns_color_bar, 0, M_UMENU,
+	"Vns    【 投票連署點歌 】",
+    menu_user_set, PERM_MENU + 'M', M_UMENU,
+    "光棒設定"
+};
+
+
 static MENU menu_user_set[] =
 {
    u_setup, 0, M_UFILES,
    "Habit      【 喜好模式 】",
    u_sign_set, 0, M_UFILES,
    "Sign       【 站簽設定 】",
+   menu_color_bar, 0, M_UMENU,
+   "Colorbar   【 光棒設定 】",
    menu_user, PERM_MENU + 'H', M_UMENU,
    "喜好模式"
 };
@@ -1383,7 +1449,8 @@ default_key:
       move(MENU_XPOS + cc, MENU_YPOS);
       mptr = table[cc];
       str = mptr->desc;
-      prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+      //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+	  prints("%s[ (\033[1;34m%c\033[m%s)%s ]\033[m",USR_COLORBAR_MENU,*str,USR_COLORBAR_MENU,str + 1);
       cx = cc;
 	}
 //#else		/* 沒有 CURSOR_BAR */
@@ -1408,7 +1475,8 @@ default_key:
       move(MENU_XPOS + cc, MENU_YPOS);
       mptr = table[cc];
       str = mptr->desc;
-      prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+      //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+	  prints("%s[ (\033[1;34m%c%s)%s ]\033[m",USR_COLORBAR_MENU,*str,USR_COLORBAR_MENU,str + 1);
 	}
 //#else
 	else

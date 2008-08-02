@@ -1583,15 +1583,15 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
 
 
     /*smiler.070724: 看板配色,人氣 */
-    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD,num, token, str1);
+    prints("\033[m%s%6d%c%s%s",USR_COLORBAR_BRD,num, token, str1,USR_COLORBAR_BRD);
 
 	/* smiler.080712: 處理隱板可見顯色 */    
     if( (brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP) )
 	{
 		if(post_read_secret)
-            prints("\033[1;32m%-13s\033[m"COLORBAR_BRD, brd->brdname);
+            prints("\033[1;32m%-13s\033[m%s", brd->brdname,USR_COLORBAR_BRD);
 		else
-			prints("\033[1;30m%-13s\033[m"COLORBAR_BRD, brd->brdname);
+			prints("\033[1;30m%-13s\033[m%s", brd->brdname,USR_COLORBAR_BRD);
 	}
 	else
 		prints("%-13s", brd->brdname);
@@ -1612,7 +1612,7 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
         prints("\033[35m");
     else
         prints("\033[1;3%dm",brd->class[3] & 7);
-    prints("%-5s\033[m"COLORBAR_BRD"%s%s ",brd->class,str2,COLORBAR_BRD);
+    prints("%-5s\033[m%s%s%s ",brd->class,USR_COLORBAR_BRD,str2,USR_COLORBAR_BRD);
 
 
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
@@ -1620,17 +1620,17 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
   num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
   /* smiler.070724: 獨立處理看板人氣 */
-  prints(COLORBAR_BRD);
+  prints("%s",USR_COLORBAR_BRD);
   if(bno>60)
-      prints("\033[1;35m爆了\033[m"COLORBAR_BRD" ");
+      prints("\033[1;35m爆了\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>40)
-      prints("\033[1;31m熱門\033[m"COLORBAR_BRD" ");
+      prints("\033[1;31m熱門\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>20)
-      prints("\033[1;33m有勁\033[m"COLORBAR_BRD" ");
+      prints("\033[1;33m有勁\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>10)
-      prints("\033[1;31m%4d\033[m"COLORBAR_BRD" ", bno);
+      prints("\033[1;31m%4d\033[m%s ", bno,USR_COLORBAR_BRD);
   else if(bno>5)
-      prints("\033[1;33m%4d\033[m"COLORBAR_BRD" ", bno);
+      prints("\033[1;33m%4d\033[m%s ", bno,USR_COLORBAR_BRD);
   else if(bno>0)
       prints("%4d ", bno);
   else
@@ -1644,7 +1644,7 @@ class_item_bar(brd, bno, chn, brdpost ,pbno)
   else
 	  tmp_bm[0]='\0';
 
-  prints(COLORBAR_BRD);
+  prints("%s",USR_COLORBAR_BRD);
   prints("%.*s",d_cols - (d_cols >> 1) + 12, brd->BM);
   prints("%s\033[m",tmp_bm);
 
@@ -1709,7 +1709,7 @@ class_mf_item_bar(brd, bno, chn, brdpost, pbno)
 
 
     /*smiler.070724: 看板配色,人氣 */
-    prints("\033[m"COLORBAR_BRD"%6d%c%s"COLORBAR_BRD"\033[1;36m%-13s\033[m"COLORBAR_BRD,num, token, str1, brd->brdname);
+    prints("\033[m%s%6d%c%s%s\033[1;36m%-13s\033[m%s",USR_COLORBAR_BRD,num, token, str1,USR_COLORBAR_BRD, brd->brdname,USR_COLORBAR_BRD);
 
     if(strcmp(brd->class,"楓橋")==0 || strcmp(brd->class,"系統")==0)
         prints("\033[1;31m");
@@ -1727,7 +1727,7 @@ class_mf_item_bar(brd, bno, chn, brdpost, pbno)
         prints("\033[35m");
     else
         prints("\033[1;3%dm",brd->class[3] & 7);
-    prints("%-5s\033[m"COLORBAR_BRD"%s%s ",brd->class,str2,COLORBAR_BRD);
+    prints("%-5s\033[m%s%s%s ",brd->class,USR_COLORBAR_BRD,str2,USR_COLORBAR_BRD);
 
 
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
@@ -1735,17 +1735,17 @@ class_mf_item_bar(brd, bno, chn, brdpost, pbno)
   num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
   /* smiler.070724: 獨立處理看板人氣 */
-  prints(COLORBAR_BRD);
+  prints("%s",USR_COLORBAR_BRD);
   if(bno>60)
-      prints("\033[1;35m爆了\033[m"COLORBAR_BRD" ");
+      prints("\033[1;35m爆了\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>40)
-      prints("\033[1;31m熱門\033[m"COLORBAR_BRD" ");
+      prints("\033[1;31m熱門\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>20)
-      prints("\033[1;33m有勁\033[m"COLORBAR_BRD" ");
+      prints("\033[1;33m有勁\033[m%s ",USR_COLORBAR_BRD);
   else if(bno>10)
-      prints("\033[1;31m%4d\033[m"COLORBAR_BRD" ", bno);
+      prints("\033[1;31m%4d\033[m%s ", bno,USR_COLORBAR_BRD);
   else if(bno>5)
-      prints("\033[1;33m%4d\033[m"COLORBAR_BRD" ", bno);
+      prints("\033[1;33m%4d\033[m%s ", bno,USR_COLORBAR_BRD);
   else if(bno>0)
       prints("%4d ", bno);
   else
@@ -1759,7 +1759,7 @@ class_mf_item_bar(brd, bno, chn, brdpost, pbno)
   else
 	  tmp_bm[0]='\0';
 
-  prints(COLORBAR_BRD);
+  prints("%s",USR_COLORBAR_BRD);
   prints("%.*s",d_cols - (d_cols >> 1) + 12, brd->BM);
   prints("%s\033[m",tmp_bm);
 
@@ -1811,11 +1811,11 @@ class_bar(xo, mode)
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
-	prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s%s%-51s%s",
-      mode ? COLORBAR_BRD : "",
+	prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s\033[m%s%-51s%s",
+      mode ? USR_COLORBAR_BRD : "",
       cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
       str, str[BNLEN + 4] & 7,str + BNLEN + 1,
-	  mode ? "\033[m"COLORBAR_BRD : "\033[m",
+	  mode ? USR_COLORBAR_BRD : "",
 	  str + BNLEN + 1 + BCLEN + 1,
       mode ? "\033[m" : "");
   }

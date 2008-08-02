@@ -75,7 +75,7 @@ vote_item_bar(xo, mode)
   vch = (VCH *) xo_pool + xo->pos - xo->top;
                                                                                 
   prints("%s%6d%c%c%c%c %-9.8s%-12s %-45.45s%s",
-    mode ? COLORBAR_VOTE : "",         //這裡是光棒的顏色，可以自己改
+    mode ? USR_COLORBAR_VOTE : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, tag_char(vch->chrono),
     vch->vsort, vch->vpercent, vch->vprivate,
     vch->cdate, vch->owner, vch->title,

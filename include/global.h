@@ -508,6 +508,22 @@ VAR int deletelog_use;          /* 是否啟用Deletelog功能? */
 VAR int mail_to_newone;         /* 是否寄信給新申請者? */
 
 
+/* 使用者個人設定區 */
+/* 光棒色碼 */
+
+VAR char USR_COLORBAR_MENU[32];  /*  menu.c 選單光棒 */
+VAR char USR_COLORBAR_BRD[32];   /*  board.c, favor.c 選單光棒 */
+VAR char USR_COLORBAR_POST[32];  /*  post.c 選單光棒 */
+VAR char USR_COLORBAR_GEM[32];   /*  gem.c  選單光棒 */
+VAR char USR_COLORBAR_PAL[32];   /*  pal.c  選單光棒 */
+VAR char USR_COLORBAR_USR[32];   /*  ulist.c 選單光棒 */
+VAR char USR_COLORBAR_BMW[32];   /*  bmw.c 選單光棒 */
+VAR char USR_COLORBAR_MAIL[32];  /*  mail.c 選單光棒 */
+VAR char USR_COLORBAR_ALOHA[32]; /*  aloha.c 選單光棒 */
+VAR char USR_COLORBAR_VOTE[32];  /*  vote.c 選單光棒 */
+VAR char USR_COLORBAR_NBRD[32];  /*	 newbrd.c 選單光棒 */
+VAR char USR_COLORBAR_SONG[32];  /*  song.c 選單光棒 */
+
 #undef	VAR
 #undef	INI
 

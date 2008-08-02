@@ -136,7 +136,7 @@ aloha_item_bar(xo, mode)
 #endif
                                                                                 
   prints("%s%6d%c   %s%-14s%s%54s%s",
-    mode ? COLORBAR_ALOHA : "",         //這裡是光棒的顏色，可以自己改
+    mode ? USR_COLORBAR_ALOHA : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, tag_char(aloha->userno),
     online ? "\033[33m" : "",
     aloha->userid, "",

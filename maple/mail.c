@@ -1352,15 +1352,15 @@ mbox_item_bar(xo, mode)
                                                                                 
 #ifdef OVERDUE_MAILDEL
   xmode = hdr->xmode;
-  prints(xmode & MAIL_DELETE ?
-    (mode ? COLORBAR_MAIL"%6d \033[5;37;41m%c\033[0;1;44m"COLORBAR_MAIL" " :
-      "%6d \033[1;5;37;41m%c\033[m ") :
-    (mode ? COLORBAR_MAIL"%6d %c " :
-      "%6d %c "),
-    xo->pos + 1, mbox_attr(xmode));
+  prints(xmode & MAIL_DELETE ? 
+	  "%s%6d%c\033[1;5;37;41m%c\033[m%s " : 
+      "%s%6d%c%c%s ",
+		  mode ? USR_COLORBAR_MAIL : "",
+    num, tag_char(hdr->chrono), mbox_attr(xmode),
+	mode ? USR_COLORBAR_MAIL : "");
 #else
   prints("%s%6d %c ",
-    mode ? COLORBAR_MAIL : "", xo->pos + 1, mbox_attr(hdr->xmode));
+    mode ? USR_COLORBAR_MAIL : "", xo->pos + 1, mbox_attr(hdr->xmode));
 #endif
                                                                                 
   if (mode)

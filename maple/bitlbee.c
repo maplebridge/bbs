@@ -88,12 +88,12 @@ bit_item_bar(xo, mode)
     pp = bit_pool + xo->pos;
 
     prints("%s%5d   \033[1;37m%-18.17s\033[m%s  \033[30;1m%-34.33s\033[m%s ",
-	    mode ? COLORBAR_PAL : "",
+	    mode ? USR_COLORBAR_USR : "",
 		xo->pos + 1,
 		pp->nick,
-		mode ? COLORBAR_PAL : "",
+		mode ? USR_COLORBAR_USR : "",
 		pp->addr,
-		mode ? COLORBAR_PAL : ""
+		mode ? USR_COLORBAR_USR : ""
 		);
                                                                                 
       (strstr (pp->status, "Online")) ?

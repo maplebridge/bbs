@@ -157,9 +157,9 @@ nbrd_item_bar(xo, mode)
   nbrd = (NBRD *) xo_pool + xo->pos - xo->top;
                                                                                 
   prints("%s%6d %c %-5s %-13s [%-13s%s]:%-22.22s%s%s",
-    mode ? COLORBAR_NBRD : "",         //這裡是光棒的顏色，可以自己改
+    mode ? USR_COLORBAR_NBRD : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
-    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m",mode ? COLORBAR_NBRD : "", nbrd->title,
+    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m",mode ? USR_COLORBAR_NBRD : "", nbrd->title,
     (nbrd->mode & NBRD_NEWBOARD) ? "           " :"                ",mode ? "\033[m" : "");
                                                                                 
   return XO_NONE;
