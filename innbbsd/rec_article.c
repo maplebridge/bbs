@@ -206,8 +206,8 @@ bbspost_topic_add(board, addr, nick ,board_from)
   HISadd(MSGID, board, hdr.xname);
   
   /* HBrian.080801 : ¬ö¿ý¤å³¹ */
-  bbslog("topic_add: posted:%d MSGID:%s SUBJ:%s\n",
-    posted, MSGID, SUBJECT);
+  bbslog("topic_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
+    posted, hdr.xname, board, MSGID, SUBJECT);
 
 }
 
@@ -382,8 +382,8 @@ bbspost_add(board, addr, nick)
     HISadd(MSGID, board, hdr.xname);
     
     /* HBrian.080801 : ¬ö¿ý¤å³¹ */
-    bbslog("bbspost_add: posted:%d MSGID:%s SUBJ:%s\n",
-      posted, MSGID, SUBJECT);
+    bbslog("bbspost_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, board, MSGID, SUBJECT);
 
   } // smiler.070916                                  
 }
