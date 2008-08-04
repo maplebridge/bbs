@@ -197,7 +197,9 @@ u_set_bar(barname)
 	}
 
 	char colorpath[64];
-	sprintf(colorpath,BBSHOME"/usr/%c/%s/%s.bar",cuser.userid[0],cuser.userid,barname);
+    char barname_in[24];
+	sprintf(barname_in,"%s.bar",barname);
+	usr_fpath(colorpath,cuser.userid,barname_in);
 
     switch (ans = vans("◎ 選擇 Y)確定 N)取消 D)預設 [Q] "))
     {

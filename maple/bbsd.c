@@ -1115,7 +1115,9 @@ tn_user_set_bar(barname)
 		return 0;
 	else
     {
-	  sprintf(filepath,BBSHOME"/usr/%c/%s/%s.bar",cuser.userid[0],cuser.userid,barname);
+	  char barname_in[24];
+	  sprintf(barname_in,"%s.bar",barname);
+	  usr_fpath(filepath,cuser.userid,barname_in);
 	  FILE *fp;
 	  if(fp=fopen(filepath,"r"))
 	  {
