@@ -11,6 +11,7 @@
 
 #define DO_POST_FILTER
 
+
 extern BCACHE *bshm;
 extern XZ xz[];
 
