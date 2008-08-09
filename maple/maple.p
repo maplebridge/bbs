@@ -140,8 +140,10 @@ void *mread(int fd, int len);
 int more(char *fpath, char *footer);
 
 /* pal.c */
+int is_super_mygood(int userno);
 int is_mygood(int userno);
 int is_mybad(int userno);
+int is_super_ogood(UTMP *up);
 int is_ogood(UTMP *up);
 int is_obad(UTMP *up);
 int is_bgood(BPAL *bpal);

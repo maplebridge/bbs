@@ -51,13 +51,13 @@ extern UMODELOG modelog;
 extern time_t mode_lastchange;
 #endif
 
-int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
+//int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
 
 
 /* ----------------------------------------------------- */
-/*                     load .USR                         */
+/*                     load .SET                         */
 /* ----------------------------------------------------- */
-/* smiler.071110: load .USR 進來 */
+/* smiler.071110: load .SET 進來 */
 void
 setuploader()
 {
@@ -1310,9 +1310,9 @@ tn_main()
 #endif
   talk_main();
 
-  tn_motd();
+  tn_user_setup(); /* smiler.080810: load 使用者個人設定檔 */
 
-  tn_user_setup();
+  tn_motd();
 
   menu();
   abort_bbs();	/* to make sure it will terminate */
@@ -1752,7 +1752,7 @@ main(argc, argv)
 	{
       setuploader();
 	}
-
+#if 0
 	/* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
 	if (ChangeLoging==1)
 	{
@@ -1761,7 +1761,7 @@ main(argc, argv)
       close(csock);
       continue;
 	}
-
+#endif
     if (argc >= MAXACTIVE - 5 /* || *avgload > THRESHOLD */ )
     {
       /* 借用 currtitle */

@@ -52,6 +52,12 @@ belong_pal(pool, max, userno)
   return 0;
 }
 
+int
+is_super_mygood(userno)	/*  1: 我設對方為超級好友 */
+  int userno;
+{
+  return belong_pal(pal_pool, pal_max, userno + MATE_MASK);
+}
 
 int
 is_mygood(userno)		/*  1: 我設對方為好友 */
@@ -72,6 +78,13 @@ is_mybad(userno)		/*  1: 我設對方為壞人 */
 #endif
 }
 
+
+int
+is_super_ogood(up)		/* 1: 對方設我為超級好友 */
+  UTMP *up;
+{
+  return belong_pal(up->pal_spool, up->pal_max, cuser.userno + MATE_MASK);
+}
 
 int
 is_ogood(up)			/* 1: 對方設我為好友 */
@@ -373,7 +386,7 @@ pal_item_bar(xo, mode)
   prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
     mode ? USR_COLORBAR_PAL : "",         //這裡是光棒的顏色，可以自己改。
     xo->pos + 1, tag_char(pal->userno),
-    pal->ftype & PAL_BAD ? "Ｘ" : "",
+    pal->ftype & PAL_BAD ? "Ｘ": pal->ftype & PAL_MATE ? "△" : "",
     online ? COLOR7 : "",
     pal->userid,
     online ? COLOR7 : "",

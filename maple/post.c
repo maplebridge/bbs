@@ -967,7 +967,9 @@ do_post(xo, title)
   if((strstr(hdr2.title,"½æ") || strstr(hdr2.title,"°â") || strstr(hdr2.title,"¥X²M")) && (strcmp(currboard,"forsale")))
   {
 	 if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
-	   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) )
+	   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
+	   (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) && 
+	   (!strstr(board_from,"Deletelog")) && (!strstr(board_from,"Editlog")) )
 	 {
           rec_bot(folder2, &hdr2, sizeof(HDR));
           //btime_update(brd_bno("nthu.forsale"));

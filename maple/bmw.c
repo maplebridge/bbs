@@ -14,6 +14,7 @@ extern UCACHE *ushm;
 extern XZ xz[];
 extern char xo_pool[];
 
+extern BCACHE *bshm;
 
 /* ----------------------------------------------------- */
 /* BMW : bbs message write routines			 */
@@ -23,8 +24,8 @@ extern char xo_pool[];
 #define BMW_FORMAT	"\033[1;33;46m★%s \033[37;45m %s \033[m"	/* 收到的水球 */
 #define BMW_FORMAT2	"\033[1;33;41m☆%s \033[34;47m %s \033[m"	/* 送出的水球 */
 
-#define MSN_FORMAT	"\033[1;33;42m(MSN)%s \033[37;45m %s \033[m"	/* 收到的水球 */
-#define MSN_FORMAT2	"\033[1;33;43m(MSN)%s \033[34;47m %s \033[m"	/* 送出的水球 */
+#define MSN_FORMAT	"\033[1;33;42m(MSN)%s \033[37;45m %s \033[m"	/* 收到的MSN水球 */
+#define MSN_FORMAT2	"\033[1;33;43m(MSN)%s \033[34;47m %s \033[m"	/* 送出的MSN水球 */
 
 static int bmw_locus = 0;		/* 總共保存幾個水球 (保留最近收到 BMW_LOCAL_MAX 個) */
 static BMW bmw_lslot[BMW_LOCAL_MAX];	/* 保留收到的水球 */
@@ -44,6 +45,13 @@ can_override(up)
 
   ufo = up->ufo;
 
+  /* smiler.080806: 若雙方互設特殊好友，且對方未遠離塵囂/鎖定, 則必可互傳水球 */
+  if (!((ufo & UFO_QUIET) || (up->status & STATUS_REJECT)))
+  {
+	  if(is_super_mygood(up->userno) && is_super_ogood(up))
+         return 1;
+  }
+
 #ifdef HAVE_SUPERCLOAK
   if ((ufo & UFO_SUPERCLOAK) && !(cuser.ufo & UFO_SUPERCLOAK))	/* 紫隱只有紫隱的才看的見 */
     return 0;
@@ -57,6 +65,13 @@ can_override(up)
   /* itoc.010909: 鎖定時不能被傳水球 */
   if ((ufo & UFO_QUIET) || (up->status & STATUS_REJECT))	/* 遠離塵囂/鎖定時 不能被傳 */
     return 0;
+
+  /* smiler.080806: 隱身時傳送水球，須先雙方互加特殊好友才可傳送水球 */
+  if((cuser.ufo & UFO_CLOAK) || (up->ufo & UFO_CLOAK))
+  {
+	  vmsg("雙方互加特殊好友，才可於隱身模式互丟水球 !!");
+	  return 0;
+  }
 
   if (!(up->ufo & UFO_CLOAK) || HAS_PERM(PERM_SEECLOAK))
   {
@@ -106,6 +121,29 @@ can_see(my, up)
     myufo = my->ufo;
   }
   urufo = up->ufo;
+
+  /* smiler.080806: 對方是否設我為特殊好友，若有，則必可看到對方 */
+  if(is_super_ogood(up))
+	  return 1;
+
+  /* smiler.080806: 兩者是否看同一看板，且我是板主 */
+  if(my->reading && up->reading)
+  {
+	char bmid1[15];
+	char bmid2[15];
+	char bmid3[15];
+    BRD *nowbrd;
+    nowbrd = bshm->bcache + brd_bno(my->reading);
+	sprintf(bmid1,"%s",cuser.userid);
+    sprintf(bmid2,"/%s",cuser.userid);
+	sprintf(bmid3,"%s/",cuser.userid);
+	if(strstr(nowbrd->BM,bmid1) || strstr(nowbrd->BM,bmid2) || strstr(nowbrd->BM,bmid3))
+	{
+		if(!strcmp(my->reading,up->reading))
+			return 1;
+	}
+  }
+
 
   if ((urufo & UFO_CLOAK) && !(mylevel & PERM_SEECLOAK))
     return 0;

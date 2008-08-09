@@ -25,11 +25,25 @@ typedef UTMP *pickup;
 
 /* 此順序即為排序的順序 */
 #define FTYPE_SELF	0x01
+#define FTYPE_SUPER_BOTHGOOD	0x02
+#define FTYPE_SUPER_MYGOOD		0x04
+#define FTYPE_SUPER_OGOOD		0x08
+#define FTYPE_BOTHGOOD	0x10
+#define FTYPE_MYGOOD	0x20
+#define FTYPE_OGOOD	0x40
+#define FTYPE_NORMAL	0x80
+#define FTYPE_MYBAD	0x100
+
+
+#if 0
+/* 此順序即為排序的順序 */
+#define FTYPE_SELF	0x01
 #define FTYPE_BOTHGOOD	0x02
 #define FTYPE_MYGOOD	0x04
 #define FTYPE_OGOOD	0x08
 #define FTYPE_NORMAL	0x10
 #define FTYPE_MYBAD	0x20
+#endif
 
 static int mygood_num;		/* 對方設我為好友 */
 static int ogood_num;		/* 我設對方為好友 */
@@ -53,7 +67,8 @@ pal_ship(ftype, userno)	/* itoc.020811: 傳回朋友敘述 */
   char fpath[64];
   static char palship[46];
 
-  if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD))	/* 互設好友、我的好友、壞人才有友誼敘述 */
+  //if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD))	/* 互設好友、我的好友、壞人才有友誼敘述 */
+  if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_MYGOOD))	/* 互設好友、我的好友、壞人才有友誼敘述 */
   {
     usr_fpath(fpath, cuser.userid, fn_pal);
     if ((fd = open(fpath, O_RDONLY)) >= 0)
@@ -117,7 +132,7 @@ pal_ship(ftype, userno)	/* itoc.020811: 傳回朋友敘述 */
     }    
   }
 
-  if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD))	/* 互設好友、我的好友、壞人才有友誼敘述 */
+  if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_MYGOOD ))	/* 互設好友、我的好友、壞人才有友誼敘述 */
   {
     /* 經 pal_sync 以後的朋友名單是依 ID 排序的，考慮是否用 binary search? */
     pp = palship;
@@ -212,6 +227,9 @@ ulist_item(num, up, slot, now, sysop)
 #  endif
 #endif
     ftype & FTYPE_NORMAL ? COLOR_NORMAL : 
+    ftype & FTYPE_SUPER_BOTHGOOD ? COLOR_SUPER_BOTHGOOD : 
+    ftype & FTYPE_SUPER_MYGOOD ? COLOR_SUPER_MYGOOD : 
+    ftype & FTYPE_SUPER_OGOOD ? COLOR_SUPER_OGOOD :
     ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD : 
     ftype & FTYPE_MYGOOD ? COLOR_MYGOOD : 
     ftype & FTYPE_OGOOD ? COLOR_OGOOD : 
@@ -226,9 +244,9 @@ ulist_item(num, up, slot, now, sysop)
     d_cols - (d_cols >> 1) + 19, d_cols - (d_cols >> 1) + 18, 
     pickup_ship ? pal_ship(ftype, up->userno) : 
 #ifdef GUEST_WHERE
-    (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD) || !up->userlevel) ? 	/* 可看見 guest 的故鄉 */
+    (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD) || !up->userlevel) ? 	/* 可看見 guest 的故鄉 */
 #else
-    (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD)) ?			/* 對方設我為好友可看見對方來源 */
+    (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?			/* 對方設我為好友可看見對方來源 */
 #endif
     up->from : "*", bmode(up, 0), buf);
 }
@@ -313,6 +331,9 @@ ulist_item_bar(xo, mode)
 #  endif
 #endif
     ftype & FTYPE_NORMAL ? COLOR_NORMAL :
+    ftype & FTYPE_SUPER_BOTHGOOD ? COLOR_SUPER_BOTHGOOD :
+    ftype & FTYPE_SUPER_MYGOOD ? COLOR_SUPER_MYGOOD :
+    ftype & FTYPE_SUPER_OGOOD ? COLOR_SUPER_OGOOD :
     ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD :
     ftype & FTYPE_MYGOOD ? COLOR_MYGOOD :
     ftype & FTYPE_OGOOD ? COLOR_OGOOD :
@@ -330,10 +351,10 @@ ulist_item_bar(xo, mode)
     pickup_ship ? pal_ship(ftype, up->userno) :
 #ifdef GUEST_WHERE
     (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
-      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD) || !up->userlevel) ?
+      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD ) || !up->userlevel) ?
 #else
     (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
-      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD)) ?
+      ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?
 #endif
     up->from : "*", bmode(up, 0), buf,
     mode ? "\033[m" : "");
@@ -502,9 +523,11 @@ ulist_paltype(up)		/* 朋友種類 */
     return FTYPE_SELF;
   if (is_mybad(userno))
     return FTYPE_MYBAD;
+  if (is_super_mygood(userno))
+    return is_super_ogood(up) ? FTYPE_SUPER_BOTHGOOD : FTYPE_SUPER_MYGOOD;
   if (is_mygood(userno))
     return is_ogood(up) ? FTYPE_BOTHGOOD : FTYPE_MYGOOD;
-  return is_ogood(up) ? FTYPE_OGOOD : FTYPE_NORMAL;
+  return is_super_ogood(up) ? FTYPE_SUPER_OGOOD : is_ogood(up) ? FTYPE_OGOOD : FTYPE_NORMAL;
 }
 
 
@@ -569,13 +592,13 @@ ulist_init(xo)
       if (can_see(cutmp, up))
       {
 	userno = ulist_ftype[slot];
-	if (!filter || userno & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_MYGOOD))
+	if (!filter || userno & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_MYGOOD))
 	  *pp++ = up;
 
 	/* 算有幾個好友 */
-	if (userno & (FTYPE_BOTHGOOD | FTYPE_MYGOOD))
+	if (userno & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_MYGOOD))
 	  mygood_num++;
-	if (userno & (FTYPE_BOTHGOOD | FTYPE_OGOOD))
+	if (userno & (FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD))
 	  ogood_num++;
       }
     }
@@ -728,7 +751,7 @@ ulist_addpal(xo)
     up = ulist_pool[xo->pos];
     userno = up->userno;
     if (userno > 0 && (userno != cuser.userno) &&	/* lkchu.981217: 自己不可為朋友 */
-      !is_mygood(userno) && !is_mybad(userno))		/* 尚未列入朋友名單 */
+      !is_mygood(userno) && !is_mybad(userno) && !is_super_mygood(userno) )		/* 尚未列入朋友名單 */
     {
       PAL pal;
       char fpath[64];
@@ -776,7 +799,7 @@ ulist_delpal(xo)
 
     up = ulist_pool[xo->pos];
     userno = up->userno;
-    if (userno > 0 && (is_mygood(userno) || is_mybad(userno)))	/* 在朋友名單中 */
+    if (userno > 0 && (is_mygood(userno) || is_mybad(userno) || is_super_mygood(userno) ) )	/* 在朋友名單中 */
     {
       if (vans(msg_del_ny) == 'y')
       {
@@ -874,7 +897,7 @@ ulist_broadcast(xo)
 
 	/* itoc.011126: 若 up-> 已下站，被其他 user 所取代時，
 	   會有廣播誤植的問題，得重新檢查是否為我的好友 */
-	if (!is_mygood(up->userno))
+	if (!(is_mygood(up->userno) || is_super_mygood(up->userno)))
 	  continue;
       }
 
