@@ -917,7 +917,7 @@ u_sign_set()/*ikulan.080726:將改站簽功能獨立出來*/
    file_host=fopen(host_path_name,"w");
    if(file_host)
    {
-     fprintf(file_host,"%d",host_choice_int%4);
+     fprintf(file_host,"%d",host_choice_int);
      fclose(file_host);
    }
 
