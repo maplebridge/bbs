@@ -11,6 +11,7 @@
 
 
 extern char *ufo_tbl[];
+extern char *usr_show_tbl[];
 
 /* ----------------------------------------------------- */
 /* 設定個人光棒                      */
@@ -947,6 +948,23 @@ u_setup()
   return 0;
 }
 
+int
+u_usr_show_set()
+{
+	int len;
+	len = NUM_USR_SHOW;
+	USR_SHOW = bitset(USR_SHOW, len, len, MSG_USR_SHOW, usr_show_tbl);
+
+	char filepath[64];
+	usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
+	FILE *fp;
+
+	fp=fopen(filepath,"w");
+	fprintf(fp,"%d",USR_SHOW);
+	fclose(fp);
+
+	return 0;
+}
 
 int
 u_lock()

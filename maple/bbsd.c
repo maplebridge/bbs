@@ -1159,7 +1159,7 @@ tn_user_set_bar(barname)
 }
 
 static void
-tn_user_setup()
+tn_user_bar()
 {
 	strcpy(USR_COLORBAR_MENU ,COLORBAR_MENU );
     strcpy(USR_COLORBAR_BRD  ,COLORBAR_BRD  );
@@ -1185,6 +1185,48 @@ tn_user_setup()
 	tn_user_set_bar("_VOTE");
 	tn_user_set_bar("_NBRD");
 	tn_user_set_bar("_SONG");
+}
+
+static void
+tn_user_show()
+{
+	/* initialization USR_SHOW */
+
+	USR_SHOW=0;
+	USR_SHOW |= USR_SHOW_POST_ATTR_RESTRICT_F;
+	USR_SHOW |= USR_SHOW_POST_ATTR_RESTRICT;
+	USR_SHOW |= USR_SHOW_POST_ATTR_GEM_MARKED;
+	USR_SHOW |= USR_SHOW_POST_ATTR_GEM;
+	USR_SHOW |= USR_SHOW_POST_ATTR_DELETE;
+	USR_SHOW |= USR_SHOW_POST_ATTR_NOFORWARD;
+	USR_SHOW |= USR_SHOW_POST_ATTR_NOSCORE;
+	USR_SHOW |= USR_SHOW_POST_ATTR_MARKED;
+	USR_SHOW |= USR_SHOW_POST_SCORE_0;
+	USR_SHOW |= USR_SHOW_POST_SCORE;
+
+	/* 讀出使用者個人設定的 USR_SHOW */
+
+	char filepath[64];
+	usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
+	FILE *fp;
+	if(fp=fopen(filepath,"r"))       //若檔案存在則讀出來
+	{
+		fscanf(fp,"%d",&USR_SHOW);
+		fclose(fp);
+	}
+	else                             //反之則將我們 initial 的 USR_SHOW 寫回去
+	{
+		fp=fopen(filepath,"w");
+		fprintf(fp,"%d",USR_SHOW);
+		fclose(fp);
+	}
+}
+
+static void
+tn_user_setup()
+{
+	tn_user_bar();
+	tn_user_show();
 }
 
 static void

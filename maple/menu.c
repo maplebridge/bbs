@@ -769,6 +769,8 @@ static MENU menu_user_set[] =
    "Sign       【 站簽設定 】",
    menu_color_bar, 0, M_UMENU,
    "Colorbar   【 光棒設定 】",
+   u_usr_show_set, 0, M_UFILES,
+   "Usrshow    【 符號顯示 】",
    menu_user, PERM_MENU + 'H', M_UMENU,
    "喜好模式"
 };

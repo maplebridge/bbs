@@ -376,6 +376,7 @@ KEY_BKSP == Ctrl('H') == 0x08
 #define MSG_POSTPERM	"發表權限："
 #define MSG_BRDATTR	"看板屬性："
 #define MSG_USERUFO	"習慣旗標：             ■ / □                                 ■ / □"
+#define MSG_USR_SHOW	"顯示旗標：             ■ / □                                 ■ / □"
 
 #define MSG_XYPOST1	"標題關鍵字："
 #define MSG_XYPOST2	"作者關鍵字："
@@ -523,6 +524,22 @@ VAR char USR_COLORBAR_ALOHA[32]; /*  aloha.c 選單光棒 */
 VAR char USR_COLORBAR_VOTE[32];  /*  vote.c 選單光棒 */
 VAR char USR_COLORBAR_NBRD[32];  /*	 newbrd.c 選單光棒 */
 VAR char USR_COLORBAR_SONG[32];  /*  song.c 選單光棒 */
+
+/* 使用者選擇顯示選項 */
+VAR int  USR_SHOW;
+#define USR_SHOW_POST_ATTR_RESTRICT_F	0x00000001	/* 好友文顯示 顯示 F  */
+#define USR_SHOW_POST_ATTR_RESTRICT		0x00000002	/* 鎖文 顯示 L        */
+#define USR_SHOW_POST_ATTR_GEM_MARKED	0x00000004	/* mark + gem 顯示 B  */
+#define USR_SHOW_POST_ATTR_GEM			0x00000008	/* gem 顯示 G         */
+#define USR_SHOW_POST_ATTR_DELETE		0x00000010	/* 待刪文章顯示 T     */
+#define USR_SHOW_POST_ATTR_NOFORWARD	0x00000020	/* 文章禁轉符號顯示 X */
+#define USR_SHOW_POST_ATTR_NOSCORE		0x00000040	/* 文章禁止推文顯示 N */
+#define USR_SHOW_POST_ATTR_MARKED		0x00000080	/* 文章標記符號 M     */
+#define USR_SHOW_POST_SCORE_0			0x00000100	/* 文章推文為 0 顯示  */
+#define USR_SHOW_POST_SCORE				0x00000200	/* 文章推文皆顯示     */
+
+#define NUM_USR_SHOW	10
+
 
 #undef	VAR
 #undef	INI

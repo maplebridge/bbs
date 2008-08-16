@@ -1165,8 +1165,6 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
   int ch, len;
   int in_chi;		/* 1: 在中文字中 */
   char title_tmp[64];  //smiler 1108
-  int chi_detect;      //smiler 071114
-  int i;               //smiler 071114
 #ifdef HAVE_DECLARE
   int square;		/* 1: 要處理方括 */
 #endif
@@ -1345,8 +1343,6 @@ hdr_outs_bar(hdr, cc)           /* print HDR's subject */
   int ch, len;
   int in_chi;		/* 1: 在中文字中 */
   char title_tmp[64];  //smiler 1108
-  int chi_detect;      //smiler 071114
-  int i;               //smiler 071114
 #ifdef HAVE_DECLARE
   int square;		/* 1: 要處理方括 */
 #endif
@@ -1555,11 +1551,14 @@ post_load(xo)
 }
 
 
-static int
+static char*
 post_attr(hdr)
   HDR *hdr;
 {
   int mode, attr;
+
+  char attr_tmp[15];  
+  attr_tmp[0]='\0';
 
   mode = hdr->xmode;
 
@@ -1573,35 +1572,65 @@ post_attr(hdr)
   attr = ((mode & POST_BOTTOM) || !brh_unread(BMAX(hdr->chrono, hdr->stamp)) ? 0x20 : 0;
 #endif
 
+
 #ifdef HAVE_REFUSEMARK
-  if (mode & POST_RESTRICT)
+  if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
   {
-   if (RefusePal_level(currboard, hdr)==1)
-       attr |= 'F';
-   else
-    attr |= 'L';
+       attr |= 'F',
+	   strcpy(attr_tmp,"\033[1;33m");
+  }
+  else if((mode & POST_RESTRICT) && (! RefusePal_level(currboard, hdr) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+  {
+       attr |= 'L';
+	   strcpy(attr_tmp,"\033[1;34m");
   }
   else
 #endif
-  if ((bbstate & STAT_BOARD) && (mode & POST_GEM))      /* 板主才看得到 G/B */
-       attr |= (mode & POST_MARKED ? 'B' : 'G');        /* 若有 mark+gem，顯示 B */
+  if ((bbstate & STAT_BOARD) && (mode & POST_GEM) && (mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM_MARKED))   /* 板主才看得到 G/B */
+  {        
+
+	   attr |= 'B';                       /* 若有 mark+gem，顯示 B */
+	   strcpy(attr_tmp,"\033[1;31m");
+  }
+  else if((bbstate & STAT_BOARD) && (mode & POST_GEM) && (!(mode & POST_MARKED)) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM))
+  {
+	   attr |= 'G';
+	   strcpy(attr_tmp,"\033[1;35m");
+  }
   else
 
 #ifdef HAVE_LABELMARK
-  if (mode & POST_DELETE)
-    attr |= 'T';
+  if ((mode & POST_DELETE) && (USR_SHOW & USR_SHOW_POST_ATTR_DELETE))
+  {
+       attr |= 'T';
+	   strcpy(attr_tmp,"\033[1;32m");
+  }
   else
 #endif
-  if (mode & POST_NOFORWARD)
+  if ((mode & POST_NOFORWARD) && (USR_SHOW & USR_SHOW_POST_ATTR_NOFORWARD))
+  {
     attr |= 'X';
-  else if (mode & POST_NOSCORE)
+	strcpy(attr_tmp,"\033[1;34m");
+  }
+  else if ((mode & POST_NOSCORE) && (USR_SHOW & USR_SHOW_POST_ATTR_NOSCORE))
+  {
     attr |= 'N';
-  else if (mode & POST_MARKED)
+	strcpy(attr_tmp,"\033[1;34m");
+  }
+  else if ((mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_MARKED))
+  {
     attr |= 'M';
+	strcpy(attr_tmp,"\033[1;36m");
+  }
   else if (!attr)
+  {
     attr = '+';
+    attr_tmp[0]='\0';
+  }
 
-  return attr;
+  static char color_attr[30];
+  sprintf(color_attr,"%s%c\033[m",attr_tmp,attr);
+  return color_attr;
 }
 
 
@@ -1614,13 +1643,15 @@ post_item(num, hdr)
   if(!(cuser.ufo & UFO_FILENAME))
   {  
    if(hdr->xmode & POST_BOTTOM)
-     prints("  \033[1;33m重要\033[m%c%c", tag_char(hdr->chrono), post_attr(hdr));
+	 prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
    else
-     prints("%6d%c%c", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-   if (hdr->xmode & POST_SCORE)
+     prints("%6d%c%s", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+   if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
    {
      num = hdr->score;
-     if (num <= 99 && num >= -99)
+	 if ((num==0) && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
+	   outs("  ");
+     else if (num <= 99 && num >= -99)
        prints("\033[%c;3%cm%2d\033[m", num == 0 ? '0' : '1', num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
      else
        prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
@@ -1639,9 +1670,9 @@ post_item(num, hdr)
  {
    /*ckm.070325: 置底文沒有編號*/
    if(hdr->xmode & POST_BOTTOM)
-     prints("  \033[1;33m重要\033[m%c%c", tag_char(hdr->chrono), post_attr(hdr));
+	 prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
    else
-     prints("%6d%c%c ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+	 prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
  }
  else
    prints("%10s",hdr->xname);    
@@ -1675,25 +1706,29 @@ post_item_bar(xo, mode)
   
    if(hdr->xmode & POST_BOTTOM)
    {
-   prints("%s%s%s%c%c",
+   prints("%s%s%s%c%s%s",
      mode ? USR_COLORBAR_POST : "",
      "  \033[1;33m重要\033[m",mode ? USR_COLORBAR_POST : "",
-     tag_char(hdr->chrono), post_attr(hdr));
+     tag_char(hdr->chrono), post_attr(hdr),
+	 mode ? USR_COLORBAR_POST : "");
    }
    else
    {
-   prints("%s%6d%c%c",
+   prints("%s%6d%c%s%s",
      mode ? USR_COLORBAR_POST : "",
      num,
-     tag_char(hdr->chrono), post_attr(hdr));
+     tag_char(hdr->chrono), post_attr(hdr),
+	 mode ? USR_COLORBAR_POST : "");
    } 
 
 
-   if (hdr->xmode & POST_SCORE)
+   if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
    {
      //num = hdr->score;
      num = hdr->score;
-     if (num <= 99 && num >= -99)
+	 if ((num==0) && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
+	   outs("  ");
+     else if (num <= 99 && num >= -99)
          prints("%s\033[%c;3%cm%s%2d\033[m%s",mode ? USR_COLORBAR_POST : "", '1', num > 0 ? '1' : num < 0 ? '2' : '7' ,mode ? USR_COLORBAR_POST : num > 0 ? "\033[m\033[1;31m" : num < 0 ? "\033[m\033[1;32m" : "\033[m\033[1;37m" , abs(num),mode ? USR_COLORBAR_POST : "");
      else
        prints("%s\033[1;3%s\033[m%s",mode ? USR_COLORBAR_POST : "", num >= 0 ? "1m爆" : "2m噓",mode ? USR_COLORBAR_POST : "");
@@ -1717,17 +1752,19 @@ post_item_bar(xo, mode)
   {
    if(hdr->xmode & POST_BOTTOM)
    {
-     prints("%s%s%s%c%c ",
+	 prints("%s%s%s%c%s%s ",
      mode ? USR_COLORBAR_POST : "",
      "  \033[1;33m重要\033[m",mode ? USR_COLORBAR_POST : "",
-     tag_char(hdr->chrono), post_attr(hdr));
+     tag_char(hdr->chrono), post_attr(hdr),
+	 mode ? USR_COLORBAR_POST : "");
    }
    else
    {
-     prints("%s%6d%c%c ",
+	 prints("%s%6d%c%s%s ",
      mode ? USR_COLORBAR_POST : "",
      num,
-     tag_char(hdr->chrono), post_attr(hdr));
+     tag_char(hdr->chrono), post_attr(hdr),
+	 mode ? USR_COLORBAR_POST : "");
    }
   }
   else
@@ -1823,13 +1860,7 @@ post_visit(xo)
     /* weiyu.041010: 在置底文上選 w 視為全部已讀 */
     brh_visit((ans == 'u') ? 1 : (ans == 'w' && !(hdr->xmode & POST_BOTTOM)) ? hdr->chrono : 0);
 
-    hdr = (HDR *) xo_pool;
-    row = 3;
-    do
-    {
-      move(row, 7);
-      outc(post_attr(hdr++));
-    } while (++row < max);
+    return XO_BODY;
   }
   return XO_FOOT;
 }
@@ -2435,7 +2466,7 @@ post_mark(xo)
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
 
     move(3 + cur, 7);
-    outc(post_attr(hdr));
+	outs(post_attr(hdr++));
   }
   return XO_NONE;
 }
@@ -2554,7 +2585,7 @@ post_friend(xo)
      if (vans("解除文章保密會刪除全部可見名單，您確定嗎(Y/N)？[N] ") != 'y')
      {
        move(3 + cur, 7);
-       outc(post_attr(hdr));
+	   outs(post_attr(hdr));
        return XO_FOOT;
      }
 #endif
@@ -2573,7 +2604,7 @@ hdr->xid : pos, cmpchrono);
      return XoBM_Refuse_pal(xo);
                                                                                 
     move(3 + cur, 7);
-    outc(post_attr(hdr));
+	outs(post_attr(hdr));
   }
   return XO_NONE;
                                                                                 
@@ -2613,7 +2644,7 @@ post_refuse(xo)     /* itoc.010602: 文章加密 */
 hdr->xid : pos, cmpchrono);
                                                                                 
     move(3 + cur, 7);
-    outc(post_attr(hdr));                                                                                
+	outs(post_attr(hdr));
   }
                                                                                 
   return XO_NONE;
@@ -2645,7 +2676,7 @@ post_label(xo)
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
 
     move(3 + cur, 7);
-    outc(post_attr(hdr));
+	outs(post_attr(hdr));
 
     return pos + 1 + XO_MOVE;	/* 跳至下一項 */
   }
@@ -2828,7 +2859,7 @@ delpost(xo, hdr)
   HDR *hdr;
 {
   char fpath[64];
-  char Deletelog_folder[64],Deletelog_title[64],copied[64];
+  char Deletelog_folder[64],copied[64];
   HDR  Deletelog_hdr;
 
 //  /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
@@ -2954,7 +2985,7 @@ post_edit(xo)
   HDR *hdr;
   FILE *fp;
   /* smiler 1031 */
-  char Editlog_folder[64],Editlog_title[64],copied[64];
+  char Editlog_folder[64],copied[64];
   HDR  Editlog_hdr;
 
   /* smiler.071111 保護 Editlog 以及 Deletelog 板的備份資料 */
@@ -3187,9 +3218,9 @@ post_x_score(xo,reason_input)
   int pos, cur, ans, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
   FILE *fp;
-#ifdef HAVE_ANONYMOUS
-  char uid[IDLEN + 1];
-#endif
+//#ifdef HAVE_ANONYMOUS
+//  char uid[IDLEN + 1];
+//#endif
 
   if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
     return XO_NONE;
@@ -3321,9 +3352,9 @@ post_t_score(xo,reason_input,hdr_in)
   int pos, cur, ans, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
   FILE *fp;
-#ifdef HAVE_ANONYMOUS
-  char uid[IDLEN + 1];
-#endif
+//#ifdef HAVE_ANONYMOUS
+//  char uid[IDLEN + 1];
+//#endif
 
   if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
     return XO_NONE;
@@ -3757,7 +3788,7 @@ post_noforward(xo)
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
       hdr->xid : pos, cmpchrono);
       move(3 + cur, 7);
-      outc(post_attr(hdr));
+	  outs(post_attr(hdr));
   }
   return XO_NONE;
 }
@@ -3783,7 +3814,7 @@ post_noscore(xo)
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ?
       hdr->xid : pos, cmpchrono);
     move(3 + cur, 7);
-    outc(post_attr(hdr));
+	outs(post_attr(hdr));
   }
   return XO_NONE;
 }
