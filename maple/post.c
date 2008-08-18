@@ -1579,7 +1579,7 @@ post_attr(hdr)
        attr |= 'F',
 	   strcpy(attr_tmp,"\033[1;33m");
   }
-  else if((mode & POST_RESTRICT) && (! RefusePal_level(currboard, hdr) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+  else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==(-1) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
        attr |= 'L';
 	   strcpy(attr_tmp,"\033[1;34m");
