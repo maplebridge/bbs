@@ -46,6 +46,7 @@ u_set_bar(barname)
     #define COLORBAR_VOTE	"\033[0;30;43m"	/*  vote.c 選單光棒 */
     #define COLORBAR_NBRD	"\033[1;46m"	/*	newbrd.c 選單光棒 */
     #define COLORBAR_SONG	"\033[1;42m"	/*  song.c 選單光棒 */
+	#define COLORBAR_RSS	"\033[1;46m"	/*  rss.c 選單光棒 */
 #endif
 
 	/* load 楓橋原始光棒 */
@@ -62,15 +63,16 @@ u_set_bar(barname)
       "COLORBAR_ALOHA",COLORBAR_ALOHA,
       "COLORBAR_VOTE",COLORBAR_VOTE,
       "COLORBAR_NBRD",COLORBAR_NBRD,
-      "COLORBAR_SONG",COLORBAR_SONG
+      "COLORBAR_SONG",COLORBAR_SONG,
+	  "COLORBAR_RSS",COLORBAR_RSS
 	};
 
-	for(i=0;i<12;i++)
+	for(i=0;i<13;i++)
 	{
 		if(strstr(colorbar[2*i],barname))
 			break;
 	}
-	if(i >= 12)
+	if(i >= 13)
 		strcpy(imaplecolor,"\033[m");
 	else
 	{
@@ -100,7 +102,9 @@ u_set_bar(barname)
 		else if(i==10)
 			strcpy(orgcolor,USR_COLORBAR_NBRD);
 		else if(i==11)
-			strcpy(orgcolor,USR_COLORBAR_SONG);		
+			strcpy(orgcolor,USR_COLORBAR_SONG);
+		else if(i==12)
+			strcpy(orgcolor,USR_COLORBAR_RSS);
 
 	}
 
@@ -119,7 +123,8 @@ u_set_bar(barname)
         {USR_COLORBAR_ALOHA,"COLORBAR_ALOHA"},
 		{USR_COLORBAR_VOTE ,"COLORBAR_VOTE" },
 		{USR_COLORBAR_NBRD ,"COLORBAR_NBRD" },
-		{USR_COLORBAR_SONG ,"COLORBAR_SONG" }
+		{USR_COLORBAR_SONG ,"COLORBAR_SONG" },
+		{USR_COLORBAR_RSS  ,"COLORBAR_RSS"}
 	};
 #endif
 
@@ -307,6 +312,13 @@ int
 u_song_bar()
 {
 	u_set_bar("_SONG");
+	return 0;
+}
+
+int
+u_rss_bar()
+{
+	u_set_bar("_RSS");
 	return 0;
 }
 /* ----------------------------------------------------- */

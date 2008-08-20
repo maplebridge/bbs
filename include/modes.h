@@ -57,8 +57,9 @@
 #define M_PAGE		29
 #define M_QUERY		30
 #define M_IDLE		31	/* ← M_TALK(含) 與 M_IDLE(含) 間接 mateid */
+#define M_RSS		32
 
-#define M_XMODE		32
+#define M_XMODE		33
 #define M_MAX           M_XMODE
 
 
@@ -105,6 +106,7 @@ static char *ModeTypeTable[] =
   "呼叫",			/* M_PAGE */
   "查詢",			/* M_QUERY */
   "發呆",			/* M_IDLE */
+  "RSS 設定",		/* M_RSS */
 
   "其他"			/* M_XMODE */
 };
@@ -252,5 +254,6 @@ static char *ModeTypeTable[] =
 #define XZ_GEM		(XO_ZONE + 13)	/* 精華區 */
 #define XZ_BITLBEE	(XO_ZONE + 14)	/* BITLBEE */
 #define XZ_FAKE_PAL	(XO_ZONE + 15)	/* post.c內觀看板友名單 */
+#define XZ_RSS		(XO_ZONE + 16)	/* RSS */
 
 #endif				/* _MODES_H_ */

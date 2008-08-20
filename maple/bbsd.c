@@ -1101,17 +1101,18 @@ tn_user_set_bar(barname)
       "USR_COLORBAR_ALOHA","COLORBAR_ALOHA",
       "USR_COLORBAR_VOTE" ,"COLORBAR_VOTE" ,
       "USR_COLORBAR_NBRD" ,"COLORBAR_NBRD" ,
-      "USR_COLORBAR_SONG" ,"COLORBAR_SONG"
+      "USR_COLORBAR_SONG" ,"COLORBAR_SONG" ,
+	  "USR_COLORBAR_RSS"  ,"COLORBAR_RSS"
 	};
 
 
-	for(i=0;i<12;i++)
+	for(i=0;i<13;i++)
 	{
 		if(strstr(colorbar[2*i+1],barname))
 			break;
 	}
 
-	if(i >= 12)
+	if(i >= 13)
 		return 0;
 	else
     {
@@ -1149,6 +1150,8 @@ tn_user_set_bar(barname)
 				 strcpy(USR_COLORBAR_NBRD,color);
 			 else if(i==11)
 				 strcpy(USR_COLORBAR_SONG,color);
+			 else if(i==12)
+				 strcpy(USR_COLORBAR_RSS,color);
 		  }
 		}
 		fclose(fp);
@@ -1173,6 +1176,7 @@ tn_user_bar()
     strcpy(USR_COLORBAR_VOTE ,COLORBAR_VOTE );
     strcpy(USR_COLORBAR_NBRD ,COLORBAR_NBRD );
     strcpy(USR_COLORBAR_SONG ,COLORBAR_SONG );
+	strcpy(USR_COLORBAR_RSS  ,COLORBAR_RSS  );
     tn_user_set_bar("_MENU");
 	tn_user_set_bar("_BRD");
 	tn_user_set_bar("_POST");
@@ -1185,6 +1189,7 @@ tn_user_bar()
 	tn_user_set_bar("_VOTE");
 	tn_user_set_bar("_NBRD");
 	tn_user_set_bar("_SONG");
+	tn_user_set_bar("_RSS");
 }
 
 static void

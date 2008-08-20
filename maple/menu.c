@@ -756,6 +756,8 @@ static MENU menu_color_bar[] =
 	"Wma    【 水球信件上站 】",
 	menu_vns_color_bar, 0, M_UMENU,
 	"Vns    【 投票連署點歌 】",
+	u_rss_bar, PERM_BASIC, M_UFILES,
+	"Rss    【   看板 RSS   】",
     menu_user_set, PERM_MENU + 'M', M_UMENU,
     "光棒設定"
 };

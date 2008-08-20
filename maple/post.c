@@ -806,7 +806,7 @@ do_post(xo, title)
   int mode;
   time_t spendtime;
   char buf_filepath[50];                       /* smiler.070914: for post_filter */
-  HDR  hdr2;                                   /* smiler.080705: 依站務要求改轉文至 forsale */ /* smiler.070916: for 轉文至 nthu.forsale */
+  HDR  hdr2;                                   /* smiler.080820: 依站務要求改轉文至 nthu.forsale *//* smiler.080705: 依站務要求改轉文至 forsale */ /* smiler.070916: for 轉文至 nthu.forsale */
   char fpath2[64], folder2[64];                // smiler.070916
   char board_from[30];                         // smiler.070916
 
@@ -906,8 +906,8 @@ do_post(xo, title)
   strcpy(fpath2,fpath);                               // smiler.070916
   strcpy(folder2,folder);                             // smiler.070916
   folder2[4]='\0';                                    // smiler.070916
-  //strcat(folder2,"nthu.forsale/.DIR");                // smiler.070916 
-  strcat(folder2,"forsale/.DIR");                     // smiler.080705
+  strcat(folder2,"nthu.forsale/.DIR");                //smiler.080820 // smiler.070916 
+  //strcat(folder2,"forsale/.DIR");                     // smiler.080705
   hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);  // smiler.070916
   strcpy(board_from,folder+4);                        // smiler.070916
   board_from[strlen(board_from)-5]='\0';              // smiler.070916
@@ -964,16 +964,19 @@ do_post(xo, title)
   btime_update(currbno);
 
   /* smiler 0916 */
-  if((strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清")) && (strcmp(currboard,"forsale")))
+  if( (strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清")) && 
+	  (strcmp(currboard,"nthu.forsale")) && (strcmp(currboard,"deleted")) && (strcmp(currboard,"Deletelog")) && (strcmp(currboard,"Editlog")))
   {
-	 if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
-	   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
-	   (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) && 
-	   (!strstr(board_from,"Deletelog")) && (!strstr(board_from,"Editlog")) )
+	 //if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
+	 //  (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
+	 //  (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) && 
+	 //  (!strstr(board_from,"Deletelog")) && (!strstr(board_from,"Editlog")) )
+	  /* smiler.080820: 依站務要求僅 nctu nthu 轉買賣文至 nthu.forsale */
+	 if((!strcmp(board_from,"nctu")) || (!strcmp(board_from,"nthu")))
 	 {
           rec_bot(folder2, &hdr2, sizeof(HDR));
-          //btime_update(brd_bno("nthu.forsale"));
-		  btime_update(brd_bno("forsale"));
+          btime_update(brd_bno("nthu.forsale"));
+		  //btime_update(brd_bno("forsale"));
 	 }
   }
 
@@ -1114,7 +1117,7 @@ tag_char(chrono)
 
 
 #ifdef HAVE_DECLARE
-static inline int
+inline int
 cal_day(date)		/* itoc.010217: 計算星期幾 */
   char *date;
 {
@@ -4006,10 +4009,18 @@ static int
 post_rss(xo)
   XO *xo;
 {
+
   int bm;
   int ans;
-  bm = bbstate & STAT_BOARD;  
-  if (bm)
+  bm = bbstate & STAT_BOARD;
+  
+//  if (bm)
+  if(!strcmp(currboard,"P_smiler"))
+  {
+     rss_main();
+     return XO_INIT;
+  }
+  else if(bm)
   {
      switch (ans = vans("◎RSS 1)新增 2)刪除 [Q] "))
 	 {
@@ -4024,6 +4035,8 @@ post_rss(xo)
 	}
   }
   return XO_INIT;
+
+
 }
 
 KeyFunc post_cb[] =

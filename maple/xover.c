@@ -1184,7 +1184,7 @@ extern KeyFunc pal_cb[];
 extern KeyFunc f_pal_cb[];
 extern KeyFunc bmw_cb[];
 extern KeyFunc post_cb[];
-
+extern KeyFunc rss_cb[];
 
 XZ xz[] =
 {
@@ -1203,7 +1203,8 @@ XZ xz[] =
   {NULL, post_cb, M_READA, FEETER_POST},	/* XZ_POST */
   {NULL, NULL, M_GEM, FEETER_GEM},			/* XZ_GEM */
   {NULL, NULL, M_PAL, FEETER_BITLBEE},		/* XZ_BITLBEE */
-  {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL}	/* XZ_FAKE_PAL */
+  {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL},	/* XZ_FAKE_PAL */
+  {NULL, rss_cb, M_RSS, FEETER_RSS}			/* XZ_RSS */
 };
 
 

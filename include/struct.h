@@ -732,4 +732,26 @@ typedef struct
   char status[10];
 }   BITUSR;
 
+/* ----------------------------------------------------- */
+/* RSS                                                   */
+/* ----------------------------------------------------- */
+                                                                                
+typedef struct
+{
+  char bookmark[30 + 1];
+  time_t chrono;
+  int  xmode;
+  int  xid;			           /* reserved */
+  char owner[IDLEN + 1];       /* 作者ID */
+  char date[9];			       /* 日期 */
+  char url[73];		           /* 網址 */
+  char info[73];               /* 相關說明 */
+}   RSS;
+
+#define RSS_START		0x00000001	/* RSS為啟用狀態 */
+#define RSS_ATOM		0x00000002	/* 採用 Atom 格式 */
+#define	RSS_UTF8		0x00000004	/* RSS採用UTF8編碼，反之為採用Big5編碼 */
+#define RSS_TXT			0x00000008	/* RSS需轉譯為txt格式，反之為html格式 */
+#define RSS_RESTRICT	0x00000010	/* 隱藏此 RSS 內容 */
+
 #endif				/* _STRUCT_H_ */

@@ -40,6 +40,7 @@
 #define COLORBAR_VOTE	"\033[0;30;43m"	/*  vote.c 選單光棒 */
 #define COLORBAR_NBRD	"\033[1;46m"	/*	newbrd.c 選單光棒 */
 #define COLORBAR_SONG	"\033[1;42m"	/*  song.c 選單光棒 */
+#define COLORBAR_RSS	"\033[1;46m"	/*  rss.c 選單光棒 */
 
 /* ----------------------------------------------------- */
 /* 使用者名單顏色					 */
@@ -140,6 +141,8 @@
 #define NECKER_INNBBS	"[←]離開 [^P]新增 [d]刪除 [E]編輯 [/]搜尋 [Enter]詳細\n" \
 			COLOR10 "  編號            內         容%*s                                               \033[m"
 
+#define NECKER_RSS	"[←]離開 [→]瀏覽 [o]隱藏 [p]RSS版本 [u]RSS編碼 [n]Html/Txt [s]啟動/暫停      \n" \
+			COLOR10 "  編號  日 期%*s 編  者       版本 編碼 格式    標籤名稱                         \033[m"
 
 /* ----------------------------------------------------- */
 /* 訊息字串：more() 時的 footer 都抓出來定義在這	 */
@@ -242,6 +245,9 @@ COLOR1 "  即時通  "COLOR9" (w)"COLOR2"傳送訊息 " COLOR9 "(^r)"COLOR2"回覆訊息 " 
 
 #define FEETER_FAKE_PAL	\
 COLOR1 " 瀏覽名單 " COLOR9 " 本名單僅供瀏覽，板主修改板友名單請退出後按(B)選擇修改 "
+
+#define FEETER_RSS	\
+COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"(E)"COLOR2"編輯 "COLOR9"(T)"COLOR2"標簽名稱 "COLOR9"(H)"COLOR2"RSS網址 "COLOR9"(m)"COLOR2"移動 "COLOR9"(h)"COLOR2"說明  "
 
 /* ----------------------------------------------------- */
 /* 站台來源簽名						 */

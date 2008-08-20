@@ -524,6 +524,7 @@ VAR char USR_COLORBAR_ALOHA[32]; /*  aloha.c 選單光棒 */
 VAR char USR_COLORBAR_VOTE[32];  /*  vote.c 選單光棒 */
 VAR char USR_COLORBAR_NBRD[32];  /*	 newbrd.c 選單光棒 */
 VAR char USR_COLORBAR_SONG[32];  /*  song.c 選單光棒 */
+VAR char USR_COLORBAR_RSS[32];	 /*  rss.c 選單光棒 */
 
 /* 使用者選擇顯示選項 */
 VAR int  USR_SHOW;

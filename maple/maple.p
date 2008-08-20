@@ -160,6 +160,7 @@ int t_list(void);
 int belong_pal(int *pool, int max, int userno);
 
 /* post.c */
+inline int cal_day(  char *date);                            /* itoc.010217: 計算星期幾 */
 int cmpchrono(HDR *hdr);
 void RefusePal_kill(char *board, HDR *hdr);   /* redfox:加密文章可見名單 */
 int RefusePal_belong(char *board, HDR *hdr);  /* redfox:加密文章可見名單 */
@@ -179,6 +180,9 @@ int post_e_score(XO *xo);
 int post_score(XO *xo);
 void hdr_outs_bar(HDR *hdr, int cc);
 void post_history(XO *xo, HDR *hdr);
+
+/* rss.c */
+int rss_main(void);
 
 /* talk.c */
 char *bmode(UTMP *up, int simple);
@@ -211,6 +215,7 @@ int u_aloha_bar(void);
 int u_vote_bar(void);
 int u_newbrd_bar(void);
 int u_song_bar(void);
+int u_rss_bar(void);
 void justify_log(char *userid, char *justify);
 int u_addr(void);
 int u_register(void);
