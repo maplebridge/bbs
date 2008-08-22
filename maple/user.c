@@ -482,7 +482,7 @@ do_pop3(addr)		/* itoc.010821: §ï¼g¤@¤U :) */
 {
   int sock, i;
   char *ptr, *str, buf[80], username[80];
-  char *alias[] = {"", "pop3.", "mail.", NULL};
+  char *alias[] = {"", "pop.", "pop3.", "mail.", NULL};
   ACCT acct;
 
   strcpy(username, addr);
