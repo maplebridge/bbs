@@ -141,8 +141,8 @@
 #define NECKER_INNBBS	"[←]離開 [^P]新增 [d]刪除 [E]編輯 [/]搜尋 [Enter]詳細\n" \
 			COLOR10 "  編號            內         容%*s                                               \033[m"
 
-#define NECKER_RSS	"[←]離開 [→]瀏覽 [o]隱藏 [p]RSS版本 [u]RSS編碼 [n]Html/Txt [s]啟動/暫停      \n" \
-			COLOR10 "  編號  日 期%*s 編  者       版本 編碼 格式    標籤名稱                         \033[m"
+#define NECKER_RSS	"[←]離開 [→]瀏覽 [o]隱藏 [u]UTF8編碼 [n]Html/Txt [s]啟動/暫停 [R]重送        \n" \
+			COLOR10 "  編號  日 期%*s 標  簽       屬 性    網址                                      \033[m"
 
 /* ----------------------------------------------------- */
 /* 訊息字串：more() 時的 footer 都抓出來定義在這	 */
