@@ -91,7 +91,7 @@ send_rss(old, new, brd_name)
 
 
     /* smiler.080823: °e¥X command */
-    sprintf(com_buf,BBSHOME"/bin/rss_b002 %s %s;",BBSHOME,brd_name);
+    sprintf(com_buf,BBSHOME"/bin/rss_b003 %s %s;",BBSHOME,brd_name);
     system(com_buf);
 
 
