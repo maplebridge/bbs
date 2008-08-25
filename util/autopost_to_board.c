@@ -110,6 +110,7 @@ main(argc, argv)
 	  if(fp = fopen(filepath,"r"))
 	  {
 		  fgets (title , 70 , fp);
+		  title[strlen(title) - 1]='\0';
 		  fclose(fp);
 	  }
 	  else
