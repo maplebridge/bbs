@@ -71,6 +71,57 @@ typedef struct			/* 要和舊版程式 struct 一樣 */
 }	userec;
 
 
+typedef struct
+{
+  int userno;			/* unique positive code */
+
+  char userid[IDLEN + 1];	/* ID */
+  char passwd[PASSLEN + 1];	/* 密碼 */
+  char realname[RNLEN + 1];	/* 真實姓名 */
+  char username[UNLEN + 1];	/* 暱稱 */
+
+  usint userlevel;		/* 權限 */
+  usint ufo;			/* habit */
+  uschar signature;		/* 預設簽名檔 */
+
+  char year;			/* 生日(民國年) */
+  char month;			/* 生日(月) */
+  char day;			/* 生日(日) */
+  char sex;			/* 性別 0:中性 奇數:男性 偶數:女性 */
+  int money;			/* 銀幣 */
+  int gold;			/* 金幣 */
+
+  int numlogins;		/* 上站次數 */
+  int numposts;			/* 發表次數 */
+  int numemails;		/* 寄發 Inetrnet E-mail 次數 */
+
+  time_t firstlogin;		/* 第一次上站時間 */
+  time_t lastlogin;		/* 上一次上站時間 */
+  time_t tcheck;		/* 上次 check 信箱/朋友名單的時間 */
+  time_t tvalid;		/* 若停權，停權期滿的時間；
+                                   若未停權且通過認證，通過認證的時間；
+                                   若未停權且未通過認證，認證函的 time-seed */
+  usint staytime;			/* 總共停留時間 */
+
+  char lasthost[30];		/* 上次登入來源 */
+  char email[56];		/* 目前登記的電子信箱 */
+}      ACCT_080827;
+
+/* ----------------------------------------------------- */
+/* PAL : friend struct : 64 bytes                        */
+/* ----------------------------------------------------- */
+
+
+typedef struct
+{ 
+    char userid[IDLEN + 1];
+    char ftype;
+    char ship[46];
+    int userno;
+}      MAPLE_PAL;
+
+#define PAL_BAD         0x02
+
 /* ----------------------------------------------------- */
 /* (舊的) 使用者習慣 ufo				 */
 /* ----------------------------------------------------- */

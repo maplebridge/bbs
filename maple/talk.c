@@ -177,6 +177,9 @@ do_query(acct)
   prints("[帳號] %-12s [暱稱] %-16.16s [上站] %5d 次 [文章] %5d 篇\n",
     userid, acct->username, acct->numlogins, acct->numposts);
 
+  prints("[優文] %9d 篇 [劣文] %13d 篇 [違規] %5d 次 \n",
+	  acct->good_article,acct->poor_article,acct->violation);
+
   prints("[認證] %s通過認證 [動態] %-16.16s [財產] %s [信箱] %s\n",
     acct->userlevel & PERM_VALID ? "已經" : "尚未",
     (up && can_see(cutmp, up)) ? bmode(up, 1) : "不在站上",

@@ -92,7 +92,13 @@ typedef struct
   usint staytime;			/* 總共停留時間 */
 
   char lasthost[30];		/* 上次登入來源 */
-  char email[56];		/* 目前登記的電子信箱 */
+  char email[56];		 /* 目前登記的電子信箱 */
+  int good_article;     /* 優文 */
+  int poor_article;     /* 劣文 */
+  int violation;        /* 違規記錄 */
+  int reserved_1;
+  int reserved_2;
+  char reserved[256];
 }      ACCT;
 
 

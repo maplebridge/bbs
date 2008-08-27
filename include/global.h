@@ -88,6 +88,10 @@
 
 #define FN_MSN      "msn"       /* msn 紀錄 */
 
+#define FN_GOOD_ARTICLE	"log_good_article"	/* 優文記錄 */
+#define FN_POOR_ARTICLE	"log_poor_article"	/* 劣文記錄 */
+#define FN_VIOLATION	"log_violation"		/* 違規記錄 */
+
 /* ----------------------------------------------------- */
 /* 看板/精華區/信箱/RSS檔名設定                              */
 /* ----------------------------------------------------- */

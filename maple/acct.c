@@ -341,6 +341,8 @@ acct_show(u, adm)
 
   prints("  \033[32m上站次數：\033[37m%-10d(共 %5d 時 %2d 分)      \033[32m文章篇數：\033[37m%d\n", u->numlogins, u->staytime/60, u->staytime%60, u->numposts);
 
+  prints("  \033[32m優文篇數：\033[37m%-10d    \033[32m劣文篇數：\033[37m%-10d  \033[32m違規次數：\033[37m%-10d\n", u->good_article, u->poor_article, u->violation);
+
   prints("  \033[32m郵件信箱：\033[37m%s\n", u->email);
 
   prints("  \033[32m註冊日期：\033[37m%s\n", Btime(&u->firstlogin));
@@ -401,6 +403,83 @@ end_show:
   outs("\033[m");
 }
 
+/* smiler.080827: 站務自行設定 優文/劣文/違規記錄 */
+static int
+acct_set_violation(u)
+  ACCT *u;
+{
+	ACCT x, acct;
+	int  ans, ans2, num;
+	char buf[256];
+	char reason[55];
+	char fpath[64];
+
+	if(acct_load(&acct, u->userid) < 0)
+		return 0;
+
+	ans = vans("設定 1)優文 2)劣文 3)違規 Q)取消 [Q] ");
+	ans2 = vans("選擇 1)數字設定  2)觀看記錄  Q)取消 [Q] ");
+
+	if((ans > '3') || (ans < '1') || (ans2 > '2') || (ans2 < '1'))
+		return 0;
+
+	move(3, 0);
+    clrtobot();
+	move(4, 0);
+	prints("%s --- %s\n", (ans=='1') ? "優文" : (ans=='2') ? "劣文" : "違規" ,
+						  (ans2 == '1') ? "數字設定" : "觀看記錄");
+
+	usr_fpath(fpath, acct.userid, (ans=='1') ? FN_GOOD_ARTICLE : (ans=='2') ? FN_POOR_ARTICLE : FN_VIOLATION);
+
+	memcpy(&x, &acct, sizeof(ACCT));
+
+	if(ans2 == '1')
+	{
+		if(!vget(6, 0, "請輸入理由：", reason, 55, DOECHO))
+		{
+			vmsg("取消修改 !!");
+			return 0;
+		}
+
+		sprintf(buf,"%d",(ans=='1') ? x.good_article : (ans=='2') ? x.poor_article : x.violation);
+	    vget(8, 0, "輸入數字：", buf, 10, GCARRY);
+        if ((num = atoi(buf)) > 0)
+           (ans=='1') ? (x.good_article = num) : (ans=='2') ? (x.poor_article=num) : (x.violation = num);
+		else
+		{
+			vmsg("取消修改 !!");
+			return 0;
+		}
+
+        sprintf(buf, "%s %-13s 站務  : 修改前:%d 修改後:%d %s\n",
+			Now(), cuser.userid,
+			(ans=='1') ? acct.good_article : (ans=='2') ? acct.poor_article : acct.violation,
+			num, reason);
+
+     	/* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式 */
+		/****************************************************************************************/
+		/* itoc.010811: 動態設定線上使用者 */
+        /* 被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
+           這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料 */
+        /* 在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
+           所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。 */
+		/****************************************************************************************/
+		utmp_admset(x.userno, STATUS_DATALOCK | STATUS_COINLOCK);
+	    memcpy(&acct, &x, sizeof(ACCT));
+        acct_save(&acct);
+		f_cat(fpath, buf);
+		return 0;
+	}
+
+	if (ans2 == '2')
+	{
+		more(fpath, NULL);
+		return 0;
+	}
+
+	return 0;
+
+}
 
 void
 acct_setup(u, adm)
@@ -444,7 +523,14 @@ acct_setup(u, adm)
 
   if (adm)
   {
-    adm = vans("設定 1)資料 2)權限 Q)取消 [Q] ");
+    adm = vans("設定 1)資料 2)權限 3)優文/劣文/違規 Q)取消 [Q] ");
+
+	if (adm == '3')
+	{
+		acct_set_violation(u);
+		return;
+	}
+
     if (adm == '2')
       goto set_perm;
 

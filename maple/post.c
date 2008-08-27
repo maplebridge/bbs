@@ -1624,6 +1624,8 @@ post_attr(hdr)
   {
     attr |= 'M';
 	strcpy(attr_tmp,"\033[1;36m");
+	if(mode & POST_GOOD)
+		strcpy(attr_tmp,"\033[1;33m");
   }
   else if (!attr)
   {
@@ -2464,6 +2466,12 @@ post_mark(xo)
       return XO_NONE;
 #endif
 
+	if (xmode & POST_GOOD)
+	{
+		vmsg("此篇為優文，請按 M 鍵取消本篇優文 !!");
+		return XO_BODY;
+	}
+
     hdr->xmode = xmode ^ POST_MARKED;
     currchrono = hdr->chrono;
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
@@ -2474,6 +2482,95 @@ post_mark(xo)
   return XO_NONE;
 }
 
+
+/* smiler.080827: 設定優文 */
+static int
+post_mark_good(xo)
+  XO *xo;
+{
+  ACCT x, acct;
+  char buf[512];
+  char fpath[64];
+
+  if(strstr(currboard, "P_") || strstr(currboard, "R_"))
+  {
+	  vmsg("個人看板，寢板不開放優文設定 !!");
+	  return XO_BODY;
+  }
+
+  if (bbstate & STAT_BOARD)
+  {
+    HDR *hdr;
+    int pos, cur, xmode;
+
+    pos = xo->pos;
+    cur = pos - xo->top;
+    hdr = (HDR *) xo_pool + cur;
+    xmode = hdr->xmode;
+
+#ifdef HAVE_LABELMARK
+    if (xmode & POST_DELETE)	/* 待砍的文章不能 mark */
+      return XO_NONE;
+#endif
+
+	if ((xmode & POST_MARKED) && (!(xmode & POST_GOOD)))
+	{
+		vmsg("請先按 m 取消本篇文章標記，再按 M 重設本篇文章為優文 !!");
+		return XO_BODY;
+	}
+
+	if (!strcmp(hdr->owner, cuser.userid))
+	{
+		vmsg("自己不可加自己優文 !!");
+		return XO_BODY;
+	}
+
+	if ( (!strchr(hdr->owner, '.')) && (acct_load(&acct, hdr->owner) >= 0))
+	{
+	    memcpy(&x, &acct, sizeof(ACCT));
+		x.good_article = acct.good_article;
+		if (vans(msg_sure_ny) != 'y')
+			return XO_BODY;
+		else
+		{
+			usr_fpath(fpath, acct.userid, FN_GOOD_ARTICLE);			
+			hdr->xmode = xmode ^ POST_MARKED;
+			if(hdr->xmode & POST_MARKED)
+			{
+				hdr->xmode |= POST_GOOD;
+				x.good_article++;
+				sprintf(buf, "%s %-13s 優文增 %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title);
+			}
+			else
+			{
+				hdr->xmode &= (~POST_GOOD);
+				x.good_article--;
+				sprintf(buf, "%s %-13s 優文減 %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title);
+			}
+
+			/* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式 */
+			/****************************************************************************************/
+			/* itoc.010811: 動態設定線上使用者 */
+            /* 被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
+               這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料 */
+            /* 在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
+               所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。 */
+			/****************************************************************************************/
+			utmp_admset(x.userno, STATUS_DATALOCK | STATUS_COINLOCK);
+			memcpy(&acct, &x, sizeof(ACCT));
+            acct_save(&acct);
+			f_cat(fpath, buf);
+		}
+		
+	}
+
+
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
+
+    return XO_INIT;
+  }
+}
 
 /*ryancid: reset parent_chrono*/
 static void
@@ -2765,9 +2862,13 @@ post_delete(xo)
 {
   int pos, cur, by_BM;
   HDR *hdr;
-  char buf[80];
+  char buf[256];
   char Deletelog_folder[64],copied[64];
   HDR  Deletelog_hdr;
+  ACCT x, acct;
+  char fpath[64];
+  char reason[55];
+  char title[70];
 
   /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
  if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
@@ -2790,6 +2891,42 @@ post_delete(xo)
 
   if (vans(msg_del_ny) == 'y')
   {
+    
+	/* smiler.080827: 非自己砍文時，可設定是否要劣退 */
+    if(strcmp(hdr->owner, cuser.userid) && (!strchr(hdr->owner, '.')) && (acct_load(&acct, hdr->owner) >= 0))
+	{
+		memcpy(&x, &acct, sizeof(ACCT));
+        x.poor_article = acct.poor_article;
+		if(vans("要劣退本篇文章(Y/N)？[N]") == 'y')
+		{
+			if(!vget(b_lines, 0, "請輸入理由：", reason, 55, DOECHO))
+			{
+				vmsg("取消 !!");
+				return XO_BODY;
+			}
+               
+			usr_fpath(fpath, acct.userid, FN_POOR_ARTICLE);
+			x.poor_article++;
+			sprintf(buf, "%s %-13s 劣退增 %s %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title, reason);
+			/* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式 */
+			/****************************************************************************************/
+			/* itoc.010811: 動態設定線上使用者 */
+            /* 被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
+               這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料 */
+            /* 在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
+               所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。 */
+			/****************************************************************************************/
+			utmp_admset(x.userno, STATUS_DATALOCK | STATUS_COINLOCK);
+			memcpy(&acct, &x, sizeof(ACCT));
+            acct_save(&acct);
+			f_cat(fpath, buf);
+
+			hdr_fpath(fpath, xo->dir, hdr);
+			sprintf(title,"[劣退] 理由:%s",reason);
+			mail_him(fpath, acct.userid, title, 0);
+		}
+	}
+
     /* smiler 1031 */
     if(deletelog_use)
 	{
@@ -4073,6 +4210,8 @@ KeyFunc post_cb[] =
 #endif
 
   'w', post_write,
+
+  'M', post_mark_good,
 
   'b', post_memo,
   'c', post_copy,

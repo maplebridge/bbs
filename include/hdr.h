@@ -55,7 +55,7 @@ typedef struct
 #define POST_MARKED	0x00000002	/* marked */
 #define POST_NOFORWARD	0x00000004	/* 不能轉寄 */
 #define POST_NOSCORE	0x00000008	/* 不能評分 */
-#define POST_5		0x00000010
+#define POST_GOOD		0x00000010	/* 優文 */
 #define POST_GEM	0x00000020	/* 收錄精華區標記 */
 #define POST_BOTTOM	0x00000040	/* 置底 */
 #define POST_DELETE	0x00000080	/* 標記待砍的 */
