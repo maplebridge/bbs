@@ -45,7 +45,11 @@ SRC =	\
 	\
 	acl_has.c rfc2047.c xwrite.c \
 	\
-	dl_lib.c
+	dl_lib.c \
+	\
+	str_sub_all_chr.c \
+	\
+	str_sub_space_lf.c
 
 OBJ =	\
 	is_alnum.o is_alpha.o not_addr.o \
@@ -73,8 +77,11 @@ OBJ =	\
 	\
 	acl_has.o rfc2047.o xwrite.o \
 	\
-	dl_lib.o
-
+	dl_lib.o \
+	\
+	str_sub_all_chr.o \
+        \
+        str_sub_space_lf.o
 
 .c.o:   ;   $(CC) $(CFLAGS) -c $*.c
 

@@ -1095,6 +1095,13 @@ x_file(mode, xlist, flist)
   }
   else
   {
+	  if(mode == M_XFILES)
+	  {
+         char fpath_info[64];
+		 sprintf(fpath_info, BBSHOME"/gem/@/@mxfile.info");
+		 more(fpath_info, NULL);
+	  }
+
     vmsg(vedit(buf, 0) ? "原封不動" : "更新完畢");	/* Thor.981020: 注意被talk的問題  */
   }
 }

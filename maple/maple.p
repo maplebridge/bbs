@@ -164,6 +164,9 @@ inline int cal_day(  char *date);                            /* itoc.010217: ­pº
 int cmpchrono(HDR *hdr);
 void RefusePal_kill(char *board, HDR *hdr);   /* redfox:¥[±K¤å³¹¥i¨£¦W³æ */
 int RefusePal_belong(char *board, HDR *hdr);  /* redfox:¥[±K¤å³¹¥i¨£¦W³æ */
+int IS_WELCOME(char *board, char *f_mode);
+int IS_BRD_DOG_FOOD(char *fpath, char *board);
+int IS_BBS_DOG_FOOD(char *fpath);
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
 int do_reply(XO *xo, HDR *hdr);

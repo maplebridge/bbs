@@ -791,8 +791,346 @@ XoBM(xo)
 
 
 /* ----------------------------------------------------- */
+/* 看門狗                        */
+/* ----------------------------------------------------- */
+
+static int
+post_article_filter(xo)
+  XO *xo;
+{
+
+#define	NUM_DOG			10
+#define	LEN_DOG_NAME	70
+
+  int i;
+  int choose;
+  FILE *fp;
+  char fpath[64], buf[LEN_DOG_NAME], input[LEN_DOG_NAME], dog[NUM_DOG][LEN_DOG_NAME];
+ 
+  brd_fpath(fpath, currboard, FN_BBSDOG);
+
+  /* 偵測檔案是否存在 */
+
+  if(fp = fopen(fpath, "r"))
+    fclose(fp);
+  else
+  {
+	  fp = fopen(fpath, "w");
+	  i = 0;
+	  while(i < 10)
+	  {
+		  fprintf(fp, "%c\n",'\0');
+		  i++;
+	  }
+	  fclose(fp);
+  }
+  
+  choose = 0;
+
+  do
+  {
+	  if(choose)
+	  {
+		 move(b_lines - 1, 0);
+		 prints("修改第 %d 項 : ", choose);
+		 
+		 if(!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
+			 input[0] = '\0';
+
+		 while(strstr(input," "))
+		 {
+			move(b_lines - 2, 0);
+			prints("\033[1;33m輸入之字串中不得有空格，請重新輸入 !!\033[m\n");
+			prints("修改第 %d 項 : ", choose);
+		 
+		    if(!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
+			{
+			   input[0] = '\0';
+			   break;
+			}
+		 }
+         if(input[0] != '\0')
+		   strcpy(dog[choose - 1], input);
+		 else
+		   dog[choose - 1][0] = '\0';
+		 
+		 fp = fopen(fpath, "w");
+		 for(i = 0 ; i < NUM_DOG ; i++ )
+		 {
+			 if(dog[i][0] == '\0')
+			 {
+				 fprintf(fp, "%c\n", dog[i][0]);
+			 }
+			 else
+			     fprintf(fp, "%s\n", dog[i]);
+		 }
+		 fclose(fp);
+	  }
+
+      fp = fopen(fpath, "r");
+	  move(0,0);
+	  clrtobot();
+	  for( i = 0 ; i < NUM_DOG ; i++ )
+	  {
+		  prints("%d.\n", i+1);
+
+		  fscanf(fp, "%s", &buf);
+
+		  if((buf[0] == '\0') || (buf[0] == '\n'))
+		  {
+			  prints("\n");
+			  dog[i][0] = '\0';
+		  }
+		  else
+		  {
+		      prints("\033[0;30;47m%s\033[m\n", buf);
+		      strcpy(dog[i], buf);
+		  }
+	  }
+	  fclose(fp);
+
+	  switch(vans("選擇 (D)刪除 (E)修改 (Q)取消？[E] "))
+	  {
+	    case 'd':
+		  unlink(fpath);
+		case 'q':
+		  return XO_INIT;
+	  }
+                                                                                
+
+	  if(!vget(b_lines, 0, "◎ 選則修改 1)~10) (Q)離開 [Q]", input, 3, DOECHO))
+		  break;
+	  choose = atoi(input);
+
+	  if(choose > 10 || choose < 0)
+		  break;
+
+  }while(choose);
+
+  return XO_INIT;
+}
+
+/* smiler.080831: 板主自定 可讀/可寫/可列
+   目前判斷項次 :
+   1. 生日     (年齡限制　: 18禁　or any level)
+   2. 性別     (男性專板，女性專板....balabala)
+   3. 上線次數 (不得小於多少次)
+   4. 文章篇數 (不得小於多少篇)
+   5. 優文篇數 (不得小於多少篇)
+   6. 劣文篇數 (不得高於多少篇)
+   7. 違規次數 (不得高於多少次)
+   8. 銀幣　　 (不得少於多少枚)
+   9. 金幣　　 (不得少於多少枚)
+  10. 發信次數 (不得小於多少次)
+  11. 註冊時間 (不得低於多少月)
+
+*/
+
+static int
+post_my_level(xo, f_mode)
+  XO *xo;
+  char *f_mode;
+{
+	int i, wi;
+	char fpath_r[64], fpath_w[64], buf[64], wd[64];
+	FILE *fr;
+	FILE *fw;
+
+	brd_fpath(fpath_r, currboard, f_mode);
+	sprintf(fpath_w, "%s.tmp", fpath_r);
+
+	if(fr = fopen(fpath_r, "r"))
+		fclose(fr);
+	else
+	{
+		fr = fopen(fpath_r, "w");
+		for(i=0 ;i<10 ;i++ )
+			fprintf(fr,"0\n");
+		fclose(fr);
+	}
+
+	while(1)
+	{
+	  move(0, 0);
+	  clrtobot();
+
+	  fr = fopen(fpath_r, "r");
+      fw = fopen(fpath_w, "w");
+
+	  i=3;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "年齡限制 >= [%2d歲]：", wi);
+	  if(vget(i, 0, wd, buf, 3, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "性別限制 (0)不限(1)中性 (2)男性 (3)女性：[%d] ", wi);
+	  if(vget(i, 0, wd, buf, 2, DOECHO))
+         wi = (atoi(buf) % 4);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "上線次數 >= [%d次] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+	
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "文章篇數 >= [%d篇] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+	
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "優文篇數 >= [%d篇] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "劣文篇數 <  [%d篇] (0：取消) ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "違規次數 <  [%d次] (0：取消) ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "銀幣     >= [%d枚] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "金幣     >= [%d枚] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "發信次數 >= [%d次] ", wi);
+	  if(vget(i, 0, wd, buf, 10, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  i++;
+
+	  fscanf(fr, "%d", &wi);
+	  sprintf(wd, "註冊時間 >= [%3d月] ", wi);
+	  if(vget(i, 0, wd, buf, 4, DOECHO))
+         wi = atoi(buf);
+	  if(wi >= 0)
+	    fprintf(fw, "%d\n", wi);
+	  else
+	    fprintf(fw, "0\n");
+
+	  fclose(fr);
+	  fclose(fw);
+
+	  switch(vans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
+	  {
+	    case 's':
+			unlink(fpath_r);
+			rename(fpath_w, fpath_r);
+			return XO_INIT;
+
+		case 'e':
+			continue;
+
+		default:
+			unlink(fpath_w);
+			return XO_INIT;
+	  }
+
+   }
+   return XO_INIT;
+}
+
+/* ----------------------------------------------------- */
 /* 板主選單						 */
 /* ----------------------------------------------------- */
+
+static int
+post_guard_dog(xo)
+  XO *xo;
+{
+  char *menu[] = 
+  {
+	"PQ",
+	"Post    文章內容限制",
+	"Write   看板發文限制",
+	"Read    看板閱\讀限制",
+	"List    看板列出限制",
+	NULL
+  };
+  switch (pans(3, 20, "BBS 看門狗", menu))
+  {
+    case 'p':
+		return post_article_filter(xo);
+	case 'w':
+		return post_my_level(xo, FN_NO_WRITE);
+	case 'r':
+		return post_my_level(xo, FN_NO_READ);
+	case 'l':
+		return post_my_level(xo, FN_NO_LIST);
+      
+  }
+  return XO_INIT;
+}
 
 
 int
@@ -821,6 +1159,7 @@ post_manage(xo)
 	"RLock   板友可否鎖文",
     "Nfward  看板禁止轉錄",
 	"Fshow   轉錄記錄開啟",
+	"Guard   BBS 看門狗",
     NULL
   };
 #else
@@ -885,6 +1224,8 @@ post_manage(xo)
 	  return post_noforward(xo);
   case 'f':
 	  return post_showreturn(xo);
+  case 'g':
+	  return post_guard_dog(xo);
   }
 
   return XO_FOOT;

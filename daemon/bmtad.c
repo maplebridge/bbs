@@ -1215,6 +1215,151 @@ bbs_mail(ap, data, userid)
 }
 
 
+/* smiler.080830 : 看門狗 */
+static int
+IS_MAIL_BRD_DOG_FOOD(fpath, board)
+  char *fpath;
+  char *board;
+{
+
+  int fsize;
+  char fpath_img[64];
+  int *fimage;
+
+  char fpath_filter[64];
+  char filter[73];
+
+  FILE *fp;
+  brd_fpath(fpath_filter, board, FN_BBSDOG);
+
+  if(!(fp = fopen(fpath_filter, "r")))
+	  return 0;
+
+#if 1  
+
+  strcpy(fpath_img, fpath);
+
+  if(fimage = f_img(fpath_img, &fsize))
+  {
+	  while(fgets(filter, 70, fp))
+	  {
+		  if(filter[0]=='\0' || filter[0]=='\n')
+			  continue;
+		  else
+			  filter[strlen(filter) - 1] = '\0';
+
+	      if(str_sub_space_lf(fimage, filter))
+		  {
+			 fclose(fp);
+	         return 1;
+		  }
+	  }
+
+	  free(fimage);
+  }
+
+  fclose(fp);
+  return 0;
+
+#endif
+
+
+#if 0
+  /* smiler.080829 : 以下程式亦可修改後使用 */
+
+  strcpy(fpath_img, fpath);
+  
+  fimage = f_map(fpath_img, &fsize);
+  if (fimage == (char *) -1)
+    return XO_BODY;
+
+  if (str_sub(fimage, "test"))
+	  vmsg("hit !!");
+
+  munmap(fimage, fsize);
+#endif
+
+}
+
+static int
+IS_MAIL_BBS_DOG_FOOD(fpath)
+  char *fpath;
+{
+
+  int fsize;
+  char fpath_img[64];
+  int *fimage;
+
+  char fpath_filter[64];
+  char filter[73];
+
+  FILE *fp;
+  sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
+
+  if(!(fp = fopen(fpath_filter, "r")))
+	  return 0;
+
+#if 1  
+
+  strcpy(fpath_img, fpath);
+
+  if(fimage = f_img(fpath_img, &fsize))
+  {
+	  while(fgets(filter, 70, fp))
+	  {
+		  if(filter[0]=='\0' || filter[0]=='\n')
+			  continue;
+		  else
+			  filter[strlen(filter) - 1] = '\0';
+
+	      if(str_sub_all_chr(fimage, filter))
+		  {
+			 fclose(fp);
+	         return 1;
+		  }
+	  }
+
+	  free(fimage);
+  }
+
+  fclose(fp);
+  return 0;
+
+#endif
+
+
+#if 0
+  /* smiler.080829 : 以下程式亦可修改後使用 */
+
+  strcpy(fpath_img, fpath);
+  
+  fimage = f_map(fpath_img, &fsize);
+  if (fimage == (char *) -1)
+    return XO_BODY;
+
+  if (str_sub(fimage, "test"))
+	  vmsg("hit !!");
+
+  munmap(fimage, fsize);
+#endif
+
+}
+
+static void
+copy_post_to_deletelog(hdr, fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char folder[64];
+  HDR post;
+
+  brd_fpath(folder, "Deletelog", FN_DIR);
+  hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
+  memcpy(post.owner, hdr->owner, TTLEN + 140);
+  rec_bot(folder, &post, sizeof(HDR));
+
+}
+
 static int
 bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
   Agent *ap;
@@ -1264,9 +1409,18 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
     close(fd);
   }
 
+
   hdr.xmode = POST_INCOME;
   str_ncpy(hdr.owner, author, sizeof(hdr.owner));
   str_ncpy(hdr.title, title, sizeof(hdr.title));
+
+  if(IS_MAIL_BRD_DOG_FOOD(fpath, brdname) || IS_MAIL_BBS_DOG_FOOD(fpath))
+  {
+	  copy_post_to_deletelog(&hdr, fpath);
+	  unlink(fpath);
+	  return 0;
+  }
+
   rec_bot(folder, &hdr, sizeof(HDR));
 
   update_btime(brdname);

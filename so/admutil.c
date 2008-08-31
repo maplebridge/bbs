@@ -318,7 +318,7 @@ a_xfile()		/* 設定系統檔案 */
     "收信黑名單",
 
 #ifdef  HAVE_DETECT_CROSSPOST
-    "Crosspost特例",
+    "可Crosspost",
 #endif
 
 #ifdef HAVE_LOGIN_DENIED
@@ -326,6 +326,7 @@ a_xfile()		/* 設定系統檔案 */
     "拒絕連線名單",
 #endif
     "站務的情書",
+	"BBS 看門狗",
     NULL
   };
 
@@ -374,6 +375,7 @@ a_xfile()		/* 設定系統檔案 */
     BBS_DNYFILE,
 #endif
     FN_ETC_SYSMAIL,
+	FN_ETC_BBSDOG,
 	NULL
   };
 

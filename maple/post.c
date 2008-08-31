@@ -360,110 +360,450 @@ post_viewpal(xo)
 }
 
 static int
+IS_BIGGER_AGE(age)
+  int age;
+{
+	time_t now;
+    struct tm *ptime;
+
+    time(&now);
+    ptime = localtime(&now);
+
+	int ans = 0;
+   
+	ans = ((cuser.year + 11 + age) < ptime->tm_year) ? 1 :
+	      ((cuser.year + 11 + age) > ptime->tm_year) ? 0 :
+          (cuser.month < (ptime->tm_mon + 1))        ? 1 :
+          (cuser.month > (ptime->tm_mon + 1))        ? 0 :
+          (cuser.day > (ptime->tm_mday))             ? 0 : 1 ;
+
+	return ans;
+
+}
+
+static int
+IS_BIGGER_1STLG(month)
+  int month;
+{
+	time_t this_time;
+    struct tm *ptime;
+	int ans = 0;
+	int my_year, my_month, my_day;
+	int now_year, now_month, now_day;
+
+    time(&this_time);
+
+    ptime = localtime(&this_time);
+
+	now_year  = ptime->tm_year;
+	now_month = ptime->tm_mon;
+	now_day   = ptime->tm_mday;
+
+	ptime = localtime(&cuser.firstlogin);
+
+    my_year  = ptime->tm_year;
+	my_month = ptime->tm_mon;
+	my_day   = ptime->tm_mday;
+
+
+	ans = ((my_year   + (month / 12)) < now_year   ) ? 1 :
+	      ((my_year   + (month / 12)) > now_year   ) ? 0 :
+          ((my_month  + (month % 12)) < now_month  ) ? 1 :
+          ((my_month  + (month % 12)) > now_month  ) ? 0 :
+          ( my_day                    > now_day    ) ? 0 : 1 ;
+
+
+	return ans;
+
+}
+
+#define		COLOR_NOT_ACP	"\033[1;31m"
+#define		COLOR_ACP		"\033[1;37m"	
+
+int
+IS_WELCOME(board, f_mode)
+  char *board;
+  char *f_mode;
+{
+	FILE *fp;
+	char fpath[64];
+	brd_fpath(fpath, board, f_mode);
+
+	if(!(fp = fopen(fpath, "r")))
+		return 1;
+
+	int wi=0;
+
+	fscanf( fp, "%d", &wi);
+    if(!IS_BIGGER_AGE(wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(wi && (wi != cuser.sex+1))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(!(cuser.numlogins >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(!(cuser.numposts >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(!(cuser.good_article >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(wi && (!(cuser.poor_article < wi)))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(wi && (!(cuser.violation < wi)))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+	if(!(cuser.money >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(!(cuser.gold >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+	if(!(cuser.numemails >= wi))
+		return 0;
+
+	fscanf( fp, "%d", &wi);
+    if(!IS_BIGGER_1STLG(wi))
+		return 0;
+
+	fclose(fp);
+	return 1;
+}
+
+static int
+post_show_dog(xo, f_mode)
+  XO *xo;
+  char *f_mode;
+{
+	FILE *fp;
+	char fpath[64];
+	brd_fpath(fpath, currboard, f_mode);
+
+	if(!(fp = fopen(fpath, "r")))
+		return 0;
+
+	move(0, 0);
+	clrtobot();
+
+	int wi=0;
+
+	move(1, 0);
+	prints("\033[1;33m %s \033[m\n", (!strcmp(f_mode, FN_NO_WRITE)) ? "發文推文條件限制" : 
+	                                 (!strcmp(f_mode, FN_NO_READ )) ? "進入看板條件限制" :
+									 (!strcmp(f_mode, FN_NO_LIST )) ? "看板列表顯示本板" : "" );
+
+	move(3, 0);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s性別限制 : [%s] \033[m\n", (wi == 0) ? COLOR_ACP : (wi == (cuser.sex+1)) ? COLOR_ACP : COLOR_NOT_ACP, (wi==0) ? "[不限]" : (wi==1) ? "中性" : (wi==2) ? "男性" : "女性");
+
+	fscanf( fp, "%d", &wi);
+	prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n", (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s違規次數 <  [%d次] (0：不限) \033[m\n", (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	fscanf( fp, "%d", &wi);
+	prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+	vmsg(NULL);
+
+	fclose(fp);
+	return 0;
+}
+
+static int
 post_showbm(xo)
   XO *xo;
 {
     BRD  *brd;
-    FILE *fp;
-	char file_path[64];
     brd = bshm->bcache + currbno;
-    sprintf(file_path,"brd/%s/BM_%s",currboard,cuser.userid);
-	fp=fopen(file_path,"w");    
-	fprintf(fp,"看板英文板名: %s\n",brd->brdname);
-	fprintf(fp,"看板分類    : %s\n",brd->class);
-    fprintf(fp,"看板中文板名: %s\n",brd->title);
-    fprintf(fp,"看板板主名單: %s\n",brd->BM);
+
+	move(0, 0);
+    clrtobot();
+	move(3, 0);
+       
+	prints("看板英文板名: %s\n",brd->brdname);
+	prints("看板分類    : %s\n",brd->class);
+    prints("看板中文板名: %s\n",brd->title);
+    prints("看板板主名單: %s\n",brd->BM);
 	if(brd->bvote ==0)
-	  fprintf(fp,"看板活動舉辦: 無投票舉辦\n");
+	  prints("看板活動舉辦: 無投票舉辦\n");
 	else if(brd->bvote == -1)
-	  fprintf(fp,"看板活動舉辦: 有賭盤舉辦\n");
+	  prints("看板活動舉辦: 有賭盤舉辦\n");
 	else
-	  fprintf(fp,"看板活動舉辦: 有投票舉辦\n");
+	  prints("看板活動舉辦: 有投票舉辦\n");
 
 //#define BRD_NOZAP   0x01    /* 不可 zap */
-	fprintf(fp,"看板可否被z : ");
+	prints("看板可否被z : ");
 	if(currbattr & BRD_NOZAP)
-		fprintf(fp,"不可\n");
+		prints("不可\n");
 	else
-		fprintf(fp,"可\n");
+		prints("可\n");
 //#define BRD_NOTRAN  0x02    /* 不轉信 */
-	fprintf(fp,"看板可否轉信: ");
+	prints("看板可否轉信: ");
 	if(currbattr & BRD_NOTRAN)
-		fprintf(fp,"不轉信\n");
+		prints("不轉信\n");
 	else
-		fprintf(fp,"可轉信\n");
+		prints("可轉信\n");
 //#define BRD_NOCOUNT 0x04    /* 不計文章發表篇數 */
-	fprintf(fp,"文章發表篇數: ");
+	prints("文章發表篇數: ");
 	if(currbattr & BRD_NOCOUNT)
-		fprintf(fp,"不記錄\n");
+		prints("不記錄\n");
 	else
-		fprintf(fp,"記錄\n");
+		prints("記錄\n");
 //#define BRD_NOSTAT  0x08    /* 不納入熱門話題統計 */
-	fprintf(fp,"熱門話題統計: ");
+	prints("熱門話題統計: ");
 	if(currbattr & BRD_NOSTAT)
-		fprintf(fp,"不記錄\n");
+		prints("不記錄\n");
 	else
-		fprintf(fp,"記錄\n");
+		prints("記錄\n");
 //#define BRD_NOVOTE  0x10    /* 不公佈投票結果於 [record] 板 */
-	fprintf(fp,"投摽結果公佈: ");
+	prints("投摽結果公佈: ");
 	if(currbattr & BRD_NOVOTE)
-		fprintf(fp,"不公佈投表結果於 [record] 板\n");
+		prints("不公佈投表結果於 [record] 板\n");
 	else
-		fprintf(fp,"公佈投票結果於 [record] 板\n");
+		prints("公佈投票結果於 [record] 板\n");
 //#define BRD_ANONYMOUS   0x20    /* 匿名看板 */
-	fprintf(fp,"匿名看板   ?: ");
+	prints("匿名看板   ?: ");
 	if(currbattr & BRD_ANONYMOUS)
-		fprintf(fp,"是\n");
+		prints("是\n");
 	else
-		fprintf(fp,"否\n");
+		prints("否\n");
 //#define BRD_NOSCORE 0x40    /* 不評分看板 */
-	fprintf(fp,"看板可否推文: ");
+	prints("看板可否推文: ");
 	if(currbattr & BRD_NOSCORE)
-		fprintf(fp,"否\n");
+		prints("否\n");
 	else
-		fprintf(fp,"可\n");
+		prints("可\n");
 //#define BRD_NOL     0x100   /* 不可鎖文 */
-	fprintf(fp,"看板鎖文限制: ");
+	prints("看板鎖文限制: ");
 	if(currbattr & BRD_NOL)
-		fprintf(fp,"板主已設定板友不得鎖文\n");
+		prints("板主已設定板友不得鎖文\n");
 	else
-		fprintf(fp,"板主未做板友鎖文設定\n");
+		prints("板主未做板友鎖文設定\n");
 //#define BRD_SHOWPAL 0x200   /* 顯示板友名單 */
-	fprintf(fp,"顯示板友名單: ");
+	prints("顯示板友名單: ");
 	if(currbattr & BRD_SHOWPAL)
-		fprintf(fp,"板主隱藏板友名單\n");
+		prints("板主隱藏板友名單\n");
 	else
-		fprintf(fp,"板友可看板友名單(ctrl^g)\n");
+		prints("板友可看板友名單(ctrl^g)\n");
 //#define BRD_PUBLIC  0x80    /* 公眾板 */
-	fprintf(fp,"是否為公眾板: ");
+	prints("是否為公眾板: ");
 	if(currbattr & BRD_PUBLIC)
 	{
-		fprintf(fp,"是公眾板\n");
-		fprintf(fp,"\n===>\n");
-		fprintf(fp,"   公眾板板主,\n");
-		fprintf(fp,"     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
-		fprintf(fp,"     若需更改相關設定,請洽楓橋驛站站務部\n");
-		fprintf(fp,"   公眾板使用者,\n");
-		fprintf(fp,"     不得鎖文\n");
+		prints("是公眾板\n");
+		prints("\n===>\n");
+		prints("   公眾板板主,\n");
+		prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
+		prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
+		prints("   公眾板使用者,\n");
+		prints("     不得鎖文\n");
 	}
 	else
-		fprintf(fp,"非公眾板\n");
-	fclose(fp);
-	more(file_path, NULL);
-	unlink(file_path);
+		prints("非公眾板\n");
+
+	vmsg(NULL);
+
+	post_show_dog(xo, FN_NO_WRITE);
+	post_show_dog(xo, FN_NO_READ);
+	post_show_dog(xo, FN_NO_LIST);
+	
 	return XO_HEAD;
 }
 
-/* smiler 0914*/
+/* smiler.080830 : 看門狗 */
 int
-post_filter(acl)
-  char *acl;			/* file name of access control list */
+IS_BRD_DOG_FOOD(fpath, board)
+  char *fpath;
+  char *board;
 {
-  FILE *fp;
-  char filter[256];
 
-  if (!(fp = fopen(acl, "r")))
-    return -1;
+  int fsize;
+  char fpath_img[64];
+  int *fimage;
+
+  char fpath_filter[64];
+  char filter[73];
+
+  FILE *fp;
+  brd_fpath(fpath_filter, board, FN_BBSDOG);
+
+  if(!(fp = fopen(fpath_filter, "r")))
+	  return 0;
+
+#if 1  
+
+  strcpy(fpath_img, fpath);
+
+  if(fimage = f_img(fpath_img, &fsize))
+  {
+	  while(fgets(filter, 70, fp))
+	  {
+		  if(filter[0]=='\0' || filter[0]=='\n')
+			  continue;
+		  else
+			  filter[strlen(filter) - 1] = '\0';
+
+	      if(str_sub_space_lf(fimage, filter))
+		  {
+			 fclose(fp);
+	         return 1;
+		  }
+	  }
+
+	  free(fimage);
+  }
+
+  fclose(fp);
+  return 0;
+
+#endif
+
+
+#if 0
+  /* smiler.080829 : 以下程式亦可修改後使用 */
+
+  strcpy(fpath_img, fpath);
+  
+  fimage = f_map(fpath_img, &fsize);
+  if (fimage == (char *) -1)
+    return XO_BODY;
+
+  if (str_sub(fimage, "test"))
+	  vmsg("hit !!");
+
+  munmap(fimage, fsize);
+#endif
+
+}
+
+int
+IS_BBS_DOG_FOOD(fpath)
+  char *fpath;
+{
+
+  int fsize;
+  char fpath_img[64];
+  int *fimage;
+
+  char fpath_filter[64];
+  char filter[73];
+
+  FILE *fp;
+  sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
+
+  if(!(fp = fopen(fpath_filter, "r")))
+	  return 0;
+
+#if 1  
+
+  strcpy(fpath_img, fpath);
+
+  if(fimage = f_img(fpath_img, &fsize))
+  {
+	  while(fgets(filter, 70, fp))
+	  {
+		  if(filter[0]=='\0' || filter[0]=='\n')
+			  continue;
+		  else
+			  filter[strlen(filter) - 1] = '\0';
+
+	      if(str_sub_all_chr(fimage, filter))
+		  {
+			 fclose(fp);
+	         return 1;
+		  }
+	  }
+
+	  free(fimage);
+  }
+
+  fclose(fp);
+  return 0;
+
+#endif
+
+
+#if 0
+  /* smiler.080829 : 以下程式亦可修改後使用 */
+
+  strcpy(fpath_img, fpath);
+  
+  fimage = f_map(fpath_img, &fsize);
+  if (fimage == (char *) -1)
+    return XO_BODY;
+
+  if (str_sub(fimage, "test"))
+	  vmsg("hit !!");
+
+  munmap(fimage, fsize);
+#endif
+
+}
+
+/* smiler.080830 : 看門狗對文章內容過濾 */
+int
+post_filter(fpath)
+  char *fpath;			/* file name of access control list */
+{
+
+  char warn[70];
+
+  if(IS_BBS_DOG_FOOD(fpath))
+  {
+	  vmsg("您所post文章不為本站接受，請洽本站站務群 !!");
+	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
+	  f_cat(fpath, warn);
+	  mail_self(fpath, cuser.userid, warn, 0);
+	  unlink(fpath);
+	  return XO_HEAD;
+  }
+
+  if(IS_BRD_DOG_FOOD(fpath, currboard))
+  {
+	  vmsg("您所post文章不為本看板接受，請洽本看板板主 !!");
+	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!", currboard);
+	  f_cat(fpath, warn);
+	  mail_self(fpath, cuser.userid, warn, 0);
+	  unlink(fpath);
+	  return XO_HEAD;
+  }
+#if 0
+  char filter[256];
 
   while (fgets(filter, sizeof(filter), fp))
   {
@@ -471,8 +811,8 @@ post_filter(acl)
 		 || strstr(filter,"論文代寫") || strstr(filter,"代寫論文"))
 		 return 1;
   }
+#endif
 
-  fclose(fp);
   return 0;
 }
 
@@ -805,10 +1145,11 @@ do_post(xo, title)
   char fpath[64], *folder, *nick, *rcpt;
   int mode;
   time_t spendtime;
-  char buf_filepath[50];                       /* smiler.070914: for post_filter */
   HDR  hdr2;                                   /* smiler.080820: 依站務要求改轉文至 nthu.forsale *//* smiler.080705: 依站務要求改轉文至 forsale */ /* smiler.070916: for 轉文至 nthu.forsale */
   char fpath2[64], folder2[64];                // smiler.070916
   char board_from[30];                         // smiler.070916
+
+  
 
   if (!(bbstate & STAT_POST))
   {
@@ -890,18 +1231,21 @@ do_post(xo, title)
     vmsg(msg_cancel);
     return XO_HEAD;
   }
+
+#ifdef DO_POST_FILTER
+  if( post_filter(fpath) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+  {
+    unlink(fpath);
+    return XO_HEAD;
+  }
+#endif
+
   spendtime = time(0) - spendtime;	/* itoc.010712: 總共花的時間(秒數) */
 
   /* build filename */
 
   folder = xo->dir;
   hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
-
-  strcpy(buf_filepath,folder);                        // smiler.070914
-  buf_filepath[strlen(buf_filepath)-4]=hdr.xname[7];  // smiler.070914
-  buf_filepath[strlen(buf_filepath)-3]='/';           // smiler.070914
-  buf_filepath[strlen(buf_filepath)-2]='\0';          // smiler.070914
-  strcat(buf_filepath,hdr.xname);                     // smiler.070914
 
   strcpy(fpath2,fpath);                               // smiler.070916
   strcpy(folder2,folder);                             // smiler.070916
@@ -952,14 +1296,6 @@ do_post(xo, title)
   strcpy(hdr2.nick, nick);               // smiler.070916
   strcpy(hdr2.title, title);             // smiler.070916
 
-#ifdef DO_POST_FILTER
-  if(post_filter(buf_filepath) ==1)       /* smiler 0914 */
-  {
-    unlink(buf_filepath);
-    vmsg("請勿大量洗板,洗站,廣告 !!");
-    return XO_HEAD;
-  }
-#endif
   rec_bot(folder, &hdr, sizeof(HDR));
   btime_update(currbno);
 
@@ -2155,6 +2491,9 @@ post_cross(xo)
   char mail_path_tmp[64];
   char userid_tmp[15];
 
+  /* smiler.080830: 判斷轉錄是否有被 BBS 看門狗吃掉 */
+  int is_bite=0;
+
   str_lower_tmp(userid_tmp,cuser.userid);
   sprintf(mail_path_tmp,"usr/%c/%s/.DIR",userid_tmp[0],userid_tmp);
   if(!strcmp(mail_path_tmp,xo->dir))
@@ -2281,6 +2620,20 @@ post_cross(xo)
 	}
     hdr_fpath(fpath, dir, hdr);
 
+	if(IS_BBS_DOG_FOOD(fpath))
+	{
+		vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
+		is_bite = 1;
+		continue;
+	}
+
+	if(IS_BRD_DOG_FOOD(fpath, xboard))
+	{
+		vmsg("您所post文章不為轉錄接受，請洽轉錄看板板主 !!");
+		is_bite = 1;
+		continue;
+	}
+
 #ifdef HAVE_DETECT_CROSSPOST
     if (check_crosspost(fpath, xbno))
       break;
@@ -2374,7 +2727,10 @@ post_cross(xo)
     currbattr = tmpbattr;
   }
 
-  vmsg("轉錄完成");
+  if(!is_bite)
+    vmsg("轉錄完成");
+  else
+	vmsg("部分轉錄失效");
   return XO_HEAD;
 }
 
@@ -4096,83 +4452,144 @@ post_filename(xo)
 }
 
 static int
-post_sub()
-{
-  char name[IDLEN + 1];
-  char url[30], fpath[80];
-  int bm;
-  FILE *fp;
-  
-  bm = bbstate & STAT_BOARD;
-  
-  if (bm)
-  {
-    if (!vget(b_lines - 1, 0, "*bookmark* : ", name, IDLEN + 1, DOECHO))
-      return XO_INIT;
-    if (!vget(b_lines - 1, 0, "*url* : ", url, 70, DOECHO))
-      return XO_INIT;
-
-    brd_fpath(fpath, currboard, "rss");
-
-    if(fp = fopen(fpath, "r"))
-	{
-		vmsg("已有檔案，請先將舊的RSS檔案刪除後再重新新增 !!");
-		return XO_INIT;
-	}
-    else
-      fp = fopen(fpath, "w");
-    fprintf(fp, "%s\n%s", name, url);
-    fclose(fp);   
-  }  
-  return XO_INIT;
-}
-
-static int
-post_sub_delete()
-{
-  char fpath[80];
-  int bm; 
-  bm = bbstate & STAT_BOARD;
-  
-  if (bm)
-  {
-    brd_fpath(fpath, currboard, "rss");
-    unlink(fpath);
-  }  
-  return XO_INIT;
-}
-
-static int
 post_rss(xo)
   XO *xo;
-{
-
-  int bm;
-  int ans;
-  bm = bbstate & STAT_BOARD;
-  
-//  if (bm)
-  if(!strcmp(currboard,"P_smiler"))
-  {
-     rss_main();
-     return XO_INIT;
-  }
-  else if(bm)
-  {
-     switch (ans = vans("◎RSS 1)新增 2)刪除 [Q] "))
-	 {
-       case '1':
-		   return post_sub();
-		   break;
-	   case '2':
-		   return post_sub_delete();
-		   break;
-	   default:
-		   return XO_INIT;
-	}
-  }
+{  
+  char fpath[64];
+  sprintf(fpath, BBSHOME"/gem/@/@rss.info");
+  more(fpath, NULL);
+  rss_main();
   return XO_INIT;
+}
 
+static int
+post_sibala(xo)
+  XO *xo;
+{
+	HDR hdr;
+	FILE *fp, *fp2;
+	char fname_sibala[32], fpath[64], fpath_tmp[64], buf[64], title[64], folder[64];
+	int i, j, k, num_sibala, num_sibala_face;
+	time_t now;
+    struct tm *ptime;
+
+	sprintf(fname_sibala, "%s.sibala", cuser.userid);
+    brd_fpath(fpath, currboard, fname_sibala);
+
+	num_sibala = 0;
+	num_sibala_face = 0;
+
+	fp = fopen(fpath, "w");
+
+	fprintf(fp, "丟骰人   : %s\n", cuser.userid);
+	fprintf(fp, "來源     : %s\n", fromhost);
+	fprintf(fp, "來源     : %s\n", get_my_ip());
+
+	time(&now);
+    ptime = localtime(&now);
+	fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
+    ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+
+	move(0, 0);
+	clrtobot();
+    move(i=3, 0);
+	if(!vget(i,0, "輸入標題名稱 : ", buf, 60, DOECHO))
+	{
+		fclose(fp);
+		unlink(fpath);
+		return XO_INIT;
+	}
+
+	fprintf(fp, "標題名稱 : %s\n", buf);
+	strcpy(title, buf);
+
+	i=i+2;
+
+	if(!vget(i,0, "輸入骰子面數 : ", buf, 5, DOECHO))
+	{
+		fclose(fp);
+		unlink(fpath);
+		return XO_INIT;
+	}
+
+	num_sibala_face = atoi(buf);
+
+	if(!num_sibala_face)
+	{
+		fclose(fp);
+		unlink(fpath);
+		return XO_INIT;
+	}
+
+	fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+
+    i=i+2;
+
+    if(!vget(i,0, "輸入丟骰次數 : ", buf, 5, DOECHO))
+	{
+		fclose(fp);
+		unlink(fpath);
+		return XO_INIT;
+	}
+
+	num_sibala = atoi(buf);
+
+	if(!num_sibala)
+	{
+		fclose(fp);
+		unlink(fpath);
+		return XO_INIT;
+	}
+
+	fprintf(fp, "丟骰次數 : %d\n", num_sibala);
+
+	j = 0;
+
+	sprintf(fpath_tmp, "%s.tmp", fpath);
+	fp2 = fopen(fpath_tmp, "w");
+	srand (time(NULL));
+	for(i=0; i < num_sibala; i++)
+	{
+		k = rand()%num_sibala_face + 1;
+		j = j + k;
+		fprintf(fp2,"第 %4d 次丟骰結果 : %4d  加總 : %d\n", i+1, k, j);
+	}
+
+	prints("丟骰結果 : %d\n", j);
+
+	fprintf(fp, "丟骰結果 : %d\n", j);
+    
+	fclose(fp2);
+	fclose(fp);
+
+	sprintf(buf, "/bin/cat %s >> %s",fpath_tmp, fpath);
+	system(buf);
+
+    /* 貼回原看板上 */
+	brd_fpath(folder, currboard, ".DIR");
+
+    hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+    strcpy(hdr.owner, "丟骰結果");
+    strcpy(hdr.nick,  "賭神");
+    sprintf(hdr.title, "%s : %s", cuser.userid, title);
+    rec_bot(folder, &hdr, sizeof(HDR));
+
+    btime_update(brd_bno(currboard));
+
+    /* 貼至 log 板做記錄 */
+	brd_fpath(folder, "log", ".DIR");
+
+    hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+    strcpy(hdr.owner, "丟骰結果");
+    strcpy(hdr.nick,  "賭神");
+    sprintf(hdr.title, "%s : %s", cuser.userid, title);
+    rec_bot(folder, &hdr, sizeof(HDR));
+
+    btime_update(brd_bno("log"));
+
+	unlink(fpath_tmp);
+	unlink(fpath);
+	return XO_INIT;
 
 }
 
@@ -4216,6 +4633,7 @@ KeyFunc post_cb[] =
   'b', post_memo,
   'c', post_copy,
   'g', gem_gather,
+  'G', post_sibala,
 
   Ctrl('P'), post_add,
   Ctrl('D'), post_prune,

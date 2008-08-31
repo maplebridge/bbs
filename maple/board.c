@@ -612,11 +612,31 @@ Ben_Perm(bno, ulevel)
 
   if (!readlevel || (readlevel & ulevel))
   {
-    bits = BRD_L_BIT | BRD_R_BIT;
+	if(!(brd->postlevel & (~PERM_POST)))       /* smiler.080901: 一般公開板權限依照板主設定 */
+	{
+		bits = (BRD_L_BIT | BRD_R_BIT | BRD_W_BIT);
+		if(!IS_WELCOME(bname, FN_NO_LIST))
+		{
+			bits &= (~BRD_L_BIT);
+			bits &= (~BRD_R_BIT);
+			bits &= (~BRD_W_BIT);
+		}
+		else if(!IS_WELCOME(bname, FN_NO_READ))
+		{
+			bits &= (~BRD_R_BIT);
+			bits &= (~BRD_W_BIT);
+		}
+		else if(!IS_WELCOME(bname, FN_NO_WRITE))
+			bits &= (~BRD_W_BIT);
+	}
+	else
+	{
+      bits = BRD_L_BIT | BRD_R_BIT;
 
-    postlevel = brd->postlevel;
-    if (!postlevel || (postlevel & ulevel))
-      bits |= BRD_W_BIT;
+      postlevel = brd->postlevel;
+      if (!postlevel || (postlevel & ulevel))
+        bits |= BRD_W_BIT;
+	}
   }
   else
   {
@@ -626,6 +646,10 @@ Ben_Perm(bno, ulevel)
   /* Thor.980813.註解: 特別為 BM 考量，板主有該板的所有權限 */
   blist = brd->BM;
   if ((ulevel & PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
+    bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
+
+  /* smiler.080811: ATOM成員於ATOM看板具備全部屬性 */
+  else if ((ulevel & PERM_ATOM) && (brd->battr & BRD_ATOM))
     bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
 
   else if (ulevel & PERM_ALLBOARD)

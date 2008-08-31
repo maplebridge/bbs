@@ -720,7 +720,7 @@ ve_line(this, str)
 static void
 show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
 {
-  int fd, len, i;
+  int fd, len, i, j;
   char fpath[64], buf[10], ch, *str;
 
   clear();
@@ -729,6 +729,8 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
   usr_fpath(fpath, cuser.userid, buf);	/* itoc.020123: 各個簽名檔檔案分開 */
   len = strlen(fpath) - 1;
 
+  j=0;
+
   for (ch = '1'; ch <= '9'; ch++)	/* 九個簽名檔 */
   {
     fpath[len] = ch;
@@ -736,8 +738,9 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
     fd = open(fpath, O_RDONLY);
     if (fd >= 0)
     {
+	  j++;
       mgets(-1);
-      move((ch - '1') * (MAXSIGLINES + 1), 0);
+      move((j - 1) * (MAXSIGLINES + 1), 0);
       prints("\033[1;36m【 簽名檔 %c 】\033[m\n", ch);
 
       for (i = 1; i <= MAXSIGLINES; i++)
@@ -746,6 +749,15 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
 	  break;
 	prints("%s\n", str);
       }
+
+	  if(!(j%3))               /* smiler.080901: 每三個簽名檔印一頁 */
+	  {
+		  j=0;
+		  vmsg(NULL);
+		  move(0, 0);
+		  clrtobot();
+	  }
+
     }
   }
 }
@@ -1194,7 +1206,8 @@ ve_quote(this)
   /* --------------------------------------------------- */
 
 #ifdef HAVE_ANONYMOUS
-  if (!(currbattr & BRD_ANONYMOUS) && !(cuser.ufo & UFO_NOSIGN))	/* 在匿名板中無論是否匿名，均不使用簽名檔 */
+  //if (!(currbattr & BRD_ANONYMOUS) && !(cuser.ufo & UFO_NOSIGN))	/* 在匿名板中無論是否匿名，均不使用簽名檔 */
+  if (!(cuser.ufo & UFO_NOSIGN))	                                /* smiler.080830: 在匿名板中開放使用匿名 */
 #else
   if (!(cuser.ufo & UFO_NOSIGN))					/* itoc.000320: 不使用簽名檔 */
 #endif

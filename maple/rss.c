@@ -788,7 +788,8 @@ static int
 rss_help(xo)
   XO *xo;
 {
-	return XO_NONE;
+	xo_help("rss");
+	return XO_HEAD;
 }
 
 int rss_main()

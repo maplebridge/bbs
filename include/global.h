@@ -101,6 +101,10 @@
 #define FN_VCH		".VCH"		/* vote control header */
 #define FN_NOTE		"note"		/* 進板畫面 */
 #define FN_RSS      ".RSS"      /* RSS */
+#define FN_BBSDOG	".POST_FILTER"	/* board 看門狗 */
+#define FN_NO_WRITE	".NO_WRITE"	/* 看板條件 : 不可寫 */
+#define FN_NO_READ	".NO_READ"	/* 看板條件 : 不可讀 */
+#define FN_NO_LIST	".NO_LIST"	/* 看板條件 : 不可列 */
 
 
 /* ----------------------------------------------------- */
@@ -195,6 +199,7 @@
 
 #define FN_ETC_LOVELETTER "etc/loveletter"	/* 情書產生器文庫 */
 #define FN_ETC_NOCROSSPOST "etc/crosspost"	/* crosspost 特例名單*/
+#define FN_ETC_BBSDOG		"etc/POST_FILTER"	/* BBS 看門狗 */
 
 
   /* --------------------------------------------------- */

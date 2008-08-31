@@ -62,10 +62,10 @@ main_dictd()
   while(1)
   {
     clear();
-    move(0, 23);
+    move(0, 30);
     outs("\033[1;37;44m◎ 多用途字典 ◎\033[m");
     move(2, 0);
-    outs("此字典來源為 FreeBSD 的 dict-database。字典必須輸入完整單字或片語。\n");
+    outs("此字典來源為 FreeBSD 的 dict-database 以及 cdict5 字典。須輸入完整單字或片語。\n");
     move(4, 0);
     outs("字典代號   字典說明\n");
     outs("============================================================================\n");
@@ -84,11 +84,11 @@ main_dictd()
     outs("vera       Virtual Entity of Relevant Acronyms (Version 1.9, June 2002)\n");
     outs("devils     THE DEVIL'S DICTIONARY ((C)1911 Released April 15 1993)\n");
     outs("world95    The CIA World Factbook (1995)\n");
-    outs("!!!!!!! 此字典目前僅支援英翻中，中翻英部分待修正 !!!!!!!\n");
+    outs("cdict5     Chinese to English and English to Chinese Dictionary\n");
     memset(word, 0, sizeof(word));
     memset(word2, 0, sizeof(word2));
 
-    if (!vget(22, 0, "word: ", word, sizeof(word) - 1, DOECHO))
+    if (!vget(b_lines, 0, "word: ", word, sizeof(word) - 1, DOECHO))
       return 0;
     
     if(strchr(word, ';') || strchr(word, '"') || strchr(word, '|') || strchr(word, '&')) /* security reason */
@@ -136,18 +136,17 @@ main_dictd()
 	/* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
     b2u(word,strlen(word),word_utf8,256);
 
-	/* CHINESE */
-    //sprintf(tmp, "/usr/home/bbs/bin/cdict5 \"%s\" > %s", word, fname_tmp);
-	sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" >> %s",word_utf8, fname_tmp);
+	/* dict */
+	sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" > %s",word_utf8, fname_tmp);
     system(tmp);
-
-	///* ENG */
-    //sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" >> %s",word, fname_tmp);
-    //system(tmp);
 
 	/* UTF-8 轉 BIG5 */
     sprintf(tmp, "/usr/local/bin/iconv -f UTF-8 -t big5 %s > %s",fname_tmp,fname);
     system(tmp);
+
+	/* cdict5 */
+    sprintf(tmp, BBSHOME"/bin/cdict5/cdict5 \"%s\" >> %s", word, fname);
+	system(tmp);
 
     more(fname, NULL);
     sprintf(tmp, "是否把 %s 的查詢結果寄回自己信箱？ (y/N) ", word);

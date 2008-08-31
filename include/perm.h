@@ -31,7 +31,7 @@
 #define	PERM_13		0x00001000
 #define	PERM_14		0x00002000
 #define	PERM_15		0x00004000
-#define	PERM_16		0x00008000
+#define PERM_ATOM   0x00008000		/* ATOM 成員 */
 
 #define PERM_DENYPOST	0x00010000	/* 17-24 : 禁制權限 */
 #define	PERM_DENYTALK	0x00020000
@@ -113,7 +113,7 @@
 
 #define	NUMPERMS	32
 
-#define STR_PERM	"bctpjm#xr------@PTCM--L*B#-RACBS"	/* itoc: 新增權限的時候別忘了改這裡啊 */
+#define STR_PERM	"bctpjm#xr-----a@PTCM--L*B#-RACBS"	/* itoc: 新增權限的時候別忘了改這裡啊 */
 
 #ifdef _ADMIN_C_
 
@@ -135,7 +135,7 @@ static char *perm_tbl[NUMPERMS] =
   "保留",			/* PERM_13 */
   "保留",			/* PERM_14 */
   "保留",			/* PERM_15 */
-  "保留",			/* PERM_16 */
+  "ATOM 成員",		/* PERM_ATOM */
 
   "禁止發表文章",		/* PERM_DENYPOST */
   "禁止 talk",			/* PERM_DENYTALK */
