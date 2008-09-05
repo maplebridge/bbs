@@ -2495,7 +2495,7 @@ post_cross(xo)
   int is_bite=0;
 
   str_lower_tmp(userid_tmp,cuser.userid);
-  sprintf(mail_path_tmp,"usr/%c/%s/.DIR",userid_tmp[0],userid_tmp);
+  usr_fpath(mail_path_tmp, cuser.userid, ".DIR");
   if(!strcmp(mail_path_tmp,xo->dir))
 	  comefrom=0;
   else

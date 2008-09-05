@@ -612,9 +612,12 @@ Ben_Perm(bno, ulevel)
 
   if (!readlevel || (readlevel & ulevel))
   {
-	if(!(brd->postlevel & (~PERM_POST)))       /* smiler.080901: 一般公開板權限依照板主設定 */
-	{
-		bits = (BRD_L_BIT | BRD_R_BIT | BRD_W_BIT);
+    bits = BRD_L_BIT | BRD_R_BIT;
+  
+    postlevel = brd->postlevel;
+    if (!postlevel || (postlevel & ulevel))
+       bits |= BRD_W_BIT;
+  
 		if(!IS_WELCOME(bname, FN_NO_LIST))
 		{
 			bits &= (~BRD_L_BIT);
@@ -628,15 +631,6 @@ Ben_Perm(bno, ulevel)
 		}
 		else if(!IS_WELCOME(bname, FN_NO_WRITE))
 			bits &= (~BRD_W_BIT);
-	}
-	else
-	{
-      bits = BRD_L_BIT | BRD_R_BIT;
-
-      postlevel = brd->postlevel;
-      if (!postlevel || (postlevel & ulevel))
-        bits |= BRD_W_BIT;
-	}
   }
   else
   {
