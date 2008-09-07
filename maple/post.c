@@ -646,7 +646,7 @@ post_showbm(xo)
 }
 
 /* smiler.080830 : ¬Ýªùª¯ */
-int
+static int
 IS_BRD_DOG_FOOD(fpath, board)
   char *fpath;
   char *board;
@@ -681,6 +681,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 	      if(str_sub_space_lf(fimage, filter))
 		  {
 			 fclose(fp);
+			 free(fimage);
 	         return 1;
 		  }
 	  }
@@ -711,7 +712,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 
 }
 
-int
+static int
 IS_BBS_DOG_FOOD(fpath)
   char *fpath;
 {
@@ -724,7 +725,7 @@ IS_BBS_DOG_FOOD(fpath)
   char filter[73];
 
   FILE *fp;
-  sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
+  sprintf(fpath_filter, FN_ETC_BBSDOG);
 
   if(!(fp = fopen(fpath_filter, "r")))
 	  return 0;
@@ -745,6 +746,7 @@ IS_BBS_DOG_FOOD(fpath)
 	      if(str_sub_all_chr(fimage, filter))
 		  {
 			 fclose(fp);
+			 free(fimage);
 	         return 1;
 		  }
 	  }

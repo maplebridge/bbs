@@ -165,8 +165,6 @@ int cmpchrono(HDR *hdr);
 void RefusePal_kill(char *board, HDR *hdr);   /* redfox:加密文章可見名單 */
 int RefusePal_belong(char *board, HDR *hdr);  /* redfox:加密文章可見名單 */
 int IS_WELCOME(char *board, char *f_mode);
-int IS_BRD_DOG_FOOD(char *fpath, char *board);
-int IS_BBS_DOG_FOOD(char *fpath);
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
 int do_reply(XO *xo, HDR *hdr);
