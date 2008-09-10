@@ -76,6 +76,8 @@
 #define M_NONBLOCK  O_NONBLOCK
 #endif
 
+static char bbs_dog_str[80];
+
 /* ----------------------------------------------------- */
 /* SMTP commands					 */
 /* ----------------------------------------------------- */
@@ -1250,6 +1252,7 @@ IS_MAIL_BRD_DOG_FOOD(fpath, board)
 
 	      if(str_sub_space_lf(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 	         return 1;
 		  }
@@ -1314,6 +1317,7 @@ IS_MAIL_BBS_DOG_FOOD(fpath)
 
 	      if(str_sub_all_chr(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 	         return 1;
 		  }
@@ -1371,6 +1375,22 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
   FILE *fp;
   char folder[80], buf[256], from[256], *author, *fpath, *title;
 
+  char fpath_log[64];
+  char content_log[256];
+
+  usint mybattr;
+  BRD *brdp, *bend;
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+  do
+  {
+    if (!strcmp(brdname, brdp->brdname))
+    {
+      mybattr = brdp->battr;
+      break;
+    }
+  } while (++brdp < bend);
+
   fp = flog;
   sno = ap->sno;
 
@@ -1414,8 +1434,23 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
   str_ncpy(hdr.owner, author, sizeof(hdr.owner));
   str_ncpy(hdr.title, title, sizeof(hdr.title));
 
-  if(IS_MAIL_BRD_DOG_FOOD(fpath, brdname) || IS_MAIL_BBS_DOG_FOOD(fpath))
+  if((mybattr & BRD_BBS_DOG) && IS_MAIL_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
+	  brd_fpath(fpath_log, brdname, FN_BBSDOG_LOG);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), author, title, bbs_dog_str);
+	  f_cat(fpath_log, content_log);
+
+	  copy_post_to_deletelog(&hdr, fpath);
+	  unlink(fpath);
+	  return 0;
+  }
+
+  if(IS_MAIL_BRD_DOG_FOOD(fpath, brdname))
+  {
+	  brd_fpath(fpath_log, brdname, FN_BBSDOG_LOG);
+	  sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), author, title, bbs_dog_str);
+	  f_cat(fpath_log, content_log);
+
 	  copy_post_to_deletelog(&hdr, fpath);
 	  unlink(fpath);
 	  return 0;

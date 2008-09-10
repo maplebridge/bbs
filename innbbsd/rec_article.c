@@ -20,6 +20,8 @@
 #include "bbslib.h"
 #include "inntobbs.h"
 
+static char bbs_dog_str[80];
+static char bbs_dog_title[80];
 
 /* ----------------------------------------------------- */
 /* board：shm 部份須與 cache.c 相容                      */
@@ -176,6 +178,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 
 	      if(str_sub_space_lf(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 	         return 1;
 		  }
@@ -240,6 +243,7 @@ IS_BBS_DOG_FOOD(fpath)
 
 	      if(str_sub_all_chr(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 	         return 1;
 		  }
@@ -298,6 +302,22 @@ bbspost_topic_add(board, addr, nick ,board_from)
   FILE *fp;
   short posted=0; /* HBrian.080801: 文章是否有寫入(下面那個大if) */
 
+  char fpath_log[64];
+  char content_log[256];
+
+  usint mybattr;
+  BRD *brdp, *bend;
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+  do
+  {
+    if (!strcmp(board, brdp->brdname))
+    {
+      mybattr = brdp->battr;
+      break;
+    }
+  } while (++brdp < bend);
+
   /* 寫入文章內容 */
 
   brd_fpath(folder, board, FN_DIR);
@@ -344,8 +364,28 @@ bbspost_topic_add(board, addr, nick ,board_from)
   str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
   str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
 
-  if(IS_BRD_DOG_FOOD(fpath, board) || IS_BBS_DOG_FOOD(fpath))
+  if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
+	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	f_cat(fpath_log, content_log);
+
+	copy_post_to_deletelog(&hdr, fpath);
+	unlink(fpath);
+	update_btime("Deletelog");
+
+    HISadd(MSGID, "Deletelog", hdr.xname);
+    
+    /* HBrian.080801 : 紀錄文章 */
+    bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, MSGID, SUBJECT);
+  }
+  else if(IS_BRD_DOG_FOOD(fpath, board))
+  {
+	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	f_cat(fpath_log, content_log);
+
 	copy_post_to_deletelog(&hdr, fpath);
 	unlink(fpath);
 	update_btime("Deletelog");
@@ -484,6 +524,14 @@ bbspost_add(board, addr, nick)
   FILE *fp;
   short posted=0; /* HBrian.080801 : 紀錄文章是否有被此func發出 */
 
+  char fpath_log[64];
+  char content_log[256];
+
+  usint mybattr;
+  BRD *brdp, *bend;
+  brdp = bshm->bcache;
+  bend = brdp + bshm->number;
+
   char board2[30];                // smiler.070916
   strcpy(board2,"nthu.forsale");  // smiler.070916
   //strcpy(board2,"forsale");     // smiler.080820: 依站務要求改轉文至 nthu.forsale // smiler.080705:依站務要求改轉錄至 forsale
@@ -538,9 +586,37 @@ bbspost_add(board, addr, nick)
     str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
     str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
 
-
-	if(IS_BRD_DOG_FOOD(fpath, board) || IS_BBS_DOG_FOOD(fpath))
+	do
 	{
+      if (!strcmp(board, brdp->brdname))
+	  {
+        mybattr = brdp->battr;
+        break;
+	  }
+	} while (++brdp < bend);
+
+	if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
+	{
+		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	    f_cat(fpath_log, content_log);
+
+		copy_post_to_deletelog(&hdr, fpath);
+		unlink(fpath);
+		update_btime("Deletelog");
+
+        HISadd(MSGID, "Deletelog", hdr.xname);
+    
+        /* HBrian.080801 : 紀錄文章 */
+        bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
+          posted, hdr.xname, MSGID, SUBJECT);
+	}
+	else if(IS_BRD_DOG_FOOD(fpath, board))
+	{
+		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	    f_cat(fpath_log, content_log);
+
 		copy_post_to_deletelog(&hdr, fpath);
 		unlink(fpath);
 		update_btime("Deletelog");

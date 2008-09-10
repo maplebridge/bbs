@@ -101,6 +101,7 @@
 #define FN_VCH		".VCH"		/* vote control header */
 #define FN_NOTE		"note"		/* 進板畫面 */
 #define FN_RSS      ".RSS"      /* RSS */
+#define FN_BBSDOG_LOG	".BBSDOG_LOG"	/* BBS看門狗刪文記錄 */
 #define FN_BBSDOG	".POST_FILTER"	/* board 看門狗 */
 #define FN_NO_WRITE	".NO_WRITE"	/* 看板條件 : 不可寫 */
 #define FN_NO_READ	".NO_READ"	/* 看板條件 : 不可讀 */

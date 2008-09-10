@@ -31,15 +31,16 @@
 #define BRD_SHOWTURN	0x00001000	/* 是否看板要show轉錄記錄  0:否  1:要 */
 #define BRD_IAS		0x00002000	/* 藝文館看板 */
 #define BRD_ATOM	0x00004000	/* ATOM 成員看板 */
+#define BRD_BBS_DOG	0x00008000	/* 加入imaple BBS DOG 計畫 */
 
 /* ----------------------------------------------------- */
 /* 各種旗標的中文意義					 */
 /* ----------------------------------------------------- */
 
 
-#define NUMBATTRS	15
+#define NUMBATTRS	16
 
-#define STR_BATTR	"zTcsvA%PLGpFRIa"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
+#define STR_BATTR	"zTcsvA%PLGpFRIaB"			/* itoc: 新增旗標的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -59,7 +60,8 @@ static char *battr_tbl[NUMBATTRS] =
   "看板禁轉",		/* BRD_NOFORWARD */
   "轉錄記錄",       /* BRD_SHOWTURN */
   "藝文館看板",		/* BRD_IAS */
-  "ATOM成員看板"	/* BRD_ATOM */
+  "ATOM成員看板",	/* BRD_ATOM */
+  "加入BBS DOG 計畫"	/* BRD_BBS_DOG */
 };
 
 #endif

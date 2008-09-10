@@ -26,6 +26,9 @@ extern char brd_bits[];
 extern char anonymousid[];	/* itoc.010717: 自定匿名 ID */
 #endif
 
+static char bbs_dog_str[80];
+static char bbs_dog_title[80];
+
 void
 str_lower_tmp(dst, src)
   char *dst, *src;
@@ -680,6 +683,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 
 	      if(str_sub_space_lf(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 			 free(fimage);
 	         return 1;
@@ -745,6 +749,7 @@ IS_BBS_DOG_FOOD(fpath)
 
 	      if(str_sub_all_chr(fimage, filter))
 		  {
+			 strcpy(bbs_dog_str, filter);
 			 fclose(fp);
 			 free(fimage);
 	         return 1;
@@ -784,9 +789,15 @@ post_filter(fpath)
 {
 
   char warn[70];
+  char fpath_log[64];
+  char content_log[256];
 
-  if(IS_BBS_DOG_FOOD(fpath))
+  if( (currbattr & BRD_BBS_DOG) && (IS_BBS_DOG_FOOD(fpath)) ) /* smiler.080910: 讓使用者決定是否加入BBS看門狗計畫 */
   {
+	  brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	  f_cat(fpath_log, content_log);
+
 	  vmsg("您所post文章不為本站接受，請洽本站站務群 !!");
 	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
 	  f_cat(fpath, warn);
@@ -797,6 +808,10 @@ post_filter(fpath)
 
   if(IS_BRD_DOG_FOOD(fpath, currboard))
   {
+	  brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
+	  sprintf(content_log, "%s 文章內容限制: 文章寄回給原po %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	  f_cat(fpath_log, content_log);
+
 	  vmsg("您所post文章不為本看板接受，請洽本看板板主 !!");
 	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!", currboard);
 	  f_cat(fpath, warn);
@@ -1235,6 +1250,7 @@ do_post(xo, title)
   }
 
 #ifdef DO_POST_FILTER
+  strcpy(bbs_dog_title, ve_title);
   if( post_filter(fpath) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
   {
     unlink(fpath);
@@ -2488,6 +2504,9 @@ post_cross(xo)
   char fpath[64], buf[ANSILINELEN];
   FILE *fpr, *fpw;
 
+  char fpath_log[64];
+  char content_log[256];
+
   /*  解決信箱轉寄問題 */
   int comefrom;          // 0: 從信箱轉寄 1: 從看板轉寄
   char mail_path_tmp[64];
@@ -2608,6 +2627,8 @@ post_cross(xo)
 	strcpy(ve_title, hdr->title);
     }
 
+	strcpy(bbs_dog_title, ve_title);
+
 	if(comefrom)                    /* smiler.071114: 需為處在看板,下面幾行才需作判斷 */
 	{
     if (hdr->xmode & GEM_FOLDER)	/* 非 plain text 不能轉 */
@@ -2622,8 +2643,12 @@ post_cross(xo)
 	}
     hdr_fpath(fpath, dir, hdr);
 
-	if(IS_BBS_DOG_FOOD(fpath))
+	if((xbattr & BRD_BBS_DOG ) && IS_BBS_DOG_FOOD(fpath))
 	{
+		brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
+	    sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	    f_cat(fpath_log, content_log);
+
 		vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
 		is_bite = 1;
 		continue;
@@ -2631,6 +2656,10 @@ post_cross(xo)
 
 	if(IS_BRD_DOG_FOOD(fpath, xboard))
 	{
+		brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
+	    sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	    f_cat(fpath_log, content_log);
+
 		vmsg("您所post文章不為轉錄接受，請洽轉錄看板板主 !!");
 		is_bite = 1;
 		continue;

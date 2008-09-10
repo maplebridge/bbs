@@ -795,6 +795,36 @@ XoBM(xo)
 /* ----------------------------------------------------- */
 
 static int
+post_bbs_dog(xo)
+  XO *xo;
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vans("加入BBS看門狗計畫  1)是  2)否  Q)取消？[Q] "))
+  {
+  case '1':
+	newbrd.battr |= BRD_BBS_DOG;
+    break;
+  case '2':
+    newbrd.battr &= (~BRD_BBS_DOG);
+    break;
+  default:
+    return XO_HEAD;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_HEAD;
+}
+
+static int
 post_article_filter(xo)
   XO *xo;
 {
@@ -1100,6 +1130,30 @@ post_my_level(xo, f_mode)
    return XO_INIT;
 }
 
+static int
+post_view_bbs_dog_log(xo)
+  XO *xo;
+{
+	char fpath[64],warn[64];
+	brd_fpath(fpath, currboard, FN_BBSDOG_LOG);
+	more(fpath, NULL);
+	switch(vans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
+	{
+	  case 'm':
+		  sprintf(warn, "%s 板擋文記錄檔", currboard);
+		  mail_self(fpath, cuser.userid, warn, 0);
+		  return XO_HEAD;
+
+	  case 'd':
+		  unlink(fpath);
+		  return XO_HEAD;
+
+	  default:
+		  return XO_HEAD;
+	}
+	return XO_HEAD;
+}
+
 /* ----------------------------------------------------- */
 /* 板主選單						 */
 /* ----------------------------------------------------- */
@@ -1108,17 +1162,28 @@ static int
 post_guard_dog(xo)
   XO *xo;
 {
+  char fpath[64];
+  sprintf(fpath, BBSHOME"/gem/@/@BBS_DOG_WARN");
+  more(fpath, NULL);
+
+  move(b_lines, 0);
+  clrtoeol();
+
   char *menu[] = 
   {
-	"PQ",
+	"BQ",
+	"BBSdog  BBS看門狗計畫",
 	"Post    文章內容限制",
 	"Write   看板發文限制",
 	"Read    看板閱\讀限制",
 	"List    看板列出限制",
+	"Vlog    擋文log記錄",
 	NULL
   };
   switch (pans(3, 20, "BBS 看門狗", menu))
   {
+    case 'b':
+	    return post_bbs_dog(xo);
     case 'p':
 		return post_article_filter(xo);
 	case 'w':
@@ -1127,7 +1192,8 @@ post_guard_dog(xo)
 		return post_my_level(xo, FN_NO_READ);
 	case 'l':
 		return post_my_level(xo, FN_NO_LIST);
-      
+	case 'v':
+		return post_view_bbs_dog_log(xo);
   }
   return XO_INIT;
 }
