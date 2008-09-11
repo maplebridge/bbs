@@ -43,13 +43,20 @@ str_sub_space_lf(str, tag)
 	       p2++;
 	       c1 = *++p1;
 
-		   while((c1 == '\n') || (c1 == ' '))
-			 c1 = *++p1;
-
-	       if (in_chii || c1 & 0x80)
+		   if (in_chii || c1 & 0x80)
 	          in_chii ^= 1;
 	       else if (c1 >= 'A' && c1 <= 'Z')
 	          c1 |= 0x20;
+
+		   while( (c1 != c2) && ((c1 == '\n') || (c1 == ' ')))
+		   {
+			 c1 = *++p1;
+
+	         if (in_chii || c1 & 0x80)
+	            in_chii ^= 1;
+	         else if (c1 >= 'A' && c1 <= 'Z')
+	            c1 |= 0x20;
+		   }
 		 } while (c1 == c2); 
 	  }
 	}
