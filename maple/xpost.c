@@ -633,33 +633,44 @@ int
 XOXpost_search_all(xo)
   XO *xo;
 {
-  int ans;
-  switch (ans = vans("◎搜尋 1)作者標題 2)相同標題 3)作者 4)標題 5)全文 6)mark 7)local 8)檔名 [Q] "))
+  outz("◎搜尋 1)作者標題 2)相同標題 3)作者 4)標題 5)全文 6)mark 7)local 8)檔名 [Q] ");
+  switch (vkey())
   {
     case '1':
+    case '~':
       return XoXselect(xo);  /* itoc.001220: 搜尋作者/標題 */
       break;
     case '2':
+    case 'S':
+    case 's':
       return XoXsearch(xo);  /* itoc.001220: 搜尋相同標題文章 */
       break;
-	case '3':
-	  return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
-	  break;
-	case '4':
-	  return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
-	  break;
-	case '5':
-	  return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
-	  break;
-	case '6':
-	  return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
-	  break;
-	case '7':
-	  return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
-	  break;
-	case '8':
-	  return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
-	  break;
+    case '3':
+    case 'a':
+      return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
+      break;
+    case '4':
+    case '/':
+      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
+      break;
+    case '5':
+    case 'f':
+      return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
+      break;
+    case '6':
+    case 'G':
+    case 'm':
+      return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
+      break;
+    case '7':
+    case 'L':
+    case 'l':
+      return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
+      break;
+    case '8':
+    case 'x':
+      return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
+      break;
     default:
       return XO_FOOT;
       break;
