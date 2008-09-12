@@ -1,4 +1,4 @@
-/* smiler.080829: 可忽略str的 標點符號 部分 */
+/* smiler.080912: 可忽略str的 標點符號 以及 ansi 部分 */
 
 #include "dao.h"
 
@@ -12,6 +12,7 @@ str_sub_all_chr(str, tag)
   char *p1, *p2;
   int in_chi = 0;	/* 1: 前一碼是中文字 */
   int in_chii;		/* 1: 前一碼是中文字 */
+  int ansi = 0;     /* 判斷是否為 ansi code */
 
   cc = *tag++;
  
@@ -42,6 +43,19 @@ str_sub_all_chr(str, tag)
  
 	       p2++;
 	       c1 = *++p1;
+
+		   if(c1 == '\033')
+			   ansi = 1;
+
+		   while(ansi)
+		   {
+			   c1 = *++p1;
+			   if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
+			   {
+	              ansi = 0;
+				  c1 = *++p1;
+			   }
+		   }
 
 		   if (in_chii || c1 & 0x80)
 	          in_chii ^= 1;
