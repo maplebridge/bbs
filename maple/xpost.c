@@ -336,11 +336,11 @@ XoXauthor(xo)
 }
 
   /* --------------------------------------------------- */
-  /* 搜尋檔名                        */
+  /* 搜尋檔名						 */
   /* --------------------------------------------------- */
 
 
-int
+static int
 XoXxname(xo)
   XO *xo;
 {
@@ -628,53 +628,154 @@ XoXlocal(xo)
 }
 
 
+#ifdef HAVE_SCORE
+  /* --------------------------------------------------- */
+  /* 搜尋 評分						 */
+  /* --------------------------------------------------- */
+
+static int
+filter_score(head, hdr)
+ HDR *head;	/* 待測物 */
+ HDR *hdr;	/* 條件 */
+{
+  if (!hdr->xmode)
+  {
+    return hdr->score == 0 ? (head->xmode & POST_SCORE) :
+	hdr->score > 0 ? (head->score >= hdr->score) :
+	(head->score <= hdr->score);
+  }
+  else
+  {
+    return hdr->score == 0 ? !(head->xmode & POST_SCORE) :
+	hdr->score > 0 ? (head->score <= hdr->score) :
+	(head->score >= hdr->score);
+  }
+}
+
+
+static int
+XoXscore(xo)
+  XO *xo;
+{
+  HDR hdr;
+  char score[6];
+
+#ifdef EVERY_Z
+  if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+#endif
+
+  vget(b_lines, 0, "搜尋評分數 >= + / <= - 多少的文章？(按 Enter 串接所有評分文章) ", score, 5, DOECHO);
+  if (score[0] == '!')
+  {
+    hdr.xmode = 1;
+    hdr.score = atoi(score + 1);
+  }
+  else
+  {
+    hdr.xmode = 0;
+    hdr.score = atoi(score);
+  }
+
+  HintAuthor[0] = '\0';
+  if (!hdr.score)
+    strcpy(HintWord, hdr.xmode ? "\033[1;33m所有未被評分過文章\033[m" : "\033[1;33m所有被評分過文章\033[m");
+  else if (hdr.score > 0)
+    sprintf(HintWord, "\033[1;33m評分數%s於等於 %d 的文章\033[m", hdr.xmode ? "小": "大", hdr.score);
+  else  /* (hdr.score < 0) */
+    sprintf(HintWord, "\033[1;33m評分數%s於等於 %d 的文章\033[m", hdr.xmode ? "大" : "小", hdr.score);
+
+  return XoXpost(xo, &hdr, 0, INT_MAX, filter_score);
+}
+#endif
+
+
+#ifdef HAVE_REFUSEMARK
+  /* --------------------------------------------------- */
+  /* 搜尋 加密/好友文					 */
+  /* --------------------------------------------------- */
+
+static int
+filter_refuse(head, hdr)
+ HDR *head;	/* 待測物 */
+ HDR *hdr;	/* 條件 */
+{
+  return (head->xmode & POST_RESTRICT) && RefusePal_belong(currboard, head);
+}
+
+
+static int
+XoXrefuse(xo)
+  XO *xo;
+{
+#ifdef EVERY_Z
+  if (z_status && xz[XZ_XPOST - XO_ZONE].xo)    /* itoc.020308: 不得累積進入二次 */
+  {
+    vmsg(MSG_XYDENY);
+    return XO_FOOT;
+  }
+#endif
+
+  strcpy(HintWord, "\033[1;33m所有加密/好友文\033[m");
+  HintAuthor[0] = '\0';
+
+  return XoXpost(xo, NULL, 0, INT_MAX, filter_refuse);
+}
+#endif
+
+
 /* smiler.080201: 整合搜尋功能 */
 int
 XOXpost_search_all(xo)
   XO *xo;
 {
-  outz("◎搜尋 1)作者標題 2)相同標題 3)作者 4)標題 5)全文 6)mark 7)local 8)檔名 [Q] ");
+  move(b_lines - 1, 0);
+  clrtoeol();
+  outs("◎搜尋 1)作者標題 2)作者 3)標題 4)全文 5)檔名");
+  outz("  串接 6)相同標題 7)推文 8)加密/好友文 9)mark 0)local [Q]");
   switch (vkey())
   {
     case '1':
     case '~':
       return XoXselect(xo);  /* itoc.001220: 搜尋作者/標題 */
-      break;
     case '2':
+    case 'a':
+      return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
+    case '3':
+    case '/':
+      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
+    case '4':
+    case 'f':
+      return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
+    case '5':
+    case 'x':
+      return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
+    case '6':
     case 'S':
     case 's':
       return XoXsearch(xo);  /* itoc.001220: 搜尋相同標題文章 */
-      break;
-    case '3':
-    case 'a':
-      return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
-      break;
-    case '4':
-    case '/':
-      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
-      break;
-    case '5':
-    case 'f':
-      return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
-      break;
-    case '6':
+#ifdef HAVE_SCORE
+    case '7':
+    case 'e':
+      return XoXscore(xo);
+#endif
+#ifdef HAVE_REFUSEMARK
+    case '8':
+    case 'L':
+      return XoXrefuse(xo);
+#endif
+    case '9':
     case 'G':
     case 'm':
       return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
-      break;
-    case '7':
-    case 'L':
+    case '0':
     case 'l':
       return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
-      break;
-    case '8':
-    case 'x':
-      return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
-      break;
-    default:
-      return XO_FOOT;
-      break;
   }
+  return XO_BODY;
 }
 
 
@@ -694,7 +795,7 @@ xpost_head(xo)
   if (*HintAuthor)
     prints("作者：%-13s   ", HintAuthor);
   if (*HintWord)
-    prints("標題：%.30s", HintWord);
+    prints("標題：%.40s", HintWord);
 
   prints(NECKER_XPOST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○");
 

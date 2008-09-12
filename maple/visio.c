@@ -805,6 +805,12 @@ outx(str)
 {
   int ch;
 
+  if (str[0] == '-' && str[1] == '-' && str[2] == '\0')
+  {
+    outs("\033[m--");
+    return;
+  }
+
   while (ch = *str)
   {
     /* itoc.020301: ESC + * + s µ¥±±¨î½X */

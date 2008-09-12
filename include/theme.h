@@ -256,11 +256,11 @@ COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"
 /* itoc: 建議 banner 不要超過三行，過長的站簽可能會造成某些使用者的反感 */
 
 /*dexter  把origin,From改成兩行*/
-#define EDIT_BANNER	"\033[m\n--\n" \
-			"\033[32m※ Origin: 楓橋驛站<bbs.cs.nthu.edu.tw>\n◆ From: %s @%s\n\033[m"
+#define EDIT_BANNER	"\n--\n" \
+			"\033[;32m※ Origin: 楓橋驛站<bbs.cs.nthu.edu.tw>\n\033[;32m◆ From: %s @%s\033[m\n"
 
 //#define MODIFY_BANNER	"\033[m\033[1;45m(^_^)ψ\033[m \033[1mMo\033[30mdi\033[mfy: %s @%s 於 \033[1;34m%s\033[m 修改\n"
-#define MODIFY_BANNER	"\033[m\033[36m%s 於 %s 從 %s 修改\033[m\n"
+#define MODIFY_BANNER	"\033[;36m%s 於 %s 從 %s 修改\033[m\n"
 
 
 /* ----------------------------------------------------- */
