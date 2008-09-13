@@ -49,7 +49,11 @@ SRC =	\
 	\
 	str_sub_all_chr.c \
 	\
-	str_sub_space_lf.c
+	str_sub_space_lf.c \
+	\
+	f_str_sub_all_chr.c \
+	\
+	f_str_sub_space_lf.c
 
 OBJ =	\
 	is_alnum.o is_alpha.o not_addr.o \
@@ -81,7 +85,11 @@ OBJ =	\
 	\
 	str_sub_all_chr.o \
         \
-        str_sub_space_lf.o
+        str_sub_space_lf.o \
+        \
+        f_str_sub_all_chr.o \
+        \
+        f_str_sub_space_lf.o
 
 .c.o:   ;   $(CC) $(CFLAGS) -c $*.c
 

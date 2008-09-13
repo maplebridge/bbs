@@ -1223,11 +1223,6 @@ IS_MAIL_BRD_DOG_FOOD(fpath, board)
   char *fpath;
   char *board;
 {
-
-  int fsize;
-  char fpath_img[64];
-  char *fimage;
-
   char fpath_filter[64];
   char filter[73];
 
@@ -1235,52 +1230,25 @@ IS_MAIL_BRD_DOG_FOOD(fpath, board)
   brd_fpath(fpath_filter, board, FN_BBSDOG);
 
   if(!(fp = fopen(fpath_filter, "r")))
-	  return 0;
+	  return 0; 
 
-#if 1  
-
-  strcpy(fpath_img, fpath);
-
-  if(fimage = f_img(fpath_img, &fsize))
+  while(fgets(filter, 70, fp))
   {
-	  while(fgets(filter, 70, fp))
-	  {
-		  if(filter[0]=='\0' || filter[0]=='\n')
-			  continue;
-		  else
-			  filter[strlen(filter) - 1] = '\0';
+	if(filter[0]=='\0' || filter[0]=='\n')
+	    continue;
+	else
+		filter[strlen(filter) - 1] = '\0';
 
-	      if(str_sub_space_lf(fimage, filter))
-		  {
-			 strcpy(bbs_dog_str, filter);
-			 fclose(fp);
-	         return 1;
-		  }
-	  }
-
-	  free(fimage);
+	if(f_str_sub_space_lf(fpath, filter))
+	{
+		strcpy(bbs_dog_str, filter);
+		fclose(fp);
+	    return 1;
+	}
   }
 
   fclose(fp);
   return 0;
-
-#endif
-
-
-#if 0
-  /* smiler.080829 : 以下程式亦可修改後使用 */
-
-  strcpy(fpath_img, fpath);
-  
-  fimage = f_map(fpath_img, &fsize);
-  if (fimage == (char *) -1)
-    return XO_BODY;
-
-  if (str_sub(fimage, "test"))
-	  vmsg("hit !!");
-
-  munmap(fimage, fsize);
-#endif
 
 }
 
@@ -1288,11 +1256,6 @@ static int
 IS_MAIL_BBS_DOG_FOOD(fpath)
   char *fpath;
 {
-
-  int fsize;
-  char fpath_img[64];
-  char *fimage;
-
   char fpath_filter[64];
   char filter[73];
 
@@ -1302,50 +1265,23 @@ IS_MAIL_BBS_DOG_FOOD(fpath)
   if(!(fp = fopen(fpath_filter, "r")))
 	  return 0;
 
-#if 1  
-
-  strcpy(fpath_img, fpath);
-
-  if(fimage = f_img(fpath_img, &fsize))
+  while(fgets(filter, 70, fp))
   {
-	  while(fgets(filter, 70, fp))
-	  {
-		  if(filter[0]=='\0' || filter[0]=='\n')
-			  continue;
-		  else
-			  filter[strlen(filter) - 1] = '\0';
+	if(filter[0]=='\0' || filter[0]=='\n')
+		continue;
+	else
+		filter[strlen(filter) - 1] = '\0';
 
-	      if(str_sub_all_chr(fimage, filter))
-		  {
-			 strcpy(bbs_dog_str, filter);
-			 fclose(fp);
-	         return 1;
-		  }
-	  }
-
-	  free(fimage);
+	if(f_str_sub_all_chr(fpath, filter))
+	{
+	    strcpy(bbs_dog_str, filter);
+	    fclose(fp);
+	    return 1;
+	}
   }
 
   fclose(fp);
   return 0;
-
-#endif
-
-
-#if 0
-  /* smiler.080829 : 以下程式亦可修改後使用 */
-
-  strcpy(fpath_img, fpath);
-  
-  fimage = f_map(fpath_img, &fsize);
-  if (fimage == (char *) -1)
-    return XO_BODY;
-
-  if (str_sub(fimage, "test"))
-	  vmsg("hit !!");
-
-  munmap(fimage, fsize);
-#endif
 
 }
 

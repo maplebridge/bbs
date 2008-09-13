@@ -620,11 +620,6 @@ IS_BRD_DOG_FOOD(fpath, board)
   char *fpath;
   char *board;
 {
-
-  int fsize;
-  char fpath_img[64];
-  char *fimage;
-
   char fpath_filter[64];
   char filter[73];
 
@@ -634,51 +629,23 @@ IS_BRD_DOG_FOOD(fpath, board)
   if(!(fp = fopen(fpath_filter, "r")))
 	  return 0;
 
-#if 1  
-
-  strcpy(fpath_img, fpath);
-
-  if(fimage = f_img(fpath_img, &fsize))
+  while(fgets(filter, 70, fp))
   {
-	  while(fgets(filter, 70, fp))
-	  {
-		  if(filter[0]=='\0' || filter[0]=='\n')
-			  continue;
-		  else
-			  filter[strlen(filter) - 1] = '\0';
+	 if(filter[0]=='\0' || filter[0]=='\n')
+		continue;
+	 else
+	    filter[strlen(filter) - 1] = '\0';
 
-	      if(str_sub_space_lf(fimage, filter))
-		  {
-			 strcpy(bbs_dog_str, filter);
-			 fclose(fp);
-			 free(fimage);
-	         return 1;
-		  }
-	  }
-
-	  free(fimage);
+	 if(f_str_sub_space_lf(fpath, filter))
+	 {
+		strcpy(bbs_dog_str, filter);
+		fclose(fp);
+	    return 1;
+	 }
   }
 
   fclose(fp);
   return 0;
-
-#endif
-
-
-#if 0
-  /* smiler.080829 : 以下程式亦可修改後使用 */
-
-  strcpy(fpath_img, fpath);
-  
-  fimage = f_map(fpath_img, &fsize);
-  if (fimage == (char *) -1)
-    return XO_BODY;
-
-  if (str_sub(fimage, "test"))
-	  vmsg("hit !!");
-
-  munmap(fimage, fsize);
-#endif
 
 }
 
@@ -686,11 +653,6 @@ static int
 IS_BBS_DOG_FOOD(fpath)
   char *fpath;
 {
-
-  int fsize;
-  char fpath_img[64];
-  char *fimage;
-
   char fpath_filter[64];
   char filter[73];
 
@@ -700,51 +662,23 @@ IS_BBS_DOG_FOOD(fpath)
   if(!(fp = fopen(fpath_filter, "r")))
 	  return 0;
 
-#if 1  
-
-  strcpy(fpath_img, fpath);
-
-  if(fimage = f_img(fpath_img, &fsize))
+  while(fgets(filter, 70, fp))
   {
-	  while(fgets(filter, 70, fp))
-	  {
-		  if(filter[0]=='\0' || filter[0]=='\n')
-			  continue;
-		  else
-			  filter[strlen(filter) - 1] = '\0';
+     if(filter[0]=='\0' || filter[0]=='\n')
+		continue;
+	 else
+		filter[strlen(filter) - 1] = '\0';
 
-	      if(str_sub_all_chr(fimage, filter))
-		  {
-			 strcpy(bbs_dog_str, filter);
-			 fclose(fp);
-			 free(fimage);
-	         return 1;
-		  }
-	  }
-
-	  free(fimage);
+	 if(f_str_sub_all_chr(fpath, filter))
+	 {
+		strcpy(bbs_dog_str, filter);
+		fclose(fp);
+	    return 1;
+	 }
   }
 
   fclose(fp);
   return 0;
-
-#endif
-
-
-#if 0
-  /* smiler.080829 : 以下程式亦可修改後使用 */
-
-  strcpy(fpath_img, fpath);
-  
-  fimage = f_map(fpath_img, &fsize);
-  if (fimage == (char *) -1)
-    return XO_BODY;
-
-  if (str_sub(fimage, "test"))
-	  vmsg("hit !!");
-
-  munmap(fimage, fsize);
-#endif
 
 }
 
@@ -3475,7 +3409,7 @@ int
 post_edit(xo)
   XO *xo;
 {
-  char fpath[64];
+  char fpath[64],tmpfile[64];
   HDR *hdr;
   FILE *fp;
   /* smiler 1031 */
@@ -3512,7 +3446,26 @@ post_edit(xo)
     rec_bot(Editlog_folder, &Editlog_hdr, sizeof(HDR));
     btime_update(brd_bno("Editlog"));
 
-    vedit(fpath, 0);
+#ifdef DO_POST_FILTER
+	strcpy(tmpfile, "tmp/");
+    strcat(tmpfile, hdr->xname);
+    f_cp(fpath, tmpfile, O_TRUNC);
+
+    vedit(tmpfile, 0);
+#else
+	vedit(fpath, 0);
+#endif
+
+#ifdef DO_POST_FILTER
+    strcpy(bbs_dog_title, hdr->title);
+    if( post_filter(tmpfile) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+      unlink(tmpfile);
+    else
+	{
+	  unlink(fpath);
+	  rename(tmpfile, fpath);
+	}
+#endif
 
     /* smiler 1031 */                                                                                
     hdr_stamp(Editlog_folder, HDR_COPY | 'A', &Editlog_hdr, copied);
@@ -3536,14 +3489,38 @@ post_edit(xo)
     rec_bot(Editlog_folder, &Editlog_hdr, sizeof(HDR));
     btime_update(brd_bno("Editlog"));
 
+#ifdef DO_POST_FILTER
+	strcpy(tmpfile, "tmp/");
+    strcat(tmpfile, hdr->xname);
+    f_cp(fpath, tmpfile, O_TRUNC);
+
+    if (!vedit(tmpfile, 0))	/* 若非取消則加上修改資訊 */
+    {
+      if (fp = fopen(tmpfile, "a"))
+      {
+#else
     if (!vedit(fpath, 0))	/* 若非取消則加上修改資訊 */
     {
       if (fp = fopen(fpath, "a"))
       {
+#endif
+
 	ve_banner(fp, 1);
 	fclose(fp);
       }
     }
+
+#ifdef DO_POST_FILTER
+  strcpy(bbs_dog_title, hdr->title);
+  if( post_filter(tmpfile) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+    unlink(tmpfile);
+  else
+  {
+	  unlink(fpath);
+	  rename(tmpfile, fpath);
+  }
+#endif
+
     /* smiler 1031 */                                                                                
     hdr_stamp(Editlog_folder, HDR_COPY | 'A', &Editlog_hdr, copied);
     strcpy(Editlog_hdr.title , hdr->title);
@@ -3617,6 +3594,9 @@ static int
 post_title(xo)
   XO *xo;
 {
+  FILE *fp;
+  char tmpfile[64];
+  char tmptitle[TTLEN + 1];
   HDR *fhdr, mhdr;
   int pos, cur;
 
@@ -3631,7 +3611,26 @@ post_title(xo)
   if ((strcmp(cuser.userid, mhdr.owner) && (!(bbstate & STAT_BM))) && !HAS_PERM(PERM_ALLBOARD))
     return XO_NONE;
 
+  strcpy(tmptitle, mhdr.title);
+
   vget(b_lines, 0, "標題：", mhdr.title, TTLEN + 1, GCARRY);
+
+  /* smiler.080913: 偵測所改標題是否符合看門狗規定 */
+  sprintf(tmpfile, "tmp/%s_%s_title", cuser.userid, mhdr.xname);
+  fp = fopen(tmpfile, "w");
+  fprintf(fp, "%s", mhdr.title);
+  fclose(fp);
+
+#ifdef DO_POST_FILTER
+  strcpy(bbs_dog_title, tmptitle);
+  if( post_filter(tmpfile) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+  {
+	  unlink(tmpfile);
+      return XO_HEAD;
+  }
+  else
+	  unlink(tmpfile);
+#endif
 
   if (HAS_PERM(PERM_ALLBOARD))  /* itoc.000213: 原作者只能改標題 */
   {
