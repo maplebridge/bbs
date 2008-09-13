@@ -83,7 +83,7 @@ bit_item_bar(xo, mode)
   int mode;     /* 1:上光棒  0:去光棒 */
 {
 	BITUSR *pp;
-                                                                                
+
     //pp = bit_pool + xo->pos - xo->top;
     pp = bit_pool + xo->pos;
 
@@ -95,7 +95,7 @@ bit_item_bar(xo, mode)
 		pp->addr,
 		mode ? USR_COLORBAR_USR : ""
 		);
-                                                                                
+
       (strstr (pp->status, "Online")) ?
 	    prints("\033[1;36m線上           \033[m") : 
 	  (strstr (pp->status,"Away")) ?
@@ -124,13 +124,13 @@ bit_body (xo)
 {
   BITUSR *pp;
   int num, max, tail;
-  pp = &bit_pool[xo->top]; //
+  pp = &bit_pool[xo->top];
   max = xo->max;
   num = xo->top;
   tail = num + XO_TALL;
   if (max > tail)
     max = tail;
-  
+
   move(3, 0);
   do
   {
@@ -206,8 +206,8 @@ bit_head (xo)
   clear ();
   vs_head ("MSN 列表", str_site);
   move (1, 0);
-  prints
-	(" [w]傳訊 [c]改暱稱 [^k]斷線 [a]增刪聯絡人 [d]刪除聯絡人 [l]msn紀錄 [h]說明   \n"
+  prints(
+	" [w]傳訊 [c]改暱稱 [^k]斷線 [a]增刪聯絡人 [d]刪除聯絡人 [l]msn紀錄 [h]說明   \n"
     "\033[30;47m 編號   代   號             信          箱                     狀  態         \033[m");
 
   return bit_body (xo);
@@ -577,8 +577,7 @@ bit_main ()
 
       if (sock > 0)
 	{
-	  zmsg
-	    ("登入中，快了別急，本來登入就要等一下咩 :p (想像小綠人在轉 ^^O)");
+	  zmsg("登入中，快了別急，本來登入就要等一下咩 :p (想像小綠人在轉 ^^O)");
 
 	  fr = fdopen (sock, "r");
 	  fw = fdopen (sock, "w");

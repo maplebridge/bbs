@@ -1466,7 +1466,10 @@ xover(cmd)
     }
     else if (cmd == KEY_END || cmd == '$')
     {
-      cmd = xo->max - 1 + XO_MOVE;
+      if (zone == XZ_POST)
+	cmd = last_nobottom(xo->dir) + XO_MOVE;
+      else
+	cmd = xo->max - 1 + XO_MOVE;
     }
     else if (cmd >= '1' && cmd <= '9')
     {

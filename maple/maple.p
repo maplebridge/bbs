@@ -55,6 +55,7 @@ void brh_save(void);
 void brd_force(void);
 void class_item(int num, int bno, int brdpost);
 int is_bm(char *list, char *userid);
+int last_nobottom(char *folder);
 int XoPost(int bno);
 int Select(void);
 int Class(void);

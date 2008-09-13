@@ -340,7 +340,7 @@ status_foot()
     sprintf(flagmsg,
       "%s%s%s%s",
       (ufo & UFO_PAGER) ? "\033[m\033[30;41m7\033[m" : COLOR2" ",     //7
-	  (ufo & UFO_QUIET) ? "\033[m\033[30;42m9\033[m" : COLOR2" ",     //9
+      (ufo & UFO_QUIET) ? "\033[m\033[30;42m9\033[m" : COLOR2" ",     //9
       (ufo & UFO_ALOHA) ? "\033[m\033[30;43mB\033[m" : COLOR2" ",     //B
       (ufo & UFO_CLOAK) ? "\033[m\033[30;45mO\033[m" : COLOR2" ");    //O
 #if 0
@@ -393,7 +393,7 @@ status_foot()
     orig_money = cuser.money;
     sprintf(coinmsg, "銀%4d%c",
        (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
-      (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,       
+      (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
     coinmsg[7] = ' ';
   }
@@ -403,7 +403,7 @@ status_foot()
     orig_gold = cuser.gold;
     sprintf(coinmsg + 8, "金"COLOR11"%4d%c "COLOR2,
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
-      (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,      
+      (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
   }
 
@@ -486,7 +486,7 @@ static MENU menu_admin[] =
 
   menu_system, PERM_ALLADMIN, M_AMENU,
   "System     【 系統設定 】",
-  
+
   "bin/admutil.so:a_resetsys", PERM_ALLADMIN, - M_SYSTEM,
   "BBSreset   【 重置系統 】",
 
@@ -502,7 +502,7 @@ static MENU menu_system[] =
 {
   "bin/admutil.so:a_system_setup", PERM_ALLADMIN, - M_XFILES,
   "Setup      【 控制設定 】",
-                                                                                
+
   "bin/admutil.so:a_xfile", PERM_ALLADMIN, - M_XFILES,
   "Xfile      【 系統檔案 】",
 
@@ -552,10 +552,10 @@ static MENU menu_mail[] =
 
   m_sysop, 0, M_SMAIL,
   "Yes Sir!   【 投書站長 】",
-  
+
   "bin/admutil.so:m_bm", PERM_ALLADMIN, - M_SMAIL,
   "BM All     【 板主通告 】",	/* itoc.000512: 新增 m_bm */
-  
+
   "bin/admutil.so:m_all", PERM_ALLADMIN, - M_SMAIL,
   "User All   【 全站通告 】",	/* itoc.000512: 新增 m_all */
 
@@ -700,81 +700,102 @@ static MENU menu_register[] =
 
 static MENU menu_bpg_color_bar[] =
 {
-	u_brd_bar, PERM_BASIC, M_UFILES,
-    "Brd        【 看板列表 】",
-	u_post_bar, PERM_BASIC, M_UFILES,
-    "Post       【 文章列表 】",
-	u_gem_bar, PERM_BASIC, M_UFILES,
-    "Gem        【 看板精華 】",
-	menu_color_bar, PERM_MENU + 'B', M_UMENU,
-    "光棒設定"
+  u_brd_bar, PERM_BASIC, M_UFILES,
+  "Brd        【 看板列表 】",
+
+  u_post_bar, PERM_BASIC, M_UFILES,
+  "Post       【 文章列表 】",
+
+  u_gem_bar, PERM_BASIC, M_UFILES,
+  "Gem        【 看板精華 】",
+
+  menu_color_bar, PERM_MENU + 'B', M_UMENU,
+  "光棒設定"
 };
 
 static MENU menu_pl_color_bar[] =
 {
-	u_pal_bar, PERM_BASIC, M_UFILES,
-    "Pal        【 板友好友 】",
-	u_usr_bar, PERM_BASIC, M_UFILES,
-    "Usr        【 網友列表 】",
-	menu_color_bar, PERM_MENU + 'P', M_UMENU,
-    "光棒設定"
+  u_pal_bar, PERM_BASIC, M_UFILES,
+  "Pal        【 板友好友 】",
+
+  u_usr_bar, PERM_BASIC, M_UFILES,
+  "Usr        【 網友列表 】",
+
+  menu_color_bar, PERM_MENU + 'P', M_UMENU,
+  "光棒設定"
 };
 
 static MENU menu_wma_color_bar[] =
 {
-	u_bmw_bar, PERM_BASIC, M_UFILES,
-    "Bmw        【 回顧水球 】",
-	u_mail_bar, PERM_BASIC, M_UFILES,
-    "Mail       【 個人信箱 】",
-	u_aloha_bar, PERM_BASIC, M_UFILES,
-    "Aloha      【 上站通知 】",
-	menu_color_bar, PERM_MENU + 'B', M_UMENU,
-    "光棒設定"
+  u_bmw_bar, PERM_BASIC, M_UFILES,
+  "Bmw        【 回顧水球 】",
+
+  u_mail_bar, PERM_BASIC, M_UFILES,
+  "Mail       【 個人信箱 】",
+
+  u_aloha_bar, PERM_BASIC, M_UFILES,
+  "Aloha      【 上站通知 】",
+
+  menu_color_bar, PERM_MENU + 'B', M_UMENU,
+  "光棒設定"
 };
 
 static MENU menu_vns_color_bar[] =
 {
-	u_vote_bar, PERM_BASIC, M_UFILES,
-    "Vote       【 投票選單 】",
-	u_newbrd_bar, PERM_BASIC, M_UFILES,
-    "Newbrd     【 看板連署 】",
-	u_song_bar, PERM_BASIC, M_UFILES,
-    "Song       【 點歌選單 】",
-	menu_color_bar, PERM_MENU + 'V', M_UMENU,
-    "光棒設定"
+  u_vote_bar, PERM_BASIC, M_UFILES,
+  "Vote       【 投票選單 】",
+
+  u_newbrd_bar, PERM_BASIC, M_UFILES,
+  "Newbrd     【 看板連署 】",
+
+  u_song_bar, PERM_BASIC, M_UFILES,
+  "Song       【 點歌選單 】",
+
+  menu_color_bar, PERM_MENU + 'V', M_UMENU,
+  "光棒設定"
 };
 
 static MENU menu_color_bar[] =
 {
-    u_menu_bar, PERM_BASIC, M_UFILES,
-    "Menu   【   選單光棒   】",
-	menu_bpg_color_bar, 0, M_UMENU,
-	"Bpg    【 看板文章精華 】",
-	menu_pl_color_bar, 0, M_UMENU,
-    "Pl     【 板友好友網友 】",
-	menu_wma_color_bar, 0, M_UMENU,
-	"Wma    【 水球信件上站 】",
-	menu_vns_color_bar, 0, M_UMENU,
-	"Vns    【 投票連署點歌 】",
-	u_rss_bar, PERM_BASIC, M_UFILES,
-	"Rss    【   看板 RSS   】",
-    menu_user_set, PERM_MENU + 'M', M_UMENU,
-    "光棒設定"
+  u_menu_bar, PERM_BASIC, M_UFILES,
+  "Menu   【   選單光棒   】",
+
+  menu_bpg_color_bar, 0, M_UMENU,
+  "Bpg    【 看板文章精華 】",
+
+  menu_pl_color_bar, 0, M_UMENU,
+  "Pl     【 板友好友網友 】",
+
+  menu_wma_color_bar, 0, M_UMENU,
+  "Wma    【 水球信件上站 】",
+
+  menu_vns_color_bar, 0, M_UMENU,
+  "Vns    【 投票連署點歌 】",
+
+  u_rss_bar, PERM_BASIC, M_UFILES,
+  "Rss    【   看板 RSS   】",
+
+  menu_user_set, PERM_MENU + 'M', M_UMENU,
+  "光棒設定"
 };
 
 
 static MENU menu_user_set[] =
 {
-   u_setup, 0, M_UFILES,
-   "Habit      【 喜好模式 】",
-   u_sign_set, 0, M_UFILES,
-   "Sign       【 站簽設定 】",
-   menu_color_bar, 0, M_UMENU,
-   "Colorbar   【 光棒設定 】",
-   u_usr_show_set, 0, M_UFILES,
-   "Usrshow    【 符號顯示 】",
-   menu_user, PERM_MENU + 'H', M_UMENU,
-   "喜好模式"
+  u_setup, 0, M_UFILES,
+  "Habit      【 喜好模式 】",
+
+  u_sign_set, 0, M_UFILES,
+  "Sign       【 站簽設定 】",
+
+  menu_color_bar, 0, M_UMENU,
+  "Colorbar   【 光棒設定 】",
+
+  u_usr_show_set, 0, M_UFILES,
+  "Usrshow    【 符號顯示 】",
+
+  menu_user, PERM_MENU + 'H', M_UMENU,
+  "喜好模式"
 };
 
 
@@ -917,7 +938,7 @@ static MENU menu_game2[] =
 
   "bin/seven.so:main_seven", 0, - M_GAME,
   "4Seven     【 賭城七張 】",
- 
+
   "bin/race.so:main_race", 0, - M_GAME,
   "5Race      【 進賽馬場 】",
 
@@ -990,13 +1011,13 @@ static MENU menu_buy[] =
 
   "bin/bank.so:b_xempt", PERM_VALID, - M_GAME,
   "Xempt      【 永久保留 】",
-  
+
   "bin/bank.so:b_xvalid", PERM_VALID, - M_GAME,
   "Valid      【 永免認證 】",
-  
+
   "bin/bank.so:b_nthu", PERM_VALID, - M_GAME,
   "Nthu       【 清華成員 】",
-/*  
+/*
   "bin/bank.so:b_celebrate", PERM_VALID, - M_GAME,
   "Present    ♂ 開站好禮 ♀",
 */
@@ -1045,8 +1066,10 @@ static MENU menu_other[] =
   "bin/calendar.so:main_calendar", 0, - M_XMODE,
   "YCalendar  【 萬年月曆 】",
 #endif
+
   "bin/dictd.so:main_dictd", 0, - M_XMODE,
   "Dictd      【 英漢字典 】",
+
   menu_tool, PERM_MENU + Ctrl('A'), M_XMENU,	/* itoc.020829: 怕 guest 沒選項 */
   "其他功\能"
 };
@@ -1315,12 +1338,12 @@ menu()
       every_U(0);
       goto every_key;
 
-	case Ctrl('W'):
+    case Ctrl('W'):
       DL_func("bin/dictd.so:main_dictd");
       goto every_key;
 
 #endif
-    
+
 	case Ctrl('B'):           //看板列表
 	  utmp_mode(M_BOARD);
 	  Boards();
@@ -1329,7 +1352,7 @@ menu()
 	case Ctrl('C'):           //聊天室
 	  if(cuser.userlevel)
 	  {
-		utmp_mode(- M_CHAT);
+	    utmp_mode(- M_CHAT);
 	    DL_func("bin/chat.so:t_chat");
 	  }
 	  goto every_key;
@@ -1348,7 +1371,7 @@ menu()
 	case Ctrl('I'):           //閱讀信件
 	  if(cuser.userlevel)
 	  {
-		utmp_mode(M_RMAIL);
+	    utmp_mode(M_RMAIL);
 	    XoMbox();
 	  }
 	  goto every_key;
@@ -1356,7 +1379,7 @@ menu()
 	case Ctrl('N'):           //MSN
 	  if(cuser.userlevel)
 	  {
-		utmp_mode(M_LUSERS);
+	    utmp_mode(M_LUSERS);
 	    bit_main();
 	  }
 	  goto every_key;
@@ -1366,6 +1389,15 @@ menu()
       utmp_mode(M_BOARD);
       Select();
       goto every_key;
+
+    case 's':
+      if (bbsmode != M_UMENU && bbsmode != M_XMENU)
+      {
+	utmp_mode(M_BOARD);
+	Select();
+	goto every_key;
+      }
+      goto default_key;	/* 若在 M_UMENU / M_XMENU 中按 s 的話，要視為一般按鍵 */
 
     case Ctrl('T'):           //喜好模式
 	  utmp_mode(M_UFILES);
@@ -1476,9 +1508,9 @@ default_key:
 //#ifdef CURSOR_BAR
 	if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
 	{
-      move(MENU_XPOS + cc, MENU_YPOS);
-      mptr = table[cc];
-      str = mptr->desc;
+	  move(MENU_XPOS + cc, MENU_YPOS);
+	  mptr = table[cc];
+	  str = mptr->desc;
       //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
 	  prints("%s[ (\033[1;34m%c%s)%s ]\033[m",USR_COLORBAR_MENU,*str,USR_COLORBAR_MENU,str + 1);
 	}

@@ -14,7 +14,7 @@ extern char *ufo_tbl[];
 extern char *usr_show_tbl[];
 
 /* ----------------------------------------------------- */
-/* 設定個人光棒                      */
+/* 設定個人光棒						 */
 /* ----------------------------------------------------- */
 
 
@@ -165,7 +165,6 @@ u_set_bar(barname)
 	prints("\033[m目前設定 : \033[m%s%s測試\033[m",orgcolor,color_write);
 	
 	i=i+2;
-    
 	vget(i, 0, "前景：色碼(31~37)/略過(Enter)", front, 3, DOECHO);
     if((front[0]!='\0') && ((front[0]!='3') && (front[1]<'1' || front[1]>'7')))
 	{
@@ -234,93 +233,83 @@ u_set_bar(barname)
 int
 u_menu_bar()
 {
-	u_set_bar("_MENU");
-	return 0;
+  return u_set_bar("_MENU");
+
 }
 
 int
 u_brd_bar()
 {
-	u_set_bar("_BRD");
-	return 0;
+  return u_set_bar("_BRD");
 }
 
 int
 u_post_bar()
 {
-	u_set_bar("_POST");
-	return 0;
+  return u_set_bar("_POST");
 }
 
 int
 u_gem_bar()
 {
-	u_set_bar("_GEM");
-	return 0;
+  return u_set_bar("_GEM");
 }
 
 int
 u_pal_bar()
 {
-	u_set_bar("_PAL");
-	return 0;
+  return u_set_bar("_PAL");
 }
 
 int
 u_usr_bar()
 {
-	u_set_bar("_USR");
-	return 0;
+  return u_set_bar("_USR");
 }
 
 int
 u_bmw_bar()
 {
-	u_set_bar("_BMW");
-	return 0;
+  return u_set_bar("_BMW");
 }
 
 int
 u_mail_bar()
 {
-	u_set_bar("_MAIL");
-	return 0;
+  return u_set_bar("_MAIL");
 }
 
 int
 u_aloha_bar()
 {
-	u_set_bar("_ALOHA");
-	return 0;
+  return u_set_bar("_ALOHA");
 }
 
 int
 u_vote_bar()
 {
-	u_set_bar("_VOTE");
-	return 0;
+  return u_set_bar("_VOTE");
 }
 
 int
 u_newbrd_bar()
 {
-	u_set_bar("_NBRD");
-	return 0;
+  return u_set_bar("_NBRD");
 }
 
 int
 u_song_bar()
 {
-	u_set_bar("_SONG");
-	return 0;
+  return u_set_bar("_SONG");
 }
 
 int
 u_rss_bar()
 {
-	u_set_bar("_RSS");
-	return 0;
+  return u_set_bar("_RSS");
 }
+
+
 /* ----------------------------------------------------- */
 /* 認證用函式						 */
 /* ----------------------------------------------------- */
@@ -717,7 +706,7 @@ u_verify()
 {
   char buf[80], key[10];
   ACCT acct;
-  
+
   if (HAS_PERM(PERM_VALID))
   {
     zmsg("您的身分確認已經完成，不需填寫認證碼");
@@ -827,114 +816,91 @@ u_info()
   return 0;
 }
 
+
 int
-u_sign_set()/*ikulan.080726:將改站簽功能獨立出來*/
+u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
 {
-   FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
-   char helloworld[37];
-   char user_hello_path[256];
-   FILE *file_host;      /* smiler.071110: 個人選擇站簽 */
-   char host_path_name[64];
-   char host_choice_char[3];
-   int  host_choice_int;
-   char userid_tmp[64];
-   char ans;
+   FILE *hello;		/* smiler.071030: 站簽個人化內使用者想對大家說的話 */
+   FILE *file_host;	/* smiler.071110: 個人選擇站簽 */
+   int  choice;		/* 選用第幾個站簽 */
+   char buf[ANSILINELEN];
+   char helloworld[38];
 
    /*ikulan.080727: 印出站簽*/
    FILE *host_sign;
-   int host_sign_num = 4; /*ikulan.080727: 站簽的數目，此有四個站簽*/
-   int host_sign_id;
-   char host_sign_path[64];
-   char host_sign_temp[999];
+
+#define HOST_SIGN_NUM	4	/*ikulan.080727: 站簽的數目，此有四個站簽*/
 
    move(1, 0);
    clrtobot();
-   int i=8;
 
-   str_lower_acct(userid_tmp,cuser.userid);   /* smiler.071030: 輸入使用者想對大家說的話 */
-   i++;
-   sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
-   hello = fopen(user_hello_path,"r");
-   if(hello)
-     fgets(helloworld,38,hello);
-   else
-     sprintf(helloworld,"\0");
-   if(!vget(i, 0, "想對大家說的話：", helloworld, 37+1, GCARRY))
+   /* smiler.071030: 輸入使用者想對大家說的話 */
+   usr_fpath(buf, cuser.userid, "hello");
+   if(hello = fopen(buf,"r"))
    {
-     if(hello)
+     fgets(helloworld, 38, hello);
+     fclose(hello);
+     unlink(buf);
+   }
+   else
+     helloworld[0] = '\0';
+
+   if(!vget(9, 0, "想對大家說的話：", helloworld, 38, GCARRY))
+   {
+     if(!hello)
      {
-       fclose(hello);
-       unlink(user_hello_path);
-     }
-     else
-     {
-       hello = fopen(user_hello_path,"w");
+       hello = fopen(buf, "w");
        fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
        fclose(hello);
      }
    }
    else
    {
-     if(hello)
-     {
-       fclose(hello);
-       unlink(user_hello_path);
-     }
-     hello = fopen(user_hello_path,"w");
-     fputs(helloworld,hello);
+     hello = fopen(buf, "w");
+     fputs(helloworld, hello);
      fclose(hello);
    }
-   sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
-   file_host=fopen(host_path_name,"r");
-   if(file_host)
+
+   usr_fpath(buf, cuser.userid, "host");
+   if (file_host = fopen(buf,"r"))
    {
-     fgets(host_choice_char,3,hello);
+     fgets(buf, 3, file_host);
      fclose(file_host);
    }
+   choice = atoi(buf);
 
    vmsg(NULL);
    move(1,0);
    clrtobot();
 
-
-   for(host_sign_id=1; host_sign_id<=host_sign_num; host_sign_id++)
+   int i;
+   for(i = 1; i <= HOST_SIGN_NUM; i++)
    {
-     prints("%d號站簽：\n", host_sign_id);
-     sprintf(host_sign_path,"gem/@/@host_%d",host_sign_id-1);
-     host_sign=fopen(host_sign_path,"r");
+     prints("\n%d號站簽：\n", i);
+     sprintf(buf, "gem/@/@host_%d", i - 1);
+     host_sign = fopen(buf, "r");
      if(host_sign)
      {
-       while(fgets(host_sign_temp, 999, host_sign))
-         prints("%s", host_sign_temp);
-
-      prints("\n");
+       while(fgets(buf, ANSILINELEN, host_sign))
+         prints("%s", buf);
      }
    }
-   
-   switch (ans = vans("◎ 選擇 0)任意 1~4)選擇站簽 [Q] "))
+
+   sprintf(buf, "◎ 選擇 0)隨機 1~4)選擇站簽 [%d] ", choice);
+   choice = vans(buf);
+   if (choice >= '0' && choice <= HOST_SIGN_NUM + '0')
+     choice -= '0';
+   else
+     return 0;
+
+   usr_fpath(buf, cuser.userid, "host");
+   if (file_host = fopen(buf, "w"))
    {
-     case '0': host_choice_int = 0;
-		       break;
-     case '1': host_choice_int = 1;
-               break;
-     case '2': host_choice_int = 2;
-               break;
-     case '3': host_choice_int = 3;
-               break;
-     case '4': host_choice_int = 4;
-               break;
-     default:
-               return 0;
-   }
-   sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
-   file_host=fopen(host_path_name,"w");
-   if(file_host)
-   {
-     fprintf(file_host,"%d",host_choice_int);
+     fprintf(file_host, "%d", choice);
      fclose(file_host);
    }
 
-}/*ikulan.080726:(end of function)將改站簽功能獨立出來*/
+}	/*ikulan.080726:(end of function)將改站簽功能獨立出來*/
 
 
 int
@@ -1097,9 +1063,9 @@ x_file(mode, xlist, flist)
   {
 	  if(mode == M_XFILES)
 	  {
-         char fpath_info[64];
-		 sprintf(fpath_info, BBSHOME"/gem/@/@mxfile.info");
-		 more(fpath_info, NULL);
+		char fpath_info[64];
+		sprintf(fpath_info, BBSHOME"/gem/@/@mxfile.info");
+		more(fpath_info, NULL);
 	  }
 
     vmsg(vedit(buf, 0) ? "原封不動" : "更新完畢");	/* Thor.981020: 注意被talk的問題  */
@@ -1121,13 +1087,13 @@ u_xfile()
     "暫存檔.3",
     "暫存檔.4",
     "暫存檔.5",
-	"簽名檔.1",
+    "簽名檔.1",
     "簽名檔.2",
     "簽名檔.3",
-	"簽名檔.4",
+    "簽名檔.4",
     "簽名檔.5",
     "簽名檔.6",
-	"簽名檔.7",
+    "簽名檔.7",
     "簽名檔.8",
     "簽名檔.9",
     NULL
@@ -1142,13 +1108,13 @@ u_xfile()
     "buf.3",
     "buf.4",
     "buf.5",
-	FN_SIGN ".1",
+    FN_SIGN ".1",
     FN_SIGN ".2",
     FN_SIGN ".3",
     FN_SIGN ".4",
     FN_SIGN ".5",
     FN_SIGN ".6",
-	FN_SIGN ".7",
+    FN_SIGN ".7",
     FN_SIGN ".8",
     FN_SIGN ".9"
   };

@@ -62,21 +62,6 @@ char anonymousid[IDLEN + 1];	/* itoc.010717: 自定匿名 ID */
 
 #define	FN_BAK		"bak"
 
-void
-str_lower_edit(dst, src)
-  char *dst, *src;
-{
-  int ch;
-
-  do
-  {
-    ch = *src++;
-    if (ch >= 'A' && ch <= 'Z')
-      ch |= 0x20;
-    *dst++ = ch;
-  } while (ch);
-}
-
 /* ----------------------------------------------------- */
 /* 記憶體管理與編輯處理					 */
 /* ----------------------------------------------------- */
@@ -1401,7 +1386,7 @@ ve_header(fp)
     fprintf(fp, "%s %s (%s)\n", str_author1, cuser.userid, cuser.username);
   }
   else
-  {   
+  {
 #ifdef HAVE_ANONYMOUS
     if (currbattr & BRD_ANONYMOUS && !(curredit & EDIT_RESTRICT))
     {
@@ -1473,11 +1458,12 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
   char host_personal_path[64];
   char host_personal_choice_char[3];
   int  host_personal_choice_int;
-                                                                                
+
+  char user_hello_path[256];
+#if 0
   FILE *hello;                /* smiler.071030: 使用者想對大家說的話
                                               以及相關id ip顯示 */
   char helloworld[38];
-  char user_hello_path[256];
   char hello_id[40];
   char hello_ip[42];
   char hello_hostspace[18];
@@ -1485,19 +1471,18 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
                                               以及相關id ip顯示 */
   char x_hello[38];
   char x_ip[42];
+#endif
+
+#if 0
   FILE *f_model;              /* smiler.071030: 站簽娃娃相關顯示 */
   char model_path[256];
   char model_type[24];
-                                                                                
+
   char m[6][50];
-  char space[50]="                                                  ";
-                //123456789 123456789 123456789 123456789 123456789 //
+#endif
 
   char post_userid[13];
-  strncpy(post_userid,space,13);
-  strcpy(post_userid,cuser.userid);
-  post_userid[strlen(cuser.userid)]=' ';
-  post_userid[13]='\0';
+  sprintf(post_userid, "%-*.*s", sizeof(post_userid), sizeof(post_userid), cuser.userid);
 
   FILE *file_tmp;
   char buf_tmp[64];
@@ -1509,9 +1494,6 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
   time(&time_now);
   struct tm *t = localtime(&time_now);
 
-
-  char userid_tmp[16];
-  str_lower_edit(userid_tmp,cuser.userid);
 
   host_sight_number=4;  
   if(host_sight_number)
@@ -1527,16 +1509,14 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
  //select_devide=4;
   select=(int) (t->tm_sec) % (select_devide);  /* smiler.071030: select witch 站簽 */
 
- 
-                                                                                
-                                                                               
+#if 0
   if(cuser.sex==0)      /* smiler.071030: 由使用者性別設定要load的站簽娃娃 */
       strcpy(model_type,"model_0");
   else if(cuser.sex==1)
       strcpy(model_type,"model_1");
   else
       strcpy(model_type,"model_2");
- 
+
   /* 站長指定全站站簽娃選擇 */
   if(model_select)
   {
@@ -1547,7 +1527,7 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 		  sprintf(model_type,"model_%d",model_select-1);
 	  }
   } 
-  
+
   /* load 站簽娃娃 */
   sprintf(model_path,"gem/@/@%s",model_type);
   if(f_model = fopen(model_path,"r"))
@@ -1561,10 +1541,10 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 	  for(i=0;i<=5;i++)
 		strcpy(m[i],"\n");
   }
-   
+
   /* 處理站址長度 */
   if(strlen(MYHOSTNAME) < 18)
-    strncpy(hello_hostspace,space,18-strlen(MYHOSTNAME));
+    str_ncpy(hello_hostspace," ",18-strlen(MYHOSTNAME));
   else if(strlen(MYHOSTNAME) == 18)
 	  hello_hostspace[0]='\0';
   else
@@ -1573,9 +1553,8 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
       hello_hostspace[0]='\0';
   }
 
-
   /* 處理使用者"想對大家說的話"相關顯示 */
-  sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
+  usr_fpath(user_hello_path, cuser.userid, "hello");
   if(hello = fopen(user_hello_path,"r"))
   {
       fgets(helloworld,38,hello);
@@ -1585,41 +1564,27 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
       strcpy(helloworld,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
 
   if(strlen(helloworld)<37)
-  {
-      strncpy(helloworld+strlen(helloworld),space,37-strlen(helloworld));
-      helloworld[37]='\0';
-  }
-                                                                                
+    sprintf(helloworld, "%-*.*s", sizeof(helloworld), sizeof(helloworld), helloworld)
+
   /* 處理站簽個人化的使用者名言該行顯示  */
   sprintf(hello_id,"%s的名言:",cuser.userid);
   if(strlen(hello_id)<40)
-  {
-      strncpy(hello_id+strlen(hello_id),space,40-strlen(hello_id));
-      hello_id[40]='\0';
-  }
-                                                                                
-  /* 處理使用者ip顯示 */
-  strcpy(hello_ip,fromhost);
-  if(strlen(hello_ip)<42)
-  {
-      strncpy(hello_ip+strlen(hello_ip),space,42-strlen(hello_ip));
-      hello_ip[42]='\0';
-  }
-                                                                                
-  /* 處理匿名使用者站簽個人化的顯示 */
-  strcpy(x_id,STR_ANONYMOUS);
-  strncpy(x_id+strlen(x_id),space,40-strlen(x_id));
-  x_id[40]='\0';
-                                                                                
-  strcpy(x_hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
-  strncpy(x_hello+strlen(x_hello),space,37-strlen(x_hello));
-  x_hello[37]='\0';
-                                                                                
-  strcpy(x_ip,"遙遠的那美克星");
-  strncpy(x_ip+strlen(x_ip),space,42-strlen(x_ip));
-  x_ip[42]='\0';
+    sprintf(hello_id, "%-*.*s", sizeof(hello_id), sizeof(hello_id), hello_id);
 
-  sprintf(host_personal_path,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
+  /* 處理使用者ip顯示 */
+  sprintf(hello_ip, "%-*.*s", sizeof(hello_ip), sizeof(hello_ip), fromhost);
+
+  /* 處理匿名使用者站簽個人化的顯示 */
+  sprintf(x_id, "%-*.*s", sizeof(x_id), sizeof(x_id), STR_ANONYMOUS)
+
+  strcpy(x_hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+  str_ncpy(x_hello+strlen(x_hello),space,37-strlen(x_hello));
+
+  strcpy(x_ip,"遙遠的那美克星");
+  str_ncpy(x_ip+strlen(x_ip),space,42-strlen(x_ip));
+#endif
+
+  usr_fpath(user_hello_path, cuser.userid, "host");
   host_personal=fopen(host_personal_path,"r");
   if(host_personal)
   {
@@ -1634,7 +1599,7 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 	  if(host_personal_choice_int >0 && host_personal_choice_int <=host_sight_number)
 		  select=host_personal_choice_int-1;
   }
-  
+
 
   /* 站長指定全站站簽選擇 */
   if(host_sight_select)
@@ -1649,7 +1614,6 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 
   char my_ip[15];
   sprintf(my_ip,"%s",get_my_ip());
-  char my_space[20];
 
   if (!modify)
   {
@@ -1668,10 +1632,16 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
     }
 	else if(select==1)
 	{
-		if((curredit & EDIT_ANONYMOUS))
-		  str_ncpy(my_space,space,33-strlen(STR_ANONYMOUS)-strlen("納美克星")-2-1);
-		else
-          str_ncpy(my_space,space,33-strlen(cuser.userid)-strlen(my_ip)-2-1);
+		i = 32;		/* 設定顯示寬度 */
+		sprintf(buf_tmp, "%s從%s",
+#ifdef HAVE_ANONYMOUS
+			(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
+#endif
+			cuser.userid,
+#ifdef HAVE_ANONYMOUS
+			(curredit & EDIT_ANONYMOUS) ? "納美克星" : 
+#endif
+			my_ip);
 /*
 　: ffffffa1 ffffff40
 ◤: ffffffa2 ffffffab
@@ -1696,43 +1666,33 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 "   \033[1;37m紅蘿蔔！\033[m▄▅▇\033[1;30;47m \033[m;\033[47m \033[;30;47m \033[m \033[1;36m快來尋找你愛的作家。\033[m       \033[1;31m▃▆\033[41m◤\033[;30;41m ／＼\033[31m     \033[36m◢\033[46m    \033[30;47m◥\033[m       \n"
 "          \033[30m \033[47m◣▃\033[45m%c\033[37;47m%c \033[1;31m%c\033[41m%c\033[;30;47m%c\033[40m%c\033[36m為你嘔心瀝血的作品找個窩。\033[37m \033[30;41m◣       \033[31m%c\033[36m%c\033[30m   \033[31m◢\033[30;46m＝＝＝\033[47m \033[37m%c\033[33;40m%c\033[37m      \n"
 "                 \033[30;47m ◥\033[m  \033[1;36m文學版＋美工板，強烈邀請您。\033[m \033[30;41m◣▁▂  \033[36;46m \033[41m▆\033[46m         \033[30;47m◢\033[m       \n"
-"      \033[30;42m%c\033[32m%c     \033[37m   %c\033[47m%c\033[30m.\033[37m%c\033[42m%c %s從%s%s\033[30m \033[37m \033[31m◢\033[32;41m◢\033[42m          %c\033[30m%c\033[m         \033[m\n",
+"      \033[30;42m%c\033[32m%c     \033[37m   %c\033[47m%c\033[30m.\033[37m%c\033[42m%c %-*.*s\033[30m \033[37m \033[31m◢\033[32;41m◢\033[42m          %c\033[30m%c\033[m         \033[m\n",
 
 /*◤*/0xffffffa2,0xffffffab,/*˙*/0xffffffa3,0xffffffbb,/*˙*/0xffffffa3,0xffffffbb,/*楓*/0xffffffb7,0xffffffac,/*橋*/0xffffffbe,0xfffffff4,/*驛*/0xffffffc5,0xffffffe6,/*站*/0xffffffaf,0xffffffb8,/*˙*/0xffffffa3,0xffffffbb,
 /*▅*/0xffffffa2,0x00000066,/*　*/0xffffffa1,0x00000040,/*◢*/0xffffffa2,0xffffffa8,/*◣*/0xffffffa2,0xffffffa9,/*◆*/0xffffffa1,0xffffffbb,
 /*◣*/0xffffffa2,0xffffffa9,/*●*/0xffffffa1,0xffffffb4,/*●*/0xffffffa1,0xffffffb4,
-#ifdef HAVE_ANONYMOUS
-           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
-#endif
-           cuser.userid,
-#ifdef HAVE_ANONYMOUS
-           (curredit & EDIT_ANONYMOUS) ? "納美克星" :
-#endif
-          my_ip,
-          my_space,
+	   i, i, buf_tmp,
 /*◥*/0xffffffa2,0xffffffaa);
 	}
 	else if(select==2)
 	{
-		if((curredit & EDIT_ANONYMOUS))
-		  str_ncpy(my_space,space,35-strlen(STR_ANONYMOUS)-strlen("納美克星")-2-1);
-		else
-          str_ncpy(my_space,space,35-strlen(cuser.userid)-strlen(my_ip)-2-1);
+		i = 36 + 10;		/* 設定顯示寬度，記得把色碼長度加進去 */
+		sprintf(buf_tmp, "%s\033[37m 從\033[33m %s",
+#ifdef HAVE_ANONYMOUS
+			(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
+#endif
+			cuser.userid,
+#ifdef HAVE_ANONYMOUS
+			(curredit & EDIT_ANONYMOUS) ? "納美克星" : 
+#endif
+			my_ip);
+
 	    fprintf(fp,
 "\n--\n"
 "  ▄       ◢ ▄▄▄ ▄▄▄ ▄     ▄▄▄ \033[1;37m 清大資工\033[m                             \n"
-"\033[1;37;44m  █ █◣◢█ █▄█ █▄█ █     █▄▄  \033[33m%s\033[37m 從\033[33m %s%s\033[m  \n"
+"\033[1;37;44m  █ █◣◢█ █▄█ █▄█ █     █▄▄  \033[33m%-*.*s\033[m  \n"
 "  █ █◥◤█ █  █ █     █▄▄ █▄▄ \033[1;37m【楓橋驛站】 telnet://imaple.tw\033[m       \033[m\n",
-#ifdef HAVE_ANONYMOUS
-           (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
-#endif
-           cuser.userid,
-#ifdef HAVE_ANONYMOUS
-           (curredit & EDIT_ANONYMOUS) ? "納美克星" :
-#endif
-          my_ip,
-          my_space
-			);
+	   i, i, buf_tmp);
 	}
 	else
 	{

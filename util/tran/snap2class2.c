@@ -1,11 +1,11 @@
 /*-------------------------------------------------------*/
-/* util/snap2maplecsgem.c	( NTHU CS MapleBBS )		 */
+/* util/snap2maplecsgem.c	( NTHU CS MapleBBS )	 */
 /*-------------------------------------------------------*/
-/* target : M3 MAPLECS gem 轉換程式						 */
-/* create : 07/03/31									 */
-/* author : smiler.bbs@lexel.twbbs.org					 */
+/* target : M3 MAPLECS gem 轉換程式			 */
+/* create : 07/03/31					 */
+/* author : smiler.bbs@lexel.twbbs.org			 */
 /*-------------------------------------------------------*/
-/* syntax : snap2maplecsgem [board]						 */
+/* syntax : snap2maplecsgem [board]			 */
 /*-------------------------------------------------------*/
 
 

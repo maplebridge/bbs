@@ -3,7 +3,7 @@
 /*-------------------------------------------------------*/
 /* target : RSS						 */
 /* create : 08/08/16					 */
-/* update : // 					 */
+/* update : // 						 */
 /* author : smiler.bbs@bbs.cs.nthu.edu.tw		 */
 /*-------------------------------------------------------*/
 
@@ -73,9 +73,9 @@ rss_item(num, rss)
 	prints("\033[1;3%dm%s\033[m ", cal_day(rss->date) + 1, rss->date + 3); //6
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
 	prints("%-12.12s ",rss->bookmark);                                     //13
-	prints("%s %s %s ",  (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",        //3*3=9
-		                 (rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
-						 (rss->xmode & RSS_START) ? "◆"    : "◇"
+	prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",        //3*3=9
+			    (rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
+			    (rss->xmode & RSS_START) ? "◆"    : "◇"
 		);
 	prints("%-42.40s",rss->url);                                           //42
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[m" : "");
@@ -97,7 +97,7 @@ rss_item_bar(xo, mode)
 	num = xo->pos + 1;
 
 	prints("\033[m%s",mode ? USR_COLORBAR_RSS : "");
-    prints("%6d ", num);                                                   //7
+	prints("%6d ", num);                                                   //7
 	prints("%c",   (rss->xmode & RSS_RESTRICT) ? ')' : ' ');               //1
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
 	if( (rss->xmode & RSS_RESTRICT) && (!(bbstate & STAT_BOARD))  &&  (strcmp(rss->owner,cuser.userid)) )
@@ -110,12 +110,12 @@ rss_item_bar(xo, mode)
 	prints("%s ",mode ? USR_COLORBAR_RSS : "");                            //1
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
 	prints("%-12.12s ",rss->bookmark);                                     //13
-	prints("%s %s %s ",  (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",        //3*3=9
-						 (rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
-						 (rss->xmode & RSS_START) ? "◆"    : "◇"
+	prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",        //3*3=9
+			    (rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
+			    (rss->xmode & RSS_START) ? "◆"    : "◇"
 		  );
 	prints("%-42.40s",rss->url);                                           //42
-    prints("%s",((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
+	prints("%s",((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
 
 	return XO_NONE;
 
@@ -135,7 +135,7 @@ rss_body(xo)
     if (bbstate & STAT_BOARD)
     {
       if (vans("要新增資料嗎(Y/N)？[N] ") == 'y')
-	     return rss_add(xo);
+	return rss_add(xo);
     }
     else
     {
@@ -188,9 +188,9 @@ rss_add(xo)
 	}
 
 	i+=2;
-    prints("\n請輸入網址：");
+	prints("\n請輸入網址：");
 	i++;
-    if(!vget(i, 0, "", rss.url, 73, DOECHO))
+	if(!vget(i, 0, "", rss.url, 73, DOECHO))
 	{
 		return XO_BODY;
 	}
@@ -202,16 +202,12 @@ rss_add(xo)
 	}
 	if(!IS_URL(rss.url))
 	{
-		char warm_message[64];
-		sprintf(warm_message,"網址格式含不正確字符 ; \" | & space ，請重新輸入 !!");
-		vmsg(warm_message);
+		vmsg("網址格式含不正確字符 ; \" | & space ，請重新輸入 !!");
 		continue;
 	}
 
 	i+=2;
-
-
-    if(!vget(i, 0, "是UTF8編碼或其他編碼： U)UTF8  Q)其他  [U] ", buf, 1 + 1, DOECHO))
+	if(!vget(i, 0, "是UTF8編碼或其他編碼： U)UTF8  Q)其他  [U] ", buf, 1 + 1, DOECHO))
 	{
 		strcpy(buf,"u");
 	}
@@ -220,64 +216,48 @@ rss_add(xo)
 	{
 		rss.xmode &= (~RSS_UTF8);
 		i+=2;
-        if(!vget(i, 0, "輸入編碼名稱：", rss.code_type, 64, DOECHO))
+        	if(!vget(i, 0, "輸入編碼名稱：", rss.code_type, 64, DOECHO))
 		{
 		  vmsg("未輸入編碼名稱 !!");
 		  return XO_INIT;
-		}        
+		}
 
 	}
 	else
 		rss.xmode |= RSS_UTF8;
 
 	i+=2;
-
-	if(!vget(i, 0, "是否要將html格式轉譯為txt格式：Y)要 N)否 [Y] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"y");
-	}
-	if((buf[0] == 'N') || (buf[0]=='n'))
+	if(vget(i, 0, "是否要將html格式轉譯為txt格式：Y)要 N)否 [Y] ", buf, 2, LCECHO) == 'n')
 		rss.xmode &= (~RSS_TXT);
 	else
 		rss.xmode |= RSS_TXT;
 
 	i+=2;
-
-    prints("\n請輸入相關說明：");
+	prints("\n請輸入相關說明：");
 	i++;
-    if(!vget(i, 0, "", rss.info, 73, DOECHO))
+	if(!vget(i, 0, "", rss.info, 73, DOECHO))
 	{
 		strcpy(rss.info," ");
 	}
 
 	i+=2;
-
-	if(!vget(i, 0, "是否隱藏此RSS選項：Y)是 N)否 [N] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"n");
-	}
-	if((buf[0] == 'Y') || (buf[0]=='y'))
+	if(vget(i, 0, "是否隱藏此RSS選項：Y)是 N)否 [N] ", buf, 2, LCECHO) == 'y')
 		rss.xmode |= RSS_RESTRICT;
 	else
 		rss.xmode &= (~RSS_RESTRICT);
 
 	i+=2;
-
-	if(!vget(i, 0, "是否立即啟用RSS：Y)是 N)否 [Y] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"y");
-	}
-	if((buf[0] == 'N') || (buf[0]=='n'))
+	if(vget(i, 0, "是否立即啟用RSS：Y)是 N)否 [Y] ", buf, 2, DOECHO) == 'n')
 		rss.xmode &= (~RSS_START);
 	else
 		rss.xmode |= RSS_START;
 
     ans = vans("選擇： S)儲存  E)繼續  Q)離開 [Q] ");
 
-    if (ans != 'S' && ans != 's' && ans != 'E' && ans != 'e')
+    if (ans != 's' && ans != 'e')
       return XO_BODY;
-    else if((ans == 'S') || (ans == 's'))
-	  break;
+    else if(ans == 's')
+      break;
   }
 
   time(&(rss.chrono));
@@ -329,7 +309,7 @@ rss_delete(xo)
 
   if (vans(msg_del_ny) == 'y')
   {
-   
+
     if (!rec_del(xo->dir, sizeof(RSS), xo->pos, NULL))
       return rss_load(xo);
   }
@@ -380,9 +360,9 @@ rss_edit(xo)
 	}
 
 	i+=2;
-    prints("\n請輸入網址：");
+	prints("\n請輸入網址：");
 	i++;
-    if(!vget(i, 0, "", mrss.url, 73, GCARRY))
+	if(!vget(i, 0, "", mrss.url, 73, GCARRY))
 	{
 		return XO_BODY;
 	}
@@ -404,74 +384,52 @@ rss_edit(xo)
 	sprintf(mrss.modified,"start");              /* smiler.080823: 初始rss.modified */
 
 	i+=2;
-
-	if(!vget(i, 0, "是UTF8編碼或其他編碼： U)UTF8  Q)其他  [U] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"u");
-	}
-
-	if((buf[0] == 'Q') || (buf[0]=='q'))
+	if(vget(i, 0, "是UTF8編碼或其他編碼： U)UTF8  Q)其他  [U] ", buf, 2, LCECHO) == 'q')
 	{
 		mrss.xmode &= (~RSS_UTF8);
 		i+=2;
-        if(!vget(i, 0, "輸入編碼名稱：", mrss.code_type, 64, DOECHO))
+		if(!vget(i, 0, "輸入編碼名稱：", mrss.code_type, 64, DOECHO))
 		{
 		  vmsg("未輸入編碼名稱 !!");
 		  return XO_INIT;
-		}        
+		}
 
 	}
 	else
 		mrss.xmode |= RSS_UTF8;
 
 	i+=2;
-
-	if(!vget(i, 0, "是否要將html格式轉譯為txt格式：Y)要 N)否 [Y] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"y");
-	}
-	if((buf[0] == 'N') || (buf[0]=='n'))
+	if(vget(i, 0, "是否要將html格式轉譯為txt格式：Y)要 N)否 [Y] ", buf, 2, LCECHO) == 'n')
 		mrss.xmode &= (~RSS_TXT);
 	else
 		mrss.xmode |= RSS_TXT;
 
 	i+=2;
-
-    prints("\n請輸入相關說明：");
+	prints("\n請輸入相關說明：");
 	i++;
-    if(!vget(i, 0, "", mrss.info, 73, GCARRY))
+	if(!vget(i, 0, "", mrss.info, 73, GCARRY))
 	{
 		strcpy(mrss.info," ");
 	}
 
 	i+=2;
-
-	if(!vget(i, 0, "是否隱藏此RSS選項：Y)是 N)否 [N] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"n");
-	}
-	if((buf[0] == 'Y') || (buf[0]=='y'))
+	if(vget(i, 0, "是否隱藏此RSS選項：Y)是 N)否 [N] ", buf, 2, LCECHO) == 'y')
 		mrss.xmode |= RSS_RESTRICT;
 	else
 		mrss.xmode &= (~RSS_RESTRICT);
 
 	i+=2;
-
-	if(!vget(i, 0, "是否立即啟用RSS：Y)是 N)否 [Y] ", buf, 1 + 1, DOECHO))
-	{
-		strcpy(buf,"y");
-	}
-	if((buf[0] == 'N') || (buf[0]=='n'))
+	if(vget(i, 0, "是否立即啟用RSS：Y)是 N)否 [Y] ", buf, 2, LCECHO) == 'n')
 		mrss.xmode &= (~RSS_START);
 	else
 		mrss.xmode |= RSS_START;
 
     ans = vans("選擇： S)儲存  E)繼續  Q)離開 [Q] ");
 
-    if (ans != 'S' && ans != 's' && ans != 'E' && ans != 'e')
+    if (ans != 's' && ans != 'e')
       return XO_BODY;
-    else if((ans == 'S') || (ans == 's'))
-	  break;
+    else if(ans == 's')
+      break;
   }
 
   sprintf(mrss.modified,"start");       /* smiler.080823: 將 feed->modified 清掉，重新記錄 */
@@ -483,7 +441,7 @@ rss_edit(xo)
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(frss, &mrss, sizeof(RSS));
-	rss_currchrono = frss->chrono;
+    rss_currchrono = frss->chrono;
     rec_put(xo->dir, frss, sizeof(RSS), pos, rss_cmpchrono);
 
     move(3 + cur, 0);
@@ -514,13 +472,12 @@ rss_url(xo)
   char buf_url[73];
   strcpy(buf_url,mrss.url);
   if(!vget(b_lines, 0, "", mrss.url, 73, GCARRY))
-	 strcpy(mrss.url,buf_url);
+    strcpy(mrss.url,buf_url);
 
 
-  if( strlen(mrss.url)<7  || mrss.url[0] != 'h' || mrss.url[1] != 't' || mrss.url[2] != 't' || mrss.url[3] != 'p' ||
-		mrss.url[4]!=':' || mrss.url[5] != '/' || mrss.url[6] != '/')
+  if( strlen(mrss.url)<7  || mrss.url[0] != 'h' || mrss.url[1] != 't' || mrss.url[2] != 't' || mrss.url[3] != 'p' || mrss.url[4]!=':' || mrss.url[5] != '/' || mrss.url[6] != '/')
   {
-		strcpy(mrss.url,buf_url);
+	strcpy(mrss.url,buf_url);
   }
   if(!IS_URL(mrss.url))
   {
@@ -539,7 +496,7 @@ rss_url(xo)
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(frss, &mrss, sizeof(RSS));
-	rss_currchrono = frss->chrono;
+    rss_currchrono = frss->chrono;
     rec_put(xo->dir, frss, sizeof(RSS), pos, rss_cmpchrono);
 
     move(3 + cur, 0);
@@ -566,7 +523,7 @@ rss_bookmark(xo)
   memcpy(&mrss, frss, sizeof(RSS));
 
   if(!vget(b_lines, 0, "請輸入RSS標籤名稱：", mrss.bookmark, IDLEN + 1, GCARRY))
-	 strcpy(mrss.bookmark," ");
+    strcpy(mrss.bookmark," ");
 
   struct tm *ptime;
   ptime = localtime(&(mrss.chrono));
@@ -575,7 +532,7 @@ rss_bookmark(xo)
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(frss, &mrss, sizeof(RSS));
-	rss_currchrono = frss->chrono;
+    rss_currchrono = frss->chrono;
     rec_put(xo->dir, frss, sizeof(RSS), pos, rss_cmpchrono);
 
     move(3 + cur, 0);
@@ -625,10 +582,10 @@ static int
 rss_mark(xo)
   XO *xo;
 {
-	RSS *rss;
+    RSS *rss;
     int pos, cur, xmode;
 
-	if (!(bbstate & STAT_BOARD))
+    if (!(bbstate & STAT_BOARD))
        return XO_NONE;
 
     pos = xo->pos;
@@ -639,19 +596,19 @@ rss_mark(xo)
     rss->xmode = xmode ^ RSS_RESTRICT;
     rss_currchrono = rss->chrono;
     rec_put(xo->dir, rss, sizeof(RSS), pos, rss_cmpchrono);
-    
-	return XO_BODY;
+
+    return XO_BODY;
 }
 
 static int
 rss_utf8(xo)
   XO *xo;
 {
-	RSS *rss;
+    RSS *rss;
     int pos, cur, xmode;
 
-	if (!(bbstate & STAT_BOARD))
-       return XO_NONE;
+    if (!(bbstate & STAT_BOARD))
+      return XO_NONE;
 
     pos = xo->pos;
     cur = pos - xo->top;
@@ -677,19 +634,19 @@ rss_utf8(xo)
 
     rss_currchrono = rss->chrono;
     rec_put(xo->dir, rss, sizeof(RSS), pos, rss_cmpchrono);
-    
-	return XO_BODY;
+
+    return XO_BODY;
 }
 
 static int
 rss_html_txt(xo)
   XO *xo;
 {
-	RSS *rss;
+    RSS *rss;
     int pos, cur, xmode;
 
-	if (!(bbstate & STAT_BOARD))
-       return XO_NONE;
+    if (!(bbstate & STAT_BOARD))
+      return XO_NONE;
 
     pos = xo->pos;
     cur = pos - xo->top;
@@ -699,19 +656,19 @@ rss_html_txt(xo)
     rss->xmode = xmode ^ RSS_TXT;
     rss_currchrono = rss->chrono;
     rec_put(xo->dir, rss, sizeof(RSS), pos, rss_cmpchrono);
-    
-	return XO_BODY;
+
+    return XO_BODY;
 }
 
 static int
 rss_start_idle(xo)
   XO *xo;
 {
-	RSS *rss;
+    RSS *rss;
     int pos, cur, xmode;
 
-	if (!(bbstate & STAT_BOARD))
-       return XO_NONE;
+    if (!(bbstate & STAT_BOARD))
+      return XO_NONE;
 
     pos = xo->pos;
     cur = pos - xo->top;
@@ -721,19 +678,19 @@ rss_start_idle(xo)
     rss->xmode = xmode ^ RSS_START;
     rss_currchrono = rss->chrono;
     rec_put(xo->dir, rss, sizeof(RSS), pos, rss_cmpchrono);
-    
-	return XO_BODY;
+
+    return XO_BODY;
 }
 
 static int
 rss_restart(xo)
   XO *xo;
 {
-	RSS *rss;
+    RSS *rss;
     int pos, cur, xmode;
 
-	if (!(bbstate & STAT_BOARD))
-       return XO_NONE;
+    if (!(bbstate & STAT_BOARD))
+      return XO_NONE;
 
     pos = xo->pos;
     cur = pos - xo->top;
@@ -743,8 +700,8 @@ rss_restart(xo)
     rss->xmode = xmode ^ RSS_RESTART;
     rss_currchrono = rss->chrono;
     rec_put(xo->dir, rss, sizeof(RSS), pos, rss_cmpchrono);
-    
-	return XO_BODY;
+
+    return XO_BODY;
 }
 
 static int
@@ -753,7 +710,7 @@ rss_browse(xo)
 {
 
 	RSS *rss;
-    rss = (RSS *) xo_pool + (xo->pos - xo->top);
+	rss = (RSS *) xo_pool + (xo->pos - xo->top);
 
 	if((!(bbstate & STAT_BOARD)) && (rss->xmode & RSS_RESTRICT))
 	  return XO_NONE;
@@ -794,7 +751,7 @@ rss_help(xo)
 
 int rss_main()
 {
-	XO *xo;
+    XO *xo;
     char rss_fpath[64];
     brd_fpath(rss_fpath,currboard,FN_RSS);
     xz[XZ_RSS - XO_ZONE].xo = xo = xo_new(rss_fpath);

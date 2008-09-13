@@ -1000,6 +1000,34 @@ czh_load()
 
 /*-------------------------------------------------------*/
 
+int
+last_nobottom(folder)	/* 找看板最後一篇非置底文的位置 */
+  char *folder;
+{
+  int fd, fsize;
+  struct stat st;
+  HDR hdr;
+
+  if ((fd = open(folder, O_RDONLY)) >= 0)
+  {
+    if (!fstat(fd, &st) && (fsize = st.st_size) >= sizeof(HDR))
+    {
+      while ((fsize -= sizeof(HDR)) >= 0)
+      {
+	lseek(fd, fsize, SEEK_SET);
+	read(fd, &hdr, sizeof(HDR));
+	if (!(hdr.xmode & POST_BOTTOM))
+	  break;
+      }
+    }
+    close(fd);
+
+    return fsize / sizeof(HDR);
+  }
+
+  return XO_TALL;
+}
+
 
 int
 XoPost(bno)

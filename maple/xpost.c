@@ -710,17 +710,18 @@ filter_score(head, hdr)
  HDR *head;	/* «Ý´úª« */
  HDR *hdr;	/* ±ø¥ó */
 {
+  int score = (head->xmode & POST_SCORE);
   if (!hdr->xmode)
   {
-    return hdr->score == 0 ? (head->xmode & POST_SCORE) :
-	hdr->score > 0 ? (head->score >= hdr->score) :
-	(head->score <= hdr->score);
+    return hdr->score == 0 ? score :
+	hdr->score > 0 ? score && (head->score >= hdr->score) :
+	score && (head->score <= hdr->score);
   }
   else
   {
-    return hdr->score == 0 ? !(head->xmode & POST_SCORE) :
-	hdr->score > 0 ? (head->score <= hdr->score) :
-	(head->score >= hdr->score);
+    return hdr->score == 0 ? !score :
+	hdr->score > 0 ? score && (head->score <= hdr->score) :
+	score && (head->score >= hdr->score);
   }
 }
 

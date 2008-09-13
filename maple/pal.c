@@ -141,7 +141,7 @@ BPAL *bpal;
 
 
 /* ----------------------------------------------------- */
-/* 朋友名單：新增、刪除、修改、載入、同步		 */
+/* 朋友名單：新增、刪除、修改、載入、同步			 */
 /* ----------------------------------------------------- */
 
 
@@ -376,13 +376,13 @@ pal_item_bar(xo, mode)
 #else
   int online = 0;
 #endif
-                                                                                
+
   pal = (PAL *) xo_pool + xo->pos - xo->top;
-                                                                                
+
 #ifdef CHECK_ONLINE
   online = utmp_get(pal->userno, NULL);
 #endif
-                                                                                
+
   prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
     mode ? USR_COLORBAR_PAL : "",         //這裡是光棒的顏色，可以自己改。
     xo->pos + 1, tag_char(pal->userno),
@@ -392,7 +392,7 @@ pal_item_bar(xo, mode)
     online ? COLOR7 : "",
     pal->ship,
     mode ? "\033[m" : "");
-                                                                                
+
   return XO_NONE;
 }
 #endif
@@ -611,7 +611,7 @@ pal_change(xo)
 {
   PAL *pal, oldpal;
   int pos, cur;
-  
+
   pos = xo->pos;
   cur = pos - xo->top;
   pal = (PAL *) xo_pool + cur;
@@ -768,7 +768,7 @@ pal_cite(xo)
 
   if ((fd = open(fpath, O_RDONLY)) < 0)
     return XO_FOOT;
- 
+
   num = PAL_MAX - xo->max;
 
   mgets(-1);

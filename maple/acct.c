@@ -16,21 +16,6 @@
 extern BCACHE *bshm;
 
 
-void
-str_lower_acct(dst, src)
-  char *dst, *src;
-{
-  int ch;
-
-  do
-  {
-    ch = *src++;
-    if (ch >= 'A' && ch <= 'Z')
-      ch |= 0x20;
-    *dst++ = ch;
-  } while (ch);
-}
-
 /* ----------------------------------------------------- */
 /* (.ACCT) 使用者帳號 (account) subroutines		 */
 /* ----------------------------------------------------- */
@@ -596,7 +581,7 @@ acct_setup(u, adm)
   };
 
 #if 0/*ikulan.080726:將站簽設定獨立出來*/
-  str_lower_acct(userid_tmp,x.userid);
+  str_lower(userid_tmp,x.userid);
   /* smiler.071030: 輸入使用者想對大家說的話 */
   i++;
   sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);

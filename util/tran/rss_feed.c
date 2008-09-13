@@ -12,7 +12,6 @@
 #include "snap.h"
 #include <netinet/in.h>
 
-#define FN_RSS	"rss"
 
 int boardnumber=0;
 
@@ -21,8 +20,8 @@ main(argc, argv)
   int argc;
   char *argv[];
 {
-  FILE *fp;                      
-//  HDR hdr;                       
+  FILE *fp;
+//  HDR hdr;
   if (argc > 2)
   {
     printf("Usage: %s [board]\n", argv[0]);
@@ -36,7 +35,7 @@ main(argc, argv)
 
     sprintf(buf, BBSHOME"/brd");
     chdir(buf);
-    
+
     dirp = opendir(".");
 
     while (de = readdir(dirp))
@@ -69,7 +68,7 @@ main(argc, argv)
 
 	}
 
-    closedir(dirp);    
+    closedir(dirp);
 
 
   return 0;

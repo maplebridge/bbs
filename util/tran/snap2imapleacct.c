@@ -1,5 +1,5 @@
 /*-------------------------------------------------------*/
-/* util/snap2imapleacct.c	( NTHU CS MapleBBS Ver Maple )	 */
+/* util/snap2imapleacct.c( NTHU CS MapleBBS Ver Maple )	 */
 /*-------------------------------------------------------*/
 /* target : iMaple ACCT Âà´«µ{¦¡				 */
 /* create : 98/12/15					 */
@@ -7,7 +7,7 @@
 /* author : mat.bbs@fall.twbbs.org			 */
 /* modify : itoc.bbs@bbs.tnfsh.tn.edu.tw		 */
 /*          ckm.bbs@lexel.twbbs.org			 */
-/*          smiler.bbs@bbs.cs.nthu.edu.tw     */
+/*          smiler.bbs@bbs.cs.nthu.edu.tw		 */
 /*-------------------------------------------------------*/
 /* syntax : snap2usr [userid]				 */
 /*-------------------------------------------------------*/
