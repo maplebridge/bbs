@@ -1814,7 +1814,8 @@ post_attr(hdr)
 {
   int mode, attr, unread;
 
-  char *attr_tmp;
+  char attr_tmp[15];
+  attr_tmp[0] = '\0';
 
   mode = hdr->xmode;
 
@@ -1835,55 +1836,55 @@ post_attr(hdr)
   if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
   {
     attr |= 'F',
-    attr_tmp = "\033[1;33m";
+    strcpy(attr_tmp, "\033[1;33m");
   }
   else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==(-1) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
     attr |= 'L';
-    attr_tmp = "\033[1;34m";
+    strcpy(attr_tmp, "\033[1;34m");
   }
   else
 #endif
   if ((bbstate & STAT_BOARD) && (mode & POST_GEM) && (mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM_MARKED))   /* 板主才看得到 G/B */
   {
     attr |= 'B';                       /* 若有 mark+gem，顯示 B */
-    attr_tmp = "\033[1;31m";
+    strcpy(attr_tmp, "\033[1;31m");
   }
   else if((bbstate & STAT_BOARD) && (mode & POST_GEM) && (!(mode & POST_MARKED)) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM))
   {
     attr |= 'G';
-    attr_tmp = "\033[1;35m";
+    strcpy(attr_tmp, "\033[1;35m");
   }
   else
 #ifdef HAVE_LABELMARK
   if ((mode & POST_DELETE) && (USR_SHOW & USR_SHOW_POST_ATTR_DELETE))
   {
     attr |= 'T';
-    attr_tmp = "\033[1;32m";
+    strcpy(attr_tmp, "\033[1;32m");
   }
   else
 #endif
   if ((mode & POST_NOFORWARD) && (USR_SHOW & USR_SHOW_POST_ATTR_NOFORWARD))
   {
     attr |= 'X';
-    attr_tmp = "\033[1;34m";
+    strcpy(attr_tmp, "\033[1;34m");
   }
   else if ((mode & POST_NOSCORE) && (USR_SHOW & USR_SHOW_POST_ATTR_NOSCORE))
   {
     attr |= 'N';
-    attr_tmp = "\033[1;34m";
+    strcpy(attr_tmp, "\033[1;34m");
   }
   else if ((mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_MARKED))
   {
     attr |= 'M';
-    attr_tmp = "\033[1;36m";
+    strcpy(attr_tmp, "\033[1;36m");
     if (mode & POST_GOOD)
-      attr_tmp = "\033[1;33m";
+      strcpy(attr_tmp, "\033[1;33m");
   }
   else if (!attr)
   {
     attr = '+';
-    attr_tmp = "";
+    strcpy(attr_tmp, "");
   }
 
   if (unread)
