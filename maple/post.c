@@ -704,9 +704,9 @@ post_filter(fpath)
 
 
 	  vmsg("您所post文章不為本站接受，請洽本站站務群 !!");
-	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!\n");
+	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
 	  mail_self(fpath, cuser.userid, warn, 0);
-      sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
+      sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!\n");
 	  f_cat(fpath, warn);
 	  unlink(fpath);
 	  return XO_HEAD;
@@ -723,9 +723,9 @@ post_filter(fpath)
 	  f_cat(fpath_log, content_log);
 
 	  vmsg("您所post文章不為本看板接受，請洽本看板板主 !!");
-	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!\n", currboard);
-	  mail_self(fpath, cuser.userid, warn, 0);
 	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!", currboard);
+	  mail_self(fpath, cuser.userid, warn, 0);
+	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!\n", currboard);
 	  f_cat(fpath, warn);
 	  unlink(fpath);
 	  return XO_HEAD;

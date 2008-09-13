@@ -72,15 +72,15 @@ f_str_sub_all_chr(fpath, tag)  /* 1: found 0: none */
 
 		   while(ansi)
 		   {
-			   c1 = fgetc(fp);
-			   if(feof(fp))
-			   {
-	              fclose(fp);
-	              return 0;
-			   }
+			  c1 = fgetc(fp);
+			  if(feof(fp))
+			  {
+	             fclose(fp);
+	             return 0;
+			  }
 
-			   if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
-			   {
+			  if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
+			  {
 	              ansi = 0;
 				  c1 = fgetc(fp);
 				  if(feof(fp))
@@ -88,7 +88,7 @@ f_str_sub_all_chr(fpath, tag)  /* 1: found 0: none */
 	                 fclose(fp);
 	                 return 0;
 				  }
-			   }
+			  }
 		   }
 
 		   if (in_chii || c1 & 0x80)
@@ -103,8 +103,32 @@ f_str_sub_all_chr(fpath, tag)  /* 1: found 0: none */
 			   || (c1 == '+')  || (c1 == '[') || (c1 == ']')  || (c1 == '\{') || (c1 == '\}')
 			   || (c1 == '\\') || (c1 == '|') || (c1 == '\;') || (c1 == ':')  || (c1 == '\'')
 			   || (c1 == '\"') || (c1 == ',') || (c1 == '<')  || (c1 == '.')  || (c1 == '>')
-			   || (c1 == '/')  || (c1 == '?') || (c1 == '\n') || (c1 == ' ') ))
+			   || (c1 == '/')  || (c1 == '?') || (c1 == '\n') || (c1 == ' ')  || (c1 == '\033') ))
 		   {
+			   if(c1 == '\033')
+			     ansi = 1;
+
+		       while(ansi)
+			   {
+			     c1 = fgetc(fp);
+			     if(feof(fp))
+				 {
+	                fclose(fp);
+	                return 0;
+				 }
+
+			     if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
+				 {
+	                ansi = 0;
+				    c1 = fgetc(fp);
+				    if(feof(fp))
+					{
+	                   fclose(fp);
+	                   return 0;
+					}
+				 }
+			   }
+
 			 c1 = fgetc(fp);
 			 if(feof(fp))
 			 {
