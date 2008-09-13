@@ -78,8 +78,10 @@ static int *xpostIndex;		/* Thor: first ypost pos in ypost_xo.key */
 static int comebackPos;		/* 記錄最後閱讀那篇文章的位置 */
 
 
-static char HintWord[TTLEN + 1];
-static char HintAuthor[IDLEN + 1];
+static char HintWord[TTLEN + 20];
+static char HintAuthor[IDLEN + 20];
+
+static int ReverseSearch;	/* 本次搜尋是否為排除條件 */
 
 
 static int
@@ -144,6 +146,8 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
 
 
   munmap(fimage, fsize);
+
+  ReverseSearch = 0;
 
   if (count <= 0)
   {
@@ -253,6 +257,34 @@ filter_select(head, hdr)
 }
 
 
+static int			/* 0:不滿足條件  !=0:滿足條件 */
+filter_R_select(head, hdr)
+  HDR *head;	/* 待測物 */
+  HDR *hdr;	/* 條件 */
+{
+  char *title;
+  usint str4;
+
+  /* 借用 hdr->xid 當 strlen(hdr->owner) */
+
+  /* Thor.981109: 特別注意，為了降低 load，author 是從頭 match，不是 substr match */
+  if (hdr->xid && !str_ncmp(head->owner, hdr->owner, hdr->xid))
+    return 0;
+
+  if (hdr->title[0])
+  {
+    title = head->title;
+    str4 = STR4(title);
+    if (str4 == STR4(STR_REPLY) || str4 == STR4(STR_FORWARD))	/* Thor.980911: 先把 Re:/Fw: 除外 */
+      title += 4;
+    if (str_sub(title, hdr->title))
+      return 0;
+  }
+
+  return 1;
+}
+
+
 int
 XoXselect(xo)
   XO *xo;
@@ -322,23 +354,33 @@ XoXauthor(xo)
 #endif
 
   author = hdr.owner;
-  if (!vget(b_lines, 0, MSG_XYPOST2, author, IDLEN + 1, DOECHO))
-    return XO_FOOT;
+  if (!ReverseSearch)
+  {
+    if (!vget(b_lines, 0, MSG_XYPOST2, author, IDLEN + 1, DOECHO))
+      return XO_FOOT;
+  }
+  else
+  {
+    if (!vget(b_lines, 0, "[排除] 作者關鍵字：", author, IDLEN + 1, DOECHO))
+      return XO_FOOT;
+  }
 
   HintWord[0] = '\0';
-  strcpy(HintAuthor, author);
+  if (!ReverseSearch)
+    strcpy(HintAuthor, author);
+  else
+    sprintf(HintAuthor, "\033[1;33m排除\033[m %s", author);
 
   hdr.title[0] = '\0';
   str_lower(author, author);
   hdr.xid = strlen(author);
 
-  return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
+  return XoXpost(xo, &hdr, 0, INT_MAX, ReverseSearch ? filter_R_select : filter_select);
 }
 
   /* --------------------------------------------------- */
   /* 搜尋檔名						 */
   /* --------------------------------------------------- */
-
 
 static int
 XoXxname(xo)
@@ -390,16 +432,27 @@ XoXtitle(xo)
 #endif
 
   title = hdr.title;
-  if (!vget(b_lines, 0, MSG_XYPOST1, title, 30, DOECHO))
-    return XO_FOOT;
+  if (!ReverseSearch)
+  {
+    if (!vget(b_lines, 0, MSG_XYPOST1, title, 30, DOECHO))
+      return XO_FOOT;
+  }
+  else
+  {
+    if (!vget(b_lines, 0, "[排除] 標題關鍵字：", title, 30, DOECHO))
+      return XO_FOOT;
+  }
 
-  strcpy(HintWord, title);
+  if (!ReverseSearch)
+    strcpy(HintWord, title);
+  else
+    sprintf(HintWord, "\033[1;33m排除\033[m %s", title);
   HintAuthor[0] = '\0';
 
   str_lowest(title, title);
   hdr.xid = 0;
 
-  return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
+  return XoXpost(xo, &hdr, 0, INT_MAX, ReverseSearch ? filter_R_select : filter_select);
 }
 
 
@@ -572,6 +625,15 @@ filter_mark(head, hdr)
 }
 
 
+static int			/* 0:不滿足條件  !=0:滿足條件 */
+filter_R_mark(head, hdr)
+  HDR *head;	/* 待測物 */
+  HDR *hdr;	/* 條件 */
+{
+  return !(head->xmode & POST_MARKED);
+}
+
+
 int
 XoXmark(xo)
   XO *xo;
@@ -583,9 +645,9 @@ XoXmark(xo)
     return XO_FOOT;
   }
 #endif
-  strcpy(HintWord, "\033[1;33m所有 mark 文章\033[m");
+  strcpy(HintWord, ReverseSearch ? "\033[1;33m所有無 mark 文章\033[m" : "\033[1;33m所有 mark 文章\033[m");
   HintAuthor[0] = '\0';
-  return XoXpost(xo, NULL, 0, INT_MAX, filter_mark);
+  return XoXpost(xo, NULL, 0, INT_MAX, ReverseSearch ? filter_R_mark : filter_mark);
 }
 
 
@@ -603,15 +665,25 @@ filter_local(head, hdr)
 }
 
 
+static int			/* 0:不滿足條件  !=0:滿足條件 */
+filter_R_local(head, hdr)
+  HDR *head;	/* 待測物 */
+  HDR *hdr;	/* 條件 */
+{
+  return (head->xmode & POST_INCOME);
+}
+
 int
 XoXlocal(xo)
   XO *xo;
 {
+#if 0
   if (currbattr & BRD_NOTRAN)
   {
     vmsg("本板為不轉信板，全部都是本地文章");
     return XO_FOOT;
   }
+#endif
 
 #ifdef EVERY_Z
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
@@ -621,10 +693,10 @@ XoXlocal(xo)
   }
 #endif
 
-  strcpy(HintWord, "\033[1;33m所有非轉進文章\033[m");
+  strcpy(HintWord, ReverseSearch ? "\033[1;33m所有轉進文章\033[m" : "\033[1;33m所有非轉進文章\033[m");
   HintAuthor[0] = '\0';
 
-  return XoXpost(xo, NULL, 0, INT_MAX, filter_local);
+  return XoXpost(xo, NULL, 0, INT_MAX, ReverseSearch ? filter_R_local : filter_local);
 }
 
 
@@ -668,7 +740,7 @@ XoXscore(xo)
   }
 #endif
 
-  vget(b_lines, 0, "搜尋評分數 >= + / <= - 多少的文章？(按 Enter 串接所有評分文章) ", score, 5, DOECHO);
+  vget(b_lines, 0, "搜尋評分數 >= + / <= - 多少的文章？ (反向搜尋請前置 ! 符號) ", score, 5, DOECHO);
   if (score[0] == '!')
   {
     hdr.xmode = 1;
@@ -776,6 +848,45 @@ XOXpost_search_all(xo)
       return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
   }
   return XO_BODY;
+}
+
+
+int
+XoRXsearch(xo)
+  XO *xo;
+{
+  ReverseSearch = 1;
+  outz("排除條件搜尋 1)作者 2)標題 3)mark 4)local：");
+  switch(vkey())
+  {
+  case '1':
+  case 'a':
+    return XoXauthor(xo);
+    break;
+
+  case '2':
+  case '/':
+    return XoXtitle(xo);
+    break;
+
+  case '3':
+  case 'G':
+  case 'g':
+  case 'm':
+    return XoXmark(xo);
+    break;
+
+  case '4':
+  case 'L':
+  case 'l':
+    return XoXlocal(xo);
+
+  default:
+    ReverseSearch = 0;
+    break;
+  }
+
+  return XO_FOOT;
 }
 
 

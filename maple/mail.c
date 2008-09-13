@@ -1924,6 +1924,7 @@ static KeyFunc mbox_cb[] =
   'f', XoXfull,			/* itoc.030608: 全文搜尋 */
   'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
   'L', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+  '!', XoRXsearch, 
 
   Ctrl('D'), mbox_prune,
   Ctrl('Q'), xo_uquery,
@@ -1977,6 +1978,7 @@ KeyFunc xmbox_cb[] =
   'f', XoXfull,
   'G', XoXmark,
   'L', XoXlocal,
+  '!', XoRXsearch, 
 
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,

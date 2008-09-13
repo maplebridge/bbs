@@ -121,7 +121,7 @@ RefusePal_level(board, hdr)       //smiler 1108
        fclose(fp);
        if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
             return 1;
-       if (fimage = f_img(fpath, &fsize))
+       if (fimage = (int *) f_img(fpath, &fsize))
        {
         fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
         free(fimage);
@@ -149,7 +149,7 @@ RefusePal_belong(board, hdr)
                                                                                 
   //RefusePal_fpath(fpath, board, 'C', hdr);  //smiler 1109
   RefusePal_fpath(fpath, board, 'R', hdr);  //smiler 1109
-  if (fimage = f_img(fpath, &fsize))
+  if (fimage = (int *) f_img(fpath, &fsize))
   {
     fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
     free(fimage);
@@ -513,7 +513,7 @@ post_show_dog(xo, f_mode)
 	prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
 
 	fscanf( fp, "%d", &wi);
-	prints("%s性別限制 : [%s] \033[m\n", (wi == 0) ? COLOR_ACP : (wi == (cuser.sex+1)) ? COLOR_ACP : COLOR_NOT_ACP, (wi==0) ? "[不限]" : (wi==1) ? "中性" : (wi==2) ? "男性" : "女性");
+	prints("%s性別限制 : [%s] \033[m\n", (wi == 0) ? COLOR_ACP : (wi == (cuser.sex+1)) ? COLOR_ACP : COLOR_NOT_ACP, (wi==0) ? "不限" : (wi==1) ? "中性" : (wi==2) ? "男性" : "女性");
 
 	fscanf( fp, "%d", &wi);
 	prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
@@ -548,6 +548,7 @@ post_show_dog(xo, f_mode)
 	return 0;
 }
 
+
 static int
 post_showbm(xo)
   XO *xo;
@@ -555,15 +556,15 @@ post_showbm(xo)
     BRD  *brd;
     brd = bshm->bcache + currbno;
 
-	move(0, 0);
-    clrtobot();
-	move(3, 0);
-       
-	prints("看板英文板名: %s\n",brd->brdname);
-	prints("看板分類    : %s\n",brd->class);
+    clear();
+    move(3, 0);
+
+    prints("看板英文板名: %s\n",brd->brdname);
+    prints("看板分類    : %s\n",brd->class);
     prints("看板中文板名: %s\n",brd->title);
     prints("看板板主名單: %s\n",brd->BM);
-	if(brd->bvote ==0)
+
+	if(brd->bvote == 0)
 	  prints("看板活動舉辦: 無投票舉辦\n");
 	else if(brd->bvote == -1)
 	  prints("看板活動舉辦: 有賭盤舉辦\n");
@@ -571,59 +572,23 @@ post_showbm(xo)
 	  prints("看板活動舉辦: 有投票舉辦\n");
 
 //#define BRD_NOZAP   0x01    /* 不可 zap */
-	prints("看板可否被z : ");
-	if(currbattr & BRD_NOZAP)
-		prints("不可\n");
-	else
-		prints("可\n");
+	prints("看板可否被z : %s\n", (currbattr & BRD_NOZAP) ? "不可" : "可");
 //#define BRD_NOTRAN  0x02    /* 不轉信 */
-	prints("看板可否轉信: ");
-	if(currbattr & BRD_NOTRAN)
-		prints("不轉信\n");
-	else
-		prints("可轉信\n");
+	prints("看板可否轉信: %s轉信\n", (currbattr & BRD_NOTRAN) ? "不" : "可");
 //#define BRD_NOCOUNT 0x04    /* 不計文章發表篇數 */
-	prints("文章發表篇數: ");
-	if(currbattr & BRD_NOCOUNT)
-		prints("不記錄\n");
-	else
-		prints("記錄\n");
+	prints("文章發表篇數: %s記錄\n", (currbattr & BRD_NOCOUNT) ? "不" : "");
 //#define BRD_NOSTAT  0x08    /* 不納入熱門話題統計 */
-	prints("熱門話題統計: ");
-	if(currbattr & BRD_NOSTAT)
-		prints("不記錄\n");
-	else
-		prints("記錄\n");
+	prints("熱門話題統計: %s記錄\n", (currbattr & BRD_NOSTAT) ? "不" : "");
 //#define BRD_NOVOTE  0x10    /* 不公佈投票結果於 [record] 板 */
-	prints("投摽結果公佈: ");
-	if(currbattr & BRD_NOVOTE)
-		prints("不公佈投表結果於 [record] 板\n");
-	else
-		prints("公佈投票結果於 [record] 板\n");
+	prints("投摽結果公佈: %s公佈投票結果於 [record] 板\n", (currbattr & BRD_NOVOTE) ? "不" : "");
 //#define BRD_ANONYMOUS   0x20    /* 匿名看板 */
-	prints("匿名看板   ?: ");
-	if(currbattr & BRD_ANONYMOUS)
-		prints("是\n");
-	else
-		prints("否\n");
+	prints("匿名看板   ?: %s\n", (currbattr & BRD_ANONYMOUS) ? "是" : "否");
 //#define BRD_NOSCORE 0x40    /* 不評分看板 */
-	prints("看板可否推文: ");
-	if(currbattr & BRD_NOSCORE)
-		prints("否\n");
-	else
-		prints("可\n");
+	prints("看板可否推文: %s\n", (currbattr & BRD_NOSCORE) ? "否" : "可");
 //#define BRD_NOL     0x100   /* 不可鎖文 */
-	prints("看板鎖文限制: ");
-	if(currbattr & BRD_NOL)
-		prints("板主已設定板友不得鎖文\n");
-	else
-		prints("板主未做板友鎖文設定\n");
+	prints("看板鎖文限制: %s\n", (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
 //#define BRD_SHOWPAL 0x200   /* 顯示板友名單 */
-	prints("顯示板友名單: ");
-	if(currbattr & BRD_SHOWPAL)
-		prints("板主隱藏板友名單\n");
-	else
-		prints("板友可看板友名單(ctrl^g)\n");
+	prints("顯示板友名單: %s\n", (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單(ctrl^g)");
 //#define BRD_PUBLIC  0x80    /* 公眾板 */
 	prints("是否為公眾板: ");
 	if(currbattr & BRD_PUBLIC)
@@ -648,6 +613,7 @@ post_showbm(xo)
 	return XO_HEAD;
 }
 
+
 /* smiler.080830 : 看門狗 */
 static int
 IS_BRD_DOG_FOOD(fpath, board)
@@ -657,7 +623,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 
   int fsize;
   char fpath_img[64];
-  int *fimage;
+  char *fimage;
 
   char fpath_filter[64];
   char filter[73];
@@ -723,7 +689,7 @@ IS_BBS_DOG_FOOD(fpath)
 
   int fsize;
   char fpath_img[64];
-  int *fimage;
+  char *fimage;
 
   char fpath_filter[64];
   char filter[73];
@@ -1912,10 +1878,9 @@ static char*
 post_attr(hdr)
   HDR *hdr;
 {
-  int mode, attr;
+  int mode, attr, unread;
 
-  char attr_tmp[15];  
-  attr_tmp[0]='\0';
+  char *attr_tmp;
 
   mode = hdr->xmode;
 
@@ -1923,72 +1888,80 @@ post_attr(hdr)
   /* 由於置底文沒有閱讀記錄，所以視為已讀 */
   /* 加密文章視為已讀 */
 #ifdef HAVE_REFUSEMARK
-  attr = ((mode & POST_BOTTOM) || !brh_unread(BMAX(hdr->chrono, hdr->stamp)) || 
+  attr = ((mode & POST_BOTTOM) || !brh_unread(hdr->chrono) ||
     ((mode & POST_RESTRICT) && strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))) ? 0x20 : 0;
 #else
-  attr = ((mode & POST_BOTTOM) || !brh_unread(BMAX(hdr->chrono, hdr->stamp)) ? 0x20 : 0;
+  attr = ((mode & POST_BOTTOM) || !brh_unread(hdr->chrono) ? 0x20 : 0;
 #endif
 
+          
+  unread = ((USR_SHOW & USR_SHOW_POST_MODIFY_UNREAD) && attr && brh_unread(BMAX(hdr->chrono, hdr->stamp))) ? 1 : 0;
 
 #ifdef HAVE_REFUSEMARK
   if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
   {
-       attr |= 'F',
-	   strcpy(attr_tmp,"\033[1;33m");
+    attr |= 'F',
+    attr_tmp = "\033[1;33m";
   }
   else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==(-1) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
-       attr |= 'L';
-	   strcpy(attr_tmp,"\033[1;34m");
+    attr |= 'L';
+    attr_tmp = "\033[1;34m";
   }
   else
 #endif
   if ((bbstate & STAT_BOARD) && (mode & POST_GEM) && (mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM_MARKED))   /* 板主才看得到 G/B */
-  {        
-
-	   attr |= 'B';                       /* 若有 mark+gem，顯示 B */
-	   strcpy(attr_tmp,"\033[1;31m");
+  {
+    attr |= 'B';                       /* 若有 mark+gem，顯示 B */
+    attr_tmp = "\033[1;31m";
   }
   else if((bbstate & STAT_BOARD) && (mode & POST_GEM) && (!(mode & POST_MARKED)) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM))
   {
-	   attr |= 'G';
-	   strcpy(attr_tmp,"\033[1;35m");
+    attr |= 'G';
+    attr_tmp = "\033[1;35m";
   }
   else
-
 #ifdef HAVE_LABELMARK
   if ((mode & POST_DELETE) && (USR_SHOW & USR_SHOW_POST_ATTR_DELETE))
   {
-       attr |= 'T';
-	   strcpy(attr_tmp,"\033[1;32m");
+    attr |= 'T';
+    attr_tmp = "\033[1;32m";
   }
   else
 #endif
   if ((mode & POST_NOFORWARD) && (USR_SHOW & USR_SHOW_POST_ATTR_NOFORWARD))
   {
     attr |= 'X';
-	strcpy(attr_tmp,"\033[1;34m");
+    attr_tmp = "\033[1;34m";
   }
   else if ((mode & POST_NOSCORE) && (USR_SHOW & USR_SHOW_POST_ATTR_NOSCORE))
   {
     attr |= 'N';
-	strcpy(attr_tmp,"\033[1;34m");
+    attr_tmp = "\033[1;34m";
   }
   else if ((mode & POST_MARKED) && (USR_SHOW & USR_SHOW_POST_ATTR_MARKED))
   {
     attr |= 'M';
-	strcpy(attr_tmp,"\033[1;36m");
-	if(mode & POST_GOOD)
-		strcpy(attr_tmp,"\033[1;33m");
+    attr_tmp = "\033[1;36m";
+    if (mode & POST_GOOD)
+      attr_tmp = "\033[1;33m";
   }
   else if (!attr)
   {
     attr = '+';
-    attr_tmp[0]='\0';
+    attr_tmp = "";
+  }
+
+  if (unread)
+  {
+    if (attr == 'm' || attr == 'b')
+      attr = '=';
+    else if (!(mode & POST_BOTTOM))
+      attr = '~';
   }
 
   static char color_attr[30];
-  sprintf(color_attr,"%s%c\033[m",attr_tmp,attr);
+  sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);
   return color_attr;
 }
 
@@ -2507,20 +2480,16 @@ post_cross(xo)
   char fpath_log[64];
   char content_log[256];
 
-  /*  解決信箱轉寄問題 */
-  int comefrom;          // 0: 從信箱轉寄 1: 從看板轉寄
-  char mail_path_tmp[64];
-  char userid_tmp[15];
+  /*  解決信箱轉錄問題 */
+  int comefrom;          // 0: 從信箱轉錄 1: 從看板轉錄
 
   /* smiler.080830: 判斷轉錄是否有被 BBS 看門狗吃掉 */
   int is_bite=0;
 
-  str_lower_tmp(userid_tmp,cuser.userid);
-  usr_fpath(mail_path_tmp, cuser.userid, ".DIR");
-  if(!strcmp(mail_path_tmp,xo->dir))
-	  comefrom=0;
+  if (xo->dir[0] == 'u')
+    comefrom=0;
   else
-	  comefrom=1;
+    comefrom=1;
 
 
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
@@ -2531,12 +2500,12 @@ post_cross(xo)
   if(strstr(xo->dir,"brd/"))
   {
     if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
-	{
-		vmsg("本看板禁止轉錄 !!");
+    {
+	vmsg("本看板禁止轉錄 !!");
         return XO_NONE;
-	}
+    }
 
-	if(currbattr & BRD_SHOWTURN)
+    if(currbattr & BRD_SHOWTURN)
       can_showturn=1;
   }
 
@@ -2627,43 +2596,43 @@ post_cross(xo)
 	strcpy(ve_title, hdr->title);
     }
 
-	strcpy(bbs_dog_title, ve_title);
+    strcpy(bbs_dog_title, ve_title);
 
-	if(comefrom)                    /* smiler.071114: 需為處在看板,下面幾行才需作判斷 */
-	{
-    if (hdr->xmode & GEM_FOLDER)	/* 非 plain text 不能轉 */
-      continue;
+    if(comefrom)                    /* smiler.071114: 需為處在看板,下面幾行才需作判斷 */
+    {
+      if (hdr->xmode & GEM_FOLDER)	/* 非 plain text 不能轉 */
+	continue;
 
 #ifdef HAVE_REFUSEMARK
-    if (hdr->xmode & POST_RESTRICT)
-      continue;
+      if (hdr->xmode & POST_RESTRICT)
+	continue;
 #endif
-    if (hdr->xmode & POST_NOFORWARD)
-      continue;
-	}
+      if (hdr->xmode & POST_NOFORWARD)
+	continue;
+    }
     hdr_fpath(fpath, dir, hdr);
 
-	if((xbattr & BRD_BBS_DOG ) && IS_BBS_DOG_FOOD(fpath))
-	{
-		brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
-	    f_cat(fpath_log, content_log);
+    if((xbattr & BRD_BBS_DOG ) && IS_BBS_DOG_FOOD(fpath))
+    {
+	brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
+	sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	f_cat(fpath_log, content_log);
 
-		vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
-		is_bite = 1;
-		continue;
-	}
+	vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
+	is_bite = 1;
+	continue;
+    }
 
-	if(IS_BRD_DOG_FOOD(fpath, xboard))
-	{
-		brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
-	    f_cat(fpath_log, content_log);
+    if(IS_BRD_DOG_FOOD(fpath, xboard))
+    {
+	brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
+	sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	f_cat(fpath_log, content_log);
 
-		vmsg("您所post文章不為轉錄接受，請洽轉錄看板板主 !!");
-		is_bite = 1;
-		continue;
-	}
+	vmsg("您所post文章不為轉錄接受，請洽轉錄看板板主 !!");
+	is_bite = 1;
+	continue;
+    }
 
 #ifdef HAVE_DETECT_CROSSPOST
     if (check_crosspost(fpath, xbno))
@@ -2735,13 +2704,11 @@ post_cross(xo)
       outgo_post(&xpost, xboard);
 
 
-	char str_tag_score[50];
+    char str_tag_score[50];
     sprintf(str_tag_score," 轉錄至 %s 看板 ",xboard);
-	if(strstr(xo->dir,"brd/"))
-	{
-	  if(can_showturn)
-        post_t_score(xo,str_tag_score,hdr);
-	}
+
+    if(can_showturn)	/* 只有看板才有可能有 can_showturn */
+      post_t_score(xo,str_tag_score,hdr);
 
   } while (++locus < tag);
 
@@ -2797,10 +2764,10 @@ post_forward(xo)
   if(strstr(xo->dir,"brd/"))
   {
     if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
-	{
-		vmsg("本看板禁止轉錄 !!");
-	    return XO_NONE;
-	}
+    {
+	vmsg("本看板禁止轉錄 !!");
+	return XO_NONE;
+    }
   }
 
   if (acct_get("轉達信件給：", &muser) > 0)
@@ -2816,13 +2783,13 @@ post_forward(xo)
     mail_send(muser.userid);
     *quote_file = '\0';
 
-	char str_tag_score[50];
+    char str_tag_score[50];
     sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",muser.userid);
-	if(strstr(xo->dir,"brd/"))
-	{
-	   if(currbattr & BRD_SHOWTURN)
-         post_t_score(xo,str_tag_score,hdr);
-	}
+    if(strstr(xo->dir,"brd/"))
+    {
+	if(currbattr & BRD_SHOWTURN)
+	post_t_score(xo,str_tag_score,hdr);
+    }
 
   }
   return XO_HEAD;
@@ -3883,8 +3850,11 @@ post_t_score(xo,reason_input,hdr_in)
 //  char uid[IDLEN + 1];
 //#endif
 
-  if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
-    return XO_NONE;
+  /* post_cross() 中的 currbattr 在呼叫 post_t_score 時仍為轉錄目標看板 battr,
+     故這裡判斷會發生錯誤. 又, 因板主已主動開啟紀錄轉錄, 故應不用再去管此板是否可評分.
+     而會呼叫 post_t_score 的 post_corss/post_forward/xo_forward 都已判斷了權限, 故下面兩行刪除. */
+//  if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
+//    return XO_NONE;
 
   pos = xo->pos;
   cur = pos - xo->top;
@@ -4000,43 +3970,42 @@ post_t_score(xo,reason_input,hdr_in)
     fclose(fp);
   }
 
+  /* 問題待解: 若為 tag 轉錄, 則有可能 hdr_in 不在 pos 上, 每次都讓 rec_ref 從頭找起有損效率*/
     curraddscore = ans;
-	if(!strcmp(hdr->xname,hdr_in->xname))
-	{
+    if(!strcmp(hdr->xname,hdr_in->xname))
+    {
       currchrono = hdr->chrono;
       change_stamp(xo->dir, hdr);
       rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
       if (hdr->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
-	  {
+      {
         currchrono = hdr->parent_chrono;
         rec_ref(dir, hdr, sizeof(HDR), 0, cmpchrono, addscore);
-	  }
+      }
       else                           /* 若是評分一般文章，去找謄本來連動分數 */
-	  {
+      {
         /* currchrono = hdr->chrono; */ /* 前面有了 */
         rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
-	  }
+      }
       post_history(xo, hdr);
-	}
-	else
-	{
-	  currchrono = hdr_in->chrono;
+    }
+    else
+    {
+      currchrono = hdr_in->chrono;
       change_stamp(xo->dir, hdr_in);
       rec_ref(dir, hdr_in, sizeof(HDR), xo->key == XZ_XPOST ? hdr_in->xid : pos, cmpchrono, addscore);
       if (hdr_in->xmode & POST_BOTTOM)  /* 若是評分置底文章，去找正本來連動分數 */
-	  {
+      {
         currchrono = hdr_in->parent_chrono;
         rec_ref(dir, hdr_in, sizeof(HDR), 0, cmpchrono, addscore);
-	  }
+      }
       else                           /* 若是評分一般文章，去找謄本來連動分數 */
-	  {
+      {
         /* currchrono = hdr->chrono; */ /* 前面有了 */
         rec_ref(dir, hdr_in, sizeof(HDR), 0, cmpparent, addscore);
-	  }
+      }
       post_history(xo, hdr_in);
-	}
-
-
+    }
 
     btime_update(currbno);
 
@@ -4695,15 +4664,18 @@ KeyFunc post_cb[] =
 #endif
 
   '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
+  '!', XoRXsearch, 
 
-  //'~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
-  //'~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
-  //'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
-  //'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
-  //'/', XoXtitle,		/* itoc.001220: 搜尋標題 */
-  //'f', XoXfull,			/* itoc.030608: 全文搜尋 */
-  //'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
-  //'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+#if 0
+  '~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
+  '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
+  'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
+  'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
+  '/', XoXtitle,		/* itoc.001220: 搜尋標題 */
+  'f', XoXfull,			/* itoc.030608: 全文搜尋 */
+  'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
+  'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+#endif
 
 #ifdef HAVE_XYNEWS
   'u', XoNews,			/* itoc.010822: 新聞閱讀模式 */
@@ -4747,14 +4719,17 @@ KeyFunc xpost_cb[] =
   'n', post_label,
 #endif
 
-    '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
-//  '~', XoXselect,
-//  'S', XoXsearch,
-//  'a', XoXauthor,
-//  '/', XoXtitle,
-//  'f', XoXfull,
-//  'G', XoXmark,
-//  'K', XoXlocal,
+  '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
+  '!', XoRXsearch, 
+#if 0
+  '~', XoXselect,
+  'S', XoXsearch,
+  'a', XoXauthor,
+  '/', XoXtitle,
+  'f', XoXfull,
+  'G', XoXmark,
+  'K', XoXlocal,
+#endif
 
   Ctrl('P'), post_add,
   Ctrl('D'), post_prune,

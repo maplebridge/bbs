@@ -188,7 +188,7 @@ char *ufo_tbl[NUMUFOS] =
 /* 各種顯示的中文意義					 */
 /* ----------------------------------------------------- */
 
-#define NUM_USR_SHOW_inufo	10
+#define NUM_USR_SHOW_inufo	11
 
 char *usr_show_tbl[NUM_USR_SHOW_inufo] =
 {
@@ -201,7 +201,8 @@ char *usr_show_tbl[NUM_USR_SHOW_inufo] =
 	"進推文顯示N|n   (顯示/取消)",
 	"標記文顯示M|m   (顯示/取消)",
 	"推文歸0 顯示    (顯示/取消)",
-	"推文分數顯示    (顯示/取消)"
+	"推文分數顯示    (顯示/取消)",
+	"推文未讀提示    (顯示/取消)"
 };
 
 

@@ -226,7 +226,7 @@ COLOR1 " ¦ê¦C·j´M " COLOR9 " (y/x)"COLOR2"¦^À³/Âà¿ý  "COLOR9"(m/t)"COLOR2"¼Ð°O/¼
 COLOR1 " «H«H¬Û±¤ " COLOR9 " (y)"COLOR2"¦^«H "COLOR9"(F/X/x)"COLOR2"Âà±H/Âà¹F/Âà¿ý "COLOR9"(d)"COLOR2"§R°£ "COLOR9"(D)"COLOR2"°Ï¬q§R°£ "COLOR9"(m)"COLOR2"¼Ð°O "COLOR9"(E)"COLOR2"½s¿è  "
 
 #define FEETER_POST	\
-COLOR1 " ¤å³¹¦Cªí \033[m" COLOR9 " (f)"COLOR8"½s¸¹/ÀÉ¦W¤Á´«\033[m" COLOR9 " (ry)"COLOR2"¦^«H " COLOR9 "(/)"COLOR8"·j´M\¥\\¯à¾ã¦XÁä\033[m" COLOR9 " (x/V/u)"COLOR2"Âà¿ý/§ë²¼/·s»D  "
+COLOR1 " ¤å³¹¦Cªí \033[m" COLOR9 " (f)"COLOR8"½s¸¹/ÀÉ¦W¤Á´«\033[m" COLOR9 " (ry)"COLOR2"¦^«H " COLOR9 "(/)"COLOR8"·j´M¥\\¯à¾ã¦XÁä\033[m" COLOR9 " (x/V/u)"COLOR2"Âà¿ý/§ë²¼/·s»D  "
 
 #define FEETER_GEM	\
 COLOR1 " ¬ÝªOºëµØ " COLOR9 " (^P/a/f)"COLOR2"·s¼W/¤å³¹/¥Ø¿ý "COLOR9"(E)"COLOR2"½s¿è "COLOR9"(T)"COLOR2"¼ÐÃD "COLOR9"(m)"COLOR2"²¾°Ê "COLOR9"(c)"COLOR2"½Æ»s "COLOR9"(p^V)"COLOR2"¶K¤W   "

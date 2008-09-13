@@ -152,7 +152,7 @@ IS_BRD_DOG_FOOD(fpath, board)
 
   int fsize;
   char fpath_img[64];
-  int *fimage;
+  char *fimage;
 
   char fpath_filter[64];
   char filter[73];
@@ -217,7 +217,7 @@ IS_BBS_DOG_FOOD(fpath)
 
   int fsize;
   char fpath_img[64];
-  int *fimage;
+  char *fimage;
 
   char fpath_filter[64];
   char filter[73];
@@ -971,3 +971,4 @@ receive_article()
 
   return 0;
 }
+

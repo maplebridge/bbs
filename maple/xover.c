@@ -601,8 +601,8 @@ xo_forward(xo)
   {
    if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
    {
-	   vmsg("本看板禁止轉錄 !!");
-       return XO_NONE;
+      vmsg("本看板禁止轉錄 !!");
+      return XO_NONE;
    }
   }
 
@@ -688,27 +688,27 @@ xo_forward(xo)
 
       if (method)		/* 轉寄站內 */
       {
-	    HDR mhdr;
+	HDR mhdr;
 
-	    if ((cc = hdr_stamp(folder, HDR_COPY, &mhdr, fpath)) < 0)
-	       break;
+	if ((cc = hdr_stamp(folder, HDR_COPY, &mhdr, fpath)) < 0)
+	  break;
 
-	    if (method > 0)		/* 轉寄自己 */
-		{
-	       strcpy(mhdr.owner, "[精 選 集]");
-	       mhdr.xmode = MAIL_READ | MAIL_NOREPLY;
-	       sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",cuser.userid);
-		}
-	    else			/* 轉寄其他使用者 */
-		{
-	       strcpy(mhdr.owner, userid);
-	       sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",rcpt);
-		}
-	    strcpy(mhdr.nick, cuser.username);
-	    strcpy(mhdr.title, title);
-	    if ((cc = rec_add(folder, &mhdr, sizeof(HDR))) < 0)
-	       break;
-	  }
+	if (method > 0)		/* 轉寄自己 */
+	{
+	  strcpy(mhdr.owner, "[精 選 集]");
+	  mhdr.xmode = MAIL_READ | MAIL_NOREPLY;
+	  sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",cuser.userid);
+	}
+	else			/* 轉寄其他使用者 */
+	{
+	  strcpy(mhdr.owner, userid);
+	  sprintf(str_tag_score," 轉錄至 %s 的bbs信箱 ",rcpt);
+	}
+	strcpy(mhdr.nick, cuser.username);
+	strcpy(mhdr.title, title);
+	if ((cc = rec_add(folder, &mhdr, sizeof(HDR))) < 0)
+	   break;
+      }
       else			/* 轉寄站外 */
       {
 	    if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)

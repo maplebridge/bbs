@@ -374,7 +374,7 @@ post_brd_prefix(xo)
                                                                                 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
                                                                                 
-  switch (vans("使用文章類別 (1)使用\ (2)不使用\ (3)設定類別 (Q)取消？[Q] "))
+  switch (vans("使用文章類別 (1)使用 (2)不使用 (3)設定類別 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_PREFIX;
@@ -512,7 +512,7 @@ post_noforward(xo)
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("轉錄文章 (1)允許\ (2)禁止\ (Q)取消？[Q] "))
+  switch (vans("轉錄文章 (1)允許\ (2)禁止 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOFORWARD;
@@ -542,7 +542,7 @@ post_showreturn(xo)
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("轉錄記錄 (1)打開\ (2)關閉\ (Q)取消？[Q] "))
+  switch (vans("轉錄記錄 (1)打開 (2)關閉 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr |= BRD_SHOWTURN;
@@ -1296,3 +1296,4 @@ post_manage(xo)
 
   return XO_FOOT;
 }
+

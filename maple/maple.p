@@ -307,3 +307,4 @@ int news_init(XO *xo);
 int news_load(XO *xo);
 int XoNews(XO *xo);
 int XOXpost_search_all(XO *xo);
+int XoRXsearch(XO *xo); 
