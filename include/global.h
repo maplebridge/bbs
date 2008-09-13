@@ -201,6 +201,7 @@
 #define FN_ETC_LOVELETTER "etc/loveletter"	/* 情書產生器文庫 */
 #define FN_ETC_NOCROSSPOST "etc/crosspost"	/* crosspost 特例名單*/
 #define FN_ETC_BBSDOG		"etc/POST_FILTER"	/* BBS 看門狗 */
+#define FN_ETC_BBSDOG_LOG	"etc/BBSDOG_LOG"	/* BBS 看門狗 log */
 
 
   /* --------------------------------------------------- */

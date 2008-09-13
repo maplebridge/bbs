@@ -303,7 +303,11 @@ bbspost_topic_add(board, addr, nick ,board_from)
   if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
 	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+	f_cat(fpath_log, content_log);
+
+	sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
 	f_cat(fpath_log, content_log);
 
 	copy_post_to_deletelog(&hdr, fpath);
@@ -319,7 +323,11 @@ bbspost_topic_add(board, addr, nick ,board_from)
   else if(IS_BRD_DOG_FOOD(fpath, board))
   {
 	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+	f_cat(fpath_log, content_log);
+
+	sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
 	f_cat(fpath_log, content_log);
 
 	copy_post_to_deletelog(&hdr, fpath);
@@ -534,7 +542,11 @@ bbspost_add(board, addr, nick)
 	if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
 	{
 		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+	    f_cat(fpath_log, content_log);
+
+		sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
 	    f_cat(fpath_log, content_log);
 
 		copy_post_to_deletelog(&hdr, fpath);
@@ -550,7 +562,11 @@ bbspost_add(board, addr, nick)
 	else if(IS_BRD_DOG_FOOD(fpath, board))
 	{
 		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, hdr.title, bbs_dog_str);
+	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+	    f_cat(fpath_log, content_log);
+
+		sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
 	    f_cat(fpath_log, content_log);
 
 		copy_post_to_deletelog(&hdr, fpath);

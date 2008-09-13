@@ -1373,7 +1373,11 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
   if((mybattr & BRD_BBS_DOG) && IS_MAIL_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
 	  brd_fpath(fpath_log, brdname, FN_BBSDOG_LOG);
-	  sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), author, title, bbs_dog_str);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), author, title);
+	  f_cat(fpath_log, content_log);
+
+	  sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), author, brdname, title, bbs_dog_str);
 	  f_cat(fpath_log, content_log);
 
 	  copy_post_to_deletelog(&hdr, fpath);
@@ -1384,7 +1388,11 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
   if(IS_MAIL_BRD_DOG_FOOD(fpath, brdname))
   {
 	  brd_fpath(fpath_log, brdname, FN_BBSDOG_LOG);
-	  sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板 %s\n標題: %s\n字串: %s\n\n", Now(), author, title, bbs_dog_str);
+	  sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), author, title);
+	  f_cat(fpath_log, content_log);
+
+	  sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	  sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), author, brdname, title, bbs_dog_str);
 	  f_cat(fpath_log, content_log);
 
 	  copy_post_to_deletelog(&hdr, fpath);

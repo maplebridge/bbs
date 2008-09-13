@@ -327,6 +327,7 @@ a_xfile()		/* 設定系統檔案 */
 #endif
     "站務的情書",
 	"BBS 看門狗",
+	"看門狗記錄",
     NULL
   };
 
@@ -376,6 +377,7 @@ a_xfile()		/* 設定系統檔案 */
 #endif
     FN_ETC_SYSMAIL,
 	FN_ETC_BBSDOG,
+	FN_ETC_BBSDOG_LOG,
 	NULL
   };
 

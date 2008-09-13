@@ -695,13 +695,19 @@ post_filter(fpath)
   if( (currbattr & BRD_BBS_DOG) && (IS_BBS_DOG_FOOD(fpath)) ) /* smiler.080910: 讓使用者決定是否加入BBS看門狗計畫 */
   {
 	  brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
-	  sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po\n作者: %s\n標題: %s\n\n", Now(), cuser.userid, bbs_dog_title);
 	  f_cat(fpath_log, content_log);
 
+	  sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	  sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
+	  f_cat(fpath_log, content_log);
+
+
 	  vmsg("您所post文章不為本站接受，請洽本站站務群 !!");
-	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
-	  f_cat(fpath, warn);
+	  sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!\n");
 	  mail_self(fpath, cuser.userid, warn, 0);
+      sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
+	  f_cat(fpath, warn);
 	  unlink(fpath);
 	  return XO_HEAD;
   }
@@ -709,13 +715,18 @@ post_filter(fpath)
   if(IS_BRD_DOG_FOOD(fpath, currboard))
   {
 	  brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
-	  sprintf(content_log, "%s 文章內容限制: 文章寄回給原po %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	  sprintf(content_log, "%s 文章內容限制: 文章寄回給原po\n作者: %s\n標題: %s\n\n", Now(), cuser.userid, bbs_dog_title);
+	  f_cat(fpath_log, content_log);
+
+	  sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	  sprintf(content_log, "%s 文章內容限制: 文章寄回給原po\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
 	  f_cat(fpath_log, content_log);
 
 	  vmsg("您所post文章不為本看板接受，請洽本看板板主 !!");
+	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!\n", currboard);
+	  mail_self(fpath, cuser.userid, warn, 0);
 	  sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!", currboard);
 	  f_cat(fpath, warn);
-	  mail_self(fpath, cuser.userid, warn, 0);
 	  unlink(fpath);
 	  return XO_HEAD;
   }
@@ -2550,7 +2561,11 @@ post_cross(xo)
     if((xbattr & BRD_BBS_DOG ) && IS_BBS_DOG_FOOD(fpath))
     {
 	brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	sprintf(content_log, "%s BBS看門狗計畫: 轉錄失敗\n作者: %s\n來源: %s\n標題: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "個人信箱", bbs_dog_title);
+	f_cat(fpath_log, content_log);
+
+	sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	sprintf(content_log, "%s BBS看門狗計畫: 轉錄失敗\n作者: %s\n來源: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "個人信箱", xboard, bbs_dog_title, bbs_dog_str);
 	f_cat(fpath_log, content_log);
 
 	vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
@@ -2561,10 +2576,14 @@ post_cross(xo)
     if(IS_BRD_DOG_FOOD(fpath, xboard))
     {
 	brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s BBS看門狗: 個人信件未轉入看板 %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, bbs_dog_title, bbs_dog_str);
+	sprintf(content_log, "%s 文章內容限制: 轉錄失敗\n作者: %s\n來源: %s\n標題: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "個人信箱", bbs_dog_title);
 	f_cat(fpath_log, content_log);
 
-	vmsg("您所post文章不為轉錄接受，請洽轉錄看板板主 !!");
+    sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+	sprintf(content_log, "%s 文章內容限制: 轉錄失敗\n作者: %s\n來源: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "個人信箱", xboard, bbs_dog_title, bbs_dog_str);
+	f_cat(fpath_log, content_log);
+
+	vmsg("您所轉錄文章不為對方看板接受，請洽看板板主 !!");
 	is_bite = 1;
 	continue;
     }
