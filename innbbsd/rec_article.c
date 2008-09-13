@@ -182,11 +182,6 @@ static int
 IS_BBS_DOG_FOOD(fpath)
   char *fpath;
 {
-
-  int fsize;
-  char fpath_img[64];
-  int *fimage;
-
   char fpath_filter[64];
   char filter[73];
 
