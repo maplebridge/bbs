@@ -1,123 +1,65 @@
 /*-------------------------------------------------------*/
-/* util/mergebrd.c      ( NTHU CS MapleBBS Ver 3.10 )    */
+/* util/appendbrd.c ( NTHU CS MapleBBS Ver 楓橋驛站 )    */
 /*-------------------------------------------------------*/
-/* target : merge several boards into one board          */
-/* create : 07/03/16                                     */
-/* update :   /  /                                       */
+/* target : M3 楓橋看板複製程式	     			 */
+/* create : 08/09/15					 */
+/* author : smiler.bbs@bbs.cs.nthu.edu.tw	         */
 /*-------------------------------------------------------*/
-/* syntax : appendbrd dst src1 [src2 src3 ...]            */
+/* syntax : appendbrd board_src board_dst		 */
 /*-------------------------------------------------------*/
-                                                                                
+
+
 #include "bbs.h"
-                                                                                
-                                                                                
-static int
-is_board(brdname)
-  char *brdname;
-{
-  BRD brd;
-  int fd;
-  int rc = 0;
-                                                                                
-  if ((fd = open(FN_BRD, O_RDONLY)) >= 0)
-  {
-    while (read(fd, &brd, sizeof(BRD)) == sizeof(BRD))
-    {
-      if (!strcmp(brdname, brd.brdname))
-      {
-        rc = 1;
-        break;
-      }
-    }
-    close(fd);
-  }
-  return rc;
-}
-                                                                                
-                                                                                
-static int
-merge_board(src, dst)
-  char *src, *dst;
-{
-  int i;
-  char x;
-  char fnew[64], fold[64];
-  char cmd[256];
-  if (!strcmp(src, dst))
-  {
-    printf("不能將同一板合併\n");
-    return 0;
-  }
-                                                                                
-  if (!is_board(src))
-  {
-    printf("沒有 %s 這板！\n", src);
-    return 0;
-  }
-                                                                                
-  for (i = 0; i < 32; i++)
-  {
-    x = radix32[i];                       /* @/ 拋棄 */
-    sprintf(fold, "brd/%s/%c/*", src, x);
-    sprintf(fnew, "brd/%s/%c/", dst, x);
-    sprintf(cmd, "cp %s %s", fold, fnew); /* 假設沒有同樣檔名的。若有會覆蓋 */
-    system(cmd);
-  }
-                                                                                
-  brd_fpath(fold, src, FN_DIR);
-  brd_fpath(fnew, dst, FN_DIR);
-  sprintf(cmd, "cat %s >> %s", fold, fnew);
-  system(cmd);
-                                                                                
-  return 1;
-}
-                                                                                
-static int
-hdr_cmp(a, b)
-  HDR *a;
-  HDR *b;
-{
-  return a->chrono - b->chrono;
-}
-                                                                                
-                                                                                
+
 int
 main(argc, argv)
   int argc;
   char *argv[];
 {
-  int i, num;
-  char *src, *dst;
-                                                                                
-  char folder[64];
-                                                                                
-  if (argc < 3)
+  FILE *fp;                      
+  HDR hdr, old;
+  char buf[64], folder_src[64], folder_dst[64];
+  char brdname_src[BNLEN + 1], brdname_dst[BNLEN + 1];
+
+  if (argc < 2)
   {
-    printf("Usage: %s dst src1 [src2 src3 ...]\n", argv[0]);
+    printf("Usage: %s brdname_src brdname_dst \n", argv[0]);
     return -1;
   }
-  chdir(BBSHOME);
-                                                                                
-  dst = argv[1];
-  if (!is_board(dst))
+
+  strcpy(brdname_src, argv[1]);
+  strcpy(brdname_dst, argv[2]);
+
+  sprintf(buf, BBSHOME);
+  chdir(buf);
+
+  brd_fpath(folder_src, brdname_src, FN_DIR);
+  brd_fpath(folder_dst, brdname_dst, FN_DIR);
+
+  if ((fp = fopen(folder_src, "r")))
   {
-    printf("沒有 %s 這板！\n", dst);
-    return -1;
+     while (fread(&old, sizeof(old), 1, fp) == 1)
+     {
+        hdr_fpath(buf, folder_src, &old);         
+        hdr_stamp(folder_dst, HDR_COPY | 'A', &hdr, buf);
+
+        hdr.xmode  = old.xmode;
+        hdr.parent_chrono = old.parent_chrono;
+        strcpy(hdr.owner, old.owner);
+        hdr.stamp  = old.stamp;
+        strcpy(hdr.nick , old.nick);
+        hdr.score  = old.score;
+        strcpy(hdr.date , old.date);
+        strcpy(hdr.title, old.title);
+
+        rec_bot(folder_dst, &hdr, sizeof(HDR));
+     }
+	 
+     fclose(fp);
+
   }
-                                                                                
-  num = 0;
-  for (i = 2; i < argc; i++)
-  {
-    src = argv[i];
-    printf("開始將 %s 板合併到 %s 板內\n", src, dst);
-    num += merge_board(src, dst);
-  }
-                                                                                
-  if (num > 0)
-  {
-    brd_fpath(folder, dst, FN_DIR);
-    rec_sync(folder, sizeof(HDR), hdr_cmp, NULL);
-    printf("%d 個板合併成功\n", num);
-  }
+  else
+     printf("無此看板或看板內內無資料 !!\n");
+ 
   return 0;
 }
