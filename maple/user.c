@@ -878,8 +878,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
    {
      prints("\n%d號站簽：\n", i);
      sprintf(buf, "gem/@/@host_%d", i - 1);
-     host_sign = fopen(buf, "r");
-     if(host_sign)
+     if(host_sign = fopen(buf, "r"))
      {
        while(fgets(buf, ANSILINELEN, host_sign))
          prints("%s", buf);
@@ -937,7 +936,7 @@ u_usr_show_set()
 	usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
 	FILE *fp;
 
-	fp=fopen(filepath,"w");
+	fp = fopen(filepath,"w");
 	fprintf(fp,"%d",USR_SHOW);
 	fclose(fp);
 

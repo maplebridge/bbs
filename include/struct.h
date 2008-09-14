@@ -419,6 +419,7 @@ typedef struct MF
 #define	MF_GEM      	0x08	/* 精華區捷徑 */
 #define MF_LINE		0x10	/* 分隔線 */
 #define MF_CLASS	0x20	/* 分類群組 */
+#define MF_LABEL	0x8000	/* 標記: 用最後一個 flag */
 
 #endif  /* MY_FAVORITE */
 

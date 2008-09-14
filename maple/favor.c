@@ -58,10 +58,11 @@ mf_item(num, mf)
   MF *mf;
 {
   char folder[64];
-  int mftype, brdpost, bno;
+  int mftype, brdpost, bno, label;
 
   mftype = mf->mftype;
   brdpost = cuser.ufo & UFO_BRDPOST;
+  label = mftype & MF_LABEL;
 
   if (mftype & MF_FOLDER)
   {
@@ -70,36 +71,37 @@ mf_item(num, mf)
       mf_fpath(folder, cuser.userid, mf->xname);
       num = rec_num(folder, sizeof(MF));
     }
-    prints("%6d%c  %s %s\n", num, mftype & MF_MARK ? ')' : ' ', "◆", mf->title);
+    prints("%6d%c%c %s %s\n", num, mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
     if ((bno = brd_bno(mf->xname)) >= 0)
-      class_mf_item(num, bno, brdpost);
+      class_item(num, bno, brdpost, 1, label);
     else
       /* itoc.010821: 不見的看板，讓 user 自己清掉，如此 user 才知道哪些看板被砍了 */
-      prints("         \033[36m<%s 已改名或被刪除，請將本捷徑刪除>\033[m\n", mf->xname);
+      prints("       %c \033[36m<%s 已改名或被刪除，請將本捷徑刪除>\033[m\n", label ? 'T' : ' ', mf->xname);
   }
   else if (mftype & MF_GEM)
   {
-    prints("%6d%c  %s %s\n",
+    prints("%6d%c%c %s %s\n",
       brdpost ? 0 : num, 
-      mftype & MF_MARK ? ')' : ' ', "■", mf->title);
+      mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "■", mf->title);
   }
   else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
   {
-    prints("%6d   %s\n", 
-      brdpost ? 0 : num, mf->title);
+    prints("%6d %c %s\n", 
+      brdpost ? 0 : num, label ? 'T' : ' ', mf->title);
   }
   else /* if (mftype & MF_CLASS) */	/* LHD.051007: 分類群組 */
   {
     char cname[BNLEN + 2];
 
     sprintf(cname, "%s/", mf->xname);
-    prints("%6d   %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
-      num, cname, mf->class[3] & 7, mf->class, mf->title);
+    prints("%6d %c %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
+      num, label ? 'T' : ' ', cname, mf->class[3] & 7, mf->class, mf->title);
   }
 }
+
 
 #ifdef HAVE_LIGHTBAR
 static int
@@ -109,12 +111,13 @@ mf_item_bar(xo, mode)
 {
   int num;
   MF *mf;
-  int mftype, brdpost, invalid;
+  int mftype, brdpost, invalid, label;
                                                                                 
   num = xo->pos + 1;
   mf = (MF *) xo_pool + xo->pos - xo->top;
   mftype = mf->mftype;
   brdpost = cuser.ufo & UFO_BRDPOST;
+  label = mftype & MF_LABEL;
                                                                                 
   if (mftype & MF_FOLDER)
   {
@@ -127,8 +130,8 @@ mf_item_bar(xo, mode)
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
     }
-    prints("%s%6d%c  %s %-66.54s\033[m", mode ? USR_COLORBAR_BRD : "",
-      num, mftype & MF_MARK ? ')' : ' ', "◆", mf->title);
+    prints("%s%6d%c%c %s %-66.54s\033[m", mode ? USR_COLORBAR_BRD : "",
+      num, mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -147,9 +150,9 @@ mf_item_bar(xo, mode)
       {
 		pbno = bshm->mantime[chn];
         if (mode)
-          class_mf_item_bar(bhead, num, chn, brdpost, pbno);
+          class_item_bar(bhead, num, chn, brdpost, pbno, 1, label);
         else
-          class_mf_item(num, chn, brdpost);
+          class_item(num, chn, brdpost, 1, label);
         invalid = 0;
         break;
       }
@@ -158,37 +161,37 @@ mf_item_bar(xo, mode)
                                                                                 
     if (invalid)        /* itoc.010821: 被砍的看板要另外印 */
     {
-      prints("%s         \033[36m%-13s%-56s\033[m", mode ?
-        USR_COLORBAR_BRD : "", mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
+      prints("%s       %c \033[36m%-13s%-56s\033[m", mode ?
+        USR_COLORBAR_BRD : "", label ? 'T' : ' ', mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
     }  /* 長度好難調 乾脆自己改了= =*/
   }
   else if (mftype & MF_GEM)
   {
-    prints("%s%6d%c  %s %-66.54s\033[m",
+    prints("%s%6d%c%c %s %-66.54s\033[m",
       mode ? USR_COLORBAR_BRD : "",
       brdpost ? 0 : num,
-      mftype & MF_MARK ? ')' : ' ', "■", mf->title);
+      mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "■", mf->title);
   }
   else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
   {
     prints("%s%6d%c  %-69.54s\033[m",
       mode ? USR_COLORBAR_BRD : "",
       brdpost ? 0 : num,
-      mftype & MF_MARK ? ')' : ' ', mf->title);
+      label ? 'T' : ' ', mf->title);
   }
   else /* if (mftype & MF_CLASS) */	/* LHD.051007: 分類群組 */
   {
     char cname[BNLEN + 2];
 
     sprintf(cname, "%s/", mf->xname);
-    prints("%s%6d   %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
-      mode ? USR_COLORBAR_BRD : "",num, cname, mf->class[3] & 7, mf->class,mode ? USR_COLORBAR_BRD : "",
+    prints("%s%6d %c %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
+      mode ? USR_COLORBAR_BRD : "",num, label ? 'T' : ' ', cname, mf->class[3] & 7,
+      mf->class, mode ? USR_COLORBAR_BRD : "",
 	  mf->title);
   }
   return XO_NONE;
 }
 #endif
-
 
 
 static int
@@ -343,13 +346,16 @@ mf_stamp(mf)
   char fpath[64];
   int fd;
 
-  mf->xname[0] = 'F';
-  archiv32(mf->chrono, mf->xname + 1);
+  do
+  {
+    mf->xname[0] = 'F';
+    archiv32(mf->chrono, mf->xname + 1);
 
-  mf_fpath(fpath, cuser.userid, mf->xname);
+    mf_fpath(fpath, cuser.userid, mf->xname);
 
-  if ((fd = open(fpath, O_WRONLY | O_CREAT | O_EXCL, 0600)) >= 0)
-    close(fd);
+    if ((fd = open(fpath, O_WRONLY | O_CREAT | O_EXCL, 0600)) >= 0)
+      close(fd);
+  } while (fd < 0 && mf->chrono++);
 
   return fd;
 }
@@ -585,6 +591,124 @@ mf_mark(xo)
 
 
 static int
+mf_label(xo)
+  XO *xo;
+{
+  MF *mf;
+  int pos, cur, type;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  mf = (MF *) xo_pool + cur;
+  type = mf->mftype;
+
+  if (type & MF_MARK)	/* mark 的卷宗不不能移動 */
+    return XO_NONE;
+
+  mf->mftype = type ^ MF_LABEL;
+  rec_put(xo->dir, mf, sizeof(MF), pos, NULL);
+
+  move(3 + cur, 0);
+  mf_item(xo, pos + 1, mf);
+
+  return pos + 1 + XO_MOVE;   /* 跳至下一項 */
+
+  return XO_NONE;
+}
+
+
+static int
+mf_has_label(src, depth)
+  char *src;
+  int depth;
+{
+  static int has_label;
+
+  int fd;
+  char fpath[64];
+  MF fmf;
+
+  if (!depth)
+    has_label = 0;
+  else
+  {
+    if (has_label)		/* 在某一個遞迴中找豆鋮?MF_LABEL 就停止搜尋 */
+      return 1;
+  }
+
+  mf_fpath(fpath, cuser.userid, src);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &fmf, sizeof(MF)) == sizeof(MF))
+    {  
+      if (fmf.mftype & MF_LABEL)
+      {
+	has_label = 1;
+	break;
+      }
+      if (fmf.mftype & MF_FOLDER)
+	mf_has_label(fmf.xname, 1);
+    }
+    close(fd);
+  }
+
+  return has_label;
+}
+
+
+static int
+mf_do_clear_label(src, curDir)
+  char *src, *curDir;
+{
+  int fsize;
+  char fpath[64];
+  MF mf, *data, *head, *tail;
+
+  if (data = (MF *) f_img(src, &fsize))
+  {
+    head = data;
+    tail = data + (fsize / sizeof(MF));
+    do
+    {
+      if (head->mftype & MF_FOLDER)
+      {
+        mf_fpath(fpath, cuser.userid, head->xname);
+        mf_do_clear_label(fpath, curDir);
+      }
+
+      if ((!curDir || strcmp(curDir, src)) && (head->mftype & MF_LABEL))
+      {
+        memcpy(&mf, head, sizeof(MF));
+        mf.mftype &= ~MF_LABEL;
+	rec_put(src, &mf, sizeof(MF), head - data, NULL);
+      }
+    } while (++head < tail);
+
+    free(data);
+  }
+}
+
+
+static int
+mf_clear_label(xo)
+  XO *xo;
+{
+  char folder[64];
+
+  if (!mf_has_label(FN_MF, 0))
+    return XO_NONE;
+
+  if (vans("要清除所有的標記嗎？[y/N]") != 'y')
+    return XO_FOOT;
+
+  mf_fpath(folder, cuser.userid, FN_MF);
+  mf_do_clear_label(folder, NULL);
+
+  return mf_load(xo);
+}
+
+
+static int
 mf_browse(xo)
   XO *xo;
 {
@@ -675,6 +799,101 @@ mf_copy(xo)
 }
 
 
+static void
+mf_do_paste(dstDir, mf, pos)
+  char *dstDir;		/* destination folder */
+  MF *mf;		/* source hdr */
+  int pos;		/* -1: 附加在最後  >=0: 貼上的位置 */
+{
+  int xmode, fsize;
+  char folder[64], fpath[64];
+  MF fmf, *data, *head, *tail;
+
+  xmode = mf->mftype;
+  memcpy(&fmf, mf, sizeof(MF));
+
+  if (xmode & MF_FOLDER)	/* 卷宗/分類 */
+  {
+    /* 在複製/貼上後一律變成卷宗，因為分類是站長專用特殊用途的 */
+    time(&fmf.chrono);			/* 造一個新的 chrono */
+    if ((fsize = mf_stamp(&fmf)) < 0)
+      return;
+    close(fsize);
+  }
+  fmf.mftype &= ~MF_LABEL;	/* 標記不複製 */
+
+  if (pos < 0)
+    rec_add(dstDir, &fmf, sizeof(MF));
+  else
+    rec_ins(dstDir, &fmf, sizeof(MF), pos, 1);
+
+  if (xmode & MF_FOLDER)	/* 卷宗/分類 */
+  {
+    /* 建立完自己這個卷宗以後，再 recursive 地一層一層目錄進去一篇一篇另存新檔 */
+    mf_fpath(folder, cuser.userid, mf->xname);
+    mf_fpath(fpath, cuser.userid, fmf.xname);
+    if (data = (MF *) f_img(folder, &fsize))
+    {
+      head = data;
+      tail = data + (fsize / sizeof(MF));
+      do
+      {
+	mf_do_paste(fpath, head, -1);
+      } while (++head < tail);
+
+      free(data);
+    }
+  }
+}
+
+
+static int
+mf_invalid_loop(dst, src, depth)
+  char *dst, *src;
+  int depth;
+{
+  static int valid;
+
+  int fd;
+  char fpath[64];
+  MF fmf;
+
+  if (!depth)
+  {
+    if (!strcmp(dst, src))	/* 把自己拷到自己裡面 */
+      return 1;
+    valid = 0;
+  }
+  else
+  {
+    if (valid)		/* 在某一個遞迴中找到非法證據就停止搜證工作 */
+      return 1;
+  }
+
+  mf_fpath(fpath, cuser.userid, src);
+  if ((fd = open(fpath, O_RDONLY)) >= 0)
+  {
+    while (read(fd, &fmf, sizeof(MF)) == sizeof(MF))
+    {  
+      if (fmf.mftype & MF_FOLDER)	/* MF_FOLDER 以外不會造成無窮迴圈 */
+      {
+	if (!strcmp(dst, fmf.xname))
+	{
+	  valid = 1;
+	  return 1;
+	}
+
+	/* recursive 地一層一層卷宗進去檢查是否會造成無窮迴圈 */
+	mf_invalid_loop(dst, fmf.xname, 1);
+      }
+    }
+    close(fd);
+  }
+
+  return valid;
+}
+
+
 static int
 mf_paste(xo)
   XO *xo;
@@ -695,9 +914,9 @@ mf_paste(xo)
   /* itoc.010726.註解: 卷宗複製貼上，裡面的東西並沒有貼上，懶得寫 recursive 的程式 :p */
   if (mf.mftype & MF_FOLDER)
   {
-    if (mf_stamp(&mf) < 0)
+    if (mf_invalid_loop(xo->dir + 10 + strlen(cuser.userid), mftmp.xname, 0))	/* strlen("usr/u/userid/MF/") */
     {
-      vmsg("資料有誤，請重新複製後再貼上");
+      vmsg("造成迴圈的卷宗將無法收錄");
       return XO_FOOT;
     }
   }
@@ -711,14 +930,140 @@ mf_paste(xo)
   case 'i':
   case 'n':
 
-    rec_ins(xo->dir, &mf, sizeof(MF), xo->pos + (ans == 'n'), 1);
+    if (mf.mftype & MF_FOLDER)
+      mf_do_paste(xo->dir, &mftmp, xo->pos + (ans == 'n'));
+    else
+      rec_ins(xo->dir, &mf, sizeof(MF), xo->pos + (ans == 'n'), 1);
     break;
 
   default:
 
-    rec_add(xo->dir, &mf, sizeof(MF));
+    if (mf.mftype & MF_FOLDER)
+      mf_do_paste(xo->dir, &mftmp, -1);
+    else
+      rec_add(xo->dir, &mf, sizeof(MF));
     break;
   }
+
+  return mf_load(xo);
+}
+
+
+static void
+mf_do_append(dst, src)
+  char *dst, *src;
+{
+  int fsize, offset;
+  char fpath[64];
+  MF mf, *data, *head, *tail;
+
+  if (data = (MF *) f_img(src, &fsize))
+  {
+    offset = 0;
+    head = data;
+    tail = data + (fsize / sizeof(MF));
+    do
+    {
+      if (head->mftype & MF_FOLDER)
+      {
+	mf_fpath(fpath, cuser.userid, head->xname);
+	mf_do_append(dst, fpath);
+
+	if (mf_invalid_loop(dst + 10 + strlen(cuser.userid), head->xname, 0))	/* strlen("usr/u/userid/MF/") */
+	  continue;
+      }
+
+      if (strcmp(dst, src) && (head->mftype & MF_LABEL))	/* 不允許同一個卷宗下append, 請改用 move */
+      {
+	memcpy(&mf, head, sizeof(MF));
+	mf.mftype &= ~MF_LABEL;
+	rec_add(dst, &mf, sizeof(MF));
+	rec_del(src, sizeof(MF), head - data - offset, NULL);
+	++offset;
+      }
+    } while (++head < tail);
+
+    free(data);
+  }
+
+}
+
+
+static int
+mf_append(xo)	/* 把有 MF_LABEL 標記的移到當前目錄 */
+  XO *xo;
+{
+  char folder[64];
+
+  if (!mf_has_label(FN_MF, 0))
+    return XO_NONE;
+
+  if (vans("要將所有標記移到現在這個卷宗嗎？[y/N]") != 'y')
+    return XO_FOOT;
+
+  mf_fpath(folder, cuser.userid, FN_MF);
+
+  mf_do_append(xo->dir, folder);
+  mf_do_clear_label(folder, xo->dir);
+
+  return mf_load(xo);
+}
+
+
+static void
+mf_do_del_label(src)
+  char *src;
+{
+  int fsize, offset;
+  char fpath[64];
+  MF *data, *head, *tail;
+
+  if (data = (MF *) f_img(src, &fsize))
+  {
+    offset = 0;
+    head = data;
+    tail = data + (fsize / sizeof(MF));
+    do
+    {
+      if (head->mftype & MF_LABEL)
+      {
+	if (head->mftype & MF_FOLDER)
+	{
+	  mf_fpath(fpath, cuser.userid, head->xname);
+	  mf_do_delete(fpath);
+	}
+	rec_del(src, sizeof(MF), head - data - offset, NULL);
+
+	++offset;
+	continue;
+      }
+
+      if (head->mftype & MF_FOLDER)
+      {
+        mf_fpath(fpath, cuser.userid, head->xname);
+        mf_do_del_label(fpath);
+      }
+    } while (++head < tail);
+
+    free(data);
+  }
+}
+
+
+static int
+mf_del_label(xo)
+  XO *xo;
+{
+  char folder[64];
+
+  if (!mf_has_label(FN_MF, 0))
+    return XO_NONE;
+
+  if (vans("要刪除所有標記嗎？[y/N]") != 'y')
+    return XO_FOOT;
+
+  mf_fpath(folder, cuser.userid, FN_MF);
+  mf_do_del_label(folder);
 
   return mf_load(xo);
 }
@@ -876,6 +1221,7 @@ static KeyFunc mf_cb[] =
   'd', mf_delete,
   'D', mf_rangedel,
   'o', mf_mark,
+  't', mf_label,
   'm', mf_move,
   'T', mf_title,
   'E', mf_edit,
@@ -890,6 +1236,9 @@ static KeyFunc mf_cb[] =
   'g', mf_copy,
   'p', mf_paste,
   Ctrl('V'), mf_paste,
+  Ctrl('A'), mf_append,
+  Ctrl('T'), mf_clear_label,
+  Ctrl('D'), mf_del_label,
 
   'h', mf_help
 };

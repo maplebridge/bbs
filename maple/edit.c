@@ -1499,7 +1499,7 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   if(host_sight_number)
   {
     sprintf(buf_tmp,"gem/@/@host_%d",host_sight_number-1);
-    if(file_tmp=fopen(buf_tmp,"r"))
+    if(file_tmp = fopen(buf_tmp,"r"))
     {
       fclose(file_tmp);
       select_devide=host_sight_number;
@@ -1521,7 +1521,7 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   if(model_select)
   {
     sprintf(buf_tmp,"gem/@/@model_%d",model_select-1);
-    if(file_tmp=fopen(buf_tmp,"r"))
+    if(file_tmp = fopen(buf_tmp,"r"))
     {
       fclose(file_tmp);
       sprintf(model_type,"model_%d",model_select-1);
@@ -1539,7 +1539,7 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   else
   {
     for(i=0;i<=5;i++)
-    strcpy(m[i],"\n");
+      strcpy(m[i],"\n");
   }
 
   /* 矪瞶 */
@@ -1585,13 +1585,11 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
 #endif
 
   usr_fpath(host_personal_path, cuser.userid, "host");
-  host_personal=fopen(host_personal_path,"r");
-  if(host_personal)
+  if(host_personal = fopen(host_personal_path,"r"))
   {
     fgets(host_personal_choice_char,3,host_personal);
     fclose(host_personal);
   }
-
 
   host_personal_choice_int=atoi(host_personal_choice_char);
   if(host_personal_choice_int != 0)
@@ -1605,7 +1603,7 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   if(host_sight_select)
   {
     sprintf(buf_tmp,"gem/@/@host_%d",host_sight_select-1);
-    if (file_tmp=fopen(buf_tmp,"r"))
+    if (file_tmp = fopen(buf_tmp,"r"))
     {
       fclose(file_tmp);
       select=host_sight_select-1;

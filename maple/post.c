@@ -94,26 +94,24 @@ RefusePal_level(board, hdr)       //smiler 1108
   int fsize;
   char fpath[64];
   int *fimage;
-  FILE *fp;
 
   if(! hdr->xmode & POST_RESTRICT)
      return 0;
   else
   {
     RefusePal_fpath(fpath, board, 'R', hdr);     //0709
-    if(fp=fopen(fpath,"r"))
+    if (dashf(fpath))
     {
-       fclose(fp);
-       if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+      if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
             return 1;
-       if (fimage = (int *) f_img(fpath, &fsize))
-       {
+      if (fimage = (int *) f_img(fpath, &fsize))
+      {
         fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
         free(fimage);
         //return fsize;                          //0709
-		if(fsize)
-			return fsize;
-       }
+	if(fsize)
+	  return fsize;
+      }
     }
     //else                                       //0709
     return -1;
@@ -204,7 +202,6 @@ XoBM_Refuse_pal(xo)
   char fpath_friend[64];
   XO *xr;
   char tmp[64],tmp2[64];
-  FILE *fp;
   int pos, cur;              //smiler 1108
   pos = xo->pos;             //smiler 1108
   cur = pos - xo->top;       //smiler 1108
@@ -282,9 +279,7 @@ XoBM_Refuse_pal(xo)
 	}
 	else
 	{
-         if(fp=fopen(fpath_friend,"r"))
-            fclose(fp);
-         else
+         if(!dashf(fpath_friend))
 	 {
            xz[XZ_PAL - XO_ZONE].xo = xr = xo_new(fpath_friend);
 	   if(ans2=='0')
@@ -314,11 +309,10 @@ static int
 post_viewpal(xo)
   XO *xo;
 {
-	XO *xt;
-	FILE *fp;
-	char fpath_org[64];
-    char fpath_new[64];
-	char tmp[64];
+  XO *xt;
+  char fpath_org[64];
+  char fpath_new[64];
+  char tmp[64];
 
   if (!cuser.userlevel)
     return XO_NONE;
@@ -329,21 +323,20 @@ post_viewpal(xo)
   sprintf(fpath_org,"brd/%s/friend",currboard);
   sprintf(fpath_new,"brd/%s/friend_%s",currboard,cuser.userid);
   sprintf(tmp,"cp %s %s",fpath_org,fpath_new);
-  if(fp=fopen(fpath_org,"r"))
+  if(dashf(fpath_org))
   {
-	  fclose(fp);
-	  system(tmp);
-      xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath_new);
-      xt->key = PALTYPE_BPAL;
-      xover(XZ_FAKE_PAL);
-      free(xt);
-	  unlink(fpath_new);
-	  return XO_INIT;
+    system(tmp);
+    xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath_new);
+    xt->key = PALTYPE_BPAL;
+    xover(XZ_FAKE_PAL);
+    free(xt);
+    unlink(fpath_new);
+    return XO_INIT;
   }
   else
   {
-	  vmsg("本板尚未設定板友名單 !!");
-	  return XO_NONE;
+    vmsg("本板尚未設定板友名單 !!");
+    return XO_NONE;
   }
 }
 
@@ -413,61 +406,61 @@ IS_WELCOME(board, f_mode)
   char *board;
   char *f_mode;
 {
-	FILE *fp;
-	char fpath[64];
-	brd_fpath(fpath, board, f_mode);
+  FILE *fp;
+  char fpath[64];
+  brd_fpath(fpath, board, f_mode);
 
-	if(!(fp = fopen(fpath, "r")))
-		return 1;
+  if (!(fp = fopen(fpath, "r")))
+    return 1;
 
-	int wi=0;
+  int wi=0;
 
-	fscanf( fp, "%d", &wi);
-    if(!IS_BIGGER_AGE(wi))
-		return 0;
+  fscanf(fp, "%d", &wi);
+  if (!IS_BIGGER_AGE(wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(wi && (wi != cuser.sex+1))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (wi && (wi != cuser.sex+1))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(!(cuser.numlogins >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.numlogins >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(!(cuser.numposts >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.numposts >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(!(cuser.good_article >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.good_article >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(wi && (!(cuser.poor_article < wi)))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (wi && !(cuser.poor_article < wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(wi && (!(cuser.violation < wi)))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (wi && (!(cuser.violation < wi)))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-	if(!(cuser.money >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.money >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(!(cuser.gold >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.gold >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-	if(!(cuser.numemails >= wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!(cuser.numemails >= wi))
+    return 0;
 
-	fscanf( fp, "%d", &wi);
-    if(!IS_BIGGER_1STLG(wi))
-		return 0;
+  fscanf( fp, "%d", &wi);
+  if (!IS_BIGGER_1STLG(wi))
+    return 0;
 
-	fclose(fp);
-	return 1;
+  fclose(fp);
+  return 1;
 }
 
 static int
@@ -677,7 +670,8 @@ post_filter(fpath)
   char fpath_log[64];
   char content_log[256];
 
-  if( (currbattr & BRD_BBS_DOG) && (IS_BBS_DOG_FOOD(fpath)) ) /* smiler.080910: 讓使用者決定是否加入BBS看門狗計畫 */
+  /* smiler.080910: 讓使用者決定是否加入BBS看門狗計畫 */
+  if( (currbattr & BRD_BBS_DOG) && (IS_BBS_DOG_FOOD(fpath)) )
   {
 	  brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
 	  sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po\n作者: %s\n標題: %s\n\n", Now(), cuser.userid, bbs_dog_title);
@@ -730,7 +724,7 @@ post_filter(fpath)
 }
 
 /* ----------------------------------------------------- */
-/* 改良 innbbsd 轉出信件、連線砍信之處理程序			 */
+/* 改良 innbbsd 轉出信件、連線砍信之處理程序		 */
 /* ----------------------------------------------------- */
 
 
@@ -1885,7 +1879,8 @@ post_attr(hdr)
   {
     if (attr == 'm' || attr == 'b')
       attr = '=';
-    else if (!(mode & POST_BOTTOM))
+    else if (!(mode & POST_BOTTOM) &&
+      (attr != 'l' || (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))) )
       attr = '~';
   }
 
@@ -2196,8 +2191,8 @@ post_browse(xo)
 
 #ifdef HAVE_REFUSEMARK
     //if ((xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
-	if (!chkrestrict(hdr))
-      break;
+    if (!chkrestrict(hdr))
+      return XO_NONE;
 #endif
 
     hdr_fpath(fpath, dir, hdr);
@@ -3412,7 +3407,7 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
 
 
 /* ----------------------------------------------------- */
-/* 站長功能：edit / title					 */
+/* 站長功能：edit / title				 */
 /* ----------------------------------------------------- */
 
 
@@ -3428,8 +3423,8 @@ post_edit(xo)
   HDR  Editlog_hdr;
 
   /* smiler.071111 保護 Editlog 以及 Deletelog 板的備份資料 */
- if((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
-   return XO_NONE;
+  if ((!strcmp(xo->dir,"brd/Deletelog/.DIR")) || (!strcmp(xo->dir,"brd/Editlog/.DIR")))
+    return XO_NONE;
 
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
 
@@ -3444,7 +3439,7 @@ post_edit(xo)
   {
 #ifdef HAVE_REFUSEMARK
     //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
-	if (!chkrestrict(hdr))
+    if (!chkrestrict(hdr))
       return XO_NONE;
 #endif
 
@@ -3458,13 +3453,13 @@ post_edit(xo)
     btime_update(brd_bno("Editlog"));
 
 #ifdef DO_POST_FILTER
-	strcpy(tmpfile, "tmp/");
+    strcpy(tmpfile, "tmp/");
     strcat(tmpfile, hdr->xname);
     f_cp(fpath, tmpfile, O_TRUNC);
 
     vedit(tmpfile, 0);
 #else
-	vedit(fpath, 0);
+    vedit(fpath, 0);
 #endif
 
 #ifdef DO_POST_FILTER
@@ -3501,7 +3496,7 @@ post_edit(xo)
     btime_update(brd_bno("Editlog"));
 
 #ifdef DO_POST_FILTER
-	strcpy(tmpfile, "tmp/");
+    strcpy(tmpfile, "tmp/");
     strcat(tmpfile, hdr->xname);
     f_cp(fpath, tmpfile, O_TRUNC);
 
@@ -3510,16 +3505,15 @@ post_edit(xo)
       if (fp = fopen(tmpfile, "a"))
       {
 #else
-    if (!vedit(fpath, 0))	/* 若非取消則加上修改資訊 */
-    {
-      if (fp = fopen(fpath, "a"))
-      {
+	if (!vedit(fpath, 0))	/* 若非取消則加上修改資訊 */
+	{
+	  if (fp = fopen(fpath, "a"))
+	  {
 #endif
-
-	ve_banner(fp, 1);
-	fclose(fp);
-      }
-    }
+	    ve_banner(fp, 1);
+	    fclose(fp);
+	  }
+	}
 
 #ifdef DO_POST_FILTER
   strcpy(bbs_dog_title, hdr->title);
@@ -3551,6 +3545,8 @@ post_edit(xo)
 #endif
     vedit(fpath, -1);
   }
+#else
+  return XO_NONE;
 #endif
 
   /* return post_head(xo); */
@@ -4006,30 +4002,40 @@ post_append_score(xo, choose)
     return XO_NONE;
 #endif
 
-  switch ((ans = choose) || (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] ")))
+  ans = choose;
+  if (!ans)
   {
-  case '1':
-    verb = "1m△";
-    vtlen = 2;
-    break;
+    switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
+    {
+    case '1':
+      verb = "1m△";
+      vtlen = 2;
+      break;
 
-  case '2':
-    verb = "2m▽";
-    vtlen = 2;
-    break;
+    case '2':
+      verb = "2m▽";
+      vtlen = 2;
+      break;
 
-  case '3':
-    verb = "7m─";
-    vtlen = 2;
-    break;
-    /* songsongboy.070124:lexel version*/
-    /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
-      return XO_FOOT;
-    vtlen = strlen(fpath);
-    sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
-    break;*/
+    case '3':
+      verb = "7m─";
+      vtlen = 2;
+      break;
+      /* songsongboy.070124:lexel version*/
+      /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
+        return XO_FOOT;
+      vtlen = strlen(fpath);
+      sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
+     break;*/
 
-  default:
+    default:
+      ans='3';
+      verb = "7m─";
+      vtlen = 2;
+    }
+  }
+  else
+  {
     ans='3';
     verb = "7m─";
     vtlen = 2;

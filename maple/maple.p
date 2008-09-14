@@ -53,7 +53,7 @@ int brh_add(time_t prev, time_t chrono, time_t next);
 int bstamp2bno(time_t stamp);
 void brh_save(void);
 void brd_force(void);
-void class_item(int num, int bno, int brdpost);
+void class_item(int num, int bno, int brdpost, int infav, int label);
 int is_bm(char *list, char *userid);
 int last_nobottom(char *folder);
 int XoPost(int bno);
