@@ -81,7 +81,7 @@ static int comebackPos;		/* 記錄最後閱讀那篇文章的位置 */
 static char HintWord[TTLEN + 20];
 static char HintAuthor[IDLEN + 20];
 
-static int ReverseSearch;	/* 本次搜尋是否為排除條件 */
+static int ReverseSearch = 0;	/* 本次搜尋是否為排除條件 */
 
 
 static int
@@ -109,7 +109,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
   if (fimage == (char *) -1)
   {
     vmsg("目前無法開啟索引檔");
-    return XO_FOOT;
+    return XO_BODY;
   }
 
   /* allocate index memory, remember free first */
@@ -147,13 +147,13 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
 
   munmap(fimage, fsize);
 
-  ReverseSearch = 0;
+  ReverseSearch = 0;	/* 每次搜尋完就重置 */
 
   if (count <= 0)
   {
     free(list);
     vmsg(MSG_XY_NONE);
-    return XO_FOOT;
+    return XO_BODY;
   }
 
   /* 增加條件再次搜尋 */
@@ -249,7 +249,7 @@ filter_select(head, hdr)
   if (hdr->xname[0])
   {
      xname = head->xname;
-     if(strcmp(xname, hdr->xname))
+     if (strcmp(xname, hdr->xname))
        return 0;
   }
 
@@ -296,7 +296,7 @@ XoXselect(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -327,7 +327,9 @@ XoXselect(xo)
   }
   
   if (!hdr.title[0] && !hdr.xid)
-    return XO_FOOT;
+    return XO_BODY;
+
+  hdr.xname[0] = '\0';
 
   return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
 }
@@ -349,7 +351,7 @@ XoXauthor(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -357,12 +359,12 @@ XoXauthor(xo)
   if (!ReverseSearch)
   {
     if (!vget(b_lines, 0, MSG_XYPOST2, author, IDLEN + 1, DOECHO))
-      return XO_FOOT;
+      return XO_BODY;
   }
   else
   {
     if (!vget(b_lines, 0, "[排除] 作者關鍵字：", author, IDLEN + 1, DOECHO))
-      return XO_FOOT;
+      return XO_BODY;
   }
 
   HintWord[0] = '\0';
@@ -372,6 +374,7 @@ XoXauthor(xo)
     sprintf(HintAuthor, "\033[1;33m排除\033[m %s", author);
 
   hdr.title[0] = '\0';
+  hdr.xname[0] = '\0';
   str_lower(author, author);
   hdr.xid = strlen(author);
 
@@ -393,19 +396,19 @@ XoXxname(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)    /* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
   xname = hdr.xname;
-  if (!vget(b_lines, 0, "標題關鍵字：", xname, 30, DOECHO))
-    return XO_FOOT;
+  if (!vget(b_lines, 0, "檔名關鍵字：", xname, 9, DOECHO))
+    return XO_BODY;
 
   strcpy(HintWord, xname);
   HintAuthor[0] = '\0';
 
-  //str_lowest(title, title);
   hdr.xid = 0;
+  hdr.title[0] = '\0';
 
   return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
 }
@@ -427,7 +430,7 @@ XoXtitle(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -435,12 +438,12 @@ XoXtitle(xo)
   if (!ReverseSearch)
   {
     if (!vget(b_lines, 0, MSG_XYPOST1, title, 30, DOECHO))
-      return XO_FOOT;
+      return XO_BODY;
   }
   else
   {
     if (!vget(b_lines, 0, "[排除] 標題關鍵字：", title, 30, DOECHO))
-      return XO_FOOT;
+      return XO_BODY;
   }
 
   if (!ReverseSearch)
@@ -451,6 +454,7 @@ XoXtitle(xo)
 
   str_lowest(title, title);
   hdr.xid = 0;
+  hdr.xname[0] = '\0';
 
   return XoXpost(xo, &hdr, 0, INT_MAX, ReverseSearch ? filter_R_select : filter_select);
 }
@@ -490,7 +494,7 @@ XoXsearch(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -579,7 +583,7 @@ XoXfull(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -587,7 +591,7 @@ XoXfull(xo)
 
   key = hdr.title;
   if (!vget(b_lines, 0, "內文關鍵字：", key, 30, DOECHO))
-    return XO_FOOT;
+    return XO_BODY;
 
   vget(b_lines, 0, "[設定搜尋範圍] 起點：(Enter)從頭開始 ", ans, 6, DOECHO);
   if ((head = atoi(ans)) <= 0)
@@ -642,7 +646,7 @@ XoXmark(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
   strcpy(HintWord, ReverseSearch ? "\033[1;33m所有無 mark 文章\033[m" : "\033[1;33m所有 mark 文章\033[m");
@@ -681,7 +685,7 @@ XoXlocal(xo)
   if (currbattr & BRD_NOTRAN)
   {
     vmsg("本板為不轉信板，全部都是本地文章");
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -689,7 +693,7 @@ XoXlocal(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -737,7 +741,7 @@ XoXscore(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)	/* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
@@ -788,7 +792,7 @@ XoXrefuse(xo)
   if (z_status && xz[XZ_XPOST - XO_ZONE].xo)    /* itoc.020308: 不得累積進入二次 */
   {
     vmsg(MSG_XYDENY);
-    return XO_FOOT;
+    return XO_BODY;
   }
 #endif
 
