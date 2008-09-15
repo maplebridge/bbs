@@ -71,7 +71,7 @@ mf_item(num, mf)
       mf_fpath(folder, cuser.userid, mf->xname);
       num = rec_num(folder, sizeof(MF));
     }
-    prints("%6d%c%c %s %s\n", num, mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "◆", mf->title);
+    prints("%6d%c  %s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -83,13 +83,13 @@ mf_item(num, mf)
   }
   else if (mftype & MF_GEM)
   {
-    prints("%6d%c%c %s %s\n",
+    prints("%6d%c  %s %s\n",
       brdpost ? 0 : num, 
-      mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "■", mf->title);
+      mftype & MF_MARK ? ')' : label ? 'T' : ' ', "■", mf->title);
   }
   else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
   {
-    prints("%6d %c %s\n", 
+    prints("%6d%c  %s\n", 
       brdpost ? 0 : num, label ? 'T' : ' ', mf->title);
   }
   else /* if (mftype & MF_CLASS) */	/* LHD.051007: 分類群組 */
@@ -97,7 +97,7 @@ mf_item(num, mf)
     char cname[BNLEN + 2];
 
     sprintf(cname, "%s/", mf->xname);
-    prints("%6d %c %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
+    prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
       num, label ? 'T' : ' ', cname, mf->class[3] & 7, mf->class, mf->title);
   }
 }
@@ -130,14 +130,14 @@ mf_item_bar(xo, mode)
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
     }
-    prints("%s%6d%c%c %s %-66.54s\033[m", mode ? USR_COLORBAR_BRD : "",
-      num, mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "◆", mf->title);
+    prints("%s%6d%c  %s %-66.54s\033[m", mode ? USR_COLORBAR_BRD : "",
+      num, mftype & MF_MARK ? ')' : label ? 'T' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
     BRD *bhead, *btail;
     int chn;
-	int pbno;
+    int pbno;
                                                                                 
     chn = 0;
     invalid = 1;
@@ -148,7 +148,7 @@ mf_item_bar(xo, mode)
     {
       if (!strcmp(mf->xname, bhead->brdname))
       {
-		pbno = bshm->mantime[chn];
+	pbno = bshm->mantime[chn];
         if (mode)
           class_item_bar(bhead, num, chn, brdpost, pbno, 1, label);
         else
@@ -167,10 +167,10 @@ mf_item_bar(xo, mode)
   }
   else if (mftype & MF_GEM)
   {
-    prints("%s%6d%c%c %s %-66.54s\033[m",
+    prints("%s%6d%c  %s %-66.54s\033[m",
       mode ? USR_COLORBAR_BRD : "",
       brdpost ? 0 : num,
-      mftype & MF_MARK ? ')' : ' ', label ? 'T' : ' ', "■", mf->title);
+      mftype & MF_MARK ? ')' : label ? 'T' : ' ', "■", mf->title);
   }
   else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
   {
@@ -184,10 +184,9 @@ mf_item_bar(xo, mode)
     char cname[BNLEN + 2];
 
     sprintf(cname, "%s/", mf->xname);
-    prints("%s%6d %c %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
+    prints("%s%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
       mode ? USR_COLORBAR_BRD : "",num, label ? 'T' : ' ', cname, mf->class[3] & 7,
-      mf->class, mode ? USR_COLORBAR_BRD : "",
-	  mf->title);
+      mf->class, mode ? USR_COLORBAR_BRD : "", mf->title);
   }
   return XO_NONE;
 }
@@ -609,11 +608,9 @@ mf_label(xo)
   rec_put(xo->dir, mf, sizeof(MF), pos, NULL);
 
   move(3 + cur, 0);
-  mf_item(xo, pos + 1, mf);
+  mf_item(pos, mf);
 
-  return pos + 1 + XO_MOVE;   /* 跳至下一項 */
-
-  return XO_NONE;
+  return (pos + 1 == xo->max ? 0 : pos + 1) + XO_MOVE;   /* 跳至下一項 */
 }
 
 

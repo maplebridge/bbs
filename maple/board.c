@@ -1428,7 +1428,7 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
       prints("%-13s", brd->brdname);
   }
   else	/* smiler.070724: 我的最愛看板另外上色*/
-    prints("%6d%c%s\033[1;36m%-13s\033[m", num, token, str1, brd->brdname);
+    prints("%6d%c%s\033[1;36m%-13s\033[m", num, label ? 'T' : token, str1, brd->brdname);
 
   if (!strcmp(brd->class,"楓橋") || !strcmp(brd->class,"系統"))
     prints("\033[1;31m");
@@ -1553,7 +1553,7 @@ class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
   }
   else	/* smiler.070724: 我的最愛看板另外上色*/
     prints("\033[m%s%6d%c%s%s\033[1;36m%-13s\033[m%s",
-      USR_COLORBAR_BRD, num, token, str1,
+      USR_COLORBAR_BRD, num, label ? 'T' : token, str1,
       USR_COLORBAR_BRD, brd->brdname, USR_COLORBAR_BRD);
 
   if (!strcmp(brd->class,"楓橋") || !strcmp(brd->class,"系統"))
@@ -1572,7 +1572,7 @@ class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
     prints("\033[35m");
   else
     prints("\033[1;3%dm",brd->class[3] & 7);
-  prints("%-5s\033[m%s%s%s ",brd->class,USR_COLORBAR_BRD,str2,USR_COLORBAR_BRD);
+  prints("%-5s\033[m%s%s%s ",brd->class, USR_COLORBAR_BRD, str2, USR_COLORBAR_BRD);
 
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
   str1 = brd->title;
