@@ -94,7 +94,7 @@ aloha_sync(fpath)
 
 
 /* ----------------------------------------------------- */
-/* 上站通知名單：選單式操作界面描述			 */
+/* 上站通知名單：選單式操作界面描述				 */
 /* ----------------------------------------------------- */
 
 
@@ -128,21 +128,21 @@ aloha_item_bar(xo, mode)
 #else
   int online = 0;
 #endif
-                                                                                
+
   aloha = (ALOHA *) xo_pool + xo->pos - xo->top;
-                                                                                
+
 #ifdef CHECK_ONLINE
   online = utmp_get(aloha->userno, NULL);
 #endif
-                                                                                
+
   prints("%s%6d%c   %s%-14s%s%54s%s",
-    mode ? USR_COLORBAR_ALOHA : "",         //這裡是光棒的顏色，可以自己改
+    mode ? UCBAR[UCBAR_ALOHA] : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, tag_char(aloha->userno),
     online ? "\033[33m" : "",
     aloha->userid, "",
     online ? "\033[37m" : "",
     mode ? "\033[m" : "");
-                                                                                
+
   return XO_NONE;
 }
 #endif

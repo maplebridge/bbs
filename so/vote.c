@@ -71,16 +71,16 @@ vote_item_bar(xo, mode)
   int mode;     /* 1:次  0:次 */
 {
   VCH *vch;
-                                                                                
+
   vch = (VCH *) xo_pool + xo->pos - xo->top;
-                                                                                
+
   prints("%s%6d%c%c%c%c %-9.8s%-12s %-45.45s%s",
-    mode ? USR_COLORBAR_VOTE : "",         //硂柑琌次肅︹э
+    mode ? UCBAR[UCBAR_VOTE] : "",         //硂柑琌次肅︹э
     xo->pos + 1, tag_char(vch->chrono),
     vch->vsort, vch->vpercent, vch->vprivate,
     vch->cdate, vch->owner, vch->title,
     mode ? "\033[m" : "");
-                                                                                
+
   return XO_NONE;
 }
 #endif

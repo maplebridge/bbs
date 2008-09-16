@@ -31,7 +31,7 @@ tn_user_show()	/* 使用者上站，初使化與載入使用者文章列表顯示喜好 */
   {
     /* initialization USR_SHOW */
     USR_SHOW = -1 & ~(-1 << NUM_USR_SHOW);
-    fp = fopen(filepath,"w");
+    fp = fopen(fpath, "w");
     fprintf(fp, "%ud", USR_SHOW);
     fclose(fp);
   }
@@ -48,15 +48,16 @@ trans_bar_set()		/* 過渡時期，使用者上站時轉檔 */
 {
   FILE *fp;
   char fpath[64];
+  int i;
 
   char color[32];
   char barname_in[24];
   char *old_set[CBAR_NUM] = {"_MENU", "_BRD", "_POST", "_GEM", "_PAL", "_USR",
-		"_BMW", "_MAIL", "_ALOHA", "_VOTE", "_NBRD", "_SONG", "_RSS"}
+		"_BMW", "_MAIL", "_ALOHA", "_VOTE", "_NBRD", "_SONG", "_RSS"};
 
   for (i = 0; i < CBAR_NUM; i++)
   {
-    sprintf(barname_in, "%s.bar", barname);
+    sprintf(barname_in, "%s.bar", old_set[i]);
     usr_fpath(fpath, cuser.userid, barname_in);
     if (fp = fopen(fpath,"r"))
     {
@@ -76,7 +77,7 @@ trans_bar_set()		/* 過渡時期，使用者上站時轉檔 */
 
   /* 建立新的設定檔 */
   usr_fpath(fpath, cuser.userid, ".BARSET");
-  if (fp = fopen(fpath,, "w"))
+  if (fp = fopen(fpath, "w"))
   {
     for (i = 0; i < CBAR_NUM; i++)
     {
@@ -91,8 +92,10 @@ trans_bar_set()		/* 過渡時期，使用者上站時轉檔 */
 void
 tn_user_bar()		/* 使用者上站，初使化與載入使用者設定檔 */
 {
+  FILE *fp;
   char fpath[64];
   char color[32];
+  int i;
 
 #if 1		/* 過渡時期，使用者上站時轉檔 */
   usr_fpath(fpath, cuser.userid, ".BARSET");
@@ -100,23 +103,18 @@ tn_user_bar()		/* 使用者上站，初使化與載入使用者設定檔 */
     trans_bar_set();
 #endif
 
-  FILE *fp;
-  char barname_in[24];
-  sprintf(barname_in, "%s.bar", barname);
-  usr_fpath(fpath, cuser.userid, barname_in);
-  if (fp = fopen(filepath,"r"))
+  if (fp = fopen(fpath,"r"))
   {
     for (i = 0; i < CBAR_NUM; i++)
     {
-      fgets(color, 32, fp));
+      fgets(color, 32, fp);
       if (color[0] != '\0' && color[0] != ' ')
       {
-	 strcpy(UCBAR[bar], color);
+	 strcpy(UCBAR[i], color);
       }
     }
     fclose(fp);
   } 
-  return 0;
 }
 
 
@@ -161,7 +159,7 @@ u_set_bar(bar)
 
   i = 8;
   vget(i, 0, "前景：亮(1)/暗(0)/略過(Enter)", bright, 2, DOECHO);
-  if (bright[0]!='\0' && bright[0] != '0' && bright[0] != '1'))
+  if (bright[0]!='\0' && bright[0] != '0' && bright[0] != '1')
   {
     return vmsg("輸入錯誤 !!");
   }
@@ -229,14 +227,14 @@ u_set_bar(bar)
   }
 
   usr_fpath(fpath, cuser.userid, ".BARSET");
-  if (fp = fopen(fpath,, "w"))		/* 更新完直接寫檔 */
+  if (fp = fopen(fpath, "w"))		/* 更新完直接寫檔 */
   {
     for (i = 0; i < CBAR_NUM; i++)
     {
       fprintf(fp, "%s\n", UCBAR[i]);
     }
     fclose(fp);
-    return vmsg("更新成功！");
+    return vmsg("更新成功\！");
   }
   else
     return vmsg("更新失敗，請重試一次！");

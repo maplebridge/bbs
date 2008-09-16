@@ -153,15 +153,15 @@ nbrd_item_bar(xo, mode)
   int mode;     /* 1:次  0:次 */
 {
   NBRD *nbrd;
-                                                                                
+
   nbrd = (NBRD *) xo_pool + xo->pos - xo->top;
-                                                                                
+
   prints("%s%6d %c %-5s %-13s [%-13s%s]:%-22.22s%s%s",
-    mode ? USR_COLORBAR_NBRD : "",         //硂柑琌次肅︹э
+    mode ? UCBAR[UCBAR_NBRD] : "",         //硂柑琌次肅︹э
     xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
-    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33mセそщ\033[m",mode ? USR_COLORBAR_NBRD : "", nbrd->title,
+    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33mセそщ\033[m",mode ? UCBAR[UCBAR_NBRD] : "", nbrd->title,
     (nbrd->mode & NBRD_NEWBOARD) ? "           " :"                ",mode ? "\033[m" : "");
-                                                                                
+
   return XO_NONE;
 }
 #endif
