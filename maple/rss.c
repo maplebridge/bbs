@@ -96,7 +96,7 @@ rss_item_bar(xo, mode)
 	rss = (RSS *) xo_pool + xo->pos - xo->top;
 	num = xo->pos + 1;
 
-	prints("\033[m%s",mode ? UCBAR[COLORBAR_RSS] : "");
+	prints("\033[m%s",mode ? UCBAR[UCBAR_RSS] : "");
 	prints("%6d ", num);                                                   //7
 	prints("%c",   (rss->xmode & RSS_RESTRICT) ? ')' : ' ');               //1
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
@@ -107,7 +107,7 @@ rss_item_bar(xo, mode)
 		return XO_NONE;
 	}
 	prints("\033[1;3%dm%s\033[m", cal_day(rss->date) + 1, rss->date + 3);  //5
-	prints("%s ",mode ? UCBAR[COLORBAR_RSS] : "");                            //1
+	prints("%s ",mode ? UCBAR[UCBAR_RSS] : "");                            //1
 	prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
 	prints("%-12.12s ",rss->bookmark);                                     //13
 	prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "ву"    : "б░",        //3*3=9

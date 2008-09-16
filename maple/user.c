@@ -41,6 +41,10 @@ tn_user_show()	/* 使用者上站，初使化與載入使用者文章列表顯示喜好 */
 /* 上站時初始化個人光棒					 */
 /* ----------------------------------------------------- */
 
+static char *DEFCBAR[CBAR_NUM] = {
+		COLORBAR_MENU, COLORBAR_BRD, COLORBAR_POST, COLORBAR_GEM,
+		COLORBAR_PAL, COLORBAR_USR, COLORBAR_BMW, COLORBAR_MAIL,
+		COLORBAR_ALOHA, COLORBAR_VOTE, COLORBAR_NBRD, COLORBAR_SONG, COLORBAR_RSS };
 
 #if 1
 static void
@@ -99,7 +103,7 @@ tn_user_bar()		/* 使用者上站，初使化與載入使用者設定檔 */
 
 #if 1		/* 過渡時期，使用者上站時轉檔 */
   usr_fpath(fpath, cuser.userid, ".BARSET");
-  if (!dash(fpath))	/* 沒有 .BARSET, 表示之前無任何相關設定，或是舊設定尚未轉檔 */
+  if (!dashf(fpath))	/* 沒有 .BARSET, 表示之前無任何相關設定，或是舊設定尚未轉檔 */
     trans_bar_set();
 #endif
 
@@ -110,6 +114,7 @@ tn_user_bar()		/* 使用者上站，初使化與載入使用者設定檔 */
       fgets(color, 32, fp);
       if (color[0] != '\0' && color[0] != ' ')
       {
+	 color[strlen(color) - 1] = '\0';
 	 strcpy(UCBAR[i], color);
       }
     }
@@ -217,10 +222,10 @@ u_set_bar(bar)
   switch (ans = vans("◎ 選擇 Y)確定 N)取消 D)預設 [Q] "))
   {
     case 'd' :
-      strcpy(UCBAR[i], DEFCBAR[i]);
+      strcpy(UCBAR[bar], DEFCBAR[bar]);
       break;
     case 'y' :
-      strcpy(UCBAR[i], color_write);
+      strcpy(UCBAR[bar], color_write);
       break;
     default :
       return 0;
