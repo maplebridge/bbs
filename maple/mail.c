@@ -1355,12 +1355,12 @@ mbox_item_bar(xo, mode)
   prints(xmode & MAIL_DELETE ? 
 	  "%s%6d%c\033[1;5;37;41m%c\033[m%s " : 
       "%s%6d%c%c%s ",
-		  mode ? USR_COLORBAR_MAIL : "",
+		  mode ? UCBAR[UCBAR_MAIL] : "",
     num, tag_char(hdr->chrono), mbox_attr(xmode),
-	mode ? USR_COLORBAR_MAIL : "");
+	mode ? UCBAR[UCBAR_MAIL] : "");
 #else
   prints("%s%6d %c ",
-    mode ? USR_COLORBAR_MAIL : "", xo->pos + 1, mbox_attr(hdr->xmode));
+    mode ? UCBAR[UCBAR_MAIL] : "", xo->pos + 1, mbox_attr(hdr->xmode));
 #endif
                                                                                 
   if (mode)

@@ -72,29 +72,29 @@ gem_item_bar(xo, mode)
   HDR *hdr;
   int level;
   int xmode, gtype;
-                                                                                
+
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
   level = xo->key;
   /* ◎☆★◇◆□■▽▼ : A1B7 ... */
-                                                                                
+
   xmode = hdr->xmode;
   gtype = (char) 0xba;
-                                                                                
+
   /* 目錄用實心，不是目錄用空心 */
   if (xmode & GEM_FOLDER)               /* 文章:◇ 卷宗:◆ */
     gtype += 1;
-                                                                                
+
   if (hdr->xname[0] == '@')            /* 資料:☆ 分類:★ */
     gtype -= 2;
   else if (xmode & GEM_BOARD)           /*         看板:■ */
     gtype += 2;
-                                                                                
-  prints("%s%6d%c%c\241%c ", mode ? USR_COLORBAR_GEM : "\033[m",
+
+  prints("%s%6d%c%c\241%c ", mode ? UCBAR[UCBAR_GEM] : "\033[m",
     num, TagNum && !Tagger(hdr->chrono, num - 1, TAG_NIN) ? '*' : ' ',xmode & GEM_RESTRICT ? ')' : ' ' ,gtype);
-                                                                                
+
   gtype = gem_way;
-                                                                                
+
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
     prints("%-67s%s", "<資料保密>", mode ? "\033[m" : "");
          /* itoc.000319: 限制級文章保密 */
@@ -103,7 +103,7 @@ gem_item_bar(xo, mode)
   else
     prints("%-46.45s%-13s%-8.8s%s", hdr->title,
       (gtype == 1 ? hdr->xname : hdr->owner), hdr->date, mode ? "\033[m" : "");
-                                                                                
+
   return XO_NONE;
 }
 #endif

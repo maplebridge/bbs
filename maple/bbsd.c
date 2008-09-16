@@ -51,31 +51,30 @@ extern UMODELOG modelog;
 extern time_t mode_lastchange;
 #endif
 
-//int ChangeLoging=0;  /* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
+#define	ChangeLoging	0;	/* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
 
 
 /* ----------------------------------------------------- */
 /*                     load .SET                         */
 /* ----------------------------------------------------- */
-/* smiler.071110: load .SET 進來 */
-void
-setuploader()
-{
-	FILE *fp;
-	char file_space[64];
-	sprintf(file_space,".SET");
-	if(fp=fopen(file_space,"r"))
-    {
-       fscanf(fp,"%d",&host_sight_number);
-       fscanf(fp,"%d",&host_sight_select);
-       fscanf(fp,"%d",&model_number);
-       fscanf(fp,"%d",&model_select);          
-       fscanf(fp,"%d",&editlog_use);
-       fscanf(fp,"%d",&deletelog_use);
-       fscanf(fp,"%d",&mail_to_newone);
-	   fclose(fp);
-	}
 
+void
+setuploader()	/* smiler.071110: load 整個站的 .SET 進來 */
+{
+  FILE *fp;
+  char file_space[64];
+  sprintf(file_space, ".SET");
+  if (fp = fopen(file_space, "r"))
+  {
+    fscanf(fp,"%d",&host_sight_number);
+    fscanf(fp,"%d",&host_sight_select);
+    fscanf(fp,"%d",&model_number);
+    fscanf(fp,"%d",&model_select);
+    fscanf(fp,"%d",&editlog_use);
+    fscanf(fp,"%d",&deletelog_use);
+    fscanf(fp,"%d",&mail_to_newone);
+    fclose(fp);
+  }
 }
 
 /* ----------------------------------------------------- */
@@ -465,7 +464,7 @@ logattempt(type, content)
   char buf[128], fpath[64];
 
   sprintf(buf, "%s %c %s\n", Btime(&ap_start), type, content);
-    
+
   usr_fpath(fpath, cuser.userid, FN_LOG);
   f_cat(fpath, buf);
 
@@ -479,7 +478,7 @@ logattempt(type, content)
 
 
 /* ----------------------------------------------------- */
-/* 登錄 BBS 程式					 */
+/* 登錄 BBS 程式						 */
 /* ----------------------------------------------------- */
 
 
@@ -534,7 +533,7 @@ utmp_setup(mode)
 {
   UTMP utmp;
   uschar *addr;
-  
+
   memset(&utmp, 0, sizeof(utmp));
 
   utmp.pid = currpid;
@@ -546,7 +545,7 @@ utmp_setup(mode)
   utmp.userlevel = cuser.userlevel;	/* itoc.010309: 把 userlevel 也放入 cache */
   utmp.ufo = cuser.ufo;
   utmp.status = 0;
-  
+
   strcpy(utmp.userid, cuser.userid);
 #ifdef DETAIL_IDLETIME
   utmp.idle_time = ap_start;
@@ -561,7 +560,7 @@ utmp_setup(mode)
 #endif	/* GUEST_NICK */
 
   strcpy(utmp.username, cuser.username);
-  
+
 #ifdef HAVE_WHERE
 
 #  ifdef GUEST_WHERE
@@ -598,7 +597,7 @@ utmp_setup(mode)
 #else
   str_ncpy(utmp.from, fromhost, sizeof(utmp.from));
 #endif	/* HAVE_WHERE */      
-  
+
   /* Thor: 告訴User已經滿了放不下... */
   if (!utmp_new(&utmp))
     login_abort("\n您剛剛選的位子已經被人捷足先登了，請下次再來吧");
@@ -664,7 +663,7 @@ login_user(content)
 	vmsg("抱歉，您不夠資格擔任別人的介紹人");
       }
       else if (!vget(b_lines - 1, 40, "[保人密碼] ", passbuf, PSWDLEN + 1, NOECHO))
-      {       
+      {
 	continue;
       }
       else
@@ -717,17 +716,24 @@ login_user(content)
     {
       /* 若沒輸入 ID，那麼 continue */
     }
+    else if (acct_load(&cuser, uid) < 0)
+    {
+      vmsg(err_uid);
+      continue;
+    }
     else if (str_cmp(uid, STR_GUEST))	/* 一般使用者 */
     {
       if (!vget(b_lines - 1, 40, "[您的密碼] ", passbuf, PSWDLEN + 1, NOECHO))
 	continue;	/* 不打密碼則取消登入 */
 
+#if 0
       /* itoc.040110: 在輸入完 ID 及密碼，才載入 .ACCT */
       if (acct_load(&cuser, uid) < 0)
       {
 	vmsg(err_uid);
 	continue;
       }
+#endif
 
       if (chkpasswd(cuser.passwd, passbuf))
       {
@@ -756,7 +762,7 @@ login_user(content)
 	    /* SYSOP gets all permission bits */
 	    /* itoc.010902: DENY perm 排外 */
 	    cuser.userlevel = ~0 ^ (PERM_DENYMAIL | PERM_DENYTALK | PERM_DENYCHAT | PERM_DENYPOST | PERM_DENYLOGIN | PERM_PURGE);
-	  }   
+	  }
 	}
 
 	if (cuser.ufo & UFO_ACL)
@@ -986,29 +992,30 @@ login_other()
   ve_recover();				/* 上次斷線，編輯器回存 */
 }
 
-/* smiler.071111: 站務寄信給使用者 */
+
 static void
-board_mail_to_user()
+board_mail_to_user()	/* smiler.071111: 站務寄信給使用者 */
 {
   HDR hdr;
   char fpath_mail[80];
 
   if(mail_to_newone)
   {
-	  if(cuser.numlogins==15)         //在此設定權限
-	  {
-         usr_fpath(fpath_mail, cuser.userid, FN_DIR);
-         if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
-		 { 
-            strcpy(hdr.title, "楓橋站務寄給您的情書");
-            strcpy(hdr.owner, STR_SYSOP);
-            hdr.xmode = 0; 
-            rec_add(fpath_mail, &hdr, sizeof(HDR));
-            cutmp->status |= STATUS_BIFF;
-		 }
-	  }
+    if (cuser.numlogins == 15)	//在此設定權限
+    {
+      usr_fpath(fpath_mail, cuser.userid, FN_DIR);
+      if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
+      { 
+	strcpy(hdr.title, "楓橋站務寄給您的情書");
+	strcpy(hdr.owner, STR_SYSOP);
+	hdr.xmode = 0; 
+	rec_add(fpath_mail, &hdr, sizeof(HDR));
+	cutmp->status |= STATUS_BIFF;
+      }
+    }
   }
 }
+
 
 static void
 tn_login()
@@ -1078,140 +1085,6 @@ tn_login()
   }
 
   srand(ap_start * cuser.userno * currpid);
-}
-
-
-int
-tn_user_set_bar(barname)
-  char *barname;
-{
-  char filepath[64];
-  char color[32];
-  int i;
-  char colorbar[][32]=
-  {
-    "USR_COLORBAR_MENU" ,"COLORBAR_MENU" ,
-    "USR_COLORBAR_BRD"  ,"COLORBAR_BRD"  ,
-    "USR_COLORBAR_POST" ,"COLORBAR_POST" ,
-    "USR_COLORBAR_GEM"  ,"COLORBAR_GEM"  ,
-    "USR_COLORBAR_PAL"  ,"COLORBAR_PAL"  ,
-    "USR_COLORBAR_USR"  ,"COLORBAR_USR"  ,
-    "USR_COLORBAR_BMW"  ,"COLORBAR_BMW"  ,
-    "USR_COLORBAR_MAIL" ,"COLORBAR_MAIL" ,
-    "USR_COLORBAR_ALOHA","COLORBAR_ALOHA",
-    "USR_COLORBAR_VOTE" ,"COLORBAR_VOTE" ,
-    "USR_COLORBAR_NBRD" ,"COLORBAR_NBRD" ,
-    "USR_COLORBAR_SONG" ,"COLORBAR_SONG" ,
-    "USR_COLORBAR_RSS"  ,"COLORBAR_RSS"
-  };
-
-  for (i=0;i<13;i++)
-  {
-    if (strstr(colorbar[2*i+1],barname))
-      break;
-  }
-
-  if (i >= 13)
-    return 0;
-  else
-  {
-    FILE *fp;
-    char barname_in[24];
-    sprintf(barname_in, "%s.bar", barname);
-    usr_fpath(filepath, cuser.userid, barname_in);
-    if (fp = fopen(filepath,"r"))
-    {
-      if (fgets(color,32,fp))
-      {
-	if (color[0]!='\0' && color[0]!=' ')
-	{
-	  if (i==0)
-	    strcpy(USR_COLORBAR_MENU,color);
-	  else if(i==1)
-	    strcpy(USR_COLORBAR_BRD,color);
-	  else if(i==2)
-	    strcpy(USR_COLORBAR_POST,color);
-	  else if(i==3)
-	    strcpy(USR_COLORBAR_GEM,color);
-	  else if(i==4)
-	    strcpy(USR_COLORBAR_PAL,color);
-	  else if(i==5)
-	    strcpy(USR_COLORBAR_USR,color);
-	  else if(i==6)
-	    strcpy(USR_COLORBAR_BMW,color);
-	  else if(i==7)
-	    strcpy(USR_COLORBAR_MAIL,color);
-	  else if(i==8)
-	    strcpy(USR_COLORBAR_ALOHA,color);
-	  else if(i==9)
-	    strcpy(USR_COLORBAR_VOTE,color);
-	  else if(i==10)
-	    strcpy(USR_COLORBAR_NBRD,color);
-	  else if(i==11)
-	    strcpy(USR_COLORBAR_SONG,color);
-	  else if(i==12)
-	    strcpy(USR_COLORBAR_RSS,color);
-	}
-      }
-      fclose(fp);
-    } 
-  }
-  return 0;
-}
-
-static void
-tn_user_bar()
-{
-  strcpy(USR_COLORBAR_MENU ,COLORBAR_MENU );
-  strcpy(USR_COLORBAR_BRD  ,COLORBAR_BRD  );
-  strcpy(USR_COLORBAR_POST ,COLORBAR_POST );
-  strcpy(USR_COLORBAR_GEM  ,COLORBAR_GEM  );
-  strcpy(USR_COLORBAR_PAL  ,COLORBAR_PAL  );
-  strcpy(USR_COLORBAR_USR  ,COLORBAR_USR  );
-  strcpy(USR_COLORBAR_BMW  ,COLORBAR_BMW  );
-  strcpy(USR_COLORBAR_MAIL ,COLORBAR_MAIL );
-  strcpy(USR_COLORBAR_ALOHA,COLORBAR_ALOHA);
-  strcpy(USR_COLORBAR_VOTE ,COLORBAR_VOTE );
-  strcpy(USR_COLORBAR_NBRD ,COLORBAR_NBRD );
-  strcpy(USR_COLORBAR_SONG ,COLORBAR_SONG );
-  strcpy(USR_COLORBAR_RSS  ,COLORBAR_RSS  );
-  tn_user_set_bar("_MENU");
-  tn_user_set_bar("_BRD");
-  tn_user_set_bar("_POST");
-  tn_user_set_bar("_GEM");
-  tn_user_set_bar("_PAL");
-  tn_user_set_bar("_USR");
-  tn_user_set_bar("_BMW");
-  tn_user_set_bar("_MAIL");
-  tn_user_set_bar("_ALOHA");
-  tn_user_set_bar("_VOTE");
-  tn_user_set_bar("_NBRD");
-  tn_user_set_bar("_SONG");
-  tn_user_set_bar("_RSS");
-}
-
-
-static void
-tn_user_show()
-{
-  FILE *fp;
-  char filepath[64];
-
-  /* 讀出使用者個人設定的 USR_SHOW */
-  usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
-  if (fp = fopen(filepath, "r"))	//若檔案存在則讀出來
-  {
-    fscanf(fp, "%ud", &USR_SHOW);
-    fclose(fp);
-  }
-  else					//反之則將我們 initial 的 USR_SHOW 寫回去
-  {
-    /* initialization USR_SHOW */
-    USR_SHOW = -1 & ~(-1 << NUM_USR_SHOW);
-    fp = fopen(filepath,"w");
-    fprintf(fp, "%ud", USR_SHOW);
-    fclose(fp);
-  }
 }
 
 
@@ -1317,21 +1190,19 @@ tn_main()
   time(&ap_start);
 
   /* smiler.070602:更改進站版面配置 */
-  if(ushm->count>=0 && ushm->count<10)
-  prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉          \033[40m\n",
-	  str_site,ushm->count);
-  else if(ushm->count>=10 && ushm->count<100)
-  prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉         \033[40m\n",
-	  str_site,ushm->count);
-  else if(ushm->count>=100 && ushm->count<1000)
-  prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉        \033[40m\n",
-	  str_site,ushm->count);
-  else if(ushm->count>=1000 && ushm->count<10000)
-  prints("\033[1;37;41m歡迎光臨\033[1;37;41m【\033[1;33m %s \033[1;37;41m】" MYIPADDR " ⊙\033[1;33m \033[1;37;41m" SCHOOLNAME "\033[1;33m \033[1;37;41m⊙線上有 [\033[1;33m%d\033[1;37;41m] 片楓葉       \033[40m\n",
-	  str_site,ushm->count);
-  prints("\033[1;33;41m                                                                            \033[0m\n");
+  int len;
+  char header[ANSILINELEN];
+  sprintf(header, "%d", ushm->count);
+  len = strlen(header);
+  sprintf(header, "線上有 [\033[33m%d\033[37m] 片楓葉%-*s\033[40m",
+    ushm->count, 11 - len + d_cols, "");
+
+  prints("\033[1;41m歡迎光臨【\033[33m %s \033[37m】" MYIPADDR " ⊙ " SCHOOLNAME " ⊙%s\n",
+    str_site, header);
+  prints("\033[1;41m%-*s\033[m\n", 76 + d_cols, "");
+
   film_out((ap_start % 10) + FILM_OPENING0, 2);	/* 亂數顯示開頭畫面 */ /* smiler.070602:更改進站版面配置 */
-  
+
   currpid = getpid();
 
   tn_signals();	/* Thor.980806: 放於 tn_login前, 以便 call in不會被踢 */
@@ -1344,7 +1215,7 @@ tn_main()
 #endif
   talk_main();
 
-  tn_user_setup(); /* smiler.080810: load 使用者個人設定檔 */
+  tn_user_setup();	/* smiler.080810: load 使用者個人設定檔 */
 
   tn_motd();
 
@@ -1782,19 +1653,19 @@ main(argc, argv)
 
     //if(argc<=1)
     //if(argc>0)
-	if(1)
-	{
-      setuploader();
-	}
+    if(1)
+    {
+      setuploader();	/* 載入整個站的設定檔 */
+    }
 #if 0
-	/* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
-	if (ChangeLoging==1)
-	{
+    /* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
+    if (ChangeLoging)
+    {
       sprintf(currtitle, "程式修改中，請稍後再來\n");     /* 公佈修改進度及相關資訊 */
       send(csock, currtitle, strlen(currtitle), 0);
       close(csock);
       continue;
-	}
+    }
 #endif
     if (argc >= MAXACTIVE - 5 /* || *avgload > THRESHOLD */ )
     {

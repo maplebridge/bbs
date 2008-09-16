@@ -343,11 +343,11 @@ ulist_item_bar(xo, mode)
     "";
                                                                                 
   prints("%s%6d%c%c%s%-13s%-*.*s\033[m%s%-*.*s%-11.10s%6s%s",
-    mode ? USR_COLORBAR_USR : "",
+    mode ? UCBAR[COLORBAR_USR] : "",
     xo->pos + 1, ufo & UFO_CLOAK ? ')' : ' ', pager,
     fcolor, up->userid,
     (d_cols >> 1) + 21, (d_cols >> 1) + 20, up->username,
-    mode ? USR_COLORBAR_USR : "",
+    mode ? UCBAR[COLORBAR_USR] : "",
     d_cols - (d_cols >> 1) + 19, d_cols - (d_cols >> 1) + 18,
     pickup_ship ? pal_ship(ftype, up->userno) :
 #ifdef GUEST_WHERE

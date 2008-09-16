@@ -864,14 +864,14 @@ bmw_item_bar(xo, mode)
   if (bmw->sender == cuser.userno)  /* 送出的水球 */
   {
     prints("%s%6d%c\033[33m%-13s\033[36m%-53.53s\033[33m%02d:%02d\033[m",
-      mode ? USR_COLORBAR_BMW : "",
+      mode ? UCBAR[UCBAR_BMW] : "",
       xo->pos + 1, tag_char(bmw->btime),
       bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
   }
   else                              /* 收到的水球 */
   {
     prints("%s%6d%c%-13s\033[32m%-53.53s\033[37m%02d:%02d%s",
-      mode ? USR_COLORBAR_BMW : "",
+      mode ? UCBAR[UCBAR_BMW] : "",
       xo->pos + 1, tag_char(bmw->btime),
       bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min,
       mode ? "\033[m" : "");

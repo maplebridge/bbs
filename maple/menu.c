@@ -1486,7 +1486,7 @@ default_key:
       mptr = table[cc];
       str = mptr->desc;
       //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	  prints("%s[ (\033[1;34m%c\033[m%s)%s ]\033[m",USR_COLORBAR_MENU,*str,USR_COLORBAR_MENU,str + 1);
+	  prints("%s[ (\033[1;34m%c\033[m%s)%s ]\033[m", UCBAR[UCBAR_MENU], *str, UCBAR[UCBAR_MENU], str + 1);
       cx = cc;
 	}
 //#else		/* ¨S¦³ CURSOR_BAR */
@@ -1512,7 +1512,7 @@ default_key:
 	  mptr = table[cc];
 	  str = mptr->desc;
       //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	  prints("%s[ (\033[1;34m%c%s)%s ]\033[m",USR_COLORBAR_MENU,*str,USR_COLORBAR_MENU,str + 1);
+	  prints("%s[ (\033[1;34m%c%s)%s ]\033[m", UCBAR[UCBAR_MENU], *str, UCBAR[UCBAR_MENU], str + 1);
 	}
 //#else
 	else

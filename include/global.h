@@ -515,15 +515,51 @@ VAR char *str_ransi	INI("\033[m");
 VAR int host_sight_number;      /* 站簽個數設定 */
 VAR int host_sight_select;      /* 站簽全站指定 */
 VAR int model_number;           /* 站簽娃個數設定 */
-VAR int model_select;           /* 站簽娃使用全站指定 */           
+VAR int model_select;           /* 站簽娃使用全站指定 */
 VAR int editlog_use;            /* 是否啟用Editlog功能? */
 VAR int deletelog_use;          /* 是否啟用Deletelog功能? */
 VAR int mail_to_newone;         /* 是否寄信給新申請者? */
 
-
 /* 使用者個人設定區 */
 /* 光棒色碼 */
 
+#define	CBAR_NUM	13	/* 共有幾種自訂光棒 *//* 新增下面自訂光棒選單時別忘了改陣列的大小 */
+
+#define	UCBAR_MENU	0	/* menu.c 選單光棒 */
+#define	UCBAR_BRD	1	/* board.c/favor.c 選單光棒 */
+#define	UCBAR_POST	2	/* post.c 選單光棒 */
+#define	UCBAR_GEM	3	/* gem.c 選單光棒 */
+#define	UCBAR_PAL	4	/* pal.c 選單光棒 */
+#define	UCBAR_USR	5	/* ulist.c 選單光棒 */
+#define	UCBAR_BMW	6	/* bmw.c 選單光棒 */
+#define	UCBAR_MAIL	7	/* mail.c 選單光棒 */
+#define	UCBAR_ALOHA	8	/* aloha.c 選單光棒 */
+#define	UCBAR_VOTE	9	/* vote.c 選單光棒 */
+#define	UCBAR_NBRD	10	/* newbrd.c 選單光棒 */
+#define	UCBAR_SONG	11	/* song.c 選單光棒 */
+#define	UCBAR_RSS	12	/* rss.c 選單光棒 */
+
+#define COLORBAR_MENU   "\033[0;30;47m" /* menu.c 選單光棒 */
+#define	COLORBAR_BRD	"\033[1;41m"	/* board.c, favor.c 選單光棒 */
+#define COLORBAR_POST	"\033[1;43m"	/* post.c 選單光棒 */
+#define COLORBAR_GEM	"\033[1;42m"	/* gem.c  選單光棒 */
+#define COLORBAR_PAL	"\033[1;45m"	/* pal.c  選單光棒 */
+#define COLORBAR_USR	"\033[1;45m"	/* ulist.c 選單光棒 */
+#define COLORBAR_BMW	"\033[1;43m"	/* bmw.c 選單光棒 */
+#define COLORBAR_MAIL	"\033[1;42m"	/* mail.c 選單光棒 */
+#define COLORBAR_ALOHA	"\033[1;41m"	/* aloha.c 選單光棒 */
+#define COLORBAR_VOTE	"\033[0;30;43m"	/* vote.c 選單光棒 */
+#define COLORBAR_NBRD	"\033[1;46m"	/* newbrd.c 選單光棒 */
+#define COLORBAR_SONG	"\033[1;42m"	/* song.c 選單光棒 */
+#define COLORBAR_RSS	"\033[1;46m"	/* rss.c 選單光棒 */
+
+VAR char *DEFCBAR[CBAR_NUM] = {
+		COLORBAR_MENU, COLORBAR_BRD, COLORBAR_POST, COLORBAR_GEM,
+		COLORBAR_PAL, COLORBAR_USR, COLORBAR_BMW, COLORBAR_MAIL,
+		COLORBAR_ALOHA, COLORBAR_VOTE, COLORBAR_NBRD, COLORBAR_SONG, COLORBAR_RSS };
+VAR char UCBAR[CBAR_NUM][32];
+
+#if 0
 VAR char USR_COLORBAR_MENU[32];  /*  menu.c 選單光棒 */
 VAR char USR_COLORBAR_BRD[32];   /*  board.c, favor.c 選單光棒 */
 VAR char USR_COLORBAR_POST[32];  /*  post.c 選單光棒 */
@@ -537,23 +573,24 @@ VAR char USR_COLORBAR_VOTE[32];  /*  vote.c 選單光棒 */
 VAR char USR_COLORBAR_NBRD[32];  /*	 newbrd.c 選單光棒 */
 VAR char USR_COLORBAR_SONG[32];  /*  song.c 選單光棒 */
 VAR char USR_COLORBAR_RSS[32];	 /*  rss.c 選單光棒 */
+#endif
 
 /* 使用者選擇顯示選項 */
-VAR int  USR_SHOW;
+
+VAR usint USR_SHOW;
 #define USR_SHOW_POST_ATTR_RESTRICT_F	0x00000001	/* 好友文顯示 顯示 F	 */
 #define USR_SHOW_POST_ATTR_RESTRICT	0x00000002	/* 鎖文 顯示 L		 */
 #define USR_SHOW_POST_ATTR_GEM_MARKED	0x00000004	/* mark + gem 顯示 B	 */
 #define USR_SHOW_POST_ATTR_GEM		0x00000008	/* gem 顯示 G		 */
-#define USR_SHOW_POST_ATTR_DELETE	0x00000010	/* 待刪文章顯示 T	 */
+#define USR_SHOW_POST_ATTR_DELETE	0x00000010	/* 待刪文章顯示 T		 */
 #define USR_SHOW_POST_ATTR_NOFORWARD	0x00000020	/* 文章禁轉符號顯示 X	 */
 #define USR_SHOW_POST_ATTR_NOSCORE	0x00000040	/* 文章禁止推文顯示 N	 */
-#define USR_SHOW_POST_ATTR_MARKED	0x00000080	/* 文章標記符號 M	 */
+#define USR_SHOW_POST_ATTR_MARKED	0x00000080	/* 文章標記符號 M		 */
 #define USR_SHOW_POST_SCORE_0		0x00000100	/* 文章推文為 0 顯示	 */
-#define USR_SHOW_POST_SCORE		0x00000200	/* 文章推文皆顯示	 */
-#define USR_SHOW_POST_MODIFY_UNREAD	0x00000400	/* 文章修文/推文未讀提示 */
+#define USR_SHOW_POST_SCORE		0x00000200	/* 文章推文皆顯示		 */
+#define USR_SHOW_POST_MODIFY_UNREAD	0x00000400	/* 文章修文/推文未讀提示	 */
 
 #define NUM_USR_SHOW	11
-
 
 #undef	VAR
 #undef	INI

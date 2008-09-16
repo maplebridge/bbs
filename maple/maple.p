@@ -22,7 +22,6 @@ void alog(char *mode, char *msg);
 void blog(char *mode, char *msg);
 void u_exit(char *mode);
 void abort_bbs(void);
-int tn_user_set_bar(char *barname);
 
 /* bitlbee.c */
 int bit_main(void);
@@ -205,6 +204,8 @@ void talk_rqst(void);
 void talk_main(void);
 
 /* user.c */
+void tn_user_bar(void);
+void tn_user_show(void);
 int u_menu_bar(void);
 int u_brd_bar(void);
 int u_post_bar(void);
