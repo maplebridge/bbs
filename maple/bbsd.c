@@ -1064,9 +1064,10 @@ tn_login()
 
     login_status(multi);
 
-	/*  ------------------------------------------------ */
-	/*  smiler.071111: 站務寄信給使用者 */	  
-	/*  ------------------------------------------------ */
+    /*  ------------------------------------------------ */
+    /*  smiler.071111: 站務寄信給使用者			 */
+    /*  ------------------------------------------------ */
+
     board_mail_to_user();
 
     /* ------------------------------------------------- */
@@ -1084,154 +1085,141 @@ int
 tn_user_set_bar(barname)
   char *barname;
 {
-	char filepath[64];
-	char color[32];
-	int i;
-	
-	char colorbar[][32]=
-	{
-	  "USR_COLORBAR_MENU" ,"COLORBAR_MENU" ,
-      "USR_COLORBAR_BRD"  ,"COLORBAR_BRD"  ,
-      "USR_COLORBAR_POST" ,"COLORBAR_POST" ,
-      "USR_COLORBAR_GEM"  ,"COLORBAR_GEM"  ,
-      "USR_COLORBAR_PAL"  ,"COLORBAR_PAL"  ,
-      "USR_COLORBAR_USR"  ,"COLORBAR_USR"  ,
-      "USR_COLORBAR_BMW"  ,"COLORBAR_BMW"  ,
-      "USR_COLORBAR_MAIL" ,"COLORBAR_MAIL" ,
-      "USR_COLORBAR_ALOHA","COLORBAR_ALOHA",
-      "USR_COLORBAR_VOTE" ,"COLORBAR_VOTE" ,
-      "USR_COLORBAR_NBRD" ,"COLORBAR_NBRD" ,
-      "USR_COLORBAR_SONG" ,"COLORBAR_SONG" ,
-	  "USR_COLORBAR_RSS"  ,"COLORBAR_RSS"
-	};
+  char filepath[64];
+  char color[32];
+  int i;
+  char colorbar[][32]=
+  {
+    "USR_COLORBAR_MENU" ,"COLORBAR_MENU" ,
+    "USR_COLORBAR_BRD"  ,"COLORBAR_BRD"  ,
+    "USR_COLORBAR_POST" ,"COLORBAR_POST" ,
+    "USR_COLORBAR_GEM"  ,"COLORBAR_GEM"  ,
+    "USR_COLORBAR_PAL"  ,"COLORBAR_PAL"  ,
+    "USR_COLORBAR_USR"  ,"COLORBAR_USR"  ,
+    "USR_COLORBAR_BMW"  ,"COLORBAR_BMW"  ,
+    "USR_COLORBAR_MAIL" ,"COLORBAR_MAIL" ,
+    "USR_COLORBAR_ALOHA","COLORBAR_ALOHA",
+    "USR_COLORBAR_VOTE" ,"COLORBAR_VOTE" ,
+    "USR_COLORBAR_NBRD" ,"COLORBAR_NBRD" ,
+    "USR_COLORBAR_SONG" ,"COLORBAR_SONG" ,
+    "USR_COLORBAR_RSS"  ,"COLORBAR_RSS"
+  };
 
+  for (i=0;i<13;i++)
+  {
+    if (strstr(colorbar[2*i+1],barname))
+      break;
+  }
 
-	for(i=0;i<13;i++)
-	{
-		if(strstr(colorbar[2*i+1],barname))
-			break;
-	}
-
-	if(i >= 13)
-		return 0;
-	else
+  if (i >= 13)
+    return 0;
+  else
+  {
+    FILE *fp;
+    char barname_in[24];
+    sprintf(barname_in, "%s.bar", barname);
+    usr_fpath(filepath, cuser.userid, barname_in);
+    if (fp = fopen(filepath,"r"))
     {
-	  char barname_in[24];
-	  sprintf(barname_in,"%s.bar",barname);
-	  usr_fpath(filepath,cuser.userid,barname_in);
-	  FILE *fp;
-	  if(fp=fopen(filepath,"r"))
-	  {
-		if(fgets(color,32,fp))
-		{
-		  if(color[0]!='\0' && color[0]!=' ')
-		  {
-	         if(i==0)
-				 strcpy(USR_COLORBAR_MENU,color);
-			 else if(i==1)
-				 strcpy(USR_COLORBAR_BRD,color);
-			 else if(i==2)
-				 strcpy(USR_COLORBAR_POST,color);
-			 else if(i==3)
-				 strcpy(USR_COLORBAR_GEM,color);
-			 else if(i==4)
-				 strcpy(USR_COLORBAR_PAL,color);
-			 else if(i==5)
-				 strcpy(USR_COLORBAR_USR,color);
-			 else if(i==6)
-				 strcpy(USR_COLORBAR_BMW,color);
-			 else if(i==7)
-				 strcpy(USR_COLORBAR_MAIL,color);
-			 else if(i==8)
-				 strcpy(USR_COLORBAR_ALOHA,color);
-			 else if(i==9)
-				 strcpy(USR_COLORBAR_VOTE,color);
-			 else if(i==10)
-				 strcpy(USR_COLORBAR_NBRD,color);
-			 else if(i==11)
-				 strcpy(USR_COLORBAR_SONG,color);
-			 else if(i==12)
-				 strcpy(USR_COLORBAR_RSS,color);
-		  }
-		}
-		fclose(fp);
-	  } 
+      if (fgets(color,32,fp))
+      {
+	if (color[0]!='\0' && color[0]!=' ')
+	{
+	  if (i==0)
+	    strcpy(USR_COLORBAR_MENU,color);
+	  else if(i==1)
+	    strcpy(USR_COLORBAR_BRD,color);
+	  else if(i==2)
+	    strcpy(USR_COLORBAR_POST,color);
+	  else if(i==3)
+	    strcpy(USR_COLORBAR_GEM,color);
+	  else if(i==4)
+	    strcpy(USR_COLORBAR_PAL,color);
+	  else if(i==5)
+	    strcpy(USR_COLORBAR_USR,color);
+	  else if(i==6)
+	    strcpy(USR_COLORBAR_BMW,color);
+	  else if(i==7)
+	    strcpy(USR_COLORBAR_MAIL,color);
+	  else if(i==8)
+	    strcpy(USR_COLORBAR_ALOHA,color);
+	  else if(i==9)
+	    strcpy(USR_COLORBAR_VOTE,color);
+	  else if(i==10)
+	    strcpy(USR_COLORBAR_NBRD,color);
+	  else if(i==11)
+	    strcpy(USR_COLORBAR_SONG,color);
+	  else if(i==12)
+	    strcpy(USR_COLORBAR_RSS,color);
 	}
-	return 0;
-
+      }
+      fclose(fp);
+    } 
+  }
+  return 0;
 }
 
 static void
 tn_user_bar()
 {
-	strcpy(USR_COLORBAR_MENU ,COLORBAR_MENU );
-    strcpy(USR_COLORBAR_BRD  ,COLORBAR_BRD  );
-    strcpy(USR_COLORBAR_POST ,COLORBAR_POST );
-    strcpy(USR_COLORBAR_GEM  ,COLORBAR_GEM  );
-    strcpy(USR_COLORBAR_PAL  ,COLORBAR_PAL  );
-    strcpy(USR_COLORBAR_USR  ,COLORBAR_USR  );
-    strcpy(USR_COLORBAR_BMW  ,COLORBAR_BMW  );
-    strcpy(USR_COLORBAR_MAIL ,COLORBAR_MAIL );
-    strcpy(USR_COLORBAR_ALOHA,COLORBAR_ALOHA);
-    strcpy(USR_COLORBAR_VOTE ,COLORBAR_VOTE );
-    strcpy(USR_COLORBAR_NBRD ,COLORBAR_NBRD );
-    strcpy(USR_COLORBAR_SONG ,COLORBAR_SONG );
-	strcpy(USR_COLORBAR_RSS  ,COLORBAR_RSS  );
-    tn_user_set_bar("_MENU");
-	tn_user_set_bar("_BRD");
-	tn_user_set_bar("_POST");
-	tn_user_set_bar("_GEM");
-	tn_user_set_bar("_PAL");
-	tn_user_set_bar("_USR");
-	tn_user_set_bar("_BMW");
-	tn_user_set_bar("_MAIL");
-	tn_user_set_bar("_ALOHA");
-	tn_user_set_bar("_VOTE");
-	tn_user_set_bar("_NBRD");
-	tn_user_set_bar("_SONG");
-	tn_user_set_bar("_RSS");
+  strcpy(USR_COLORBAR_MENU ,COLORBAR_MENU );
+  strcpy(USR_COLORBAR_BRD  ,COLORBAR_BRD  );
+  strcpy(USR_COLORBAR_POST ,COLORBAR_POST );
+  strcpy(USR_COLORBAR_GEM  ,COLORBAR_GEM  );
+  strcpy(USR_COLORBAR_PAL  ,COLORBAR_PAL  );
+  strcpy(USR_COLORBAR_USR  ,COLORBAR_USR  );
+  strcpy(USR_COLORBAR_BMW  ,COLORBAR_BMW  );
+  strcpy(USR_COLORBAR_MAIL ,COLORBAR_MAIL );
+  strcpy(USR_COLORBAR_ALOHA,COLORBAR_ALOHA);
+  strcpy(USR_COLORBAR_VOTE ,COLORBAR_VOTE );
+  strcpy(USR_COLORBAR_NBRD ,COLORBAR_NBRD );
+  strcpy(USR_COLORBAR_SONG ,COLORBAR_SONG );
+  strcpy(USR_COLORBAR_RSS  ,COLORBAR_RSS  );
+  tn_user_set_bar("_MENU");
+  tn_user_set_bar("_BRD");
+  tn_user_set_bar("_POST");
+  tn_user_set_bar("_GEM");
+  tn_user_set_bar("_PAL");
+  tn_user_set_bar("_USR");
+  tn_user_set_bar("_BMW");
+  tn_user_set_bar("_MAIL");
+  tn_user_set_bar("_ALOHA");
+  tn_user_set_bar("_VOTE");
+  tn_user_set_bar("_NBRD");
+  tn_user_set_bar("_SONG");
+  tn_user_set_bar("_RSS");
 }
+
 
 static void
 tn_user_show()
 {
-	/* initialization USR_SHOW */
+  FILE *fp;
+  char filepath[64];
 
-	USR_SHOW=0;
-	USR_SHOW |= USR_SHOW_POST_ATTR_RESTRICT_F;
-	USR_SHOW |= USR_SHOW_POST_ATTR_RESTRICT;
-	USR_SHOW |= USR_SHOW_POST_ATTR_GEM_MARKED;
-	USR_SHOW |= USR_SHOW_POST_ATTR_GEM;
-	USR_SHOW |= USR_SHOW_POST_ATTR_DELETE;
-	USR_SHOW |= USR_SHOW_POST_ATTR_NOFORWARD;
-	USR_SHOW |= USR_SHOW_POST_ATTR_NOSCORE;
-	USR_SHOW |= USR_SHOW_POST_ATTR_MARKED;
-	USR_SHOW |= USR_SHOW_POST_SCORE_0;
-	USR_SHOW |= USR_SHOW_POST_SCORE;
-
-	/* 讀出使用者個人設定的 USR_SHOW */
-
-	char filepath[64];
-	usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
-	FILE *fp;
-	if(fp=fopen(filepath,"r"))       //若檔案存在則讀出來
-	{
-		fscanf(fp,"%d",&USR_SHOW);
-		fclose(fp);
-	}
-	else                             //反之則將我們 initial 的 USR_SHOW 寫回去
-	{
-		fp=fopen(filepath,"w");
-		fprintf(fp,"%d",USR_SHOW);
-		fclose(fp);
-	}
+  /* 讀出使用者個人設定的 USR_SHOW */
+  usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
+  if (fp = fopen(filepath, "r"))	//若檔案存在則讀出來
+  {
+    fscanf(fp, "%ud", &USR_SHOW);
+    fclose(fp);
+  }
+  else					//反之則將我們 initial 的 USR_SHOW 寫回去
+  {
+    /* initialization USR_SHOW */
+    USR_SHOW = -1 & ~(-1 << NUM_USR_SHOW);
+    fp = fopen(filepath,"w");
+    fprintf(fp, "%ud", USR_SHOW);
+    fclose(fp);
+  }
 }
+
 
 static void
 tn_user_setup()
 {
-	tn_user_bar();
-	tn_user_show();
+  tn_user_bar();
+  tn_user_show();
 }
 
 static void
@@ -1241,11 +1229,10 @@ tn_motd()
 
   ufo = cuser.ufo;
 
-  //if (!(ufo & UFO_MOTD))
-  if(1)
+  if(1)		/* if (!(ufo & UFO_MOTD)) */
   {
-	more("gem/@/@-Announce", NULL);  /* 近期公告 */
-	more("gem/@/@-goodboard", NULL); /* 推薦看板 */
+    more("gem/@/@-Announce", NULL);  /* 近期公告 */
+    more("gem/@/@-goodboard", NULL); /* 推薦看板 */
     more("gem/@/@-day", NULL);	/* 今日熱門話題 */
     pad_view();
   }

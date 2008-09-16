@@ -26,8 +26,8 @@ typedef UTMP *pickup;
 /* 此順序即為排序的順序 */
 #define FTYPE_SELF	0x01
 #define FTYPE_SUPER_BOTHGOOD	0x02
-#define FTYPE_SUPER_MYGOOD		0x04
-#define FTYPE_SUPER_OGOOD		0x08
+#define FTYPE_SUPER_MYGOOD	0x04
+#define FTYPE_SUPER_OGOOD	0x08
 #define FTYPE_BOTHGOOD	0x10
 #define FTYPE_MYGOOD	0x20
 #define FTYPE_OGOOD	0x40
@@ -251,11 +251,12 @@ ulist_item(num, up, slot, now, sysop)
     up->from : "*", bmode(up, 0), buf);
 }
 
+
 #ifdef HAVE_LIGHTBAR
-static void
+static int
 ulist_item_bar(xo, mode)
   XO *xo;
-  int mode;     /* 1:上光棒  0:去光棒 */
+  int mode;	/* 1:上光棒  0:去光棒 */
 {
   time_t diff, ftype;
   int userno, ufo;
@@ -358,6 +359,7 @@ ulist_item_bar(xo, mode)
 #endif
     up->from : "*", bmode(up, 0), buf,
     mode ? "\033[m" : "");
+  return 0;
 }
 #endif
 
@@ -525,27 +527,26 @@ ulist_paltype(up)		/* 朋友種類 */
   if (is_mybad(userno))
     return FTYPE_MYBAD;
 
-  if(is_super_mygood(userno))     //我設對方為超級好友
+  if (is_super_mygood(userno))     //我設對方為超級好友
   {
-	  if(is_super_ogood(up))      //對方設我為超級好友
-		return FTYPE_SUPER_BOTHGOOD;
-	  else
-		return FTYPE_SUPER_MYGOOD;
+    if (is_super_ogood(up))      //對方設我為超級好友
+      return FTYPE_SUPER_BOTHGOOD;
+    else
+      return FTYPE_SUPER_MYGOOD;
   }
-  else if(is_super_ogood(up))     //對方設我為超級好友
-      return FTYPE_SUPER_OGOOD;
-  else if(is_mygood(userno))      //我設對方為好友
+  else if (is_super_ogood(up))     //對方設我為超級好友
+    return FTYPE_SUPER_OGOOD;
+  else if (is_mygood(userno))      //我設對方為好友
   {
-	  if(is_ogood(up))            //對方設我為好友
-		  return FTYPE_BOTHGOOD;
-	  else
-		  return FTYPE_MYGOOD;
+    if (is_ogood(up))            //對方設我為好友
+      return FTYPE_BOTHGOOD;
+    else
+      return FTYPE_MYGOOD;
   }
-  else if(is_ogood(up))          //對方設我為好友
-	  return FTYPE_OGOOD;
+  else if (is_ogood(up))          //對方設我為好友
+    return FTYPE_OGOOD;
   else
-	  return FTYPE_NORMAL;
-
+    return FTYPE_NORMAL;
 }
 
 

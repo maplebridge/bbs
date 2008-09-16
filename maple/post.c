@@ -2899,15 +2899,15 @@ post_bottom(xo)
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
   pos = xo->pos;
 
-  if(!(hdr->xmode & POST_BOTTOM))
+  if (!(hdr->xmode & POST_BOTTOM))
   {
     /*Allow only one bottom post per article*/	
-    if(hdr->parent_chrono!=0)
+    if (hdr->parent_chrono)
       return post_load(xo);
 
     hdr_fpath(fpath, xo->dir, hdr);
     hdr_stamp(xo->dir, HDR_LINK | 'A', &post, fpath);
-	post.parent_chrono = hdr->chrono;
+    post.parent_chrono = hdr->chrono;
 #ifdef HAVE_REFUSEMARK
     post.xmode = POST_BOTTOM | (hdr->xmode & POST_RESTRICT);
 #else
@@ -3432,7 +3432,6 @@ post_edit(xo)
   hdr_fpath(copied,xo->dir,hdr);
   brd_fpath(Editlog_folder,"Editlog", FN_DIR);
 
-
   hdr_fpath(fpath, xo->dir, hdr);
 
   if (HAS_PERM(PERM_ALLBOARD))			/* 站長修改 */
@@ -3467,10 +3466,10 @@ post_edit(xo)
     if( post_filter(tmpfile) )         /* smiler.080830: 針對文章標題內容偵測有無不當之處 */
       unlink(tmpfile);
     else
-	{
-	  unlink(fpath);
-	  rename(tmpfile, fpath);
-	}
+    {
+      unlink(fpath);
+      rename(tmpfile, fpath);
+    }
 #endif
 
     /* smiler 1031 */
@@ -3486,7 +3485,7 @@ post_edit(xo)
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BOARD))	/* 板主/原作者修改 */
   {
 
-	/* smiler 1031 */
+    /* smiler 1031 */
     hdr_stamp(Editlog_folder, HDR_COPY | 'A', &Editlog_hdr, copied);
     strcpy(Editlog_hdr.title , hdr->title);
     strcpy(Editlog_hdr.owner , hdr->owner);
@@ -3534,10 +3533,9 @@ post_edit(xo)
     Editlog_hdr.xmode = POST_OUTGO;
     rec_bot(Editlog_folder, &Editlog_hdr, sizeof(HDR));
     btime_update(brd_bno("Editlog"));
-
   }
-#if 0
   else		/* itoc.010301: 提供使用者修改(但不能儲存)其他人發表的文章 */
+#if 0
   {
 #ifdef HAVE_REFUSEMARK
     if (hdr->xmode & POST_RESTRICT)
@@ -3546,7 +3544,7 @@ post_edit(xo)
     vedit(fpath, -1);
   }
 #else
-  return XO_NONE;
+    return XO_NONE;
 #endif
 
   /* return post_head(xo); */
@@ -4078,7 +4076,7 @@ post_append_score(xo, choose)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;36m%s\033[m：\033[0;33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
+    fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen, reason, 
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     fclose(fp);

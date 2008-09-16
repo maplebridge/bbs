@@ -928,19 +928,19 @@ u_setup()
 int
 u_usr_show_set()
 {
-	int len;
-	len = NUM_USR_SHOW;
-	USR_SHOW = bitset(USR_SHOW, len, len, MSG_USR_SHOW, usr_show_tbl);
+  FILE *fp;
+  char filepath[64];
+  int len;
 
-	char filepath[64];
-	usr_fpath(filepath,cuser.userid,"MY_USR_SHOW");
-	FILE *fp;
+  len = NUM_USR_SHOW;
+  USR_SHOW = bitset(USR_SHOW, len, len, MSG_USR_SHOW, usr_show_tbl);
 
-	fp = fopen(filepath,"w");
-	fprintf(fp,"%d",USR_SHOW);
-	fclose(fp);
+  usr_fpath(filepath, cuser.userid, "MY_USR_SHOW");
+  fp = fopen(filepath, "w");
+  fprintf(fp, "%ud", USR_SHOW);
+  fclose(fp);
 
-	return 0;
+  return 0;
 }
 
 int
