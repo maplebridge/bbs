@@ -399,7 +399,7 @@ IS_BIGGER_1STLG(month)
 }
 
 #define		COLOR_NOT_ACP	"\033[1;31m"
-#define		COLOR_ACP		"\033[1;37m"	
+#define		COLOR_ACP	"\033[1;37m"	
 
 int
 IS_WELCOME(board, f_mode)
@@ -409,121 +409,161 @@ IS_WELCOME(board, f_mode)
   FILE *fp;
   char fpath[64];
   brd_fpath(fpath, board, f_mode);
+  int wi = 0;
+  int pass = 1;
 
   if (!(fp = fopen(fpath, "r")))
     return 1;
 
-  int wi=0;
+  while(1)
+  {
+    fscanf(fp, "%d", &wi);
+    if (!IS_BIGGER_AGE(wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf(fp, "%d", &wi);
-  if (!IS_BIGGER_AGE(wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (wi && (wi != cuser.sex+1))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (wi && (wi != cuser.sex+1))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.numlogins >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.numlogins >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.numposts >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.numposts >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.good_article >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.good_article >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (wi && !(cuser.poor_article < wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (wi && !(cuser.poor_article < wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (wi && (!(cuser.violation < wi)))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (wi && (!(cuser.violation < wi)))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.money >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.money >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.gold >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.gold >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!(cuser.numemails >= wi))
+    {
+      pass = 0;
+      break;
+    }
 
-  fscanf( fp, "%d", &wi);
-  if (!(cuser.numemails >= wi))
-    return 0;
+    fscanf(fp, "%d", &wi);
+    if (!IS_BIGGER_1STLG(wi))
+    {
+      pass = 0;
+      break;
+    }
+    break;
+  }
+ fclose(fp);
 
-  fscanf( fp, "%d", &wi);
-  if (!IS_BIGGER_1STLG(wi))
-    return 0;
-
-  fclose(fp);
-  return 1;
+ return pass;
 }
+
 
 static int
 post_show_dog(xo, f_mode)
   XO *xo;
   char *f_mode;
 {
-	FILE *fp;
-	char fpath[64];
-	brd_fpath(fpath, currboard, f_mode);
+  FILE *fp;
+  char fpath[64];
+  brd_fpath(fpath, currboard, f_mode);
 
-	if(!(fp = fopen(fpath, "r")))
-		return 0;
+  if(!(fp = fopen(fpath, "r")))
+  return 0;
 
-	move(0, 0);
-	clrtobot();
+ clear();
 
-	int wi=0;
+ int wi = 0;
 
-	move(1, 0);
-	prints("\033[1;33m %s \033[m\n", (!strcmp(f_mode, FN_NO_WRITE)) ? "發文推文條件限制" : 
-	                                 (!strcmp(f_mode, FN_NO_READ )) ? "進入看板條件限制" :
-									 (!strcmp(f_mode, FN_NO_LIST )) ? "看板列表顯示本板" : "" );
+  move(1, 0);
+  prints("\033[1;33m %s \033[m\n", (!strcmp(f_mode, FN_NO_WRITE)) ? "發文推文條件限制" : 
+					(!strcmp(f_mode, FN_NO_READ )) ? "進入看板條件限制" :
+					(!strcmp(f_mode, FN_NO_LIST )) ? "看板列表顯示本板" : "" );
 
-	move(3, 0);
+  move(3, 0);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
+  fscanf(fp, "%d", &wi);
+  prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s性別限制 : [%s] \033[m\n", (wi == 0) ? COLOR_ACP : (wi == (cuser.sex+1)) ? COLOR_ACP : COLOR_NOT_ACP, (wi==0) ? "不限" : (wi==1) ? "中性" : (wi==2) ? "男性" : "女性");
+  fscanf(fp, "%d", &wi);
+  prints("%s性別限制 : [%s] \033[m\n",
+    (wi == 0) ? COLOR_ACP : (wi == (cuser.sex+1)) ? COLOR_ACP : COLOR_NOT_ACP,
+    (wi == 0) ? "不限" : (wi == 1) ? "中性" : (wi == 2) ? "男性" : "女性");
 
-	fscanf( fp, "%d", &wi);
-	prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf(fp, "%d", &wi);
+  prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n", (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n",
+    (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s違規次數 <  [%d次] (0：不限) \033[m\n", (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s違規次數 <  [%d次] (0：不限) \033[m\n",
+    (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	fscanf( fp, "%d", &wi);
-	prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  fscanf( fp, "%d", &wi);
+  prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
 
-	vmsg(NULL);
+  fclose(fp);
 
-	fclose(fp);
-	return 0;
+  return vmsg(NULL);
 }
 
 
@@ -604,22 +644,22 @@ IS_BRD_DOG_FOOD(fpath, board)
   FILE *fp;
   brd_fpath(fpath_filter, board, FN_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0;
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0;
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-	 if(filter[0]=='\0' || filter[0]=='\n')
-		continue;
-	 else
-	    filter[strlen(filter) - 1] = '\0';
+    if (filter[0]=='\0' || filter[0]=='\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	 if(f_str_sub_space_lf(fpath, filter))
-	 {
-	    strcpy(bbs_dog_str, filter);
-	    fclose(fp);
-	    return 1;
-	 }
+    if (f_str_sub_space_lf(fpath, filter))
+    {
+      strcpy(bbs_dog_str, filter);
+      fclose(fp);
+      return 1;
+    }
   }
 
   fclose(fp);
@@ -637,22 +677,22 @@ IS_BBS_DOG_FOOD(fpath)
   FILE *fp;
   sprintf(fpath_filter, FN_ETC_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0;
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0;
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-     if(filter[0]=='\0' || filter[0]=='\n')
-		continue;
-	 else
-		filter[strlen(filter) - 1] = '\0';
+    if (filter[0] == '\0' || filter[0] == '\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	 if(f_str_sub_all_chr(fpath, filter))
-	 {
-	    strcpy(bbs_dog_str, filter);
-	    fclose(fp);
-	    return 1;
-	 }
+     if (f_str_sub_all_chr(fpath, filter))
+     {
+       strcpy(bbs_dog_str, filter);
+       fclose(fp);
+       return 1;
+     }
   }
 
   fclose(fp);
@@ -921,7 +961,6 @@ checksum_find(fpath)
       if (++i >= MAX_CHECKSUM_LINE)
 	break;
     }
-
     fclose(fp);
   }
 
@@ -1099,6 +1138,7 @@ do_post(xo, title)
 	    break;
 	  strcpy(prefix[mode], fpath);
 	}
+	fclose(fp);
       }
 
       move(21, 0);
@@ -4281,60 +4321,59 @@ post_sibala(xo)
 
   clear();
   move(i=3, 0);
-	if(!vget(i,0, "輸入標題名稱 : ", title, 60, DOECHO))
-	{
-		fclose(fp);
-		unlink(fpath);
-		return XO_HEAD;
-	}
+  if(!vget(i,0, "輸入標題名稱 : ", title, 60, DOECHO))
+  {
+    fclose(fp);
+    unlink(fpath);
+    return XO_HEAD;
+  }
 
-	fprintf(fp, "標題名稱 : %s\n", title);
+  fprintf(fp, "標題名稱 : %s\n", title);
 
-	i=i+2;
+  i += 2;
 
-	if(!vget(i,0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
-	{
-		fclose(fp);
-		unlink(fpath);
-		return XO_HEAD;
-	}
+  if (!vget(i,0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
+  {
+    fclose(fp);
+    unlink(fpath);
+    return XO_HEAD;
+  }
 
-	fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+  fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
 
-    i=i+2;
+  i += 2;
 
-    if(!vget(i,0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
-	{
-		fclose(fp);
-		unlink(fpath);
-		return XO_HEAD;
-	}
+  if (!vget(i,0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
+  {
+    fclose(fp);
+    unlink(fpath);
+    return XO_HEAD;
+  }
 
+  fprintf(fp, "丟骰次數 : %d\n", num_sibala);
 
-	fprintf(fp, "丟骰次數 : %d\n", num_sibala);
+  j = 0;
 
-	j = 0;
+  sprintf(fpath_tmp, "%s.tmp", fpath);
+  fp2 = fopen(fpath_tmp, "w");
+  srand (time(NULL));
+  for (i=0; i < num_sibala; i++)
+  {
+    k = rand()%num_sibala_face + 1;
+    j = j + k;
+    fprintf(fp2,"第 %4d 次丟骰結果 : %4d  加總 : %d\n", i+1, k, j);
+  }
 
-	sprintf(fpath_tmp, "%s.tmp", fpath);
-	fp2 = fopen(fpath_tmp, "w");
-	srand (time(NULL));
-	for(i=0; i < num_sibala; i++)
-	{
-		k = rand()%num_sibala_face + 1;
-		j = j + k;
-		fprintf(fp2,"第 %4d 次丟骰結果 : %4d  加總 : %d\n", i+1, k, j);
-	}
+  sprintf(buf, "丟骰結果 : %d\n", j);
+  vmsg(buf);
 
-	sprintf(buf, "丟骰結果 : %d\n", j);
-	vmsg(buf);
+  fprintf(fp, "%s", buf);
 
-	fprintf(fp, "%s", buf);
+  fclose(fp2);
+  fclose(fp);
 
-	fclose(fp2);
-	fclose(fp);
-
-	sprintf(buf, "/bin/cat %s >> %s",fpath_tmp, fpath);
-	system(buf);
+  sprintf(buf, "/bin/cat %s >> %s",fpath_tmp, fpath);
+  system(buf);
 
   if (!(bbstate & STAT_POST))	/* 在 currboard 沒有發表權限，故寄回信箱 */
   {

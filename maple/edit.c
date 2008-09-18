@@ -1495,14 +1495,13 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   struct tm *t = localtime(&time_now);
 
 
-  host_sight_number=4;  
+  host_sight_number = 4;  
   if(host_sight_number)
   {
-    sprintf(buf_tmp,"gem/@/@host_%d",host_sight_number-1);
-    if(file_tmp = fopen(buf_tmp,"r"))
+    sprintf(buf_tmp, "gem/@/@host_%d", host_sight_number-1);
+    if(dashf(buf_tmp))
     {
-      fclose(file_tmp);
-      select_devide=host_sight_number;
+      select_devide = host_sight_number;
     }
   }
 
@@ -1521,10 +1520,9 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   if(model_select)
   {
     sprintf(buf_tmp,"gem/@/@model_%d",model_select-1);
-    if(file_tmp = fopen(buf_tmp,"r"))
+    if(dashf(buf_tmp))
     {
-      fclose(file_tmp);
-      sprintf(model_type,"model_%d",model_select-1);
+      sprintf(model_type, "model_%d", model_select-1);
     }
   } 
 
@@ -1557,8 +1555,8 @@ ve_banner(fp, modify)       /* ㄓ方单癟 */
   usr_fpath(user_hello_path, cuser.userid, "hello");
   if(hello = fopen(user_hello_path,"r"))
   {
-      fgets(helloworld,38,hello);
-	  fclose(hello);
+    fgets(helloworld,38,hello);
+    fclose(hello);
   }
   else
       strcpy(helloworld,"舧產ㄓ番爵硙硙\\(*∶∶*)/");

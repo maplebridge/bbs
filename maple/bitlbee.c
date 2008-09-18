@@ -147,8 +147,8 @@ bit_set (xo)
   char *tmp, max = 0;
   char seps[] = " \t";
 
-  fprintf (fw, "PRIVMSG root :blist\r\n");
-  fflush (fw);
+  fprintf(fw, "PRIVMSG root :blist\r\n");
+  fflush(fw);
 
   /* NICK 剛好在第 48 個字, 前面的訊息略過 */
   do
@@ -156,7 +156,7 @@ bit_set (xo)
       bit_fgets ();
       if (sock<=0)
 	return XO_QUIT;
-      tmp = strstr (buf, "Nick");
+      tmp = strstr(buf, "Nick");
     }
   while (!tmp);
 
@@ -239,7 +239,7 @@ bit_help (xo)
 
 static int
 bit_write (xo)
-     XO *xo;
+  XO *xo;
 {
   int pos;
   char hint[30], *nick, str[65], file[128];
@@ -252,19 +252,19 @@ bit_write (xo)
 
   vs_save (sl);
 
-  if (vget (b_lines - 1, 0, hint, str, 60, DOECHO) &&
-    vans ("確定要丟出 msn (Y/N)？[Y] ") != 'n')
+  if (vget(b_lines - 1, 0, hint, str, 60, DOECHO) &&
+    vans("確定要丟出 msn (Y/N)？[Y] ") != 'n')
     {
-      usr_fpath (file, cuser.userid, FN_MSN);
-      fp = fopen (file, "a");
-      fprintf (fp, "To %s (@msn)：%s\n", nick, str);
-      fclose (fp);
+      usr_fpath(file, cuser.userid, FN_MSN);
+      fp = fopen(file, "a");
+      fprintf(fp, "To %s (@msn)：%s\n", nick, str);
+      fclose(fp);
 
-      fprintf (fw, "PRIVMSG %s :%s\r\n", nick, str);
-      fflush (fw);
+      fprintf(fw, "PRIVMSG %s :%s\r\n", nick, str);
+      fflush(fw);
     }
 
-  vs_restore (sl);
+  vs_restore(sl);
   return XO_INIT;
 }
 
@@ -279,15 +279,15 @@ bit_reply (nick, msg)
   char str[65], file[128];
   FILE *fp;
 
-  sprintf (hint, "★<%s> ", nick);
+  sprintf(hint, "★<%s> ", nick);
 
-  usr_fpath (file, cuser.userid, FN_MSN);
-  fp = fopen (file, "a");
-  fprintf (fp, "To %s (@msn)：%s\n", nick, msg);
-  fclose (fp);
+  usr_fpath(file, cuser.userid, FN_MSN);
+  fp = fopen(file, "a");
+  fprintf(fp, "To %s (@msn)：%s\n", nick, msg);
+  fclose(fp);
 
-  fprintf (fw, "PRIVMSG %s :%s\r\n", nick, msg);
-  fflush (fw);
+  fprintf(fw, "PRIVMSG %s :%s\r\n", nick, msg);
+  fflush(fw);
 
 }
 
@@ -303,8 +303,8 @@ bit_allow (xo)
 
       pos = xo->pos;
       nick = bit_pool[pos].nick;
-      fprintf (fw, "PRIVMSG root :allow %s\r\n", nick);
-      fflush (fw);
+      fprintf(fw, "PRIVMSG root :allow %s\r\n", nick);
+      fflush(fw);
 
       return XO_FOOT;
     }
@@ -323,8 +323,8 @@ bit_block (xo)
 
       pos = xo->pos;
       nick = bit_pool[pos].nick;
-      fprintf (fw, "PRIVMSG root :block %s\r\n", nick);
-      fflush (fw);
+      fprintf(fw, "PRIVMSG root :block %s\r\n", nick);
+      fflush(fw);
 
       return XO_FOOT;
     }
@@ -355,8 +355,8 @@ bit_remv (xo)
 
   if (vans ("確定要刪除好友 (Y/N)？[N]") == 'y')
     {
-      fprintf (fw, "PRIVMSG root :remove %s\r\n", nick);
-      fflush (fw);
+      fprintf(fw, "PRIVMSG root :remove %s\r\n", nick);
+      fflush(fw);
     }
   return XO_INIT;
 
@@ -380,8 +380,8 @@ bit_onick (xo)
   if (strchr (str, ';') || strchr (str, ','))
     return XO_FOOT;
 
-  fprintf (fw, "PRIVMSG root :rename %s %s\r\n", nick, str);
-  fflush (fw);
+  fprintf(fw, "PRIVMSG root :rename %s %s\r\n", nick, str);
+  fflush(fw);
 
   bit_fgets ();
   if (sock <=0)
@@ -410,8 +410,8 @@ bit_mynick ()
   if (strchr (nick, ';') || strchr (nick, ','))
     return XO_FOOT;
 
-  fprintf (fw, "PRIVMSG root :nick 0 %s\r\n", nick);
-  fflush (fw);
+  fprintf(fw, "PRIVMSG root :nick 0 %s\r\n", nick);
+  fflush(fw);
 
   return XO_FOOT;
 }
@@ -425,8 +425,8 @@ bit_add ()
   if (!vget (b_lines, 0, "輸入新增好友信箱：", addr, 38, DOECHO))
     return XO_FOOT;
 
-  fprintf (fw, "PRIVMSG root :add 0 %s\r\n", addr);
-  fflush (fw);
+  fprintf(fw, "PRIVMSG root :add 0 %s\r\n", addr);
+  fflush(fw);
 
   return XO_INIT;
 }
@@ -445,13 +445,13 @@ void
 bit_abort ()
 {
   if (sock >0)
-    {
-      fprintf (fw, "QUIT :bye\r\n");
-      fflush (fw);
-      fclose (fw);
-      fclose (fr);
-      sock = 0;
-    }
+  {
+    fprintf(fw, "QUIT :bye\r\n");
+    fflush(fw);
+    fclose(fw);
+    fclose(fr);
+    sock = 0;
+  }
 }
 
 static int
@@ -506,139 +506,135 @@ bit_rqst ()
   FILE *fp;
 
   while (fgets (buf, sizeof (buf), fr))
+  {
+    if (msg = strstr(buf, "PRIVMSG"))
     {
-      if (msg = strstr (buf, "PRIVMSG"))
-	{
-	  msg = strstr (msg, ":");
-	  *msg++;
-	  nick = strtok (buf, "!");
-	  *nick++;
-	  sprintf (send, "\033[1;33;46m★%s (@msn) \033[37;45m %s \033[m", nick, msg);
+      msg = strstr (msg, ":");
+      *msg++;
+      nick = strtok (buf, "!");
+      *nick++;
+      sprintf(send, "\033[1;33;46m★%s (@msn) \033[37;45m %s \033[m", nick, msg);
 
-	  usr_fpath (file, cuser.userid, FN_MSN);
-	  fp = fopen (file, "a");
-	  fprintf (fp, "\033[1;33;46m★%s (@msn) \033[m：%s", nick, msg);
-	  fclose (fp);
-	  cursor_save ();
+      usr_fpath(file, cuser.userid, FN_MSN);
+      fp = fopen(file, "a");
+      fprintf(fp, "\033[1;33;46m★%s (@msn) \033[m：%s", nick, msg);
+      fclose(fp);
+      cursor_save();
 
-	  /***  smiler.080319:送至bmw介面  ***/
+      /***  smiler.080319:送至bmw介面  ***/
 
       UTMP *up;
       BMW bmw;
       char buf[20];
-	  char bmw_msg[49];
-
+      char bmw_msg[49];
 
       up = utmp_find(cuser.userno);
       sprintf(buf, "★<%s>", up->userid);
-      if(strlen(msg) < 49)
-		  strcpy(bmw_msg,msg);
-	  else
-		  strncpy(bmw_msg,msg,48);
+      if (strlen(msg) < 49)
+	strcpy(bmw_msg,msg);
+      else
+	strncpy(bmw_msg,msg,48);
 
-	  bmw_msg[strlen(bmw_msg)-1]='\0';  /* smiler.080319:處理bmw_msg結尾有 '\n' */
-	  strcpy(bmw.nick,nick);       /* smiler.080319: 用於 bmw介面 reply msn*/
+      bmw_msg[strlen(bmw_msg)-1]='\0';	/* smiler.080319:處理bmw_msg結尾有 '\n' */
+      strcpy(bmw.nick,nick);		/* smiler.080319: 用於 bmw介面 reply msn*/
       strcpy(bmw.msg,bmw_msg);
       bit_bmw_edit(up,buf,&bmw);
       /***********************************/
-	  cursor_restore ();
-	  refresh ();
-	  bell ();
-	  if(strlen(msg) >= 49)   /* 長度超過水球容許範圍,才印出 */
-		  vmsg("MSN訊息過長，請至【 回顧 msn 訊息 】觀看完整訊息 !!");
-	  break;
-	}
+      cursor_restore ();
+      refresh();
+      bell();
+      if (strlen(msg) >= 49)   /* 長度超過水球容許範圍,才印出 */
+	vmsg("MSN訊息過長，請至【 回顧 msn 訊息 】觀看完整訊息 !!");
+      break;
     }
+  }
 }
 
 
 int
 bit_main ()
 {
-
   int i = 0;
   char *tmp, account[50], pass[30];
 
   if (sock <= 0)
+  {
+    if (!vget (b_lines - 1, 0, "輸入 msn 帳號：", account, 45, DOECHO))
+      return 0;
+
+    if (!vget (b_lines - 1, 0, "輸入密碼：", pass, 25, NOECHO))
+      return 0;
+
+    move (b_lines - 1, 0);
+    sleep (1);
+    clrtoeol ();
+    sock = dns_open ("127.0.0.1", 6667);
+    zmsg ("連接中 :p");
+    sleep (1);
+
+    if (sock > 0)
     {
+      zmsg("登入中，快了別急，本來登入就要等一下咩 :p (想像小綠人在轉 ^^O)");
 
-      if (!vget (b_lines - 1, 0, "輸入 msn 帳號：", account, 45, DOECHO))
-	return 0;
+      fr = fdopen(sock, "r");
+      fw = fdopen(sock, "w");
 
-      if (!vget (b_lines - 1, 0, "輸入密碼：", pass, 25, NOECHO))
-	return 0;
+      fprintf(fw, "NICK %d\r\n", cutmp->pid);
+      fflush(fw);
+      fprintf(fw, "USER bitlbee ono ccy :bitlbee run\r\n");
+      fflush(fw);
+      fprintf(fw, "JOIN #bitlbee\r\n");
+      fflush(fw);
 
-      move (b_lines - 1, 0);
-      sleep (1);
-      clrtoeol ();
-      sock = dns_open ("127.0.0.1", 6667);
-      zmsg ("連接中 :p");
-      sleep (1);
+      fprintf(fw, "PRIVMSG root :account add msn %s %s\r\n", account, pass);
+      fflush(fw);
+      fprintf(fw, "PRIVMSG root :account on\r\n");
+      fflush(fw);
+      fprintf(fw, "PRIVMSG root :set charset BIG-5\r\n");
+      fflush(fw);
 
-      if (sock > 0)
+
+      sleep (10);
+
+      /* 前面 login 有 9 行 configure, 略過 */
+      while (i < 13)
+      {
+	bit_fgets ();
+	if (sock <=0)
+	  return 0;
+        i++;
+      }
+
+      /* root 再設定 mode, 略過 */
+      while (bit_fgets())
+      {
+	if (sock <=0)
+	  return XO_QUIT;
+
+	tmp = strstr (buf, "Error");
+
+	if (tmp)
 	{
-	  zmsg("登入中，快了別急，本來登入就要等一下咩 :p (想像小綠人在轉 ^^O)");
-
-	  fr = fdopen (sock, "r");
-	  fw = fdopen (sock, "w");
-
-	  fprintf (fw, "NICK %d\r\n", cutmp->pid);
-	  fflush (fw);
-	  fprintf (fw, "USER bitlbee ono ccy :bitlbee run\r\n");
-	  fflush (fw);
-	  fprintf (fw, "JOIN #bitlbee\r\n");
-	  fflush (fw);
-
-	  fprintf (fw, "PRIVMSG root :account add msn %s %s\r\n", account,
-	    pass);
-	  fflush (fw);
-	  fprintf (fw, "PRIVMSG root :account on\r\n");
-	  fflush (fw);
-	  fprintf (fw, "PRIVMSG root :set charset BIG-5\r\n");
-	  fflush (fw);
-
-
-	  sleep (10);
-
-	  /* 前面 login 有 9 行 configure, 略過 */
-	  while (i < 13)
-	    {
-	      bit_fgets ();
-	      if (sock <=0)
-		return 0;
-
-	      i++;
-	    };
-
-	  /* root 再設定 mode, 略過 */
-	  while (bit_fgets ())
-	    {
-	      if (sock <=0)
-		return XO_QUIT;
-
-	      tmp = strstr (buf, "Error");
-
-	      if (tmp)
-		{
-		  sock = 0;
-		  vmsg ("帳號或密碼輸入錯誤喔 :p");
-		  goto login_error;
-		}
-	    };
-	}
+	  sock = 0;
+	  vmsg ("帳號或密碼輸入錯誤喔 :p");
+	  goto login_error;
+        }
+      }
     }
+  }
 
   if (sock > 0)
-    {
-      xz[XZ_BITLBEE - XO_ZONE].xo = &bit_xo;
-      xz[XZ_BITLBEE - XO_ZONE].cb = bit_cb;
-      if (i)
-	bell ();
-      xover (XZ_BITLBEE);
-    }
+  {
+    xz[XZ_BITLBEE - XO_ZONE].xo = &bit_xo;
+    xz[XZ_BITLBEE - XO_ZONE].cb = bit_cb;
+    if (i)
+      bell ();
+    xover (XZ_BITLBEE);
+  }
   else
     vmsg ("無法開啟連線，請至 sysop 版回報");
 
 login_error:
   return 0;
 }
+

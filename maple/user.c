@@ -63,7 +63,7 @@ trans_bar_set()		/* 過渡時期，使用者上站時轉檔 */
   {
     sprintf(barname_in, "%s.bar", old_set[i]);
     usr_fpath(fpath, cuser.userid, barname_in);
-    if (fp = fopen(fpath,"r"))
+    if (fp = fopen(fpath, "r"))
     {
       if (fgets(color,32,fp))
       {
@@ -107,7 +107,7 @@ tn_user_bar()		/* 使用者上站，初使化與載入使用者設定檔 */
     trans_bar_set();
 #endif
 
-  if (fp = fopen(fpath,"r"))
+  if (fp = fopen(fpath, "r"))
   {
     for (i = 0; i < CBAR_NUM; i++)
     {
@@ -851,7 +851,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
 
    /* smiler.071030: 輸入使用者想對大家說的話 */
    usr_fpath(buf, cuser.userid, "hello");
-   if(hello = fopen(buf,"r"))
+   if (hello = fopen(buf, "r"))
    {
      fgets(helloworld, 38, hello);
      fclose(hello);
@@ -897,6 +897,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
      {
        while(fgets(buf, ANSILINELEN, host_sign))
          prints("%s", buf);
+       fclose(host_sign);
      }
    }
 
