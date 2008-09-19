@@ -52,6 +52,44 @@ mf_fpath(fpath, userid, fname)
 }
 
 
+static int
+mf_urifolder(fpath)
+  char * fpath;
+{
+  BRD *brd;
+  int fsize, bno, unread;
+  MF *data, *head, *tail;
+
+  unread = 0;
+  if (data = (MF *) f_img(fpath, &fsize))
+  {
+    head = data;
+    tail = data + (fsize / sizeof(MF));
+    do
+    {
+      if (head->mftype & MF_BOARD)
+      {
+	if ((bno = brd_bno(head->xname)) >= 0)	/* 只計算看得見(不一定能進入)的看板 */
+	{
+	  brd = bshm->bcache + bno;
+	  btime_refresh(brd);
+#ifdef ENHANCED_VISIT
+	  /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
+	  brh_get(brd->bstamp, bno);
+	  unread += brh_unread(brd->blast);
+#else
+	  unread += brd->blast > brd_visit[bno] ? 1 : 0;
+#endif
+	}
+      }
+    } while (++head < tail);
+    free(data);
+  }
+
+  return unread;
+}
+
+
 static void
 mf_item(num, mf)
   int num;
@@ -66,11 +104,12 @@ mf_item(num, mf)
 
   if (mftype & MF_FOLDER)
   {
+    mf_fpath(folder, cuser.userid, mf->xname);
     if (brdpost)
     {
-      mf_fpath(folder, cuser.userid, mf->xname);
       num = rec_num(folder, sizeof(MF));
     }
+    bno = mf_urifolder(folder);		/* 借用 bno */
     prints("%6d%c  %s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ', "◆", mf->title);
   }
   else if (mftype & MF_BOARD)
@@ -112,20 +151,20 @@ mf_item_bar(xo, mode)
   int num;
   MF *mf;
   int mftype, brdpost, invalid, label;
-                                                                                
+
   num = xo->pos + 1;
   mf = (MF *) xo_pool + xo->pos - xo->top;
   mftype = mf->mftype;
   brdpost = cuser.ufo & UFO_BRDPOST;
   label = mftype & MF_LABEL;
-                                                                                
+
   if (mftype & MF_FOLDER)
   {
     if (brdpost)
     {
       struct stat st;
       char fpath[64];
-                                                                                
+
       mf_fpath(fpath, cuser.userid, mf->xname);
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
@@ -138,12 +177,12 @@ mf_item_bar(xo, mode)
     BRD *bhead, *btail;
     int chn;
     int pbno;
-                                                                                
+
     chn = 0;
     invalid = 1;
     bhead = bshm->bcache;
     btail = bhead + bshm->number;
-                                                                                
+
     do
     {
       if (!strcmp(mf->xname, bhead->brdname))
@@ -158,7 +197,7 @@ mf_item_bar(xo, mode)
       }
       chn++;
     } while (++bhead < btail);
-                                                                                
+
     if (invalid)        /* itoc.010821: 被砍的看板要另外印 */
     {
       prints("%s       %c \033[36m%-13s%-56s\033[m", mode ?
@@ -637,7 +676,7 @@ mf_has_label(src, depth)
   if ((fd = open(fpath, O_RDONLY)) >= 0)
   {
     while (read(fd, &fmf, sizeof(MF)) == sizeof(MF))
-    {  
+    {
       if (fmf.mftype & MF_LABEL)
       {
 	has_label = 1;

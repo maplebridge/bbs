@@ -1305,7 +1305,8 @@ XoClass(chn)
 }
 
 
-static inline void
+//static inline void
+inline void
 btime_refresh(brd)
   BRD *brd;
 {

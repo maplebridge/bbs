@@ -812,7 +812,7 @@ XOXpost_search_all(xo)
   move(b_lines - 1, 0);
   clrtoeol();
   outs("◎搜尋 1)作者標題 2)作者 3)標題 4)全文 5)檔名");
-  outz("  串接 6)相同標題 7)推文 8)加密/好友文 9)mark 0)local [Q]");
+  outz("  串接 6)相同標題 7)推文 8)加密/好友文 9)mark 0)local [3]");
   switch (vkey())
   {
     case '1':
@@ -821,9 +821,6 @@ XOXpost_search_all(xo)
     case '2':
     case 'a':
       return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
-    case '3':
-    case '/':
-      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
     case '4':
     case 'f':
       return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
@@ -851,6 +848,10 @@ XOXpost_search_all(xo)
     case '0':
     case 'l':
       return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
+    case '3':
+    case '/':
+    default:
+      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
   }
   return XO_BODY;
 }

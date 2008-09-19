@@ -1467,7 +1467,13 @@ xover(cmd)
     else if (cmd == KEY_END || cmd == '$')
     {
       if (zone == XZ_POST)
-	cmd = last_nobottom(xo->dir) + XO_MOVE;
+      {
+	int pb = last_nobottom(xo->dir);
+	if (xo->pos == pb)
+	  cmd = xo->max - 1 + XO_MOVE;
+	else
+	  cmd = pb + XO_MOVE;
+      }
       else
 	cmd = xo->max - 1 + XO_MOVE;
     }

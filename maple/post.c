@@ -4485,6 +4485,8 @@ KeyFunc post_cb[] =
 
   '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
   '!', XoRXsearch, 
+  '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
+  'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
 
 #if 0
   '~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
@@ -4541,6 +4543,8 @@ KeyFunc xpost_cb[] =
 
   '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
   '!', XoRXsearch, 
+  '~', XoXselect,
+  'a', XoXauthor,
 #if 0
   '~', XoXselect,
   'S', XoXsearch,

@@ -45,6 +45,7 @@ int t_bmw(void);
 int t_display(void);
 
 /* board.c */
+inline void btime_refresh(BRD *brd);
 void brh_get(time_t bstamp, int bhno);
 int brh_unread(time_t chrono);
 void brh_visit(int mode);

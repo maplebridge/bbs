@@ -833,10 +833,11 @@ u_info()
 
 
 int
-u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
+u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
 {
    FILE *hello;		/* smiler.071030: 站簽個人化內使用者想對大家說的話 */
    FILE *file_host;	/* smiler.071110: 個人選擇站簽 */
+   int i;
    int  choice;		/* 選用第幾個站簽 */
    char buf[ANSILINELEN];
    char helloworld[38];
@@ -860,7 +861,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
    else
      helloworld[0] = '\0';
 
-   if(!vget(9, 0, "想對大家說的話：", helloworld, 38, GCARRY))
+   if(!vget(2, 0, "想對大家說的話：", helloworld, 38, GCARRY))
    {
      if(!hello)
      {
@@ -884,11 +885,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
    }
    choice = atoi(buf);
 
-   vmsg(NULL);
-   move(1,0);
-   clrtobot();
-
-   int i;
+   move(4, 0);
    for(i = 1; i <= HOST_SIGN_NUM; i++)
    {
      prints("\n%d號站簽：\n", i);
@@ -915,7 +912,7 @@ u_sign_set()	/*ikulan.080726:將改站簽功能獨立出來*/
      fclose(file_host);
    }
 
-}	/*ikulan.080726:(end of function)將改站簽功能獨立出來*/
+}	/* ikulan.080726:(end of function)將改站簽功能獨立出來 */
 
 
 int
