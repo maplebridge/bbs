@@ -109,6 +109,8 @@ pad_draw()
     outs("\n請留言 (至多三行)，按[Enter]結束");
     for (i = 0; (i < 3) &&
       vget(16 + i, 0, "：", buf[i], 71, DOECHO); i++);
+    if (*buf[0] == '\n')
+      return 0;
     cc = vans("(S)存檔觀賞 (E)重新來過 (Q)算了？[S] ");
     if (cc == 'q' || i == 0)
       return 0;

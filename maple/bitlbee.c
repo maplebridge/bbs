@@ -531,14 +531,14 @@ bit_rqst ()
       up = utmp_find(cuser.userno);
       sprintf(buf, "★<%s>", up->userid);
       if (strlen(msg) < 49)
-	strcpy(bmw_msg,msg);
+	strcpy(bmw_msg, msg);
       else
-	strncpy(bmw_msg,msg,48);
+	str_ncpy(bmw_msg, msg, 48);
 
-      bmw_msg[strlen(bmw_msg)-1]='\0';	/* smiler.080319:處理bmw_msg結尾有 '\n' */
-      strcpy(bmw.nick,nick);		/* smiler.080319: 用於 bmw介面 reply msn*/
-      strcpy(bmw.msg,bmw_msg);
-      bit_bmw_edit(up,buf,&bmw);
+      bmw_msg[strlen(bmw_msg)-1] = '\0';/* smiler.080319:處理bmw_msg結尾有 '\n' */
+      strcpy(bmw.nick, nick);		/* smiler.080319: 用於 bmw介面 reply msn*/
+      strcpy(bmw.msg, bmw_msg);
+      bit_bmw_edit(up, buf, &bmw);
       /***********************************/
       cursor_restore ();
       refresh();

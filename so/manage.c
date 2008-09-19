@@ -241,7 +241,7 @@ post_memo_edit(xo)
     if (mode == 'd')
     {
       unlink(fpath);
-      return XO_FOOT;
+      return XO_HEAD;
     }
 
     if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
@@ -479,7 +479,7 @@ post_vpal(xo)
   oldbrd = bshm->bcache + currbno;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_FOOT; 
+    return XO_HEAD; 
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -582,10 +582,10 @@ post_changeBM(xo)
 
   blist = oldbrd->BM;
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
-    return XO_FOOT;
+    return XO_HEAD;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_FOOT;      
+    return XO_HEAD;      
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -679,7 +679,7 @@ post_brdlevel(xo)
   memcpy(&newbrd, oldbrd, sizeof(BRD));
   
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_FOOT;
+    return XO_HEAD;
 
   if (oldbrd->battr & BRD_IAS)	/* 藝文館看板不允許隨意更動 */
   {

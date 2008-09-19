@@ -575,8 +575,8 @@ post_showbm(xo)
   brd = bshm->bcache + currbno;
 
   clear();
-  move(3, 0);
 
+  move(0, 0);
   prints("看板英文板名: %s\n",brd->brdname);
   prints("看板分類    : %s\n",brd->class);
   prints("看板中文板名: %s\n",brd->title);
@@ -613,7 +613,7 @@ post_showbm(xo)
   if(currbattr & BRD_PUBLIC)
   {
     prints("是公眾板\n");
-    prints("\n===>\n");
+    prints("===>\n");
     prints("   公眾板板主,\n");
     prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
     prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
