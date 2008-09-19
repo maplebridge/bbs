@@ -109,8 +109,13 @@ mf_item(num, mf)
     {
       num = rec_num(folder, sizeof(MF));
     }
-    bno = mf_urifolder(folder);		/* ­É¥Î bno */
-    prints("%6d%c  %s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ', "¡»", mf->title);
+    if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
+    {
+      bno = mf_urifolder(folder);		/* ­É¥Î bno */
+      sprintf(folder, "%2d", bno);
+    }
+    prints("%6d%c\033[1;33m%-2s\033[m%s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
+	(USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (bno ? folder : "") : "", "¡»", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -160,17 +165,24 @@ mf_item_bar(xo, mode)
 
   if (mftype & MF_FOLDER)
   {
+    int unread;
+    char fpath[64];
+    mf_fpath(fpath, cuser.userid, mf->xname);
     if (brdpost)
     {
       struct stat st;
-      char fpath[64];
 
-      mf_fpath(fpath, cuser.userid, mf->xname);
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
     }
-    prints("%s%6d%c  %s %-66.54s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
-      num, mftype & MF_MARK ? ')' : label ? 'T' : ' ', "¡»", mf->title);
+    if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
+    {
+      unread = mf_urifolder(fpath);
+      sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", unread, mode ? "" : "\033[m");
+    }
+    prints("%s%6d%c%-2s%s %-66.54s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
+      num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
+      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (unread ? fpath : "") : "", "¡»", mf->title);
   }
   else if (mftype & MF_BOARD)
   {

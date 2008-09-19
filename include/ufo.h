@@ -87,6 +87,25 @@
 
 #define	HAS_STATUS(x)	(cutmp->status&(x))
 
+/* ----------------------------------------------------- */
+/* User Show Habits					 */
+/* ----------------------------------------------------- */
+
+
+#define USR_SHOW_POST_ATTR_RESTRICT_F	BFLAG(0)	/* 好友文顯示 顯示 F */
+#define USR_SHOW_POST_ATTR_RESTRICT	BFLAG(1)	/* 鎖文 顯示 L */
+#define USR_SHOW_POST_ATTR_GEM_MARKED	BFLAG(2)	/* mark + gem 顯示 B */
+#define USR_SHOW_POST_ATTR_GEM		BFLAG(3)	/* gem 顯示 G */
+#define USR_SHOW_POST_ATTR_DELETE	BFLAG(4)	/* 待刪文章顯示 T */
+#define USR_SHOW_POST_ATTR_NOFORWARD	BFLAG(5)	/* 文章禁轉符號顯示 X */
+#define USR_SHOW_POST_ATTR_NOSCORE	BFLAG(6)	/* 文章禁止推文顯示 N */
+#define USR_SHOW_POST_ATTR_MARKED	BFLAG(7)	/* 文章標記符號 M */
+#define USR_SHOW_POST_SCORE_0		BFLAG(8)	/* 文章推文為 0 顯示 */
+#define USR_SHOW_POST_SCORE		BFLAG(9)	/* 文章推文皆顯示 */
+#define USR_SHOW_POST_MODIFY_UNREAD	BFLAG(10)	/* 文章修文/推文未讀提示 */
+#define USR_SHOW_MF_FOLDER_UNREAD	BFLAG(11)	/* 最愛卷宗未讀顯示 */
+
+#define NUM_USR_SHOW	12
 
 /* ----------------------------------------------------- */
 /* 各種習慣的中文意義					 */
@@ -188,21 +207,20 @@ char *ufo_tbl[NUMUFOS] =
 /* 各種顯示的中文意義					 */
 /* ----------------------------------------------------- */
 
-#define NUM_USR_SHOW_inufo	11
-
-char *usr_show_tbl[NUM_USR_SHOW_inufo] =
+char *usr_show_tbl[NUM_USR_SHOW] =
 {
-	"好友文顯示F|f   (顯示/取消)",
-	"加密文顯示L|l   (顯示/取消)",
-	"標記精華文B|b   (顯示/取消)",
-	"收錄精華文G|g   (顯示/取消)",
-	"待刪文顯示T|t   (顯示/取消)",
-	"禁轉文顯示X|x   (顯示/取消)",
-	"進推文顯示N|n   (顯示/取消)",
-	"標記文顯示M|m   (顯示/取消)",
-	"推文歸0 顯示    (顯示/取消)",
-	"推文分數顯示    (顯示/取消)",
-	"推文未讀提示    (顯示/取消)"
+  "好友文顯示F|f   (顯示/取消)",
+  "加密文顯示L|l   (顯示/取消)",
+  "標記精華文B|b   (顯示/取消)",
+  "收錄精華文G|g   (顯示/取消)",
+  "待刪文顯示T|t   (顯示/取消)",
+  "禁轉文顯示X|x   (顯示/取消)",
+  "禁推文顯示N|n   (顯示/取消)",
+  "標記文顯示M|m   (顯示/取消)",
+  "推文歸0 顯示    (顯示/取消)",
+  "推文分數顯示    (顯示/取消)",
+  "推文未讀提示    (顯示/取消)",
+  "最愛卷宗未讀顯示(顯示/取消)"
 };
 
 

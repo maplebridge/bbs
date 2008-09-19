@@ -292,8 +292,8 @@ outs_header(str, header_len)	/* ¶L•X¿…¿Y */
     if ((ptr = strstr(word, str_post1)) || (ptr = strstr(word, str_post2)))
     {
       ptr[-1] = ptr[4] = '\0';
-        prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m", 
-        	header1[0], d_cols + 53, d_cols + 53, word, ptr, ptr + 5);
+      prints(COLOR5 " %s " COLOR6 "%-*.*s" COLOR5 " %s " COLOR6 "%-13s\033[m", 
+	header1[0], d_cols + 53, d_cols + 53, word, ptr, ptr + 5);
     }
     else
     {
@@ -415,7 +415,7 @@ more(fpath, footer)
   char *fpath;
   char *footer;
 {
-  #define MSG_SEPERATE    "\033[36m"MSG_SEPERATOR"\033[m\n"
+#define	MSG_SEPERATE	"\033[36m"MSG_SEPERATOR"\033[m\n\n"
   uschar *fnew;
   char buf[ANSILINELEN];
   int i;
@@ -475,8 +475,7 @@ more(fpath, footer)
     shift = foff - fimage - 1;
     memcpy(fnew, fimage, shift);
     memcpy(fnew + shift, MSG_SEPERATE, lino);
-	memcpy(fnew + shift + lino, "\n", strlen("\n"));
-    memcpy(fnew + shift + lino + strlen("\n"), foff, fsize - shift);
+    memcpy(fnew + shift + lino, foff, fsize - shift);
 
     free(fimage);
     fsize += lino;

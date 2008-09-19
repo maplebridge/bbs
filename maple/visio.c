@@ -1017,7 +1017,7 @@ imsg(msg)			/* itoc.010827: 重要訊息顯示 important message */
   {
     move(b_lines, 0);
     clrtoeol();
-    prints(COLOR1 " ◆ %-55s " COLOR2 " [請按 %s 鍵繼續] \033[m", msg, alphabet[i]);
+    prints(COLOR1 " ◆ %-*s " COLOR2 " [請按 %s 鍵繼續] \033[m", 55 + d_cols, msg, alphabet[i]);
   }
   else
   {
@@ -1056,7 +1056,7 @@ vmsg(msg)
   {
     move(b_lines, 0);
     clrtoeol();
-    prints(COLOR1 " ◆ %-55s " COLOR2 " [請按任意鍵繼續] \033[m", msg);
+    prints(COLOR1 " ◆ %-*s " COLOR2 " [請按任意鍵繼續] \033[m", 55 + d_cols, msg);
   }
   else
   {
