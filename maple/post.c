@@ -402,13 +402,13 @@ IS_BIGGER_1STLG(month)
 #define		COLOR_ACP	"\033[1;37m"	
 
 int
-IS_WELCOME(board, f_mode)
+IS_WELCOME(board, fname)
   char *board;
-  char *f_mode;
+  char *fname;
 {
   FILE *fp;
   char fpath[64];
-  brd_fpath(fpath, board, f_mode);
+  brd_fpath(fpath, board, fname);
   int wi = 0;
   int pass = 1;
 
@@ -502,13 +502,13 @@ IS_WELCOME(board, f_mode)
 
 
 static int
-post_show_dog(xo, f_mode)
+post_show_dog(xo, fname)
   XO *xo;
-  char *f_mode;
+  char *fname;
 {
   FILE *fp;
   char fpath[64];
-  brd_fpath(fpath, currboard, f_mode);
+  brd_fpath(fpath, currboard, fname);
 
   if(!(fp = fopen(fpath, "r")))
   return 0;
@@ -518,9 +518,9 @@ post_show_dog(xo, f_mode)
  int wi = 0;
 
   move(1, 0);
-  prints("\033[1;33m %s \033[m\n", (!strcmp(f_mode, FN_NO_WRITE)) ? "發文推文條件限制" : 
-					(!strcmp(f_mode, FN_NO_READ )) ? "進入看板條件限制" :
-					(!strcmp(f_mode, FN_NO_LIST )) ? "看板列表顯示本板" : "" );
+  prints("\033[1;33m %s \033[m\n", (!strcmp(fname, FN_NO_WRITE)) ? "發文推文條件限制" : 
+					(!strcmp(fname, FN_NO_READ )) ? "進入看板條件限制" :
+					(!strcmp(fname, FN_NO_LIST )) ? "看板列表顯示本板" : "" );
 
   move(3, 0);
 
@@ -571,64 +571,65 @@ static int
 post_showbm(xo)
   XO *xo;
 {
-    BRD  *brd;
-    brd = bshm->bcache + currbno;
+  BRD  *brd;
+  brd = bshm->bcache + currbno;
 
-    clear();
-    move(3, 0);
+  clear();
+  move(3, 0);
 
-    prints("看板英文板名: %s\n",brd->brdname);
-    prints("看板分類    : %s\n",brd->class);
-    prints("看板中文板名: %s\n",brd->title);
-    prints("看板板主名單: %s\n",brd->BM);
+  prints("看板英文板名: %s\n",brd->brdname);
+  prints("看板分類    : %s\n",brd->class);
+  prints("看板中文板名: %s\n",brd->title);
+  prints("看板板主名單: %s\n",brd->BM);
 
-	if(brd->bvote == 0)
-	  prints("看板活動舉辦: 無投票舉辦\n");
-	else if(brd->bvote == -1)
-	  prints("看板活動舉辦: 有賭盤舉辦\n");
-	else
-	  prints("看板活動舉辦: 有投票舉辦\n");
+  if (brd->bvote == 0)
+    prints("看板活動舉辦: 無投票舉辦\n");
+  else if (brd->bvote == -1)
+    prints("看板活動舉辦: 有賭盤舉辦\n");
+  else
+    prints("看板活動舉辦: 有投票舉辦\n");
 
 //#define BRD_NOZAP   0x01    /* 不可 zap */
-	prints("看板可否被z : %s\n", (currbattr & BRD_NOZAP) ? "不可" : "可");
+  prints("看板可否被z : %s\n", (currbattr & BRD_NOZAP) ? "不可" : "可");
 //#define BRD_NOTRAN  0x02    /* 不轉信 */
-	prints("看板可否轉信: %s轉信\n", (currbattr & BRD_NOTRAN) ? "不" : "可");
+  prints("看板可否轉信: %s轉信\n", (currbattr & BRD_NOTRAN) ? "不" : "可");
 //#define BRD_NOCOUNT 0x04    /* 不計文章發表篇數 */
-	prints("文章發表篇數: %s記錄\n", (currbattr & BRD_NOCOUNT) ? "不" : "");
+  prints("文章發表篇數: %s記錄\n", (currbattr & BRD_NOCOUNT) ? "不" : "");
 //#define BRD_NOSTAT  0x08    /* 不納入熱門話題統計 */
-	prints("熱門話題統計: %s記錄\n", (currbattr & BRD_NOSTAT) ? "不" : "");
+  prints("熱門話題統計: %s記錄\n", (currbattr & BRD_NOSTAT) ? "不" : "");
 //#define BRD_NOVOTE  0x10    /* 不公佈投票結果於 [record] 板 */
-	prints("投摽結果公佈: %s公佈投票結果於 [record] 板\n", (currbattr & BRD_NOVOTE) ? "不" : "");
+  prints("投摽結果公佈: %s公佈投票結果於 [record] 板\n", (currbattr & BRD_NOVOTE) ? "不" : "");
 //#define BRD_ANONYMOUS   0x20    /* 匿名看板 */
-	prints("匿名看板   ?: %s\n", (currbattr & BRD_ANONYMOUS) ? "是" : "否");
+  prints("匿名看板   ?: %s\n", (currbattr & BRD_ANONYMOUS) ? "是" : "否");
 //#define BRD_NOSCORE 0x40    /* 不評分看板 */
-	prints("看板可否推文: %s\n", (currbattr & BRD_NOSCORE) ? "否" : "可");
+  prints("看板可否推文: %s\n", (currbattr & BRD_NOSCORE) ? "否" : "可");
 //#define BRD_NOL     0x100   /* 不可鎖文 */
-	prints("看板鎖文限制: %s\n", (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
+  prints("看板鎖文限制: %s\n", (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
 //#define BRD_SHOWPAL 0x200   /* 顯示板友名單 */
-	prints("顯示板友名單: %s\n", (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單(ctrl^g)");
+  prints("顯示板友名單: %s\n", (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單(ctrl^g)");
+  prints("顯示轉錄紀錄: 轉錄文章%s顯示記錄\n", (currbattr & BRD_SHOWTURN) ? "" : "不");
 //#define BRD_PUBLIC  0x80    /* 公眾板 */
-	prints("是否為公眾板: ");
-	if(currbattr & BRD_PUBLIC)
-	{
-		prints("是公眾板\n");
-		prints("\n===>\n");
-		prints("   公眾板板主,\n");
-		prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
-		prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
-		prints("   公眾板使用者,\n");
-		prints("     不得鎖文\n");
-	}
-	else
-		prints("非公眾板\n");
+  prints("是否為公眾板: ");
+  if(currbattr & BRD_PUBLIC)
+  {
+    prints("是公眾板\n");
+    prints("\n===>\n");
+    prints("   公眾板板主,\n");
+    prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
+    prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
+    prints("   公眾板使用者,\n");
+    prints("     不得鎖文\n");
+  }
+  else
+    prints("非公眾板\n");
 
-	vmsg(NULL);
+  vmsg(NULL);
 
-	post_show_dog(xo, FN_NO_WRITE);
-	post_show_dog(xo, FN_NO_READ);
-	post_show_dog(xo, FN_NO_LIST);
-	
-	return XO_HEAD;
+  post_show_dog(xo, FN_NO_WRITE);
+  post_show_dog(xo, FN_NO_READ);
+  post_show_dog(xo, FN_NO_LIST);
+
+  return XO_HEAD;
 }
 
 

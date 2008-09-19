@@ -162,7 +162,18 @@ u_set_bar(bar)
   prints("\033[m楓橋設定 : %s測試\033[m\n", imaplecolor);
   prints("\033[m目前設定 : \033[m%s測試\033[m", orgcolor);
 
-  i = 8;
+  switch (vget(8, 0, "◎ 選擇 E)進入設定 Q)取消 D)刪除個人設定使用預設值 [Q]" , color_write, 3, LCECHO))
+  {
+    case 'd' :
+      strcpy(UCBAR[bar], DEFCBAR[bar]);
+      goto save;
+    case 'e' :
+      break;
+    default :
+      return 0;
+  }
+
+  i = 10;
   vget(i, 0, "前景：亮(1)/暗(0)/略過(Enter)", bright, 2, DOECHO);
   if (bright[0]!='\0' && bright[0] != '0' && bright[0] != '1')
   {
@@ -219,7 +230,7 @@ u_set_bar(bar)
     return vmsg("取消更動 !!");
   }
 
-  switch (ans = vans("◎ 選擇 Y)確定 N)取消 D)預設 [Q] "))
+  switch (ans = vans("◎ 選擇 Y)確定 Q)取消 D)預設 [Q] "))
   {
     case 'd' :
       strcpy(UCBAR[bar], DEFCBAR[bar]);
@@ -231,6 +242,7 @@ u_set_bar(bar)
       return 0;
   }
 
+save:
   usr_fpath(fpath, cuser.userid, ".BARSET");
   if (fp = fopen(fpath, "w"))		/* 更新完直接寫檔 */
   {
@@ -835,82 +847,82 @@ u_info()
 int
 u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
 {
-   FILE *hello;		/* smiler.071030: 站簽個人化內使用者想對大家說的話 */
-   FILE *file_host;	/* smiler.071110: 個人選擇站簽 */
-   int i;
-   int  choice;		/* 選用第幾個站簽 */
-   char buf[ANSILINELEN];
-   char helloworld[38];
+  FILE *hello;		/* smiler.071030: 站簽個人化內使用者想對大家說的話 */
+  FILE *file_host;	/* smiler.071110: 個人選擇站簽 */
+  int i;
+  int  choice;		/* 選用第幾個站簽 */
+  char buf[ANSILINELEN];
+  char helloworld[38];
 
-   /*ikulan.080727: 印出站簽*/
-   FILE *host_sign;
+  /*ikulan.080727: 印出站簽*/
+  FILE *host_sign;
 
 #define HOST_SIGN_NUM	4	/*ikulan.080727: 站簽的數目，此有四個站簽*/
 
-   move(1, 0);
-   clrtobot();
+  move(1, 0);
+  clrtobot();
 
-   /* smiler.071030: 輸入使用者想對大家說的話 */
-   usr_fpath(buf, cuser.userid, "hello");
-   if (hello = fopen(buf, "r"))
-   {
-     fgets(helloworld, 38, hello);
-     fclose(hello);
-     unlink(buf);
-   }
-   else
-     helloworld[0] = '\0';
+  /* smiler.071030: 輸入使用者想對大家說的話 */
+  usr_fpath(buf, cuser.userid, "hello");
+  if (hello = fopen(buf, "r"))
+  {
+    fgets(helloworld, 38, hello);
+    fclose(hello);
+    unlink(buf);
+  }
+  else
+    helloworld[0] = '\0';
 
-   if(!vget(2, 0, "想對大家說的話：", helloworld, 38, GCARRY))
-   {
-     if(!hello)
-     {
-       hello = fopen(buf, "w");
-       fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
-       fclose(hello);
-     }
-   }
-   else
-   {
-     hello = fopen(buf, "w");
-     fputs(helloworld, hello);
-     fclose(hello);
-   }
+  if (!vget(1, 0, "想對大家說的話：", helloworld, 38, GCARRY))
+  {
+    if (!hello)
+    {
+      hello = fopen(buf, "w");
+      fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+      fclose(hello);
+    }
+  }
+  else
+  {
+    hello = fopen(buf, "w");
+    fputs(helloworld, hello);
+    fclose(hello);
+  }
 
-   usr_fpath(buf, cuser.userid, "host");
-   if (file_host = fopen(buf,"r"))
-   {
-     fgets(buf, 3, file_host);
-     fclose(file_host);
-   }
-   choice = atoi(buf);
+  usr_fpath(buf, cuser.userid, "host");
+  if (file_host = fopen(buf,"r"))
+  {
+    fgets(buf, 3, file_host);
+    fclose(file_host);
+  }
+  choice = atoi(buf);
 
-   move(4, 0);
-   for(i = 1; i <= HOST_SIGN_NUM; i++)
-   {
-     prints("\n%d號站簽：\n", i);
-     sprintf(buf, "gem/@/@host_%d", i - 1);
-     if(host_sign = fopen(buf, "r"))
-     {
-       while(fgets(buf, ANSILINELEN, host_sign))
-         prints("%s", buf);
-       fclose(host_sign);
-     }
-   }
+  move(2, 0);
+  for(i = 1; i <= HOST_SIGN_NUM; i++)
+  {
+    prints("%s\033[1;30m========== \033[37m[%d號站簽]\033[30m ==========\033[m\n", i > 2 ? "\n" : "", i);
+    sprintf(buf, "gem/@/@host_%d", i - 1);
+    if(host_sign = fopen(buf, "r"))
+    {
+      while (fgets(buf, ANSILINELEN, host_sign))
+	prints("%s", buf);
+      fclose(host_sign);
+    }
+  }
 
-   sprintf(buf, "◎ 選擇 0)隨機 1~4)選擇站簽 [%d] ", choice);
-   choice = vans(buf);
-   if (choice >= '0' && choice <= HOST_SIGN_NUM + '0')
-     choice -= '0';
-   else
-     return 0;
+  sprintf(buf, "◎ 選擇 0)隨機 1~4)選擇站簽 [%d] ", choice);
+  choice = vans(buf);
+  if (choice >= '0' && choice <= HOST_SIGN_NUM + '0')
+    choice -= '0';
+  else
+    return 0;
 
-   usr_fpath(buf, cuser.userid, "host");
-   if (file_host = fopen(buf, "w"))
-   {
-     fprintf(file_host, "%d", choice);
-     fclose(file_host);
-   }
+  usr_fpath(buf, cuser.userid, "host");
+  if (file_host = fopen(buf, "w"))
+  {
+    fprintf(file_host, "%d", choice);
+    fclose(file_host);
+  }
 
 }	/* ikulan.080726:(end of function)將改站簽功能獨立出來 */
 

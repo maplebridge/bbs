@@ -415,7 +415,7 @@ more(fpath, footer)
   char *fpath;
   char *footer;
 {
-#define	MSG_SEPERATE	"\033[36m"MSG_SEPERATOR"\033[m\n\n"
+#define	MSG_SEPERATE	"\033[36m"MSG_SEPERATOR"\033[m\n"
   uschar *fnew;
   char buf[ANSILINELEN];
   int i;
@@ -472,7 +472,7 @@ more(fpath, footer)
       return -1;
     }
 
-    shift = foff - fimage - 1;
+    shift = --foff - fimage;
     memcpy(fnew, fimage, shift);
     memcpy(fnew + shift, MSG_SEPERATE, lino);
     memcpy(fnew + shift + lino, foff, fsize - shift);

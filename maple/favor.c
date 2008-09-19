@@ -111,7 +111,7 @@ mf_item(num, mf)
     }
     if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
     {
-      bno = mf_urifolder(folder);		/* 借用 bno */
+      bno = mf_urifolder(folder);	/* 借用 bno */
       sprintf(folder, "%2d", bno);
     }
     prints("%6d%c\033[1;33m%-2s\033[m%s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
@@ -772,11 +772,16 @@ mf_browse(xo)
   if (type & MF_BOARD)		/* 看板捷徑 */
   {
     /* itoc.010726: 若是看板已經被砍或權限沒有了，則要移除捷徑 */
-    if ((bno = brd_bno(xname)) < 0 || !(brd_bits[bno] & BRD_R_BIT))
+    if ((bno = brd_bno(xname)) < 0)
     {
       //rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
       //vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
-	  vmsg("本看板已被刪除或您沒有權限閱\讀本看板 !!");
+      vmsg("本看板已被刪除 !!");
+      return mf_load(xo);
+    }
+    else if (!(brd_bits[bno] & BRD_R_BIT))
+    {
+      vmsg("您沒有權限閱\讀本看板 !!");
       return mf_load(xo);
     }
 

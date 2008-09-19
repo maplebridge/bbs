@@ -92,15 +92,15 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       HDR *hdr;
 
       char Deletelog_folder[64],Deletelog_title[64],copied[64]; /* smiler.1111: 若有啟動editlog_use deletelog_use */
-      HDR  Deletelog_hdr;                                       /* 則將被砍的資料移至 Deletelog 板備份 */
+      HDR  Deletelog_hdr;	/* 則將被砍的資料移至 Deletelog 板備份 */
 
       xmode = head->battr;
       if ((type == '1' && (xmode & BRD_NOTRAN)) || (type == '2' && !(xmode & BRD_NOTRAN)))
 	continue;
 
-	  /* smiler.1111: 保護Editlog Deletelog此兩記錄看板不被刪除資料 */
-	  if((!strcmp(head->brdname,"Deletelog")) || (!strcmp(head->brdname,"Editlog")))
-          continue;
+      /* smiler.1111: 保護Editlog Deletelog此兩記錄看板不被刪除資料 */
+      if ((!strcmp(head->brdname,"Deletelog")) || (!strcmp(head->brdname,"Editlog")))
+	continue;
 
       /* Thor.980616: 更改 currboard，以 cancel post */
       strcpy(currboard, head->brdname);
@@ -216,7 +216,7 @@ post_brdtitle(xo)
     }
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 
@@ -248,8 +248,9 @@ post_memo_edit(xo)
       vmsg(msg_cancel);
     return XO_HEAD;
   }
-  return XO_FOOT;
+  return XO_HEAD;
 }
+
 
 /* smiler.080203: 各板自訂擋信機制 */
 static int
@@ -268,7 +269,7 @@ post_spam_edit(xo)
     if (mode == 'd')
     {
       unlink(fpath);
-      return XO_FOOT;
+      return XO_HEAD;
     }
     else
     {
@@ -279,7 +280,7 @@ post_spam_edit(xo)
 
     return XO_HEAD;
   }
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 #ifdef POST_PREFIX
@@ -300,25 +301,25 @@ post_prefix_edit(xo)
 	  "[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "
    // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
   };
-                                                                                
+
   if (!(bbstate & STAT_BOARD))
     return XO_NONE;
   
   i = vans("類別 (D)刪除 (E)修改 (Q)取消？[E] ");
-                                                                                
+
   if (i == 'q')
-    return XO_FOOT;
-                                                                                
+    return XO_HEAD;
+
   brd_fpath(fpath, currboard, "prefix");
-                                                                                
+
   if (i == 'd')
   {
     unlink(fpath);
-    return XO_FOOT;
+    return XO_HEAD;
   }
-                                                                                
+
   i = 0;
-                                                                                
+
   if (fp = fopen(fpath, "r"))
   {
     for (; i < NUM_PREFIX; i++)
@@ -329,17 +330,17 @@ post_prefix_edit(xo)
     }
     fclose(fp);
   }
-                                                                                
+
   /* 填滿至 NUM_PREFIX 個 */
   for (; i < NUM_PREFIX; i++)
     sprintf(prefix[i], "%d.%s", i + 1, prefix_def[i]);
-                                                                                
+
   menu[0] = "10";
   for (i = 1; i <= NUM_PREFIX; i++)
     menu[i] = prefix[i - 1];
   menu[NUM_PREFIX + 1] = "0.離開";
   menu[NUM_PREFIX + 2] = NULL;
-                                                                                
+
   do
   {
     /* 在 popupmenu 裡面按 左鍵 離開 */
@@ -358,8 +359,8 @@ post_prefix_edit(xo)
       fprintf(fp, "%s ", prefix[i] + 2);
     fclose(fp);
   }
-                                                                                
-  return XO_FOOT;
+
+  return XO_HEAD;
 }
 #endif      /* POST_PREFIX */
 
@@ -369,11 +370,11 @@ post_brd_prefix(xo)
   XO *xo;
 {
   BRD *oldbrd, newbrd;
-                                                                                
+
   oldbrd = bshm->bcache + currbno;
-                                                                                
+
   memcpy(&newbrd, oldbrd, sizeof(BRD));
-                                                                                
+
   switch (vans("使用文章類別 (1)使用 (2)不使用 (3)設定類別 (Q)取消？[Q] "))
   {
   case '1':
@@ -385,16 +386,16 @@ post_brd_prefix(xo)
   case '3':
     post_prefix_edit(xo);
   default:
-    return XO_FOOT;
-  }
-                                                                                
-  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
-  {
-	  memcpy(oldbrd, &newbrd, sizeof(BRD));
-      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    return XO_HEAD;
   }
 
-  return XO_FOOT;
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return XO_HEAD;
 }
 
 
@@ -422,7 +423,7 @@ post_battr_noscore(xo)
     newbrd.battr |= BRD_NOSCORE;
     break;
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -431,7 +432,7 @@ post_battr_noscore(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 #endif	/* HAVE_SCORE */
 
@@ -444,7 +445,7 @@ post_rlock(xo)
   oldbrd = bshm->bcache + currbno;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_FOOT; 
+    return XO_HEAD; 
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -457,7 +458,7 @@ post_rlock(xo)
     newbrd.battr |= BRD_NOL;
     break;
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -466,7 +467,7 @@ post_rlock(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 static int
@@ -491,7 +492,7 @@ post_vpal(xo)
     newbrd.battr |= BRD_SHOWPAL;
     break;
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -500,7 +501,7 @@ post_vpal(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 static int
@@ -521,7 +522,7 @@ post_noforward(xo)
     newbrd.battr |= BRD_NOFORWARD;
     break;
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -530,11 +531,11 @@ post_noforward(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 static int
-post_showreturn(xo)
+post_showturn(xo)
   XO *xo;
 {
   BRD *oldbrd, newbrd;
@@ -551,7 +552,7 @@ post_showreturn(xo)
 	newbrd.battr &= ~BRD_SHOWTURN;
     break;
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -560,7 +561,7 @@ post_showreturn(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
 /* ----------------------------------------------------- */
@@ -585,10 +586,9 @@ post_changeBM(xo)
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
     return XO_FOOT;      
-    
+
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-        
   move(3, 0);
   clrtobot();
 
@@ -659,25 +659,9 @@ post_changeBM(xo)
     return XO_HEAD;	/* 要重繪檔頭的板主 */
   }
 
-  return XO_BODY;
+  return XO_HEAD;
 }
 
-#if 0
-#ifdef POST_PREFIX
-/* ----------------------------------------------------- */
-/* 板主功能 : 自訂文章類別                               */
-/* ----------------------------------------------------- */
-
-
-static int
-post_prefix(xo)
-  XO *xo;
-{
-  vmsg("近期開放，敬請期待");
-  return XO_FOOT;
-}
-#endif /* POST_PREFIX */
-#endif
 
 #ifdef HAVE_MODERATED_BOARD
 /* ----------------------------------------------------- */
@@ -697,10 +681,10 @@ post_brdlevel(xo)
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
     return XO_FOOT;
 
-  if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
+  if (oldbrd->battr & BRD_IAS)	/* 藝文館看板不允許隨意更動 */
   {
-	  vmsg("藝文館看板如需更動屬性請向館務申請!!");
-	  return XO_FOOT;
+    vmsg("藝文館看板如需更動屬性請向館務申請!!");
+    return XO_HEAD;
   }
 
   switch (vans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
@@ -724,7 +708,7 @@ post_brdlevel(xo)
     break;
 
   default:
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -733,7 +717,7 @@ post_brdlevel(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 #endif	/* HAVE_MODERATED_BOARD */
 
@@ -765,12 +749,6 @@ XoBM(xo)
   BRD *oldbrd;
   oldbrd = bshm->bcache + currbno;
 
-  /*if (oldbrd->battr & BRD_IAS)  /* 藝文館看板不允許隨意更動 */
-  /*{
-	  vmsg("藝文館看板如需更動板友名單請向館務申請!!");
-	  return XO_FOOT;
-  }
-  */
   XO *xt;
   char fpath[64];
 
@@ -791,7 +769,7 @@ XoBM(xo)
 
 
 /* ----------------------------------------------------- */
-/* 看門狗                        */
+/* 看門狗						 */
 /* ----------------------------------------------------- */
 
 static int
@@ -803,10 +781,10 @@ post_bbs_dog(xo)
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("加入BBS看門狗計畫  1)是  2)否  Q)取消？[Q] "))
+  switch (vans("加入BBS看門狗計畫 1)是 2)否 Q)取消？[Q] "))
   {
   case '1':
-	newbrd.battr |= BRD_BBS_DOG;
+    newbrd.battr |= BRD_BBS_DOG;
     break;
   case '2':
     newbrd.battr &= (~BRD_BBS_DOG);
@@ -828,8 +806,7 @@ static int
 post_article_filter(xo)
   XO *xo;
 {
-
-#define	NUM_DOG			10
+#define	NUM_DOG		10
 #define	LEN_DOG_NAME	70
 
   int i;
@@ -839,103 +816,95 @@ post_article_filter(xo)
  
   brd_fpath(fpath, currboard, FN_BBSDOG);
 
-  /* 偵測檔案是否存在 */
-
-  if(fp = fopen(fpath, "r"))
-    fclose(fp);
-  else
+  if (!dashf(fpath))
   {
-	  fp = fopen(fpath, "w");
-	  i = 0;
-	  while(i < 10)
-	  {
-		  fprintf(fp, "%c\n",'\0');
-		  i++;
-	  }
-	  fclose(fp);
+    fp = fopen(fpath, "w");
+    i = 0;
+    while (i < 10)
+    {
+      fprintf(fp, "%c\n",'\0');
+      i++;
+    }
+    fclose(fp);
   }
   
   choose = 0;
-
   do
   {
-	  if(choose)
-	  {
-		 move(b_lines - 1, 0);
-		 prints("修改第 %d 項 : ", choose);
-		 
-		 if(!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
-			 input[0] = '\0';
+    if (choose)
+    {
+      move(b_lines - 1, 0);
+      prints("修改第 %d 項 : ", choose);
 
-		 while(strstr(input," "))
-		 {
-			move(b_lines - 2, 0);
-			prints("\033[1;33m輸入之字串中不得有空格，請重新輸入 !!\033[m\n");
-			prints("修改第 %d 項 : ", choose);
-		 
-		    if(!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
-			{
-			   input[0] = '\0';
-			   break;
-			}
-		 }
-         if(input[0] != '\0')
-		   strcpy(dog[choose - 1], input);
-		 else
-		   dog[choose - 1][0] = '\0';
-		 
-		 fp = fopen(fpath, "w");
-		 for(i = 0 ; i < NUM_DOG ; i++ )
-		 {
-			 if(dog[i][0] == '\0')
-			 {
-				 fprintf(fp, "%c\n", dog[i][0]);
-			 }
-			 else
-			     fprintf(fp, "%s\n", dog[i]);
-		 }
-		 fclose(fp);
-	  }
+      if (!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
+	input[0] = '\0';
 
-      fp = fopen(fpath, "r");
-	  move(0,0);
-	  clrtobot();
-	  for( i = 0 ; i < NUM_DOG ; i++ )
-	  {
-		  prints("%d.\n", i+1);
+      while (strstr(input," "))
+      {
+	move(b_lines - 2, 0);
+	prints("\033[1;33m輸入之字串中不得有空格，請重新輸入 !!\033[m\n");
+	prints("修改第 %d 項 : ", choose);
 
-		  fscanf(fp, "%s", &buf);
+	if (!vget(b_lines, 0, "", input, LEN_DOG_NAME, DOECHO))
+	{
+	  input[0] = '\0';
+	  break;
+	}
+      }
+      if (input[0] != '\0')
+	strcpy(dog[choose - 1], input);
+      else
+	dog[choose - 1][0] = '\0';
 
-		  if((buf[0] == '\0') || (buf[0] == '\n'))
-		  {
-			  prints("\n");
-			  dog[i][0] = '\0';
-		  }
-		  else
-		  {
-		      prints("\033[0;30;47m%s\033[m\n", buf);
-		      strcpy(dog[i], buf);
-		  }
-	  }
-	  fclose(fp);
+      fp = fopen(fpath, "w");
+      for (i = 0 ; i < NUM_DOG ; i++ )
+      {
+	 if (dog[i][0] == '\0')
+	 {
+	   fprintf(fp, "%c\n", dog[i][0]);
+	 }
+	 else
+	   fprintf(fp, "%s\n", dog[i]);
+      }
+      fclose(fp);
+    }
 
-	  switch(vans("選擇 (D)刪除 (E)修改 (Q)取消？[E] "))
-	  {
-	    case 'd':
-		  unlink(fpath);
-		case 'q':
-		  return XO_INIT;
-	  }
-                                                                                
+    fp = fopen(fpath, "r");
+    clear();
+    for (i = 0; i < NUM_DOG; i++)
+    {
+      prints("%d.\n", i+1);
 
-	  if(!vget(b_lines, 0, "◎ 選則修改 1)~10) (Q)離開 [Q]", input, 3, DOECHO))
-		  break;
-	  choose = atoi(input);
+      fscanf(fp, "%s", &buf);
 
-	  if(choose > 10 || choose < 0)
-		  break;
+      if ((buf[0] == '\0') || (buf[0] == '\n'))
+      {
+	prints("\n");
+	dog[i][0] = '\0';
+      }
+      else
+      {
+	prints("\033[0;30;47m%s\033[m\n", buf);
+	strcpy(dog[i], buf);
+      }
+    }
+    fclose(fp);
 
-  }while(choose);
+    switch(vans("選擇 (D)刪除 (E)修改 (Q)取消？[E] "))
+    {
+    case 'd':
+      unlink(fpath);
+    case 'q':
+      return XO_INIT;
+    }
+
+    if (!vget(b_lines, 0, "◎ 選則修改 1)~10) (Q)離開 [Q]", input, 3, DOECHO))
+      break;
+    choose = atoi(input);
+
+    if (choose > 10 || choose < 0)
+      break;
+  } while(choose);
 
   return XO_INIT;
 }
@@ -957,201 +926,195 @@ post_article_filter(xo)
 */
 
 static int
-post_my_level(xo, f_mode)
+post_my_level(xo, fname)
   XO *xo;
-  char *f_mode;
+  char *fname;
 {
-	int i, wi;
-	char fpath_r[64], fpath_w[64], buf[64], wd[64];
-	FILE *fr;
-	FILE *fw;
+  FILE *fr, *fw;
+  char fpath_r[64], fpath_w[64], buf[64], wd[64];
+  int i, wi;
 
-	brd_fpath(fpath_r, currboard, f_mode);
-	sprintf(fpath_w, "%s.tmp", fpath_r);
+  brd_fpath(fpath_r, currboard, fname);
+  sprintf(fpath_w, "%s.tmp", fpath_r);
 
-	if(fr = fopen(fpath_r, "r"))
-		fclose(fr);
-	else
-	{
-		fr = fopen(fpath_r, "w");
-		for(i=0 ;i<10 ;i++ )
-			fprintf(fr,"0\n");
-		fclose(fr);
-	}
+  if (!dashf(fpath_r))
+  {
+    fr = fopen(fpath_r, "w");
+    for (i = 0; i < 10; i++)
+    fprintf(fr, "0\n");
+    fclose(fr);
+  }
 
-	while(1)
-	{
-	  move(0, 0);
-	  clrtobot();
+  while (1)
+  {
+    clear();
 
-	  fr = fopen(fpath_r, "r");
-      fw = fopen(fpath_w, "w");
+    if (!(fr = fopen(fpath_r, "r")))
+      return XO_HEAD;
 
-	  i=3;
+    if (!(fw = fopen(fpath_w, "w")))
+    {
+      fclose(fr);
+      return XO_HEAD;
+    }
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "年齡限制 >= [%2d歲]：", wi);
-	  if(vget(i, 0, wd, buf, 3, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    i = 3;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "年齡限制 >= [%2d歲]：", wi);
+    if (vget(i, 0, wd, buf, 3, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "性別限制 (0)不限(1)中性 (2)男性 (3)女性：[%d] ", wi);
+    if (vget(i, 0, wd, buf, 2, DOECHO))
+      wi = (atoi(buf) % 4);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "性別限制 (0)不限(1)中性 (2)男性 (3)女性：[%d] ", wi);
-	  if(vget(i, 0, wd, buf, 2, DOECHO))
-         wi = (atoi(buf) % 4);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "上線次數 >= [%d次] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "文章篇數 >= [%d篇] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "上線次數 >= [%d次] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
-	
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "優文篇數 >= [%d篇] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "文章篇數 >= [%d篇] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
-	
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "劣文篇數 <  [%d篇] (0：取消) ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "優文篇數 >= [%d篇] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "違規次數 <  [%d次] (0：取消) ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "銀幣     >= [%d枚] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "劣文篇數 <  [%d篇] (0：取消) ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "金幣     >= [%d枚] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  i++;
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "發信次數 >= [%d次] ", wi);
+    if (vget(i, 0, wd, buf, 10, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "違規次數 <  [%d次] (0：取消) ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    i++;
+    fscanf(fr, "%d", &wi);
+    sprintf(wd, "註冊時間 >= [%3d月] ", wi);
+    if (vget(i, 0, wd, buf, 4, DOECHO))
+      wi = atoi(buf);
+    if (wi >= 0)
+      fprintf(fw, "%d\n", wi);
+    else
+      fprintf(fw, "0\n");
 
-	  i++;
+    fclose(fr);
+    fclose(fw);
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "銀幣     >= [%d枚] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    switch (vans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
+    {
+    case 's':
+      unlink(fpath_r);
+      rename(fpath_w, fpath_r);
+      return XO_INIT;
 
-	  i++;
+    case 'e':
+      continue;
 
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "金幣     >= [%d枚] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
+    default:
+      unlink(fpath_w);
+      return XO_INIT;
+    }
+ }
 
-	  i++;
-
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "發信次數 >= [%d次] ", wi);
-	  if(vget(i, 0, wd, buf, 10, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
-
-	  i++;
-
-	  fscanf(fr, "%d", &wi);
-	  sprintf(wd, "註冊時間 >= [%3d月] ", wi);
-	  if(vget(i, 0, wd, buf, 4, DOECHO))
-         wi = atoi(buf);
-	  if(wi >= 0)
-	    fprintf(fw, "%d\n", wi);
-	  else
-	    fprintf(fw, "0\n");
-
-	  fclose(fr);
-	  fclose(fw);
-
-	  switch(vans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
-	  {
-	    case 's':
-			unlink(fpath_r);
-			rename(fpath_w, fpath_r);
-			return XO_INIT;
-
-		case 'e':
-			continue;
-
-		default:
-			unlink(fpath_w);
-			return XO_INIT;
-	  }
-
-   }
-   return XO_INIT;
+ return XO_INIT;
 }
+
 
 static int
 post_view_bbs_dog_log(xo)
   XO *xo;
 {
-	char fpath[64],warn[64];
-	brd_fpath(fpath, currboard, FN_BBSDOG_LOG);
-	more(fpath, NULL);
-	switch(vans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
-	{
-	  case 'm':
-		  sprintf(warn, "%s 板擋文記錄檔", currboard);
-		  mail_self(fpath, cuser.userid, warn, 0);
-		  return XO_HEAD;
+  char fpath[64],warn[64];
 
-	  case 'd':
-		  unlink(fpath);
-		  return XO_HEAD;
+  brd_fpath(fpath, currboard, FN_BBSDOG_LOG);
+  more(fpath, NULL);
 
-	  default:
-		  return XO_HEAD;
-	}
-	return XO_HEAD;
+  switch (vans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
+  {
+  case 'm':
+    sprintf(warn, "%s 板擋文記錄檔", currboard);
+    mail_self(fpath, cuser.userid, warn, 0);
+    return XO_HEAD;
+
+    case 'd':
+    unlink(fpath);
+    return XO_HEAD;
+
+  default:
+    return XO_HEAD;
+  }
+  return XO_HEAD;
 }
 
 /* ----------------------------------------------------- */
@@ -1163,37 +1126,36 @@ post_guard_dog(xo)
   XO *xo;
 {
   char fpath[64];
+  char *menu[] = 
+  {
+    "BQ",
+    "BBSdog  BBS看門狗計畫",
+    "Post    文章內容限制",
+    "Write   看板發文限制",
+    "Read    看板閱\讀限制",
+    "List    看板列出限制",
+    "Vlog    擋文log記錄",
+    NULL
+  };
+
   sprintf(fpath, BBSHOME"/gem/@/@BBS_DOG_WARN");
   more(fpath, NULL);
 
-  move(b_lines, 0);
-  clrtoeol();
-
-  char *menu[] = 
-  {
-	"BQ",
-	"BBSdog  BBS看門狗計畫",
-	"Post    文章內容限制",
-	"Write   看板發文限制",
-	"Read    看板閱\讀限制",
-	"List    看板列出限制",
-	"Vlog    擋文log記錄",
-	NULL
-  };
+  clear();
   switch (pans(3, 20, "BBS 看門狗", menu))
   {
-    case 'b':
-	    return post_bbs_dog(xo);
-    case 'p':
-		return post_article_filter(xo);
-	case 'w':
-		return post_my_level(xo, FN_NO_WRITE);
-	case 'r':
-		return post_my_level(xo, FN_NO_READ);
-	case 'l':
-		return post_my_level(xo, FN_NO_LIST);
-	case 'v':
-		return post_view_bbs_dog_log(xo);
+  case 'b':
+    return post_bbs_dog(xo);
+  case 'p':
+    return post_article_filter(xo);
+  case 'w':
+    return post_my_level(xo, FN_NO_WRITE);
+  case 'r':
+    return post_my_level(xo, FN_NO_READ);
+  case 'l':
+    return post_my_level(xo, FN_NO_LIST);
+  case 'v':
+    return post_view_bbs_dog_log(xo);
   }
   return XO_INIT;
 }
@@ -1203,6 +1165,7 @@ int
 post_manage(xo)
   XO *xo;
 {
+  BRD *brd;
 #ifdef POPUP_ANSWER
   char *menu[] = 
   {
@@ -1212,39 +1175,49 @@ post_manage(xo)
     "Manager 增減副板主",
 #  ifdef HAVE_MODERATED_BOARD
     "Level   公開/好友/秘密",
-#  ifdef HAVE_SCORE
+    "OPal    板友名單",
+    "VPal    可否觀看板友名單",
+#  endif
 #  ifdef POST_PREFIX
     "Prefix  設定文章類別",
 #  endif
-	"ASpam   看板擋信列表",
-    "OPal    板友名單",
-#  endif
-	"VPal    可否觀看板友名單",
+    "ASpam   看板擋信列表",
+#  ifdef HAVE_SCORE
     "Score   設定可否評分",
 #  endif
-	"RLock   板友可否鎖文",
+    "RLock   板友可否鎖文",
     "Nfward  看板禁止轉錄",
-	"Fshow   轉錄記錄開啟",
-	"Guard   BBS 看門狗",
+    "Fshow   轉錄記錄開啟",
+    "Guard   BBS 看門狗",
     NULL
   };
 #else
   char *menu = "◎ 板主選單 (B)主題 (W)進板 (S)擋信 (M)副板"
-#  ifdef HAVE_SCORE
-    " (S)評分"
-#  endif
-	" (R)鎖文 (V)名單"
 #  ifdef HAVE_MODERATED_BOARD
-    " (L)權限 (O)板友"
+    " (L)權限 (O)板友 (V)名單"
 #  endif
 #  ifdef POST_PREFIX
     " (P)類別"
 #  endif    
+    " (A)擋信"
+#  ifdef HAVE_SCORE
+    " (S)評分"
+#  endif
+    " (R)鎖文 (N)轉錄 (F)紀錄 (G)看門狗"
     "？[Q] ";
 #endif
 
   if (!(bbstate & STAT_BOARD))
-    return XO_NONE;
+    return XO_HEAD;
+
+  vs_bar("板主管理");
+  brd = bshm->bcache + currbno;
+  prints("看板名稱：%s\n看板說明：[%s] %s\n板主名單：%s\n",
+    brd->brdname, brd->class, brd->title, brd->BM);
+  prints("中文敘述：%s\n", brd->title);
+#ifdef HAVE_MODERATED_BOARD
+  prints("看板權限：%s看板\n", brd->readlevel == PERM_SYSOP ? "秘密" : brd->readlevel == PERM_BOARD ? "好友" : "公開");
+#endif
 
 #ifdef POPUP_ANSWER
   switch (pans(3, 20, "板主選單", menu))
@@ -1268,10 +1241,6 @@ post_manage(xo)
   case 's':
     return post_battr_noscore(xo);
 #endif
-  case 'r':
-	  return post_rlock(xo);
-  case 'v':
-	  return post_vpal(xo);
 
 #ifdef HAVE_MODERATED_BOARD
   case 'l':
@@ -1279,21 +1248,25 @@ post_manage(xo)
 
   case 'o':
     return XoBM(xo);
+
+  case 'v':
+    return post_vpal(xo);
 #endif
 
 #ifdef POST_PREFIX
   case 'p':
-	  post_brd_prefix(xo);
-    //return post_prefix_edit(xo);
+    return post_brd_prefix(xo);
 #endif
+  case 'r':
+    return post_rlock(xo);
   case 'n':
-	  return post_noforward(xo);
+    return post_noforward(xo);
   case 'f':
-	  return post_showreturn(xo);
+    return post_showturn(xo);
   case 'g':
-	  return post_guard_dog(xo);
+    return post_guard_dog(xo);
   }
 
-  return XO_FOOT;
+  return XO_HEAD;
 }
 
