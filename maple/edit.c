@@ -7,9 +7,7 @@
 /*-------------------------------------------------------*/
 
 
-
 #include "bbs.h"
-
 
 
 /* #define	VE_WIDTH	(ANSILINELEN - 1) */
@@ -1391,7 +1389,7 @@ ve_header(fp)
     if (currbattr & BRD_ANONYMOUS && !(curredit & EDIT_RESTRICT))
     {
       if (!vget(b_lines, 0, "請輸入您想用的ID，也可直接按[Enter]，或是按[r]用真名：", anonymousid, IDLEN, DOECHO))
-      {											/* 留 1 byte 加 "." */
+      {						/* 留 1 byte 加 "." */
 	strcpy(anonymousid, STR_ANONYMOUS);
 	curredit |= EDIT_ANONYMOUS;
       }
@@ -1923,7 +1921,7 @@ ve_filer(fpath, ve_op)
 
   default:
     if (ve_op < 0)		 /* itoc.010301: 不能儲存 */
-      return VE_FOOTER;    
+      return VE_FOOTER;
   }
 
   if (!ans)
@@ -2249,16 +2247,16 @@ ve_key:
 	/* Thor: 在 ANSI 編輯模式下, 不可以按倒退, 不然會很可怕.... */
 
 	if (mode & VE_ANSI)
-	{	
+	{
 #if 0
-	  goto ve_key;	/* 按後退鍵就當沒按 */	  
+	  goto ve_key;	/* 按後退鍵就當沒按 */
 #endif
 
 	  /* itoc.010322: ANSI 編輯時按後退鍵回到非 ANSI 模式 */
   	  mode ^= VE_ANSI;
 	  clear();
 	  ve_mode = mode | VE_REDRAW;
-	  continue;	  
+	  continue;
 	}
 
 	if (col)

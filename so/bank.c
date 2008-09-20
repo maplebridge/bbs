@@ -80,7 +80,7 @@ x_give()
       fprintf(fp, "%s %s (%s)\n標題: 轉帳通知\n時間: %s\n\n", 
 	str_author1, cuser.userid, cuser.username, Btime(&now));
       fprintf(fp, "%s\n他的理由是：%s\n\n請您至金融中心將支票兌現", buf, reason);
-      fclose(fp);      
+      fclose(fp);
 
       strcpy(hdr.title, "轉帳通知");
       strcpy(hdr.owner, cuser.userid);
@@ -132,7 +132,7 @@ x_exchange()
     sprintf(buf, "您要將銀幣兌換成多少個金幣呢？[1 - %d] ", money);
   else
     sprintf(buf, "您要兌換多少個金幣成為銀幣呢？[1 - %d] ", money);
-    
+
   if (!vget(17, 0, buf, ans, 4, DOECHO))	/* 長度比較短，避免溢位 */
     return;
 
@@ -299,14 +299,14 @@ b_invis()
     else
     {
       //if (cuser.gold < 10)    /* smiler.080613: 將花費10金改為5000銀 */
-		if(cuser.money < 5000)
-		{
-			vmsg("要 5000 銀幣才能隱形喔");
-			return XEASY;
-		}
-        if (vans("是否花 5000 銀幣隱形(Y/N)？[N] ") != 'y')
-			return XEASY;
-		cuser.money -= 5000;
+      if(cuser.money < 5000)
+      {
+	vmsg("要 5000 銀幣才能隱形喔");
+	return XEASY;
+      }
+      if (vans("是否花 5000 銀幣隱形(Y/N)？[N] ") != 'y')
+	return XEASY;
+      cuser.money -= 5000;
     }
   }
 
@@ -442,7 +442,6 @@ b_xempt()
 int
 b_xvalid()
 {
-  
   if (HAS_PERM(PERM_XVALID))
   {
     vmsg("您的帳號已經永久免認證了");
@@ -465,29 +464,28 @@ b_xvalid()
 int
 b_nthu()
 {
-  
   if (HAS_STATUS(STATUS_COINLOCK))
   {
     vmsg(msg_coinlock);
     return XEASY;
-  }            
-  
+  }
+
   char foo[56];
   char *domain;
   FILE *fp;
-  
+
   str_lower(foo, cuser.email);
-  
+
   domain = (char *) strchr(foo, '@');
   *domain++ = '\0';
-    
+
   /* songsongboy.070404: 判斷是否為 NTHU 成員*/
-  if (!strncmp(domain,"oz.nthu.edu.tw",14) || !strncmp(domain,"mx.nthu.edu.tw",14) || !strncmp(domain,"alumni.nthu.edu.tw",18) )
+  if (!strncmp(domain, "oz.nthu.edu.tw", 14) || !strncmp(domain, "mx.nthu.edu.tw", 14) || !strncmp(domain, "alumni.nthu.edu.tw", 18) )
   {
     if (!HAS_PERM(PERM_XVALID))
       buy_level(PERM_XVALID);
-    vmsg("你的帳號獲得永久免認證了！");    
-    
+    vmsg("你的帳號獲得永久免認證了！");
+
     if (acl_has("run/nthumember", foo, domain) > 0)     /* 此信箱已經拿過錢 */
       vmsg("你已經拿過 50 金幣了喔！");
     else if (vans("你要讓此帳號獲得 50 金幣嗎，請注意每人只能拿一次(Y/N)？[N] ") == 'y')
@@ -495,7 +493,7 @@ b_nthu()
       while(!(fp = fopen("run/nthumember", "a")));
       fprintf(fp, "%s %s\n", cuser.email, cuser.userid);
       fclose(fp);
-      
+
       cuser.gold += 50;
       vmsg("恭喜你獲得 50 金幣！");
     }
@@ -508,9 +506,8 @@ b_nthu()
   }
   else
     vmsg("你的信箱不符合資格喔！");
-    
+
   return XEASY;
-  
 }
 
 
@@ -518,36 +515,35 @@ int
 b_celebrate()
 {
   char foo[56];
-  char *domain;  
+  char *domain;
   int fp;
-  
+
   str_lower(foo, cuser.email);
-  
+
   domain = (char *) strchr(foo, '@');
-  *domain++ = '\0';    
-  
+  *domain++ = '\0';
+
   if (HAS_PERM(PERM_XVALID) && HAS_PERM(PERM_XEMPT))
     vmsg("此帳號已經有此權限");
   else if (acl_has("run/celebrate", foo, domain) > 0)
     vmsg("你已經申請過了喔！");
   else if (vans("你要讓此帳號獲得 VIP 嗎，請注意每人只能用在一帳號(Y/N)？[N] ") == 'y')
   {
-    while(!(fp = fopen("run/celebrate", "a")));
+    while (!(fp = fopen("run/celebrate", "a")));
     fprintf(fp, "%s %s\n", cuser.email, cuser.userid);
     fclose(fp);
-    
+
     if (!HAS_PERM(PERM_XVALID))
       buy_level(PERM_XVALID);
     vmsg("你的帳號獲得永久免認證了！");
-    
+
     if (!HAS_PERM(PERM_XEMPT))
       buy_level(PERM_XEMPT);
     vmsg("你的帳號獲得永久保留了！");
-                                          
   }
-                                        
-  return XEASY;  
-}                                      
+
+  return XEASY;
+}
 
 
 #if 0	/* 不提供購買自殺功能 */

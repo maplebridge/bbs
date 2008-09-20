@@ -92,7 +92,7 @@ acct_userno(userid)
   char fpath[64];
   char fpath2[64];
   char fn_acct[10];
-  
+
   usr_fpath(fpath2, userid, FN_ACCT);
   sprintf(fpath,"../%s",fpath2);
   fd = open(fpath, O_RDONLY);
@@ -133,60 +133,56 @@ main(argc, argv)
   int argc;
   char *argv[];
 {
-  FILE *fp;                                          
+  FILE *fp;
   if (argc > 2)
   {
     printf("Usage: %s [board]\n", argv[0]);
     return -1;
   }
 
-    char buf[64];
-    char buf2[64];
-	char make_bakup[64];
+  char buf[64];
+  char buf2[64];
+  char make_bakup[64];
 
-    struct dirent *de;
-    DIR *dirp;
+  struct dirent *de;
+  DIR *dirp;
 
-    sprintf(buf, BBSHOME"/brd");
-    chdir(buf);
-    
-    dirp = opendir(".");
+  sprintf(buf, BBSHOME"/brd");
+  chdir(buf);
 
-    while (de = readdir(dirp))
+  dirp = opendir(".");
+
+  while (de = readdir(dirp))
+  {
+    int fd;
+    char *str;
+
+
+    str = de->d_name;
+    if (*str <= ' ' ||  *str == '.')
+      continue;
+
+    if ((argc == 2) && str_cmp(str, argv[1]))
+      continue;
+
+    sprintf(buf, "%s/" FN_PAL, str);
+    sprintf(make_bakup, "cp %s %s.bak.071111",buf,buf);
+    if ( fp = fopen(buf, "r") )
     {
-      int fd;
-      char *str;
-
-
-      str = de->d_name;
-      if (*str <= ' ' ||  *str == '.')
-	continue;
-
-      if ((argc == 2) && str_cmp(str, argv[1]))
-	continue;
-
-      sprintf(buf, "%s/" FN_PAL, str);
-      sprintf(make_bakup, "cp %s %s.bak.071111",buf,buf);
-      if ( fp = fopen(buf, "r") )
-      {
-		 system(make_bakup);           /* smiler.071111: 先備份 FN_PAL*/
-         pal_sync(buf);
-         fclose(fp);
-         printf("success reload %s !!\n",buf);
-      }
+      system(make_bakup);	/* smiler.071111: 先備份 FN_PAL*/
+      pal_sync(buf);
+      fclose(fp);
+      printf("success reload %s !!\n",buf);
+    }
 //      else
 //        printf("fail to open %s\n",buf);
 //      fclose(fp);
 
-	 boardnumber++;
-	 printf("%d . %s \n",boardnumber,buf);
+    boardnumber++;
+    printf("%d . %s \n",boardnumber,buf);
+  }
 
-
-
-	}
-
-    closedir(dirp);
-
+  closedir(dirp);
 
   return 0;
 }

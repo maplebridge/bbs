@@ -98,7 +98,7 @@ typedef struct
   char ship[20];	/* 不需要和 PAL.ship 一樣大，只要夠 ulist_body() 顯示即可 */
 }	PALSHIP;
 
-        
+
 static char *
 pal_ship(ftype, userno)	/* itoc.020811: 傳回朋友敘述 */
   int ftype, userno;
@@ -129,7 +129,7 @@ pal_ship(ftype, userno)	/* itoc.020811: 傳回朋友敘述 */
 	}
       }
       close(fd);
-    }    
+    }
   }
 
   if (ftype & (FTYPE_BOTHGOOD | FTYPE_MYGOOD | FTYPE_MYBAD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_MYGOOD ))	/* 互設好友、我的好友、壞人才有友誼敘述 */
@@ -262,15 +262,15 @@ ulist_item_bar(xo, mode)
   int userno, ufo;
   char pager, buf[64], *fcolor;
   UTMP *up;
-                                                                                
+
   up = ulist_pool[xo->pos];
-                                                                                
+
   if (!(userno = up->userno))
   {
     outs("      < 此位網友正巧離開 >\n");
     return;
   }
-                                                                                
+
   /* itoc.011022: 若生日當天上站，借用 idle 欄位來放壽星 */
   if (up->status & STATUS_BIRTHDAY)
   {
@@ -288,9 +288,9 @@ ulist_item_bar(xo, mode)
     else
       buf[0] = '\0';
   }
-                                                                                
+
   ufo = up->ufo;
-                                                                                
+
   /*         pager 狀態                       */
   /*  #：不接受任何人呼叫，也不接受任何人廣播 */
   /*  *：只接受好友呼叫，且只接受好友廣播     */
@@ -321,7 +321,7 @@ ulist_item_bar(xo, mode)
     pager = ' ';
   }
   ftype = ulist_ftype[up - ushm->uslot];
-                                                                                
+
   fcolor =
 #ifdef HAVE_BRDMATE
 # ifdef HAVE_ANONYMOUS
@@ -341,7 +341,7 @@ ulist_item_bar(xo, mode)
     ftype & FTYPE_SELF ? COLOR_SELF :
     ftype & FTYPE_MYBAD ? COLOR_MYBAD :
     "";
-                                                                                
+
   prints("%s%6d%c%c%s%-13s%-*.*s\033[m%s%-*.*s%-11.10s%6s%s",
     mode ? UCBAR[UCBAR_USR] : "",
     xo->pos + 1, ufo & UFO_CLOAK ? ')' : ' ', pager,
@@ -716,7 +716,7 @@ ulist_search(xo, step)
   if (vget(b_lines, 0, "請輸入代號或暱稱：", buf, IDLEN + 1, DOECHO))
   {
     str_lowest(buf, buf);
-    
+
     pos = num = xo->pos;
     max = xo->max;
     pp = ulist_pool;
@@ -1040,10 +1040,10 @@ ulist_fromchange(xo)
   XO *xo;
 {
   char *str, buf[34];
-  
+
   if (!cuser.userlevel)
     return XO_NONE;
-  
+
   strcpy(buf, str = cutmp->from);
   if (vget(b_lines, 0, "請輸入新的故鄉：", buf, sizeof(cutmp->from), GCARRY))
   {
@@ -1068,10 +1068,10 @@ ulist_idchange(xo)
 
   /* itoc.010717.註解: 這功能提供站長可以在使用者名單暫時改自己的 ID，
      但是由於 ulist 大部分是用 userno 來判斷，所以只有好看而已 */
-  
+
   if (!HAS_PERM(PERM_ALLADMIN))
     return XO_NONE;
-  
+
   strcpy(buf, str = cutmp->userid);
   if (vget(b_lines, 0, "請輸入新的ＩＤ：", buf, IDLEN + 1, GCARRY))
   {

@@ -285,9 +285,9 @@ post_spam_edit(xo)
 
 #ifdef POST_PREFIX
 /* ----------------------------------------------------- */
-/* 板主功能 : 修改發文類別                               */
+/* 板主功能 : 修改發文類別					 */
 /* ----------------------------------------------------- */
-                                                                                                                                                                
+
 static int
 post_prefix_edit(xo)
   XO *xo;
@@ -298,13 +298,13 @@ post_prefix_edit(xo)
   char fpath[64], buf[20], prefix[NUM_PREFIX][20], *menu[NUM_PREFIX + 3];
   char *prefix_def[NUM_PREFIX] =   /* 預設的類別 */
   {
-	  "[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "
+    "[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "
    // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
   };
 
   if (!(bbstate & STAT_BOARD))
     return XO_NONE;
-  
+
   i = vans("類別 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (i == 'q')
@@ -352,7 +352,7 @@ post_prefix_edit(xo)
         strcpy(prefix[i - 1] + 2, buf);
     }
   } while (i);
-                                                                                
+
   if (fp = fopen(fpath, "w"))
   {
     for (i = 0; i < NUM_PREFIX; i++)
@@ -470,6 +470,7 @@ post_rlock(xo)
   return XO_HEAD;
 }
 
+
 static int
 post_vpal(xo)
   XO *xo;
@@ -504,6 +505,7 @@ post_vpal(xo)
   return XO_HEAD;
 }
 
+
 static int
 post_noforward(xo)
   XO *xo;
@@ -534,7 +536,8 @@ post_noforward(xo)
   return XO_HEAD;
 }
 
-static int
+
+sstatic int
 post_showturn(xo)
   XO *xo;
 {
@@ -549,7 +552,7 @@ post_showturn(xo)
     newbrd.battr |= BRD_SHOWTURN;
     break;
   case '2':
-	newbrd.battr &= ~BRD_SHOWTURN;
+    newbrd.battr &= ~BRD_SHOWTURN;
     break;
   default:
     return XO_HEAD;
@@ -585,7 +588,7 @@ post_changeBM(xo)
     return XO_HEAD;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_HEAD;      
+    return XO_HEAD;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -677,7 +680,7 @@ post_brdlevel(xo)
 
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
-  
+
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
     return XO_HEAD;
 
@@ -809,13 +812,11 @@ post_article_filter(xo)
 #define	NUM_DOG		10
 #define	LEN_DOG_NAME	70
 
-  int i;
-  int choose;
   FILE *fp;
   char fpath[64], buf[LEN_DOG_NAME], input[LEN_DOG_NAME], dog[NUM_DOG][LEN_DOG_NAME];
- 
-  brd_fpath(fpath, currboard, FN_BBSDOG);
+  int i, choose;
 
+  brd_fpath(fpath, currboard, FN_BBSDOG);
   if (!dashf(fpath))
   {
     fp = fopen(fpath, "w");
@@ -827,7 +828,7 @@ post_article_filter(xo)
     }
     fclose(fp);
   }
-  
+
   choose = 0;
   do
   {
@@ -1269,4 +1270,3 @@ post_manage(xo)
 
   return XO_HEAD;
 }
-

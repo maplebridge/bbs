@@ -102,7 +102,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
       strcpy(str, fn_dir);
       redraw = 1;
       break;
-    
+
     case Ctrl('P'):
       if (HAS_PERM(PERM_ALLADMIN))
       {
@@ -196,14 +196,15 @@ do_help(path)	/* itoc.021122: 說明文件 */
 	redraw = 1;
       }
       break;
-    
-    case 'h':                          //smiler.070927
-      more(fpath_help_all, NULL);                    
+
+    case 'h':			//smiler.070927
+      more(fpath_help_all, NULL);
       reload = 1;
       pageno = 0;
       cur = 0;
       pal = NULL;
       break;
+
     default:
       if(cuser.ufo & UFO_LIGHTBAR)
       {

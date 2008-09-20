@@ -106,9 +106,9 @@ static char *ModeTypeTable[] =
   "呼叫",			/* M_PAGE */
   "查詢",			/* M_QUERY */
   "發呆",			/* M_IDLE */
-  "RSS 設定",		/* M_RSS */
+  "RSS 設定",			/* M_RSS */
 
-  "其他"			/* M_XMODE */
+  "其他"				/* M_XMODE */
 };
 #endif				/* _MODES_C_ */
 

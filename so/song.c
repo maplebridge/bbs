@@ -204,7 +204,7 @@ song_item(num, hdr, level)
   prints("%6d%c \241%c ", num, xmode & GEM_RESTRICT ? ')' : ' ', gtype);
 
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
-	prints("%s\n",MSG_DATA_CLOAK);
+    prints("%s\n", MSG_DATA_CLOAK);
   else
     prints("%.*s\n", d_cols + 64, hdr->title);
 }
@@ -217,39 +217,24 @@ song_item_bar(xo, mode)
 {
   HDR *hdr;
   int xmode, gtype;
-  char tmp_space[80]="                                                                                ";
-                   // 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
-  char tmp_buf[64];
- 
+
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   xmode = hdr->xmode;
   gtype = (char) 0xba;
-                                                                                
+
   /* 目錄用實心，不是目錄用空心 */
   if (xmode & GEM_FOLDER)               /* 文章:◇ 卷宗:◆ */
     gtype += 1;
-                                                                                
+
   if (hdr->xname[0] == '@')             /* 資料:☆ 分類:★ */
     gtype -= 2;
   else if (xmode & GEM_BOARD)           /*         看板:■ */
     gtype += 2;
 
-  if((xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT))
-  {
-	  strncpy(tmp_buf,tmp_space,67-strlen(MSG_DATA_CLOAK));
-	  tmp_buf[67-strlen(MSG_DATA_CLOAK)]='\0';
-  }
-  else
-  {
-	  strncpy(tmp_buf,tmp_space,67-strlen(hdr->title));
-	  tmp_buf[67-strlen(hdr->title)]='\0';
-  }
-
-  prints("%s%6d%c \241%c %-.*s%s%s",
+  prints("%s%6d%c \241%c %-.*s%s",
     mode ? UCBAR[UCBAR_SONG] : "",         //這裡是光棒的顏色，可以自己改
-    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 64,
-    (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK :
-    hdr->title,tmp_buf,
+    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 80, d_cols + 80,
+    (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK : hdr->title,
     mode ? "\033[m" : "");
 
   return XO_NONE;
@@ -540,17 +525,19 @@ song_order(xo)
 
     song_check(xo, fpath, GEM_FILE); /* get fpath */
 
-    if (!strchr(rcpt, '@')){
+    if (!strchr(rcpt, '@'))
+    {
       /* 站內的寄信處理.... */ 
       /* 加入文章檔案 */
 
-      if(acct_load(&acct, rcpt) < 1){
-        /* 不存在這個帳號，就無法站內寄信 */
-        return XO_FOOT;
+      if (acct_load(&acct, rcpt) < 1)
+      {
+	/* 不存在這個帳號，就無法站內寄信 */
+	return XO_FOOT;
       }
 
       if (!(fpr = fopen(fpath, "r")))
-        return XO_FOOT;   /* acct 可能會 clear，所以要重繪 */
+	return XO_FOOT;	/* acct 可能會 clear，所以要重繪 */
 
       usr_fpath(fpath, acct.userid, fn_dir);
 
@@ -558,11 +545,11 @@ song_order(xo)
       {
 
 #ifdef HAVE_ANONYMOUS
-        song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
+	song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
 #else
-        song_quote(fpr, fpw, cuser.userid, des, say);
+	song_quote(fpr, fpw, cuser.userid, des, say);
 #endif
-        fclose(fpw);
+	fclose(fpw);
       }
 
       fclose(fpr);
@@ -579,29 +566,30 @@ song_order(xo)
 
       return XO_FOOT;
     }
-    else{ /* 站外 internet 信箱 */
-        if (!(fpr = fopen(fpath, "r")))
-          return XO_FOOT;
+    else	/* 站外 internet 信箱 */
+    {
+      if (!(fpr = fopen(fpath, "r")))
+	return XO_FOOT;
 
-        sprintf(fpath, "tmp/song_internet.%s", cuser.userid);
-        fpw = fopen(fpath, "w");
+      sprintf(fpath, "tmp/song_internet.%s", cuser.userid);
+      fpw = fopen(fpath, "w");
 
 #ifdef HAVE_ANONYMOUS
-        song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
+      song_quote(fpr, fpw, annoy ? STR_ANONYMOUS : cuser.userid, des, say);
 #else
-        song_quote(fpr, fpw, cuser.userid, des, say);
+      song_quote(fpr, fpw, cuser.userid, des, say);
 #endif
-        
-        fclose(fpr);
-        fclose(fpw);
 
-        rc = bsmtp(fpath, "點歌給您", rcpt, 0);
-        vmsg(rc >= 0 ? msg_sent_ok : "信件無法寄達，底稿備份在信箱");
- 
-        mail_hold(fpath, rcpt, hdr->title, rc);
-        unlink(fpath);
-     }
-   }
+      fclose(fpr);
+      fclose(fpw);
+
+      rc = bsmtp(fpath, "點歌給您", rcpt, 0);
+      vmsg(rc >= 0 ? msg_sent_ok : "信件無法寄達，底稿備份在信箱");
+
+      mail_hold(fpath, rcpt, hdr->title, rc);
+      unlink(fpath);
+    }
+  }
 
   return XO_FOOT;
 }
@@ -858,7 +846,7 @@ XoSongSub()
 {
   int bno;
 
-  /*ckm.07Aug29: 歌本投稿看版改為 ArtSys*/
+  /*ckm.07Aug29: 歌本投稿看板改為 ArtSys*/
   if ((bno = brd_bno("ArtSys")) >= 0)
   {
     XoPost(bno);

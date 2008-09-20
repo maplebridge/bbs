@@ -183,7 +183,7 @@ char *ufo_tbl[NUMUFOS] =
 //  "IDLE過久自動離站(選擇/不用)",	/*  UFO_TIMEKICKER */ /* smiler.070724 */
   "保留",
 #ifdef HAVE_LIGHTBAR
-  "整行光棒        (光棒/普通)",        /* UFO_LIGHTBAR */
+  "整行光棒        (光棒/普通)",	/* UFO_LIGHTBAR */
 #else
   "保留",
 #endif
@@ -198,7 +198,7 @@ char *ufo_tbl[NUMUFOS] =
   "保留",
 #endif
 
-  "站長上站來源    (限制/任意)"		/* UFO_ACL */
+  "站長上站來源    (限制/任意)"	/* UFO_ACL */
 };
 
 

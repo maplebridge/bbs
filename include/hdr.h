@@ -55,7 +55,7 @@ typedef struct
 #define POST_MARKED	0x00000002	/* marked */
 #define POST_NOFORWARD	0x00000004	/* 不能轉寄 */
 #define POST_NOSCORE	0x00000008	/* 不能評分 */
-#define POST_GOOD		0x00000010	/* 優文 */
+#define POST_GOOD	0x00000010	/* 優文 */
 #define POST_GEM	0x00000020	/* 收錄精華區標記 */
 #define POST_BOTTOM	0x00000040	/* 置底 */
 #define POST_DELETE	0x00000080	/* 標記待砍的 */
@@ -105,10 +105,10 @@ typedef struct
 #define	GEM_BOARD	0x00020000	/* 看板精華區 */
 #define GEM_19		0x00040000
 #define GEM_LINE	0x00080000	/* 分隔線 */
-#define GEM_GOPHER      0x10000000      //lexel 有 itoc 沒有/* gopher */
-#define GEM_HTTP        0x20000000      //lexel 有 itoc 沒有/* http */
-#define GEM_EXTEND      0x80000000      //lexel 有 itoc 沒有/* 延伸式 URL */
-#define HDR_URL         (GEM_GOPHER | GEM_HTTP)  //lexel 有 itoc 沒有
+#define GEM_GOPHER      0x10000000	//lexel 有 itoc 沒有/* gopher */
+#define GEM_HTTP        0x20000000	//lexel 有 itoc 沒有/* http */
+#define GEM_EXTEND      0x80000000	//lexel 有 itoc 沒有/* 延伸式 URL */
+#define HDR_URL		(GEM_GOPHER | GEM_HTTP)	//lexel 有 itoc 沒有
 
 
 

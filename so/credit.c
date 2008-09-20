@@ -113,7 +113,7 @@ credit_add()
     credit.flag = CREDIT_IN;
   else
     credit.flag = CREDIT_OUT;
-    
+
   vget(6, 0, "時間 (年份) ", buf, 5, DOECHO);
   credit.year = atoi(buf);
 
@@ -151,7 +151,7 @@ credit_delete()
 
   vget(b_lines, 0, "要刪除第幾筆資料：", buf, 4, DOECHO);
   pos = atoi(buf);
-  
+
   if (rec_num(fpath, sizeof(CREDIT)) < pos)
   {
     vmsg("您搞錯囉，沒有這筆資料");
@@ -233,7 +233,7 @@ main_credit()
     case 'c':
       vget(b_lines, 0, "跳到第幾頁：", buf, 3, DOECHO);
       redraw = atoi(buf) - 1;
-      
+
       if (page != redraw && redraw >= 0 && 
         redraw <= (rec_num(fpath, sizeof(CREDIT)) - 1) / XO_TALL)
       {

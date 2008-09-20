@@ -80,7 +80,7 @@ xo_get_post(path, brd)		/* itoc.010910: °Ñ¦Ò xover.c xo_get()¡A¬° XoPost ¶q¨­¥´³
     if (!strcmp(xo->dir, path))
       return xo;
   }
-   
+
   xo = xo_new(path);
   xo->nxt = xo_root;
   xo_root = xo;
@@ -678,7 +678,7 @@ xo_forward(xo)
     /* itoc.010602: GEM_RESTRICT ©M POST_RESTRICT ¤Ç°t¡A©Ò¥H¥[±K¤å³¹¤]¤£±oÂà±H */
     if (xmode & (GEM_RESTRICT | GEM_RESERVED))
       continue;
-      
+
     if (xmode & POST_NOFORWARD)		/* ¦¹½g¤å³¹¸TÂà */
       continue;
 

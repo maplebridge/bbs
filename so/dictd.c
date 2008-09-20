@@ -28,13 +28,13 @@ int code_convert(char *from_charset,char *to_charset,char *inbuf,int inlen,char 
   int rc;
   char **pin = &inbuf;
   char **pout = &outbuf;
-  
-  cd = iconv_open(to_charset,from_charset);
-  if (cd==0) 
-	  return -1;
+
+  if (!(cd = iconv_open(to_charset,from_charset)))
+    return -1;
+
   memset(outbuf,0,outlen);
-  if (iconv(cd,pin,&inlen,pout,&outlen)==-1)
-	  return -1;
+  if (iconv(cd,pin,&inlen,pout,&outlen) == -1)
+    return -1;
   iconv_close(cd);
   return 0;
 }
@@ -90,9 +90,9 @@ main_dictd()
 
     if (!vget(b_lines, 0, "word: ", word, sizeof(word) - 1, DOECHO))
       return 0;
-    
-    if(strchr(word, ';') || strchr(word, '"') || strchr(word, '|') || strchr(word, '&')) /* security reason */
-	  return 0;
+
+    if (strchr(word, ';') || strchr(word, '"') || strchr(word, '|') || strchr(word, '&'))	/* security reason */
+      return 0;
 
     str = word;
     ptr = word2;
@@ -101,29 +101,29 @@ main_dictd()
     while (str < pend)
     {
       if (*str >= 0x81 && *str < 0xFE && *(str + 1) >= 0x40
-        && *(str + 1) <= 0xFE && *(str + 1) != 0x7F)    /* 中文字 BIG5+ */
+	&& *(str + 1) <= 0xFE && *(str + 1) != 0x7F)    /* 中文字 BIG5+ */
       {
-        if (*(str + 1) == 0x5C)
-        {
-          *ptr = *str;
-          *(ptr + 1) = *(str + 1);
-          *(ptr + 2) = 0x5C;
-          ptr++;
-        }
-        else
-        {
-          *ptr = *str;
-          *(ptr + 1) = *(str + 1);
-        }
-        ptr++;
-        str++;
+	if (*(str + 1) == 0x5C)
+	{
+	  *ptr = *str;
+	  *(ptr + 1) = *(str + 1);
+	  *(ptr + 2) = 0x5C;
+	  ptr++;
+	}
+	else
+	{
+	  *ptr = *str;
+	  *(ptr + 1) = *(str + 1);
+	}
+	ptr++;
+	str++;
       }
       else
       {
-        *ptr = *str;
-        /* security reason */
-        if (*ptr == ';' || *ptr == '"' || *ptr == '|' || *ptr == '&')
-          return 0;
+	*ptr = *str;
+	/* security reason */
+	if (*ptr == ';' || *ptr == '"' || *ptr == '|' || *ptr == '&')
+	  return 0;
       }
       str++;
       ptr++;
@@ -133,20 +133,20 @@ main_dictd()
     sprintf(fname, "tmp/%s.dictd", cuser.userid);
 
 
-	/* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
+    /* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
     b2u(word,strlen(word),word_utf8,256);
 
-	/* dict */
-	sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" > %s",word_utf8, fname_tmp);
+    /* dict */
+    sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" > %s", word_utf8, fname_tmp);
     system(tmp);
 
-	/* UTF-8 轉 BIG5 */
-    sprintf(tmp, "/usr/local/bin/iconv -f UTF-8 -t big5 %s > %s",fname_tmp,fname);
+    /* UTF-8 轉 BIG5 */
+    sprintf(tmp, "/usr/local/bin/iconv -f UTF-8 -t big5 %s > %s", fname_tmp, fname);
     system(tmp);
 
-	/* cdict5 */
+    /* cdict5 */
     sprintf(tmp, BBSHOME"/bin/cdict5/cdict5 \"%s\" >> %s", word, fname);
-	system(tmp);
+    system(tmp);
 
     more(fname, NULL);
     sprintf(tmp, "是否把 %s 的查詢結果寄回自己信箱？ (y/N) ", word);
@@ -155,7 +155,7 @@ main_dictd()
       sprintf(tmp, "[備 忘 錄] %s 的字典查詢結果", word);
       mail_self(fname, cuser.userid, tmp, 0);
     }
-	unlink(fname_tmp);
+    unlink(fname_tmp);
     unlink(fname);
   }
 

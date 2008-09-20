@@ -48,8 +48,8 @@ can_override(up)
   /* smiler.080806: 若雙方互設特殊好友，且對方未遠離塵囂/鎖定, 則必可互傳水球 */
   if (!((ufo & UFO_QUIET) || (up->status & STATUS_REJECT)))
   {
-	  if(is_super_mygood(up->userno) && is_super_ogood(up))
-         return 1;
+    if (is_super_mygood(up->userno) && is_super_ogood(up))
+      return 1;
   }
 
 #ifdef HAVE_SUPERCLOAK
@@ -67,10 +67,10 @@ can_override(up)
     return 0;
 
   /* smiler.080806: 隱身時傳送水球，須先雙方互加特殊好友才可傳送水球 */
-  if((cuser.ufo & UFO_CLOAK) || (up->ufo & UFO_CLOAK))
+  if ((cuser.ufo & UFO_CLOAK) || (up->ufo & UFO_CLOAK))
   {
-	  vmsg("雙方互加特殊好友，才可於隱身模式互丟水球 !!");
-	  return 0;
+    vmsg("雙方互加特殊好友，才可於隱身模式互丟水球 !!");
+    return 0;
   }
 
   if (!(up->ufo & UFO_CLOAK) || HAS_PERM(PERM_SEECLOAK))
@@ -85,7 +85,7 @@ can_override(up)
   {
     /* itoc.020321: 對方若隱形傳我水球，我也可以被動回 */
     BMW *bmw;
-    
+
     //bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
 
     for (ufo = bmw_locus - 1; ufo >= 0; ufo--)
@@ -129,21 +129,15 @@ can_see(my, up)
   /* smiler.080806: 兩者是否看同一看板，且我是板主 */
   if(my->reading && up->reading)
   {
-	char bmid1[15];
-	char bmid2[15];
-	char bmid3[15];
     BRD *nowbrd;
     nowbrd = bshm->bcache + brd_bno(my->reading);
-	sprintf(bmid1,"%s",cuser.userid);
-    sprintf(bmid2,"/%s",cuser.userid);
-	sprintf(bmid3,"%s/",cuser.userid);
-	if(strstr(nowbrd->BM,bmid1) || strstr(nowbrd->BM,bmid2) || strstr(nowbrd->BM,bmid3))
-	{
-		if(!strcmp(my->reading,up->reading))
-			return 1;
-	}
-  }
 
+    if (is_bm(nowbrd->BM, cuser.userid))
+    {
+      if (!strcmp(my->reading, up->reading))
+	return 1;
+    }
+  }
 
   if ((urufo & UFO_CLOAK) && !(mylevel & PERM_SEECLOAK))
     return 0;
@@ -168,6 +162,7 @@ can_see(my, up)
 
   return 1;
 }
+
 
 int
 bmw_send(callee, bmw)
@@ -223,13 +218,12 @@ bmw_send(callee, bmw)
                   則不同隻 bbsd 互call會core dump,
                   除非這也用offset, 不過除了 -i, 應該是非必要 */
 
-
   /* sem_lock(BSEM_LEAVE); */
   return kill(pid, SIGUSR2);
 }
 
 
-#ifdef BMW_DISPLAY		
+#ifdef BMW_DISPLAY
 static void
 bmw_display(max)	/* itoc.010313: display 以前的水球 */
   int max;
@@ -255,7 +249,6 @@ bmw_display(max)	/* itoc.010313: display 以前的水球 */
        prints("  " MSN_FORMAT, bmw->nick, bmw->msg);
     i++;
   }
-
 
   move(i, 0);
   clrtoeol();
@@ -328,7 +321,7 @@ bmw_edit(up, hint, bmw)
         sprintf(hint, "★[%s]", bmw->nick);
     }
   }
-  
+
   if(bmw->nick[0]!='\0')  /* smiler.080319: 有存在nick, 表示此bmw為傳送msn */
   {
      sprintf(fpath, "確定要送出《MSN》給 %s 嗎(Y/N)？[Y] ", bmw->nick );
@@ -339,7 +332,7 @@ bmw_edit(up, hint, bmw)
   {
     sprintf(fpath, "確定要送出《水球》給 %s 嗎(Y/N)？[Y] ", up ? up->userid : "廣播");
     if (vans(fpath) != 'n')
-	{
+    {
       int i;
 
       bmw->caller = cutmp;
@@ -347,33 +340,33 @@ bmw_edit(up, hint, bmw)
       userid = cuser.userid;
 
       if (up)	/* 不是廣播 */
-	  {
-        /* 送出水球 */
-        bmw->recver = recver;
-        strcpy(bmw->userid, userid);
+      {
+	/* 送出水球 */
+	bmw->recver = recver;
+	strcpy(bmw->userid, userid);
 
-		/* smiler.0325 */
-        if (bmw_send(up, bmw))	/* 水球送不出去，不寫入水球紀錄檔 */
-		{
-	      vmsg(MSG_USR_LEFT);
-	      if (bbsmode != M_BMW_REPLY)
-	          restore_foot(slp, 2);
-	      return;
-		}
+	/* smiler.0325 */
+	if (bmw_send(up, bmw))	/* 水球送不出去，不寫入水球紀錄檔 */
+	{
+	  vmsg(MSG_USR_LEFT);
+	  if (bbsmode != M_BMW_REPLY)
+	    restore_foot(slp, 2);
+	  return;
+	}
 
-        /* lkchu.990103: 若是自己送出的水球，存對方的 userid */
-        strcpy(bmw->userid, up->userid);
-	  }
+	/* lkchu.990103: 若是自己送出的水球，存對方的 userid */
+	strcpy(bmw->userid, up->userid);
+      }
       else	/* 廣播 */
-	  {
-         /* 送出廣播的程式，在 ulist_broadcast() 處理 */
+      {
+	/* 送出廣播的程式，在 ulist_broadcast() 處理 */
 
-         bmw->recver = 0;	/* 存 0 使不能 write 回廣播 */
+	bmw->recver = 0;	/* 存 0 使不能 write 回廣播 */
 
-        /* itoc.000213: 加 "> " 為了與一般水球區分 */
-        sprintf(bmw->userid, "%s> ", cuser.userid);
-	  }
-      
+	/* itoc.000213: 加 "> " 為了與一般水球區分 */
+	sprintf(bmw->userid, "%s> ", cuser.userid);
+      }
+
       time(&bmw->btime);
       usr_fpath(fpath, userid, fn_bmw);
       rec_add(fpath, bmw, sizeof(BMW));
@@ -381,34 +374,35 @@ bmw_edit(up, hint, bmw)
       /* itoc.020126: 加入 FN_AMW */
       usr_fpath(fpath, userid, fn_amw);
       if (fp = fopen(fpath, "a"))
-	  {
-        //fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
-		if(bmw->nick[0]=='\0')
-		  fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
-	    else
-		  fprintf(fp, MSN_FORMAT2 " %s\n", bmw->nick, bmw->msg, Btime(&bmw->btime));
+      {
+	//fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
+	if (bmw->nick[0]=='\0')
+	  fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
+	else
+	  fprintf(fp, MSN_FORMAT2 " %s\n", bmw->nick, bmw->msg, Btime(&bmw->btime));
         fclose(fp);
-	  }
+      }
 
       /* itoc.030621: 保留送出的水球 */
       if (bmw_locat >= BMW_LOCAL_MAX)
-	  {
-        /* 舊的往前挪 */
-        i = BMW_LOCAL_MAX - 1;
-        memcpy(bmw_lword, bmw_lword + 1, i * sizeof(BMW));
-	  }
+      {
+	/* 舊的往前挪 */
+	i = BMW_LOCAL_MAX - 1;
+	memcpy(bmw_lword, bmw_lword + 1, i * sizeof(BMW));
+      }
       else
-	  {
+      {
         i = bmw_locat;
         bmw_locat++;
-	  }
+      }
       bmw_lword[i].recver = recver;
       strcpy(bmw_lword[i].msg, bmw->msg);
-	}
+    }
   }
   if (bbsmode != M_BMW_REPLY)
-     restore_foot(slp, 2);
+    restore_foot(slp, 2);
 }
+
 
 /* smiler.080319 */
 void
@@ -439,12 +433,12 @@ bit_bmw_edit(up, hint, bmw)
       strcpy(bmw->userid, userid);
 
       if (bmw_send(up, bmw))	/* 水球送不出去，不寫入水球紀錄檔 */
-    	return;
+	return;
 
       /* lkchu.990103: 若是自己送出的水球，存對方的 userid */
       strcpy(bmw->userid, up->userid);
     }
-      
+
     /* itoc.030621: 保留送出的水球 */
     if (bmw_locat >= BMW_LOCAL_MAX)
     {
@@ -477,8 +471,8 @@ bmw_outz()
   move(b_lines, 0);
   clrtoeol();
   //prints(BMW_FORMAT, bmw->userid, bmw->msg);
-  if(bmw->nick[0]=='\0')
-	  prints(BMW_FORMAT, bmw->userid, bmw->msg);
+  if (!bmw->nick[0])
+    prints(BMW_FORMAT, bmw->userid, bmw->msg);
   else
       prints(MSN_FORMAT, bmw->nick, bmw->msg);
 
@@ -495,7 +489,7 @@ bmw_outz()
   if(bmw->nick[0]=='\0')
       prints(BMW_FORMAT2, bmw->userid, i >= 0 ? benz->msg : "【您最近沒有傳水球給這位使用者】");
   else
-      prints(MSN_FORMAT2, bmw->nick, i >= 0 ? benz->msg : "【您最近沒有傳MSN給這位使用者】");
+      prints(MSN_FORMAT2, bmw->nick, i >= 0 ? benz->msg : "【您最近沒有傳 MSN 訊息給這位使用者】");
 }
 
 
@@ -528,15 +522,15 @@ can_reply(uhead, pos)
   if (bmw->caller != up || up->status & STATUS_REJECT)
     return NULL;
 
-  if(strcmp(cuser.userid,up->userid))
+  if (strcmp(cuser.userid,up->userid))
      return up;
   else
   {
-     strcpy(bit_usr.userid,up->userid);
-	 strcpy(bit_usr.from,bmw->nick);    /* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
-	 bit_usr.userno = up->userno;
-     bit_usr.pid = up->pid;
-	 return &bit_usr;
+    strcpy(bit_usr.userid,up->userid);
+    strcpy(bit_usr.from,bmw->nick);    /* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
+    bit_usr.userno = up->userno;
+    bit_usr.pid = up->pid;
+    return &bit_usr;
   }
 }
 
@@ -660,22 +654,21 @@ bmw_reply()
     refresh();
     return;
   }
-  
+
   /* smiler.080324 */
   if(strcmp(cuser.userid,up->userid))
     sprintf(buf, "★[%s]", up->userid);
   else
   {
-	strcpy(bmw.nick,up->from);
+    strcpy(bmw.nick,up->from);
     sprintf(buf, "★[%s]", bmw.nick);
   }
-  
+
   tmpmode = bbsmode;	/* lkchu.981201: 儲存 bbsmode */
   utmp_mode(M_BMW_REPLY);
 
 #ifdef BMW_DISPLAY
   //display = cuser.ufo & UFO_BMWDISPLAY;
-
 
   display = 1;
   if (display)
@@ -689,7 +682,7 @@ bmw_reply()
   else
 #endif
     save_foot(slt);
-  
+
   bmw_outz();
   bmw_edit(up, buf, &bmw);
 
@@ -699,7 +692,7 @@ bmw_reply()
     cursor_restore();
     vs_restore(slt);	/* itoc.010313: 還原 bmw_display 之前的 screen */
   }
-  else  
+  else
 #endif
   {
     restore_foot(slt, 3);	/* 已 bmw_outz，要還原三列 */
@@ -783,10 +776,10 @@ bmw_rqst()
 
 
     //sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
-    if(mptr->nick[0]=='\0')
-		sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
-	else
-        sprintf(buf, MSN_FORMAT, mptr->nick, mptr->msg);
+    if (mptr->nick[0]=='\0')
+      sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
+    else
+      sprintf(buf, MSN_FORMAT, mptr->nick, mptr->msg);
 
     outz(buf);
 
@@ -815,7 +808,7 @@ do_write(up)
     BMW bmw;
     char buf[20];
 
-	bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+    bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
     sprintf(buf, "★[%s]", up->userid);
     bmw_edit(up, buf, &bmw);
 
@@ -857,10 +850,10 @@ bmw_item_bar(xo, mode)
   struct tm *ptime;
 
   //bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
-  
+
   bmw = (BMW *) xo_pool + (xo->pos - xo->top);
   ptime = localtime(&bmw->btime);
-                                                                                
+
   if (bmw->sender == cuser.userno)  /* 送出的水球 */
   {
     prints("%s%6d%c\033[33m%-13s\033[36m%-53.53s\033[33m%02d:%02d\033[m",
@@ -875,7 +868,7 @@ bmw_item_bar(xo, mode)
       xo->pos + 1, tag_char(bmw->btime),
       bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min,
       mode ? "\033[m" : "");
-  }                                                                                
+  }
   return XO_NONE;
 }
 #endif
@@ -1029,7 +1022,7 @@ bmw_write(xo)
     UTMP *up;
     BMW *bmw;
 
-	//bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+    //bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
 
     bmw = (BMW *) xo_pool + (xo->pos - xo->top);
 
@@ -1066,17 +1059,17 @@ bmw_store(fpath)
   {
     BMW bmw;
 
-	bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+    bmw.nick[0] = '\0';		/* smiler.080319: for msn^bmw detect */
 
     fprintf(fp, "              == 水球記錄 %s ==\n\n", Now());
 
     while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW)) 
     {
       //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-	  if(bmw.nick[0]=='\0')
-		fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-	  else
-        fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+      if (bmw.nick[0]=='\0')
+	fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
+      else
+	fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
     }
     fclose(fp);
   }
@@ -1138,10 +1131,10 @@ bmw_save_user(xo)
 	  if (bmw.sender == acct.userno || bmw.recver == acct.userno)
 	  {
 	    //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-		if(bmw.nick[0]=='\0')
-		   fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
+	    if (bmw.nick[0]=='\0')
+	      fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
 	    else
-           fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+	      fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
 	  }
 	}
 	fclose(fp);
@@ -1221,7 +1214,7 @@ KeyFunc bmw_cb[] =
   XO_LOAD, bmw_load,
   XO_HEAD, bmw_head,
   XO_BODY, bmw_body,
-  
+
   'd', bmw_delete,
   'D', bmw_rangedel,
   'm', bmw_mail,
@@ -1293,7 +1286,7 @@ bmw_log()
   char fpath[64], buf[64];
   struct stat st;
 
-  /* lkchu.981201: 放進私人信箱內/清除/保留 */  
+  /* lkchu.981201: 放進私人信箱內/清除/保留 */
   usr_fpath(fpath, cuser.userid, fn_bmw);
 
   if (!stat(fpath, &st) && S_ISREG(st.st_mode))
@@ -1301,8 +1294,8 @@ bmw_log()
     usr_fpath(buf, cuser.userid, fn_amw);
 
     //if ((cuser.ufo & UFO_NWLOG) || !st.st_size)	/* itoc.000512: 不儲存水球記錄 */
-	if ((0) || !st.st_size)	/* itoc.000512: 不儲存水球記錄 */
-    {						/* itoc.020711: 如果 bmw size 是 0 就清除 */
+    if (!st.st_size)		/* itoc.000512: 不儲存水球記錄 */
+    {				/* itoc.020711: 如果 bmw size 是 0 就清除 */
       op = 'c';
     }
     else
@@ -1314,7 +1307,7 @@ bmw_log()
       op = vans("本次上站水球處理 (M)移至備忘錄 (R)保留 (C)清除？[R] ");
 #endif
     }
-      
+
     switch (op)
     {
     case 'm':

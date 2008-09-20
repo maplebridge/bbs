@@ -136,7 +136,7 @@ BPAL *bpal;
   return 0;
 #endif
 }
-      
+
 #endif
 
 
@@ -384,7 +384,7 @@ pal_item_bar(xo, mode)
 #endif
 
   prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
-    mode ? UCBAR[UCBAR_PAL] : "",         //這裡是光棒的顏色，可以自己改。
+    mode ? UCBAR[UCBAR_PAL] : "",	//這裡是光棒的顏色，可以自己改。
     xo->pos + 1, tag_char(pal->userno),
     pal->ftype & PAL_BAD ? "Ｘ": pal->ftype & PAL_MATE ? "△" : "",
     online ? COLOR7 : "",

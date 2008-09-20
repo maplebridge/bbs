@@ -31,7 +31,7 @@
 #define	PERM_13		0x00001000
 #define	PERM_14		0x00002000
 #define	PERM_15		0x00004000
-#define PERM_ATOM   0x00008000		/* ATOM 成員 */
+#define PERM_ATOM	0x00008000	/* ATOM 成員 */
 
 #define PERM_DENYPOST	0x00010000	/* 17-24 : 禁制權限 */
 #define	PERM_DENYTALK	0x00020000
@@ -153,7 +153,7 @@ static char *perm_tbl[NUMPERMS] =
   "帳號總管",			/* PERM_ACCOUNTS */
   "聊天室總管",			/* PERM_CHATCLOAK */
   "看板總管",			/* PERM_BOARD */
-  "站長"			/* PERM_SYSOP */
+  "站長"				/* PERM_SYSOP */
 };
 
 #endif

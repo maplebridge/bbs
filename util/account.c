@@ -154,7 +154,7 @@ init_allbrd()
     bpal++;
 #endif
 
-  } while (++head < tail);     
+  } while (++head < tail);
 }
 
 

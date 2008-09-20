@@ -146,6 +146,7 @@ nbrd_item(num, nbrd)
     (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m", d_cols + 20, nbrd->title);
 }
 
+
 #ifdef HAVE_LIGHTBAR
 static int
 nbrd_item_bar(xo, mode)

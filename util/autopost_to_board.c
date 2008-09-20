@@ -1,9 +1,9 @@
 /*-------------------------------------------------------*/
-/* util/autopost_to_board.c	( NTHU CS MapleBBS Ver 3.20 )*/
+/* util/autopost_to_board.c ( NTHU CS MapleBBS Ver 3.20 )*/
 /*-------------------------------------------------------*/
-/* target : MapleBBS 自動 post 系統	 */
+/* target : MapleBBS 自動 post 系統			 */
 /* create : 08/08/25					 */
-/* author : smiler.bbs@bbs.cs.nthu.edu.tw */
+/* author : smiler.bbs@bbs.cs.nthu.edu.tw		 */
 /* update : //					 */
 /*-------------------------------------------------------*/
 
@@ -52,11 +52,12 @@ brd_get(bname)
   return NULL;
 }
 
+
 static void
-add_post(brdname, fpath, title, userid, usernick)           /* 發文到看板 */
-  char *brdname;        /* 欲 post 的看板 */
-  char *fpath;          /* 檔案路徑 */
-  char *title;          /* 文章標題 */
+add_post(brdname, fpath, title, userid, usernick)	/* 發文到看板 */
+  char *brdname;	/* 欲 post 的看板 */
+  char *fpath;		/* 檔案路徑 */
+  char *title;		/* 文章標題 */
   char *userid;
   char *usernick;
 {
@@ -68,7 +69,6 @@ add_post(brdname, fpath, title, userid, usernick)           /* 發文到看板 */
   chdir(buf);
 
   brd_fpath(folder, brdname, ".DIR");
-
 
   hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
   strcpy(hdr.owner, userid);
@@ -102,29 +102,28 @@ main(argc, argv)
   init_bshm();
 
   /* <use> 為 RSS_POST_TO_BBS 時 */
-  if(!strcmp(argv[4],"RSS_POST_TO_BBS"))
+  if (!strcmp(argv[4],"RSS_POST_TO_BBS"))
   {
 
-	  /* smiler.080825: 擷取 title from ./RSS_POST_TITLE */
-	  sprintf(filepath, BBSHOME"/brd/%s/.RSS_POST_TITLE" ,argv[1]);
-	  if(fp = fopen(filepath,"r"))
-	  {
-		  fgets (title , 70 , fp);
-		  title[strlen(title) - 1]='\0';
-		  fclose(fp);
-	  }
-	  else
-	    strcpy(title,"iMaple RSS Feed");
+    /* smiler.080825: 擷取 title from ./RSS_POST_TITLE */
+    sprintf(filepath, BBSHOME"/brd/%s/.RSS_POST_TITLE" ,argv[1]);
+    if (fp = fopen(filepath,"r"))
+    {
+      fgets (title , 70 , fp);
+      title[strlen(title) - 1]='\0';
+      fclose(fp);
+    }
+    else
+      strcpy(title,"iMaple RSS Feed");
 
-	  printf("%s\n",argv[4]);
-	  sprintf(filepath, BBSHOME"/brd/%s/.RSS_POST" ,argv[1]);
-	  //str_ncpy(owner, argv[2], 73-3);
-	  sprintf(owner,"%s.",argv[2]);
-	  str_ncpy(nick, argv[3], 49-3);
+    printf("%s\n",argv[4]);
+    sprintf(filepath, BBSHOME"/brd/%s/.RSS_POST" ,argv[1]);
+    //str_ncpy(owner, argv[2], 73-3);
+    sprintf(owner,"%s.",argv[2]);
+    str_ncpy(nick, argv[3], 49-3);
   }
 
   add_post(argv[1], filepath, title, owner, nick);
 
   return 0;
-
 }

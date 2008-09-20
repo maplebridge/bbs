@@ -217,8 +217,8 @@ typedef struct
 }      PAL;
 
 #define	PAL_BAD		0x02	/* 好友 vs 壞人 */
-#define PAL_MATE      	0x04    /* 特殊好友 */
-#define MATE_MASK     	0x01000000 /* 人數不會超過 16^7-1 */
+#define PAL_MATE      	0x04	/* 特殊好友 */
+#define MATE_MASK     	0x01000000	/* 人數不會超過 16^7-1 */
 
 
 /* ----------------------------------------------------- */
@@ -234,7 +234,7 @@ typedef struct
   int recver;			/* called userno */
   char userid[IDLEN + 1 + 2];	/* itoc.010529: 保留 2 byte 給廣播符號 > */
   char msg[69];			/* 水球 */
-  char nick[20];        /* msn 傳送所需的nick */
+  char nick[20];		/* msn 傳送所需的 nick */
 }      BMW;			/* bbs message write */
 
 
@@ -400,7 +400,7 @@ typedef	struct
 #ifdef MY_FAVORITE
 
 /* ----------------------------------------------------- */
-/* favor.c 中運用的資料結構                              */
+/* favor.c 中運用的資料結構				 */
 /* ----------------------------------------------------- */
 
 
@@ -427,7 +427,7 @@ typedef struct MF
 #ifdef HAVE_COSIGN
 
 /* ----------------------------------------------------- */
-/* newbrd.c 中運用的資料結構                             */
+/* newbrd.c 中運用的資料結構				 */
 /* ----------------------------------------------------- */
 
 
@@ -459,7 +459,7 @@ typedef struct NewBoardHeader
 #ifdef LOG_SONG_USIES
 
 /* ----------------------------------------------------- */
-/* SONG log 中運用的資料結構                             */
+/* SONG log 中運用的資料結構				 */
 /* ----------------------------------------------------- */
 
 typedef struct SONGDATA
@@ -716,7 +716,7 @@ typedef struct
 #define INN_SPAMMSGID	0x0040
 #define INN_SPAMBODY	0x0100
 #define INN_SPAMSITE	0x0200
-#define INN_SPAMPOSTHOST 0x0400
+#define INN_SPAMPOSTHOST	0x0400
 
 typedef struct
 {
@@ -728,9 +728,9 @@ typedef struct
 } spamrule_t;
 
 /* ----------------------------------------------------- */
-/* bitlbee 的 user                                       */
+/* bitlbee 的 user					 */
 /* ----------------------------------------------------- */
-                                                                                
+
 typedef struct
 {
   time_t btime;
@@ -740,27 +740,27 @@ typedef struct
 }   BITUSR;
 
 /* ----------------------------------------------------- */
-/* RSS                                                   */
+/* RSS							 */
 /* ----------------------------------------------------- */
-                                                                                
+
 typedef struct
 {
   char bookmark[IDLEN + 1];
   time_t chrono;
   int  xmode;
-  int  xid;			           /* reserved */
-  char owner[IDLEN + 1];       /* 作者ID */
-  char date[9];			       /* 日期 */
-  char url[73];		           /* 網址 */
-  char info[73];               /* 相關說明 */
-  char modified[64];           /* feed->modified，即rss/atom最後更新時間 */
-  char code_type[64];          /* 採用編碼名稱 */
+  int  xid;			/* reserved */
+  char owner[IDLEN + 1];	/* 作者ID */
+  char date[9];			/* 日期 */
+  char url[73];			/* 網址 */
+  char info[73];		/* 相關說明 */
+  char modified[64];		/* feed->modified，即rss/atom最後更新時間 */
+  char code_type[64];		/* 採用編碼名稱 */
 }   RSS;
 
-#define RSS_START		0x00000001	/* RSS為啟用狀態 */
-#define	RSS_UTF8		0x00000002	/* RSS採用UTF8編碼，或其餘編碼 */
-#define RSS_TXT			0x00000004	/* RSS需轉譯為txt格式，反之為html格式 */
-#define RSS_RESTRICT	0x00000008	/* 隱藏此 RSS 內容 */
-#define RSS_RESTART		0x00000010	/* 重送此 RSS 內容 */
+#define RSS_START	0x0001	/* RSS為啟用狀態 */
+#define	RSS_UTF8	0x0002	/* RSS採用UTF8編碼，或其餘編碼 */
+#define RSS_TXT		0x0004	/* RSS需轉譯為txt格式，反之為html格式 */
+#define RSS_RESTRICT	0x0008	/* 隱藏此 RSS 內容 */
+#define RSS_RESTART	0x0010	/* 重送此 RSS 內容 */
 
 #endif				/* _STRUCT_H_ */

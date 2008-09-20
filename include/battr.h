@@ -46,21 +46,21 @@
 #ifdef _ADMIN_C_
 static char *battr_tbl[NUMBATTRS] =
 {
-  "不可 Zap",			/* BRD_NOZAP */
-  "不轉信出去",			/* BRD_NOTRAN */
-  "不記錄篇數",			/* BRD_NOCOUNT */
-  "不做熱門話題統計",		/* BRD_NOSTAT */
-  "不公開投票結果",		/* BRD_NOVOTE */
-  "匿名看板",			/* BRD_ANONYMOUS */
-  "不評分看板",			/* BRD_NOSCORE */
-  "公眾板",			/* BRD_PUBLIC */
+  "不可 Zap",		/* BRD_NOZAP */
+  "不轉信出去",		/* BRD_NOTRAN */
+  "不記錄篇數",		/* BRD_NOCOUNT */
+  "不做熱門話題統計",	/* BRD_NOSTAT */
+  "不公開投票結果",	/* BRD_NOVOTE */
+  "匿名看板",		/* BRD_ANONYMOUS */
+  "不評分看板",		/* BRD_NOSCORE */
+  "公眾板",		/* BRD_PUBLIC */
   "不可鎖文",		/* BRD_NOL */
-  "顯示板友名單",	/* BRD_SHOWPAL */
-  "停止POST_PREFIX", /* BRD_PREFIX */
+  "顯示板友名單",		/* BRD_SHOWPAL */
+  "停止POST_PREFIX", 	/* BRD_PREFIX */
   "看板禁轉",		/* BRD_NOFORWARD */
-  "轉錄記錄",       /* BRD_SHOWTURN */
+  "轉錄記錄",		/* BRD_SHOWTURN */
   "藝文館看板",		/* BRD_IAS */
-  "ATOM成員看板",	/* BRD_ATOM */
+  "ATOM成員看板",		/* BRD_ATOM */
   "加入BBS DOG 計畫"	/* BRD_BBS_DOG */
 };
 

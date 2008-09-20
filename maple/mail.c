@@ -1064,7 +1064,7 @@ mail_him(fpath, rcpt, title, xmode)		/* itoc.041111: 寄檔案給他人 */
 
 
 /* ----------------------------------------------------- */
-/* 群組寄信、回信					 */
+/* 群組寄信、回信						 */
 /* ----------------------------------------------------- */
 
 
@@ -1328,7 +1328,7 @@ mbox_item(num, hdr)
   int xmode;
 
   xmode = hdr->xmode;
-  prints(xmode & MAIL_DELETE ? "%6d%c\033[1;5;37;41m%c\033[m " : "%6d%c%c ",
+  prints(xmode & MAIL_DELETE ? "%6d%c\033[1;5;41m%c\033[m " : "%6d%c%c ",
     num, tag_char(hdr->chrono), mbox_attr(xmode));
 #else
   prints("%6d%c%c ", num, tag_char(hdr->chrono), mbox_attr(hdr->xmode));
@@ -1336,6 +1336,7 @@ mbox_item(num, hdr)
 
   hdr_outs(hdr, d_cols + 47);
 }
+
 
 #ifdef HAVE_LIGHTBAR
 static int
@@ -1347,27 +1348,26 @@ mbox_item_bar(xo, mode)
 #ifdef OVERDUE_MAILDEL
   int xmode;
 #endif
-                                                                                
+
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
-                                                                                
+
 #ifdef OVERDUE_MAILDEL
   xmode = hdr->xmode;
   prints(xmode & MAIL_DELETE ? 
-	  "%s%6d%c\033[1;5;37;41m%c\033[m%s " : 
-      "%s%6d%c%c%s ",
-		  mode ? UCBAR[UCBAR_MAIL] : "",
+    "%s%6d%c\033[1;5;41m%c\033[m%s " : "%s%6d%c%c%s ",
+    mode ? UCBAR[UCBAR_MAIL] : "",
     num, tag_char(hdr->chrono), mbox_attr(xmode),
-	mode ? UCBAR[UCBAR_MAIL] : "");
+    mode ? UCBAR[UCBAR_MAIL] : "");
 #else
-  prints("%s%6d %c ",
-    mode ? UCBAR[UCBAR_MAIL] : "", xo->pos + 1, mbox_attr(hdr->xmode));
+  prints("%s%6d%c%c ",
+    mode ? UCBAR[UCBAR_MAIL] : "", xo->pos + 1, tag_char(hdr->chrono), mbox_attr(hdr->xmode));
 #endif
-                                                                                
+
   if (mode)
     hdr_outs_bar(hdr, 47);
   else
     hdr_outs(hdr, 47);
-                                                                                
+
   return XO_NONE;
 }
 #endif
@@ -1709,7 +1709,7 @@ mbox_title(xo)		/* itoc.020113: 可以改自己信箱中的標題 */
   return XO_FOOT;
 }
 
- 
+
 static int
 mbox_mark(xo)
   XO *xo;

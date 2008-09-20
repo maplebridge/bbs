@@ -35,12 +35,12 @@ reaper(fpath, lowid)
   printf("> processing account %-20s ", lowid);
 
   sprintf(buf, "%s/.DIR", fpath);
-  
+
   if ((fd = open(buf, O_RDONLY)) >= 0)
   {
     fstat(fd, &st);
     size = st.st_size / sizeof(HDR);
-    
+
     if (size <= 0)
     {
       base = NULL;
@@ -51,7 +51,7 @@ reaper(fpath, lowid)
       tail = base + size;
       read(fd, base, sizeof(HDR) * size);
     }
-    
+
     close(fd);
   }
   else
@@ -59,7 +59,7 @@ reaper(fpath, lowid)
     size = 0;
     base = NULL;
   }
-  
+
   printf("total mail : %d\n", size);
   sprintf(folder, "%s/@", fpath);
 
@@ -69,7 +69,7 @@ reaper(fpath, lowid)
       free(base);
     return;
   }
-  
+
   ptr = strchr(folder, '@') + 1;
   *ptr++ = '/';
 

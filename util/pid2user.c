@@ -1,10 +1,10 @@
 /*-------------------------------------------------------*/
-/* util/pid2user.c      (MapleBBS Ver 3.10)              */
+/* util/pid2user.c      (MapleBBS Ver 3.10)		 */
 /*-------------------------------------------------------*/
-/* target : 由pid找出當前站內使用者id和動態              */
-/* author : hightman.bbs@bbs.hightman.net                */
-/* create : 02/05/19                                     */
-/* update :   /  /                                       */
+/* target : 由 pid 找出當前站內使用者 id 和動態		 */
+/* author : hightman.bbs@bbs.hightman.net		 */
+/* create : 02/05/19					 */
+/* update :   /  / 					 */
 /*-------------------------------------------------------*/
 
 
@@ -41,7 +41,7 @@ pid2user(pid)
     if (utmp->pid == pid)
     {
       printf("使用者代號: %s 狀態: %s [%d] 。 (來自 %s)\n",
-        utmp->userid, ModeTypeTable[utmp->mode], utmp->mode, utmp->from);
+	utmp->userid, ModeTypeTable[utmp->mode], utmp->mode, utmp->from);
       offset = 2;
       break;
     }
@@ -95,19 +95,19 @@ main(argc, argv)
       }
       else if (errno == ESRCH)
       {
-        printf("\nThe  pid or process group does not exist.\n"
-          "Note that an existing process might be a zombie,\n"
-          "a process which  already  committed  termination,\n"
-          "but has not yet been wait()ed for.\n");
+	printf("\nThe  pid or process group does not exist.\n"
+	  "Note that an existing process might be a zombie,\n"
+	  "a process which  already  committed  termination,\n"
+	  "but has not yet been wait()ed for.\n");
       }
       else if (errno == EPERM)
       {
-        printf("\nThe process does not have permission to \n"
-          "send the signal to any of the receiving processes. \n");
+	printf("\nThe process does not have permission to \n"
+	  "send the signal to any of the receiving processes. \n");
       }
       else
       {
-        printf("\nFail to kill the process for Unknown Reson.\n");
+	printf("\nFail to kill the process for Unknown Reson.\n");
       }
     }
   }

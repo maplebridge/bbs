@@ -109,7 +109,7 @@ pad_draw()
     outs("\n請留言 (至多三行)，按[Enter]結束");
     for (i = 0; (i < 3) &&
       vget(16 + i, 0, "：", buf[i], 71, DOECHO); i++);
-    if (*buf[0] == '\n')
+    if (!buf[0][0])
       return 0;
     cc = vans("(S)存檔觀賞 (E)重新來過 (Q)算了？[S] ");
     if (cc == 'q' || i == 0)
@@ -180,7 +180,7 @@ goodbye()
   /* lkchu.990428: 內定改為不離站 */
   case 'g':
   case 'y':
-    break;    
+    break;
 
   case 'm':
     m_sysop();
@@ -204,7 +204,7 @@ goodbye()
 
   //if (!(cuser.ufo & UFO_MOTD))	/* itoc.000407: 離站畫面一併簡化 */
   if(1)
-  {  
+  {
     clear();
     prints("親愛的 \033[32m%s(%s)\033[m，別忘了再度光臨【 %s 】\n"
       "以下是您在站內的註冊資料：\n",
@@ -223,7 +223,7 @@ goodbye()
     clear();
 //    delay_msg("Bye Bye!!",9);
   }
-  
+
   u_exit("EXIT ");
   clear();    //
   refresh(); //080515

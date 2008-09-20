@@ -63,7 +63,9 @@ gem_item(num, hdr, level)
     prints("%-*.*s%-13s%s\n", d_cols + 46, d_cols + 45, hdr->title, (gem_way == 1 ? hdr->xname : hdr->owner), hdr->date);
 }
 
+
 #ifdef HAVE_LIGHTBAR
+static int
 gem_item_bar(xo, mode)
   XO *xo;
   int mode;
@@ -95,9 +97,9 @@ gem_item_bar(xo, mode)
 
   gtype = gem_way;
 
+  /* itoc.000319: 限制級文章保密 */
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
     prints("%-67s%s", "<資料保密>", mode ? "\033[m" : "");
-         /* itoc.000319: 限制級文章保密 */
   else if (gtype == 0)
     prints("%-67.64s%s", hdr->title, mode ? "\033[m" : "");
   else
@@ -127,7 +129,7 @@ gem_body(xo)
       {
       case 'a':
 	max = gem_add_all(xo);
-    	if (xo->max > 0)
+	if (xo->max > 0)
 	  return max;
 	break;
 
@@ -787,37 +789,36 @@ gem_link(brdname)	/* 檢查連結去其他看板精華區的權限 */
   return level;
 }
 
+
 static int
-is_sbm(title,userid)
+is_sbm(title, userid)
 char *title;
 char *userid;
 {
-   char *start;
-   char *end;
-   char *pch;
+  char *start, *end, *pch;
 
-   if( ( start=strrchr(title,'[') ) && ( end=strrchr(title,']') ) )
-   {
-	   if(start < end)
-       {
-		   if(pch=strstr(title,userid))
-		   {
-			   if((start<pch) && (pch<end))
-			   {
-				   pch--;
-				   if((*pch=='[') || (*pch=='/'))
-				   {
-					   pch=pch+1+strlen(userid);
-					   if((*pch==']') || (*pch=='/'))
-						   return 1;
-				   }
-			   }
-		   }
+  if ((start = strrchr(title, '[')) && (end = strrchr(title, ']')))
+  {
+    if (start < end)
+    {
+      if (pch = strstr(title, userid))
+      {
+	if ((start < pch) && (pch < end))
+	{
+	  pch--;
+	  if ((*pch == '[') || (*pch == '/'))
+	  {
+	    pch = pch + 1 + strlen(userid);
+	    if ((*pch == ']') || (*pch == '/'))
+	      return 1;
 	   }
+	}
+      }
+    }
    }
    return 0;
-
 }
+
 
 static int
 gem_browse(xo)
@@ -830,7 +831,7 @@ gem_browse(xo)
   op = 0;
 
   for (;;)
-  {    
+  {
     if (!(hdr = gem_check(xo, fpath, op)))
       break;
 
@@ -843,22 +844,22 @@ gem_browse(xo)
       strcpy(title, hdr->title);
       if (xmode & GEM_BOARD)
       {
-	     if ((op = gem_link(hdr->xname)) < 0)
-		 {
-	       vmsg("對不起，此板精華區只准板友進入，請向板主申請入境許\可");
-	       return XO_FOOT;
-		 }
-	  }
+	if ((op = gem_link(hdr->xname)) < 0)
+	{
+	  vmsg("對不起，此板精華區只准板友進入，請向板主申請入境許\可");
+	  return XO_FOOT;
+	}
+      }
       else			/* 一般卷宗才有小板主 */
       {
-	       op = xo->key;		/* 繼承母卷宗的權限 */
+	op = xo->key;		/* 繼承母卷宗的權限 */
 
-	      /* itoc.011217: [userA/userB 的多位小板主模式也適用 */
-	      //if ((ptr = strrchr(title, '[')) && is_bm(ptr + 1, cuser.userid))
-	      //    op |= GEM_W_BIT | GEM_M_BIT;
-          if(is_sbm(title,cuser.userid))
-			  op |= GEM_W_BIT | GEM_M_BIT;
-	  }
+	/* itoc.011217: [userA/userB 的多位小板主模式也適用 */
+	//if ((ptr = strrchr(title, '[')) && is_bm(ptr + 1, cuser.userid))
+	//    op |= GEM_W_BIT | GEM_M_BIT;
+	if (is_sbm(title, cuser.userid))
+	  op |= GEM_W_BIT | GEM_M_BIT;
+      }
 
       XoGem(fpath, title, op);
       return gem_init(xo);
@@ -1102,41 +1103,40 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
     {
       memcpy(gbuf, hdr, sizeof(HDR));
       num++;
-	  if(gem_mode)
-	  {
-		  if(strstr(dir,"brd/"))
-		  {
-	         hdr->xmode |= POST_GEM;
-	         currchrono = hdr->chrono;
-             rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
-		  }
+      if (gem_mode)
+      {
+	if (dir[0] == 'b')
+	{
+	  hdr->xmode |= POST_GEM;
+	  currchrono = hdr->chrono;
+	  rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
+	}
 
 #if 0
+	if (strstr(dir,"gem/brd/"))
+	  if ((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
+	    can_show=0;
 
-		  if(strstr(dir,"gem/brd/"))
-			  if((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
-			      can_show=0;
+	if (can_show)
+	{
+	  hdr_fpath(fpath, dir, hdr);
+	  if (fp = fopen(fpath, "a"))
+	  {
+	    time_t now;
+	    struct tm *ptime;
 
-		  if(can_show)
-		  {
-		    hdr_fpath(fpath, dir, hdr);
-	        if (fp = fopen(fpath, "a"))
-			{
-              time_t now;
-              struct tm *ptime;
+	    time(&now);
+	    ptime = localtime(&now);
 
-              time(&now);
-              ptime = localtime(&now);
-
-              fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
-              "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
-              ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
-              fclose(fp);
-			}
-		  }
+	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
+	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+	    fclose(fp);
+	  }
+	}
 #endif
 
-	  }
+      }
     }
   }
   else
@@ -1152,44 +1152,40 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	num++;
       }
 
-	  if(gem_mode)
-	  {
-	    if(strstr(dir,"brd/"))
-		{
-		    buf.xmode |= POST_GEM;
-		    currchrono = buf.chrono;
-            rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
-		}
+      if (gem_mode)
+      {
+	if (dir[0] == 'b')
+	{
+	  buf.xmode |= POST_GEM;
+	  currchrono = buf.chrono;
+	  rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
+	}
 
 #if 0
+	if (strstr(dir,"gem/brd/"))
+	  if ((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
+	    can_show=0;
 
-		if(strstr(dir,"gem/brd/"))
-			  if((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
-			      can_show=0;
-		
-		if(can_show)
-		{
-	      hdr_fpath(fpath, dir, &buf);
-		  vmsg(fpath);
-	      if (fp = fopen(fpath, "a"))
-		  {
-            time_t now;
-            struct tm *ptime;
+	if (can_show)
+	{
+	  hdr_fpath(fpath, dir, &buf);
+	  vmsg(fpath);
+	  if (fp = fopen(fpath, "a"))
+	  {
+	    time_t now;
+	    struct tm *ptime;
 
-            time(&now);
-            ptime = localtime(&now);
+	    time(&now);
+	    ptime = localtime(&now);
 
-            fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
-              "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
-              ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
-            fclose(fp);
-		  }
-		}
-
-#endif
-
+	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
+	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
+	    fclose(fp);
 	  }
-
+	}
+#endif
+      }
     } while (++locus < max);
   }
 
@@ -1232,7 +1228,7 @@ gem_copy(xo)
   level = xo->key;
   if (!(level & GEM_W_BIT))
     return XO_NONE;
-  
+
   gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict ,1);
 
   zmsg("拷貝完成。[注意] 貼上後才能刪除原文！");
@@ -1315,7 +1311,7 @@ invalid_loop(srcDir, dstDir, hdr, depth)	/* itoc.010727: 檢查是否會造成無窮迴圈 
   if ((fd = open(fpath1, O_RDONLY)) >= 0)
   {
     while (read(fd, &fhdr, sizeof(HDR)) == sizeof(HDR))
-    {  
+    {
       if (fhdr.xmode & GEM_FOLDER)	/* plain text 不會造成無窮迴圈 */
       {
 	hdr_fpath(fpath2, srcDir, &fhdr);
@@ -1505,7 +1501,7 @@ gem_anchor(xo)
 
   if (!(xo->key & GEM_W_BIT))	/* Thor.981020: 只要板主以上即可使用anchor */
     return XO_NONE; 		/* Thor.981020: 不開放一般 user 使用是為了防止板主試出另一個小 bug :P */
-  
+
   ans = vans("精華區 A)定錨 D)拔錨 J)就位 Q)取消 [A] ");
   if (ans != 'q')
   {
@@ -1542,7 +1538,7 @@ chkgather(hdr)
 {
   if (hdr->xmode & GEM_RESTRICT)	/* 限制級精華區不能定錨收錄 */
     return 0;
-    
+
   if (hdr->xmode & GEM_FOLDER)		/* 查 hdr 是否 plain text (即文章/資料) */
     return 0;
 

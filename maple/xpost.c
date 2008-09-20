@@ -101,7 +101,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
 
   if (xo->max <= 0)	/* Thor.980911: 註解: 以防萬一 */
     return XO_FOOT;
-  
+
   /* build index according to input condition */
 
   fimage = f_map(xo->dir, &fsize);
@@ -143,7 +143,6 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
 
     list[count++] = locus;
   }
-
 
   munmap(fimage, fsize);
 
@@ -325,7 +324,7 @@ XoXselect(xo)
     HintAuthor[0] = '\0';
     hdr.xid = 0;
   }
-  
+
   if (!hdr.title[0] && !hdr.xid)
     return XO_BODY;
 
@@ -677,6 +676,7 @@ filter_R_local(head, hdr)
   return (head->xmode & POST_INCOME);
 }
 
+
 int
 XoXlocal(xo)
   XO *xo;
@@ -804,9 +804,8 @@ XoXrefuse(xo)
 #endif
 
 
-/* smiler.080201: 整合搜尋功能 */
 int
-XOXpost_search_all(xo)
+XOXpost_search_all(xo)	/* smiler.080201: 整合搜尋功能 */
   XO *xo;
 {
   move(b_lines - 1, 0);
@@ -1140,7 +1139,7 @@ xmbox_browse(xo)
 
     hdr_fpath(fpath, dir, hdr);
 
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if ((key = more(fpath, FOOTER_MAILER)) < 0)
       break;
 
@@ -1150,7 +1149,7 @@ xmbox_browse(xo)
     strcpy(currtitle, str_ttl(hdr->title));
 
 re_key:
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if (!key)
       key = vkey();
 

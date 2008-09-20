@@ -16,7 +16,7 @@ main(argc, argv)
   int argc;
   char *argv[];
 {
-  FILE *fp;                      
+  FILE *fp;
   HDR hdr, old;
   char buf[64], folder_src[64], folder_dst[64];
   char brdname_src[BNLEN + 1], brdname_dst[BNLEN + 1];
@@ -38,28 +38,27 @@ main(argc, argv)
 
   if ((fp = fopen(folder_src, "r")))
   {
-     while (fread(&old, sizeof(old), 1, fp) == 1)
-     {
-        hdr_fpath(buf, folder_src, &old);         
-        hdr_stamp(folder_dst, HDR_COPY | 'A', &hdr, buf);
+    while (fread(&old, sizeof(old), 1, fp) == 1)
+    {
+      hdr_fpath(buf, folder_src, &old);
+      hdr_stamp(folder_dst, HDR_COPY | 'A', &hdr, buf);
 
-        hdr.xmode  = old.xmode;
-        hdr.parent_chrono = old.parent_chrono;
-        strcpy(hdr.owner, old.owner);
-        hdr.stamp  = old.stamp;
-        strcpy(hdr.nick , old.nick);
-        hdr.score  = old.score;
-        strcpy(hdr.date , old.date);
-        strcpy(hdr.title, old.title);
+      hdr.xmode  = old.xmode;
+      hdr.parent_chrono = old.parent_chrono;
+      strcpy(hdr.owner, old.owner);
+      hdr.stamp  = old.stamp;
+      strcpy(hdr.nick , old.nick);
+      hdr.score  = old.score;
+      strcpy(hdr.date , old.date);
+      strcpy(hdr.title, old.title);
 
-        rec_bot(folder_dst, &hdr, sizeof(HDR));
-     }
-	 
-     fclose(fp);
+      rec_bot(folder_dst, &hdr, sizeof(HDR));
+   }
 
+   fclose(fp);
   }
   else
      printf("無此看板或看板內內無資料 !!\n");
- 
+
   return 0;
 }

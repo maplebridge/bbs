@@ -965,12 +965,13 @@ login_other()
   {
     int ans;
     film_out(FILM_NOTIFY, -1);		/* 尚未認證通知 */
-    if (ans = vans("是否馬上進行註冊程序 1)以電子信箱認証 2)填註冊單 3)取消？[1] ") == '2')
-      u_addr();
+    ans = vans("是否馬上進行註冊程序 1)以電子信箱認証 2)填註冊單 3)取消？[1] ");
+    if (ans == '2')
+      u_register();
     else if (ans == '3')
       vmsg("請儘快完成註冊手續，已使用完整之站上各項功\能！");
     else
-      u_register();
+      u_addr();
   }
 
 #ifdef JUSTIFY_PERIODICAL

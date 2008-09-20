@@ -98,7 +98,7 @@ acct_get(msg, acct)
   ACCT *acct;
 {
   outz("★ 輸入首字母後，可以按空白鍵自動搜尋");
-  
+
   if (!vget(1, 0, msg, acct->userid, IDLEN + 1, GET_USER))
     return 0;
 
@@ -265,7 +265,7 @@ adm_log(old, new)
     sprintf(buf, "%-13s銀%d→%d 金%d→%d", userid, old->money, new->money, old->gold, new->gold);
     alog("異動錢幣", buf);
   }
-  
+
   if ((old->ufo != new->ufo))
   {
     alog("異動習慣", userid);
@@ -333,7 +333,7 @@ acct_show(u, adm)
   prints("  \033[32m註冊日期：\033[37m%s\n", Btime(&u->firstlogin));
 
   prints("  \033[32m光臨日期：\033[37m%s\n", Btime(&u->lastlogin));
-  
+
   ulevel = u->userlevel;
 
   if (ulevel & PERM_ALLDENY)
@@ -388,6 +388,7 @@ end_show:
   outs("\033[m");
 }
 
+
 /* smiler.080827: 站務自行設定 優文/劣文/違規記錄 */
 static int
 acct_set_violation(u)
@@ -441,14 +442,14 @@ acct_set_violation(u)
       (ans=='1') ? acct.good_article : (ans=='2') ? acct.poor_article : acct.violation,
       num, reason);
 
-    /* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式 */
-    /****************************************************************************************/
-    /* itoc.010811: 動態設定線上使用者 */
-    /* 被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
-       這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料 */
-    /* 在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
-       所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。 */
-    /****************************************************************************************/
+    /* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式
+    ----------------------------------------------------------------------------------
+       itoc.010811: 動態設定線上使用者
+       被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
+       這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料
+       在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
+       所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。
+    ---------------------------------------------------------------------------------- */
     utmp_admset(x.userno, STATUS_DATALOCK | STATUS_COINLOCK);
     memcpy(&acct, &x, sizeof(ACCT));
     acct_save(&acct);
@@ -457,10 +458,8 @@ acct_set_violation(u)
   }
 
   if (ans2 == '2')
-  {
     more(fpath, NULL);
-    return 0;
-  }
+
   return 0;
 }
 
@@ -486,12 +485,12 @@ acct_setup(u, adm)
 #endif
 
   acct_show(u, adm);
-  
+
   /* 070403.songsongboy：站務不得任意觀看他人使用資料 */
   if (adm == 1)
   {
     char reason[50];
-    if(!vget(b_lines, 0, "請輸入觀看/設定資料的理由：", reason, 50, DOECHO))
+    if (!vget(b_lines, 0, "請輸入觀看/設定資料的理由：", reason, 50, DOECHO))
     {
       alog("觀看資料", u->userid);
       return;
@@ -509,16 +508,16 @@ acct_setup(u, adm)
   {
     adm = vans("設定 1)資料 2)權限 3)優文/劣文/違規 Q)取消 [Q] ");
 
-	if (adm == '3')
-	{
-		acct_set_violation(u);
-		return;
-	}
+    if (adm == '3')
+    {
+      acct_set_violation(u);
+      return;
+    }
 
-    if (adm == '2')
+    else if (adm == '2')
       goto set_perm;
 
-    if (adm != '1')
+    else if (adm != '1')
       return;
   }
   else
@@ -578,78 +577,6 @@ acct_setup(u, adm)
     if (vget(i, 0, "暱    稱：", str, UNLEN + 1, GCARRY))
       break;
   };
-
-#if 0/*ikulan.080726:將站簽設定獨立出來*/
-  str_lower(userid_tmp,x.userid);
-  /* smiler.071030: 輸入使用者想對大家說的話 */
-  i++;
-  sprintf(user_hello_path,"usr/%c/%s/hello",userid_tmp[0],userid_tmp);
-  hello = fopen(user_hello_path,"r");
-  if(hello)
-      fgets(helloworld,38,hello);
-  else
-      sprintf(helloworld,"\0");
-  if(!vget(i, 0, "想對大家說的話：", helloworld, 37+1, GCARRY))
-  {
-      if(hello)
-      {
-          fclose(hello);
-          unlink(user_hello_path);
-      }
-      else
-      {
-        hello = fopen(user_hello_path,"w");
-        fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
-        fclose(hello);
-      }
-  }
-  else
-  {
-      if(hello)
-      {
-          fclose(hello);
-          unlink(user_hello_path);
-      }
-      hello = fopen(user_hello_path,"w");
-      fputs(helloworld,hello);
-      fclose(hello);
-  }
-
-  i++;
-  sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
-  file_host=fopen(host_path_name,"r");
-  if(file_host)
-  {
-      fgets(host_choice_char,3,hello);
-	  fclose(file_host);
-  }
-  vget(i, 0, "站簽個人指定：", host_choice_char, 3, GCARRY);
-  host_choice_int=atoi(host_choice_char);
-  if(host_choice_int)
-  {
-    if(host_choice_int < 0)
-    {
-  	  vmsg("指定站簽數不得小於等於0,更改指定為 1 ");
-	  host_choice_int=1;
-    }
-    sprintf(host_path_name,"gem/@/@host_%d",host_choice_int-1);
-    file_host=fopen(host_path_name,"r");
-    if(file_host)
-	  fclose(file_host);
-    else
-    {
-	  vmsg("指定站簽不存在,更改指定為 1 ");
-	  host_choice_int=1;
-    }
-  }
-  sprintf(host_path_name,"usr/%c/%s/host",userid_tmp[0],userid_tmp);
-  file_host=fopen(host_path_name,"w");
-  if(file_host)
-  {
-	  fprintf(file_host,"%d",host_choice_int);
-	  fclose(file_host);
-  }
-#endif
 
   /* itoc.010408: 新增生日/性別欄位，不強迫使用者填 (允許填 0) */
   i++;
@@ -981,7 +908,7 @@ brd_set(brd, row)
       {
 	strcpy(buf, acct.userid);
 	BMlen = len;
-      }      
+      }
 
       acct_setperm(&acct, PERM_BM, 0);
     }

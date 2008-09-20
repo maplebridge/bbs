@@ -49,7 +49,7 @@ aloha_find(fpath, userno)
   ALOHA old;
   int fd;
   int rc = 0;
-  
+
   if ((fd = open(fpath, O_RDONLY)) >= 0)
   {
     while (read(fd, &old, sizeof(ALOHA)) == sizeof(ALOHA))
@@ -115,6 +115,7 @@ aloha_item(num, aloha)
   prints("%6d%c   %-14s\n", num, tag_char(aloha->userno), aloha->userid);
 #endif
 }
+
 
 #ifdef HAVE_LIGHTBAR
 static int
@@ -218,7 +219,7 @@ aloha_loadpal(xo)
   FRIENZ frienz;
   PAL pal;
   ALOHA aloha;
-  
+
   if (vans("要引入好友名單嗎(Y/N)？[N] ") == 'y')
   {
     usr_fpath(fpath, cuser.userid, FN_PAL);
@@ -298,7 +299,7 @@ aloha_add(xo)
   }
   xo->pos = XO_TAIL;
   xo_load(xo, sizeof(ALOHA));
-  
+
   return aloha_head(xo);
 }
 
@@ -425,7 +426,7 @@ aloha_tag(xo)
   return xo->pos + 1 + XO_MOVE;	/* lkchu.981201: 跳至下一項 */
 }
 
-      
+
 static int
 aloha_help(xo)
   XO *xo;
@@ -454,7 +455,7 @@ static KeyFunc aloha_cb[] =
 
   'r', aloha_query,
   Ctrl('Q'), aloha_query,
-  
+
   's', aloha_sort,
   't', aloha_tag,
   Ctrl('D'), aloha_prune,

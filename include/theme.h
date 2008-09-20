@@ -41,8 +41,8 @@
 #define COLOR_BOTHGOOD	"\033[1;37m"	/* 互設好友 */
 #define COLOR_BRDMATE	"\033[36m"	/* 板伴 */
 #define COLOR_SUPER_BOTHGOOD	"\033[1;35m"	/* 互設超級好友 */
-#define COLOR_SUPER_MYGOOD		"\033[32m"		/* 我的超級好友 */
-#define COLOR_SUPER_OGOOD		"\033[33m"		/* 與我為超級好友 */
+#define COLOR_SUPER_MYGOOD	"\033[32m"	/* 我的超級好友 */
+#define COLOR_SUPER_OGOOD	"\033[33m"	/* 與我為超級好友 */
 
 
 /* ----------------------------------------------------- */
