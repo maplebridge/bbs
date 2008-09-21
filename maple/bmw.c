@@ -310,7 +310,7 @@ bmw_edit(up, hint, bmw)
 
     /* 在 vget 中按 ^R 換 reply 別的水球 */
     benz = &bmw_lslot[bmw_pos];
-	strcpy(bmw->nick,benz->nick);
+      strcpy(bmw->nick, benz->nick);
     if (benz->sender != up->userno)	/* reply 不同人 */
     {
       up = bmw_up;
@@ -526,8 +526,8 @@ can_reply(uhead, pos)
      return up;
   else
   {
-    strcpy(bit_usr.userid,up->userid);
-    strcpy(bit_usr.from,bmw->nick);    /* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
+    strcpy(bit_usr.userid, up->userid);
+    strcpy(bit_usr.from, bmw->nick);    /* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
     bit_usr.userno = up->userno;
     bit_usr.pid = up->pid;
     return &bit_usr;
@@ -660,7 +660,7 @@ bmw_reply()
     sprintf(buf, "★[%s]", up->userid);
   else
   {
-    strcpy(bmw.nick,up->from);
+    strcpy(bmw.nick, up->from);
     sprintf(buf, "★[%s]", bmw.nick);
   }
 
@@ -840,6 +840,7 @@ bmw_item(num, bmw)
   }
 }
 
+
 #ifdef HAVE_LIGHTBAR
 static int
 bmw_item_bar(xo, mode)
@@ -856,17 +857,17 @@ bmw_item_bar(xo, mode)
 
   if (bmw->sender == cuser.userno)  /* 送出的水球 */
   {
-    prints("%s%6d%c\033[33m%-13s\033[36m%-53.53s\033[33m%02d:%02d\033[m",
+    prints("%s%6d%c\033[33m%-13s\033[36m%-*.*s\033[33m%02d:%02d\033[m",
       mode ? UCBAR[UCBAR_BMW] : "",
       xo->pos + 1, tag_char(bmw->btime),
-      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min);
+      bmw->userid, d_cols + 53, d_cols + 53, bmw->msg, ptime->tm_hour, ptime->tm_min);
   }
   else                              /* 收到的水球 */
   {
-    prints("%s%6d%c%-13s\033[32m%-53.53s\033[37m%02d:%02d%s",
+    prints("%s%6d%c%-13s\033[32m%-*.*s\033[37m%02d:%02d%s",
       mode ? UCBAR[UCBAR_BMW] : "",
       xo->pos + 1, tag_char(bmw->btime),
-      bmw->userid, bmw->msg, ptime->tm_hour, ptime->tm_min,
+      bmw->userid, d_cols + 53, d_cols + 53, bmw->msg, ptime->tm_hour, ptime->tm_min,
       mode ? "\033[m" : "");
   }
   return XO_NONE;

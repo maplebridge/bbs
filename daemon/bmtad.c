@@ -1229,28 +1229,29 @@ IS_MAIL_BRD_DOG_FOOD(fpath, board)
   FILE *fp;
   brd_fpath(fpath_filter, board, FN_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0; 
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0; 
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-	if(filter[0]=='\0' || filter[0]=='\n')
-	    continue;
-	else
-		filter[strlen(filter) - 1] = '\0';
+    if (filter[0] == '\0' || filter[0] == '\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	if(f_str_sub_space_lf(fpath, filter))
-	{
-		strcpy(bbs_dog_str, filter);
-		fclose(fp);
-	    return 1;
-	}
+    if(f_str_sub_space_lf(fpath, filter))
+    {
+      strcpy(bbs_dog_str, filter);
+      fclose(fp);
+      return 1;
+    }
   }
 
   fclose(fp);
   return 0;
 
 }
+
 
 static int
 IS_MAIL_BBS_DOG_FOOD(fpath)
@@ -1262,28 +1263,29 @@ IS_MAIL_BBS_DOG_FOOD(fpath)
   FILE *fp;
   sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0;
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0;
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-	if(filter[0]=='\0' || filter[0]=='\n')
-		continue;
-	else
-		filter[strlen(filter) - 1] = '\0';
+    if(filter[0] == '\0' || filter[0] == '\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	if(f_str_sub_all_chr(fpath, filter))
-	{
-	    strcpy(bbs_dog_str, filter);
-	    fclose(fp);
-	    return 1;
-	}
+    if (f_str_sub_all_chr(fpath, filter))
+    {
+      strcpy(bbs_dog_str, filter);
+      fclose(fp);
+      return 1;
+    }
   }
 
   fclose(fp);
   return 0;
 
 }
+
 
 static void
 copy_post_to_deletelog(hdr, fpath)
@@ -1293,12 +1295,13 @@ copy_post_to_deletelog(hdr, fpath)
   char folder[64];
   HDR post;
 
-  brd_fpath(folder, "Deletelog", FN_DIR);
+  brd_fpath(folder, BN_DELLOG, FN_DIR);
   hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
   memcpy(post.owner, hdr->owner, TTLEN + 140);
   rec_bot(folder, &post, sizeof(HDR));
 
 }
+
 
 static int
 bbs_brd(ap, data, brdname)	/* itoc.030323: ±H«Hµ¹¬ÝªO */

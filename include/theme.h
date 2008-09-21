@@ -96,10 +96,10 @@
 			COLOR10 "  編號     主              題%*s                            [編      選] [日  期]\033[m"
 
 #define NECKER_NEWS	"[←]離開 [→]閱\讀 [h]說明\n" \
-			COLOR10 "  編號     日 期 作  者       新  聞  標  題%*s                                   \033[m"
+			COLOR10 "  編號     日 期 作  者       新  聞  標  題%*s                                  \033[m"
 
 #define NECKER_XPOST	"\n" \
-			COLOR10 "  編號    日 期 作  者       文  章  標  題%*s                            評:%s  \033[m"
+			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                           評:%s  \033[m"
 
 #define NECKER_MBOX	"[←]離開 [→,r]讀信 [d]刪除 [R,y](群組)回信 [s]寄信 [x]轉錄 [X]轉達 [h]說明\n" \
 			COLOR10 "  編號   日 期 作  者       信  件  標  題%*s                                    \033[m"
@@ -162,7 +162,7 @@ COLOR1 " 連署機制 " COLOR9 " (ry)"COLOR2"加入連署 "COLOR9"(kj)"COLOR2"上下篇 "CO
 //COLOR1 " 瀏覽 P.%d (%d%%) " COLOR2 " (h)說明 [PgUp][PgDn][0][$]移動 (/n)搜尋 (C)暫存 (←q)結束 "
 
 #define FOOTER_MORE	\
-COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 \033[m" COLOR9 "(@)"COLOR2"動畫播放\033[m" COLOR2 " "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  \033[m"
+COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 \033[m" COLOR9 "(@)"COLOR2"動畫播放\033[m" COLOR2 " "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  "
 
 #define FOOTER_VEDIT	\
 COLOR1 " %s " COLOR9 " (^Z)"COLOR2"說明 "COLOR9"(^W)"COLOR2"符號 "COLOR9"(^L)"COLOR2"重繪 "COLOR9"(^X)"COLOR2"檔案處理 ║"COLOR9"%s"COLOR2"│"COLOR9"%s"COLOR2"║"COLOR9"%5d:%3d"COLOR2"    \033[m"
@@ -230,7 +230,7 @@ COLOR1 " 轉信設定 " COLOR9 " (↑/↓)"COLOR2"上下 "COLOR9"(PgUp/PgDn)"COLOR2"上下
 COLOR1 "  即時通  "COLOR9" (w)"COLOR2"傳送訊息 " COLOR9 "(^r)"COLOR2"回覆訊息 " COLOR9 "(a/d)"COLOR2"增/刪聯絡人 " COLOR9 "(b/B)"COLOR2"封鎖/解除 "COLOR9"(^k)"COLOR2"斷線  " 
 
 #define FEETER_FAKE_PAL	\
-COLOR1 " 瀏覽名單 " COLOR9 " 本名單僅供瀏覽，板主修改板友名單請退出後按(B)選擇修改 "
+COLOR1 " 瀏覽名單 " COLOR9 " 本名單僅供瀏覽，板主修改板友名單請退出後按(B)選擇修改              "
 
 #define FEETER_RSS	\
 COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"(E)"COLOR2"編輯 "COLOR9"(T)"COLOR2"標簽名稱 "COLOR9"(H)"COLOR2"RSS網址 "COLOR9"(m)"COLOR2"移動 "COLOR9"(h)"COLOR2"說明  "

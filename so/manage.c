@@ -99,7 +99,7 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
 	continue;
 
       /* smiler.1111: 保護Editlog Deletelog此兩記錄看板不被刪除資料 */
-      if ((!strcmp(head->brdname,"Deletelog")) || (!strcmp(head->brdname,"Editlog")))
+      if ((!strcmp(head->brdname, BN_DELLOG)) || (!strcmp(head->brdname, BN_EDITLOG)))
 	continue;
 
       /* Thor.980616: 更改 currboard，以 cancel post */
@@ -148,14 +148,14 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       if(deletelog_use)
 	  {
          hdr_fpath(copied, fpath, hdr);
-         brd_fpath(Deletelog_folder,"Deletelog", FN_DIR);
+         brd_fpath(Deletelog_folder,BN_DELLOG, FN_DIR);
          hdr_stamp(Deletelog_folder, HDR_COPY | 'A', &Deletelog_hdr, copied);
          strcpy(Deletelog_hdr.title , hdr->title);
          strcpy(Deletelog_hdr.owner , cuser.userid);
          strcpy(Deletelog_hdr.nick  , cuser.username);
          Deletelog_hdr.xmode = POST_OUTGO;
          rec_bot(Deletelog_folder, &Deletelog_hdr, sizeof(HDR));
-         btime_update(brd_bno("Deletelog"));
+         btime_update(brd_bno(BN_DELLOG));
 	  }
 
 	  hdr_fpath(fold, fpath, hdr);
@@ -212,11 +212,10 @@ post_brdtitle(xo)
     {
       memcpy(oldbrd, &newbrd, sizeof(BRD));
       rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
-      return XO_HEAD;	/* itoc.011125: 要重繪中文板名 */
     }
   }
 
-  return XO_HEAD;
+  return XO_HEAD;	/* itoc.011125: 要重繪中文板名 */
 }
 
 
@@ -246,8 +245,8 @@ post_memo_edit(xo)
 
     if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
       vmsg(msg_cancel);
-    return XO_HEAD;
   }
+
   return XO_HEAD;
 }
 
@@ -269,17 +268,15 @@ post_spam_edit(xo)
     if (mode == 'd')
     {
       unlink(fpath);
-      return XO_HEAD;
     }
     else
     {
-	  more("etc/help/post/post_spam_ed",NULL); 
-      if (vedit(fpath, 0))      /* Thor.981020: 注意被talk的問題 */
-        vmsg(msg_cancel);
+      more("etc/help/post/post_spam_ed",NULL); 
+      if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
+	vmsg(msg_cancel);
     }
-
-    return XO_HEAD;
   }
+
   return XO_HEAD;
 }
 
@@ -414,7 +411,7 @@ post_battr_noscore(xo)
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放評分 (1)允許\ (2)不許\ (Q)取消？[Q] "))
+  switch (vans("開放評分 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOSCORE;
@@ -449,7 +446,7 @@ post_rlock(xo)
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放鎖文 (1)允許\ (2)不許\ (Q)取消？[Q] "))
+  switch (vans("開放鎖文 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOL;
@@ -484,7 +481,7 @@ post_vpal(xo)
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放觀看板友名單 (1)允許\ (2)不許\ (Q)取消？[Q] "))
+  switch (vans("開放觀看板友名單 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_SHOWPAL;
@@ -537,7 +534,7 @@ post_noforward(xo)
 }
 
 
-sstatic int
+static int
 post_showturn(xo)
   XO *xo;
 {
@@ -659,10 +656,9 @@ post_changeBM(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
 
     sprintf(currBM, "板主：%s", newbrd.BM);
-    return XO_HEAD;	/* 要重繪檔頭的板主 */
   }
 
-  return XO_HEAD;
+  return XO_HEAD;	/* 要重繪檔頭的板主 */
 }
 
 
@@ -754,6 +750,8 @@ XoBM(xo)
 
   XO *xt;
   char fpath[64];
+
+  more("etc/help/post/post_pal_ed",NULL);
 
   brd_fpath(fpath, currboard, fn_pal);
   xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
@@ -891,7 +889,7 @@ post_article_filter(xo)
     }
     fclose(fp);
 
-    switch(vans("選擇 (D)刪除 (E)修改 (Q)取消？[E] "))
+    switch(vans("選擇 (D)刪除 (E)修改 (Q)離開？[E] "))
     {
     case 'd':
       unlink(fpath);
@@ -907,7 +905,7 @@ post_article_filter(xo)
       break;
   } while(choose);
 
-  return XO_INIT;
+  return XO_HEAD;
 }
 
 /* smiler.080831: 板主自定 可讀/可寫/可列
@@ -1084,11 +1082,11 @@ post_my_level(xo, fname)
 
     default:
       unlink(fpath_w);
-      return XO_INIT;
+      return XO_HEAD;
     }
  }
 
- return XO_INIT;
+ return XO_HEAD;
 }
 
 
@@ -1106,15 +1104,16 @@ post_view_bbs_dog_log(xo)
   case 'm':
     sprintf(warn, "%s 板擋文記錄檔", currboard);
     mail_self(fpath, cuser.userid, warn, 0);
-    return XO_HEAD;
+    break;
 
-    case 'd':
+  case 'd':
     unlink(fpath);
-    return XO_HEAD;
+    break;
 
   default:
-    return XO_HEAD;
+    break;
   }
+
   return XO_HEAD;
 }
 
@@ -1158,7 +1157,7 @@ post_guard_dog(xo)
   case 'v':
     return post_view_bbs_dog_log(xo);
   }
-  return XO_INIT;
+  return XO_HEAD;
 }
 
 
@@ -1177,12 +1176,14 @@ post_manage(xo)
 #  ifdef HAVE_MODERATED_BOARD
     "Level   公開/好友/秘密",
     "OPal    板友名單",
-    "VPal    可否觀看板友名單",
 #  endif
 #  ifdef POST_PREFIX
     "Prefix  設定文章類別",
 #  endif
     "ASpam   看板擋信列表",
+#  ifdef HAVE_MODERATED_BOARD
+    "VPal    可否觀看板友名單",
+#  endif
 #  ifdef HAVE_SCORE
     "Score   設定可否評分",
 #  endif
@@ -1195,14 +1196,17 @@ post_manage(xo)
 #else
   char *menu = "◎ 板主選單 (B)主題 (W)進板 (S)擋信 (M)副板"
 #  ifdef HAVE_MODERATED_BOARD
-    " (L)權限 (O)板友 (V)名單"
+    " (L)權限 (O)板友"
 #  endif
 #  ifdef POST_PREFIX
     " (P)類別"
-#  endif    
+#  endif
     " (A)擋信"
 #  ifdef HAVE_SCORE
     " (S)評分"
+#  endif
+#  ifdef HAVE_MODERATED_BOARD
+    " (V)名單"
 #  endif
     " (R)鎖文 (N)轉錄 (F)紀錄 (G)看門狗"
     "？[Q] ";

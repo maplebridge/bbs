@@ -176,7 +176,7 @@ u_exit(mode)
     usr_fpath(fpath, cuser.userid, fn_acct);
     fd = open(fpath, O_RDWR);
     if (fd >= 0)
-    {  
+    {
       if (read(fd, &tuser, sizeof(ACCT)) == sizeof(ACCT))
       {
 	if (diff > 0)

@@ -252,6 +252,8 @@ UnAnonymous 站務 黑函滿天‧匿名現身 PERM_ALLBOARD PERM_SYSOP
 #define BN_UNANONYMOUS	"UnAnonymous"	/* 匿名板的文章會複製一份在這裡 */
 #define BN_KTV		"ktv"		/* 點歌記錄放在這板，歌本放在這板的精華區 */
 #define BN_REQUEST	BN_CAMERA	/* 歌本投稿處 */
+#define BN_DELLOG	"Deletelog"	/* 刪文記錄 */
+#define BN_EDITLOG	"Editlog"	/* 修文記錄 */
 
 #define BN_NULL		"尚未選定"	/* 進站後還沒進入任何看板，所顯示的看板名稱 */
 

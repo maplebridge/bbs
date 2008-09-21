@@ -226,15 +226,15 @@ ulist_item(num, up, slot, now, sysop)
     up->mode == M_READA && !strcmp(currboard, up->reading) ? COLOR_BRDMATE :
 #  endif
 #endif
-    ftype & FTYPE_NORMAL ? COLOR_NORMAL : 
-    ftype & FTYPE_SUPER_BOTHGOOD ? COLOR_SUPER_BOTHGOOD : 
-    ftype & FTYPE_SUPER_MYGOOD ? COLOR_SUPER_MYGOOD : 
+    ftype & FTYPE_NORMAL ? COLOR_NORMAL :
+    ftype & FTYPE_SUPER_BOTHGOOD ? COLOR_SUPER_BOTHGOOD :
+    ftype & FTYPE_SUPER_MYGOOD ? COLOR_SUPER_MYGOOD :
     ftype & FTYPE_SUPER_OGOOD ? COLOR_SUPER_OGOOD :
-    ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD : 
-    ftype & FTYPE_MYGOOD ? COLOR_MYGOOD : 
-    ftype & FTYPE_OGOOD ? COLOR_OGOOD : 
-    ftype & FTYPE_SELF ? COLOR_SELF : 
-    ftype & FTYPE_MYBAD ? COLOR_MYBAD : 
+    ftype & FTYPE_BOTHGOOD ? COLOR_BOTHGOOD :
+    ftype & FTYPE_MYGOOD ? COLOR_MYGOOD :
+    ftype & FTYPE_OGOOD ? COLOR_OGOOD :
+    ftype & FTYPE_SELF ? COLOR_SELF :
+    ftype & FTYPE_MYBAD ? COLOR_MYBAD :
     "";
 
   prints("%6d%c%c%s%-13s%-*.*s\033[m%-*.*s%-11.10s%s\n",

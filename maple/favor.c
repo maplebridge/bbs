@@ -115,7 +115,8 @@ mf_item(num, mf)
       sprintf(folder, "%2d", bno);
     }
     prints("%6d%c\033[1;33m%-2s\033[m%s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
-	(USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (bno ? folder : "") : "", "¡»", mf->title);
+      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? ((bno > 99) ? "Ãz" : bno ? folder : "") : "",
+      "¡»", mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -182,7 +183,8 @@ mf_item_bar(xo, mode)
     }
     prints("%s%6d%c%-2s%s %-66.54s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
       num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
-      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (unread ? fpath : "") : "", "¡»", mf->title);
+      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? ((unread > 99) ? "Ãz" : unread ? fpath : "") : "",
+      "¡»", mf->title);
   }
   else if (mftype & MF_BOARD)
   {

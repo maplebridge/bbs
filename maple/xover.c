@@ -597,13 +597,13 @@ xo_forward(xo)
   if (!cuser.userlevel || HAS_PERM(PERM_DENYMAIL))
     return XO_NONE;
 
-  if(strstr(xo->dir,"brd/"))
+  if (xo->dir[0] == 'b')
   {
-   if( (currbattr & BRD_NOFORWARD) && (!(bbstate & STAT_BM)) )
-   {
+    if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
+    {
       vmsg("本看板禁止轉錄 !!");
       return XO_NONE;
-   }
+    }
   }
 
   tag = AskTag("轉寄");
@@ -629,12 +629,12 @@ xo_forward(xo)
     else
     {
       if (!HAS_PERM(PERM_LOCAL))
-	     return XO_FOOT;
+	return XO_FOOT;
 
       if ((userno = acct_userno(rcpt)) <= 0)
       {
-	     zmsg(err_uid);
-	     return XO_FOOT;
+	zmsg(err_uid);
+	return XO_FOOT;
       }
       method = -1;
     }
@@ -707,20 +707,20 @@ xo_forward(xo)
 	strcpy(mhdr.nick, cuser.username);
 	strcpy(mhdr.title, title);
 	if ((cc = rec_add(folder, &mhdr, sizeof(HDR))) < 0)
-	   break;
+	  break;
       }
       else			/* 轉寄站外 */
       {
-	    if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)
-	       break;
-	    sprintf(str_tag_score," 轉寄至站外 ");
+	if ((cc = bsmtp(fpath, title, rcpt, 0)) < 0)
+	  break;
+	sprintf(str_tag_score," 轉寄至站外 ");
       }
     }
-	if(strstr(xo->dir,"brd/"))
-	{
-	  if(currbattr & BRD_SHOWTURN)
-	    post_t_score(xo,str_tag_score,hdr);
-	}
+    if (xo->dir[0] == 'b')
+    {
+      if (currbattr & BRD_SHOWTURN)
+	post_t_score(xo,str_tag_score,hdr);
+    }
   } while (++locus < tag);
 
   if (userno > 0 && cc >= 0)
@@ -1021,8 +1021,7 @@ xo_thread(xo, op)
     }
 
 #ifdef HAVE_REFUSEMARK
-    if ((hdr->xmode & POST_RESTRICT) &&
-      strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
+    if ((hdr->xmode & POST_RESTRICT) && strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
       continue;
 #endif
 
@@ -1114,7 +1113,7 @@ xo_thread(xo, op)
   /* 如果 RS_FIRST && near >= 0 表示找到了，而 near, neartop = 要去的地方 */
 
 #define CLEAR_FOOT()	(!(op & RS_RELATED) && ((op & RS_UNREAD) || !(op & (RS_THREAD | RS_SEQUENT | RS_MARKED))))
-  
+
   if (match < 0)			/* 找到了 */
   {
     xo->pos = pos;			/* 把要去的位置填進去 */
@@ -1188,23 +1187,23 @@ extern KeyFunc rss_cb[];
 
 XZ xz[] =
 {
-  {NULL, NULL, M_BOARD, FEETER_CLASS},		/* XZ_CLASS */
-  {NULL, NULL, M_LUSERS, FEETER_ULIST},		/* XZ_ULIST */
-  {NULL, pal_cb, M_PAL, FEETER_PAL},		/* XZ_PAL */
-  {NULL, NULL, M_PAL, FEETER_ALOHA},		/* XZ_ALOHA */
-  {NULL, NULL, M_VOTE, FEETER_VOTE},		/* XZ_VOTE */
-  {NULL, bmw_cb, M_BMW, FEETER_BMW},		/* XZ_BMW */
-  {NULL, NULL, M_MF, FEETER_MF},			/* XZ_MF */
-  {NULL, NULL, M_COSIGN, FEETER_COSIGN},	/* XZ_COSIGN */
-  {NULL, NULL, M_SONG, FEETER_SONG},		/* XZ_SONG */
-  {NULL, NULL, M_READA, FEETER_NEWS},		/* XZ_NEWS */
-  {NULL, NULL, M_READA, FEETER_XPOST},		/* XZ_XPOST */
-  {NULL, NULL, M_RMAIL, FEETER_MBOX},		/* XZ_MBOX */
-  {NULL, post_cb, M_READA, FEETER_POST},	/* XZ_POST */
-  {NULL, NULL, M_GEM, FEETER_GEM},			/* XZ_GEM */
-  {NULL, NULL, M_PAL, FEETER_BITLBEE},		/* XZ_BITLBEE */
-  {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL},	/* XZ_FAKE_PAL */
-  {NULL, rss_cb, M_RSS, FEETER_RSS}			/* XZ_RSS */
+  {NULL, NULL, M_BOARD, FEETER_CLASS},	/* XZ_CLASS */
+  {NULL, NULL, M_LUSERS, FEETER_ULIST},	/* XZ_ULIST */
+  {NULL, pal_cb, M_PAL, FEETER_PAL},	/* XZ_PAL */
+  {NULL, NULL, M_PAL, FEETER_ALOHA},	/* XZ_ALOHA */
+  {NULL, NULL, M_VOTE, FEETER_VOTE},	/* XZ_VOTE */
+  {NULL, bmw_cb, M_BMW, FEETER_BMW},	/* XZ_BMW */
+  {NULL, NULL, M_MF, FEETER_MF},		/* XZ_MF */
+  {NULL, NULL, M_COSIGN, FEETER_COSIGN},/* XZ_COSIGN */
+  {NULL, NULL, M_SONG, FEETER_SONG},	/* XZ_SONG */
+  {NULL, NULL, M_READA, FEETER_NEWS},	/* XZ_NEWS */
+  {NULL, NULL, M_READA, FEETER_XPOST},	/* XZ_XPOST */
+  {NULL, NULL, M_RMAIL, FEETER_MBOX},	/* XZ_MBOX */
+  {NULL, post_cb, M_READA, FEETER_POST},/* XZ_POST */
+  {NULL, NULL, M_GEM, FEETER_GEM},		/* XZ_GEM */
+  {NULL, NULL, M_PAL, FEETER_BITLBEE},	/* XZ_BITLBEE */
+  {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL},/* XZ_FAKE_PAL */
+  {NULL, rss_cb, M_RSS, FEETER_RSS}		/* XZ_RSS */
 };
 
 
@@ -1223,7 +1222,7 @@ xo_jump(pos, zone)
   move(b_lines, 0);
   clrtoeol();
 #endif
-  outf(xz[zone].feeter);	/* itoc.010403: 把 b_lines 填上 feeter */
+  outf(xz[zone - XO_ZONE].feeter);	/* itoc.010403: 把 b_lines 填上 feeter */
 
   pos = atoi(buf);
 
@@ -1253,7 +1252,7 @@ xover(cmd)
     {
       if (cmd == XO_FOOT)
       {
-	outf(xz[zone].feeter);	/* itoc.010403: 把 b_lines 填上 feeter */
+	outf(xz[zone - XO_ZONE].feeter);	/* itoc.010403: 把 b_lines 填上 feeter */
 	break;
       }
 
@@ -1309,13 +1308,13 @@ xover(cmd)
 	}
 	else if (pos > num)
 	{
-          if (cmd)
-          {
-            pos = 0;
-          }
-          else
-          {
-            if (zone == XZ_POST)
+	  if (cmd)
+	  {
+	    pos = 0;
+	  }
+	  else
+	  {
+	    if (zone == XZ_POST)
 	      pos = num;	/* itoc.000304: 閱讀到最後一篇按 KEY_DOWN 或 KEY_PGDN 不會翻到最前 */
 	    else
 	      pos = (cmd || pos == num + XO_TALL) ? 0 : num;	/* itoc.020124: 要避免如果在倒數第二頁按 KEY_PGDN，
@@ -1323,8 +1322,8 @@ xover(cmd)
 								   不知道有最後一頁，故先在最後一項停一下 */
           }
         }
-        
-        /* check cursor's range */
+
+	/* check cursor's range */
 
 	cmd = xo->pos;
 
@@ -1435,7 +1434,7 @@ xover(cmd)
     /* 基本的游標移動 routines				 */
     /* ------------------------------------------------- */
 
-    if (cmd == KEY_LEFT)
+    if (cmd == KEY_LEFT || (cmd == 'q' && zone != XZ_ULIST))
     {
       TagNum = 0;	/* itoc.050413: 從精華區回到文章列表時要清除 tag */
       return;
@@ -1444,19 +1443,19 @@ xover(cmd)
     {
       continue;
     }
-    else if (cmd == KEY_UP)
+    else if (cmd == KEY_UP || cmd == 'k')
     {
       cmd = pos - 1 + XO_MOVE + XO_WRAP;
     }
-    else if (cmd == KEY_DOWN)
+    else if (cmd == KEY_DOWN || cmd == 'j')
     {
       cmd = pos + 1 + XO_MOVE + XO_WRAP;
     }
-    else if (cmd == ' ' || cmd == KEY_PGDN)
+    else if (cmd == ' ' || cmd == KEY_PGDN || cmd == 'N')
     {
       cmd = pos + XO_TALL + XO_MOVE;
     }
-    else if (cmd == KEY_PGUP)
+    else if (cmd == KEY_PGUP || cmd == 'P')
     {
       cmd = pos - XO_TALL + XO_MOVE;
     }
@@ -1770,7 +1769,7 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_UP:
-//  case 'k':
+  case 'k':
     if (*cur == 0)
     {
       if (*pageno != 0)
@@ -1796,7 +1795,7 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_DOWN:
-//  case 'j':
+  case 'j':
     if (*cur == XO_TALL - 1)
     {
       *cur = 0;
@@ -1827,11 +1826,35 @@ xo_cursor(ch, pagemax, num, pageno, cur, redraw)
     break;
 
   case KEY_END:
-//  case '$':
+  case '$':
     *pageno = pagemax;
     *cur = num % XO_TALL;
     *redraw = 1;
     break;
+
+  default:
+    if (ch >= '1' && ch <= '9')
+    {
+      int pos;
+      char buf[6];
+
+      buf[0] = ch;
+      buf[1] = '\0';
+      vget(b_lines, 0, "跳至第幾項：", buf, sizeof(buf), GCARRY);
+
+      pos = atoi(buf);
+
+      if (pos > 0)
+      {
+	pos--;
+	if (pos >num)
+	  pos = num;
+	*pageno = pos / XO_TALL;
+	*cur = pos % XO_TALL;
+      }
+
+      *redraw = 1;	/* 就算沒有換頁，也要重繪 feeter */
+    }
   }
 
   return ch;

@@ -197,8 +197,7 @@ rss_add(xo)
     {
       return XO_BODY;
     }
-    if ( strlen(rss.url)<7  || rss.url[0] != 'h' || rss.url[1] != 't' || rss.url[2] != 't' || rss.url[3] != 'p' ||
-      rss.url[4]!=':' || rss.url[5] != '/' || rss.url[6] != '/')
+    if ( strlen(rss.url) < 7  || strncmp(rss.url, "http://", 7))
     {
       vmsg("網址格式需為 http:// ，請重新輸入 !!");
       continue;
@@ -364,8 +363,7 @@ rss_edit(xo)
     {
       return XO_BODY;
     }
-    if ( strlen(mrss.url)<7  || mrss.url[0] != 'h' || mrss.url[1] != 't' || mrss.url[2] != 't' || mrss.url[3] != 'p' ||
-      mrss.url[4]!=':' || mrss.url[5] != '/' || mrss.url[6] != '/')
+    if ( strlen(mrss.url) < 7  || strncmp(mrss.url, "http://", 7))
     {
       vmsg("網址格式需為 http:// ，請重新輸入 !!");
       continue;
@@ -474,7 +472,7 @@ rss_url(xo)
     strcpy(mrss.url,buf_url);
 
 
-  if ( strlen(mrss.url)<7  || mrss.url[0] != 'h' || mrss.url[1] != 't' || mrss.url[2] != 't' || mrss.url[3] != 'p' || mrss.url[4]!=':' || mrss.url[5] != '/' || mrss.url[6] != '/')
+  if ( strlen(mrss.url) < 7  || strncmp(mrss.url, "http://", 7))
   {
     strcpy(mrss.url,buf_url);
   }

@@ -1043,7 +1043,7 @@ x_file(mode, xlist, flist)
     if (n <= 18)			/* itoc.020123: 分二欄，一欄十八個 */
     {
       move(n + 1 - 1, 0);
-      //prints("\033[m  (%d)",n);         /* smiler.071112: 修正note色碼多出來 */
+      //prints("\033[m  (%d)",n);	/* smiler.071112: 修正note色碼多出來 */
       clrtoeol();
       //move(n + 1 - 1, 2);
     }

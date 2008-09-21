@@ -52,12 +52,14 @@ belong_pal(pool, max, userno)
   return 0;
 }
 
+
 int
 is_super_mygood(userno)	/*  1: 我設對方為超級好友 */
   int userno;
 {
   return belong_pal(pal_pool, pal_max, userno + MATE_MASK);
 }
+
 
 int
 is_mygood(userno)		/*  1: 我設對方為好友 */
@@ -85,6 +87,7 @@ is_super_ogood(up)		/* 1: 對方設我為超級好友 */
 {
   return belong_pal(up->pal_spool, up->pal_max, cuser.userno + MATE_MASK);
 }
+
 
 int
 is_ogood(up)			/* 1: 對方設我為好友 */
@@ -126,8 +129,9 @@ is_bbad(bpal)			/* 1: 我是該板的板壞 */
 #endif
 }
 
+
 int
-is_bmate(bpal)                   /* 1: 我是該板的特殊好友 */
+is_bmate(bpal)                   /* 1: 我是該板的特殊好友: 水桶名單 */
 BPAL *bpal;
 {
 #ifdef HAVE_BADPAL
@@ -337,7 +341,6 @@ pal_list(reciper)
 }
 
 
-
 /* ----------------------------------------------------- */
 /* 朋友名單：選單式操作界面描述				 */
 /* ----------------------------------------------------- */
@@ -472,8 +475,8 @@ pal_edit(key, pal, echo)
   vget(b_lines, 0, "友誼：", pal->ship, sizeof(pal->ship), echo);
 #ifdef HAVE_BADPAL
   if (key != PALTYPE_VOTE)	/* 限制投票名單沒有壞人 */
-    pal->ftype = vans("特殊好友(Y/N)？[N] ") == 'y' ? PAL_MATE : 
-    vans("壞人(Y/N)？[N] ") == 'y' ? PAL_BAD : 0;
+    pal->ftype = vans((key == PALTYPE_BPAL) ? "浸水桶(Y/N)？[N] " : "特殊好友(Y/N)？[N] ") == 'y' ?
+      PAL_MATE : vans("壞人(Y/N)？[N] ") == 'y' ? PAL_BAD : 0;
   else
 #endif
     pal->ftype = 0;
@@ -843,6 +846,7 @@ pal_help(xo)
   return pal_head(xo);
 }
 
+
 static int
 f_pal_help(xo)
   XO *xo;
@@ -859,6 +863,7 @@ f_pal_help(xo)
   vmsg(NULL);
   return pal_body(xo);
 }
+
 
 KeyFunc pal_cb[] =
 {
@@ -901,25 +906,14 @@ KeyFunc f_pal_cb[] =
   XO_HEAD, pal_head,
   XO_BODY, pal_body,
 
-//  'a', pal_add,
-//  'c', pal_change,
-//  'd', pal_delete,
-//  'D', pal_rangedel,
   'm', pal_mail,
   'w', pal_write,
-//  'B', pal_broadcast,
   'r', pal_query,
   Ctrl('Q'), pal_query,
-//  's', pal_sort,
-//  't', pal_tag,
-//  Ctrl('D'), pal_prune,
-
-#if (defined(HAVE_MODERATED_BOARD) || defined(HAVE_LIST))
-//  'f', pal_cite,
-#endif
 
   'h', f_pal_help
 };
+
 
 int
 t_pal()

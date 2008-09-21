@@ -45,7 +45,7 @@ static inline int in_favor(char *brdname); /* smiler.070724 */
 		register TYPE	t = *pi;		\
 		*pi++ = *pj;				\
 		*pj++ = t;				\
-        } while (--i > 0);				\
+	} while (--i > 0);				\
 }
 
 
@@ -579,11 +579,11 @@ Ben_Perm(bno, ulevel)
   進不去：在看板列表中可以看到這個板，但是進不去
   水  桶：在看板列表中可以看到這個板，也進得去，但是不能發文
   完  整：在看板列表中可以看到這個板，也進得去及發文
-  
+
   */
 
   static int bit_data[12] =
-  {                /* 一般用戶   看板好友                           好友壞人		看板壞人 */
+  {                /* 一般用戶   看板好友                            特殊好友(水桶)           看板壞人 */
     /* 公開看板 */    0,         BRD_L_BIT | BRD_R_BIT | BRD_W_BIT, BRD_L_BIT | BRD_R_BIT, 0,
     /* 好友看板 */    BRD_L_BIT, BRD_L_BIT | BRD_R_BIT | BRD_W_BIT, BRD_L_BIT | BRD_R_BIT, 0,
     /* 秘密看板 */    0,         BRD_L_BIT | BRD_R_BIT | BRD_W_BIT, BRD_L_BIT | BRD_R_BIT, 0
@@ -613,30 +613,23 @@ Ben_Perm(bno, ulevel)
   if (!readlevel || (readlevel & ulevel))
   {
     bits = BRD_L_BIT | BRD_R_BIT;
-  
+
     postlevel = brd->postlevel;
-    if (!postlevel || (postlevel & ulevel))
+    if (!postlevel || (postlevel & ulevel))	/* 全站應只有 sysop 板沒有 postlevel */
       bits |= BRD_W_BIT;
-  
+
     if (!IS_WELCOME(bname, FN_NO_LIST))
-    {
-      bits &= (~BRD_L_BIT);
-      bits &= (~BRD_R_BIT);
-      bits &= (~BRD_W_BIT);
-    }
-    else if(!IS_WELCOME(bname, FN_NO_READ))
-    {
-      bits &= (~BRD_R_BIT);
-      bits &= (~BRD_W_BIT);
-    }
+      bits &= ~(BRD_L_BIT | BRD_R_BIT | BRD_W_BIT);
+    else if (!IS_WELCOME(bname, FN_NO_READ))
+      bits &= ~(BRD_R_BIT | BRD_W_BIT);
     else if (!IS_WELCOME(bname, FN_NO_WRITE))
-      bits &= (~BRD_W_BIT);
+      bits &= ~BRD_W_BIT;
   }
-  else
+  else					/* 有設看板讀取權限的板， guest 就無法看見 */
   {
     bits = 0;
   }
-  
+
   /* Thor.980813.註解: 特別為 BM 考量，板主有該板的所有權限 */
   blist = brd->BM;
   if ((ulevel & PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
@@ -1052,10 +1045,10 @@ XoPost(bno)
     {
       char reason[50];
       char buf[80];
-      
+
       if (vans("您確定要進入反匿名版嗎(Y/N)？[N] ") != 'y')
-        return -1;
-      
+	return -1;
+
       vmsg("請輸入觀看反匿名版之理由");
       vget(b_lines, 0, "請輸入設定資料的理由：", reason, 50, DOECHO);
       sprintf(buf, "理由：%s", reason);
@@ -1485,8 +1478,6 @@ class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
 {
   int num;
   char *str1, *str2, *str3, token, buf[16];
-  char tmp_bm[12];
-  char tmp_space[13]="             ";
   int post_read_secret = 1;
 
   btime_refresh(brd);
@@ -1597,17 +1588,8 @@ class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
   else
     prints("     ");
 
-  if (strlen(brd->BM) < 12)
-  {
-    strncpy(tmp_bm,tmp_space,12-strlen(brd->BM));
-    tmp_bm[12-strlen(brd->BM)]='\0';
-  }
-  else
-    tmp_bm[0]='\0';
-
   prints("%s", UCBAR[UCBAR_BRD]);
-  prints("%.*s",d_cols - (d_cols >> 1) + 12, brd->BM);
-  prints("%s\033[m",tmp_bm);
+  prints("%-*.*s\033[m", d_cols - (d_cols >> 1) + 12, d_cols - (d_cols >> 1) + 12, brd->BM);
 }
 
 
@@ -1619,18 +1601,17 @@ class_bar(xo, mode)
   short *chp;
   BRD *brd;
   int chn, cnt, brdpost;
-
   int pbno;  //smiler 1107
-                                                                                
+
   cnt = xo->pos + 1;
   chp = (short *) xo->xyz + xo->pos;
   chn = *chp;
   brd = bshm->bcache + chn;
   brdpost = class_flag & UFO_BRDPOST;
 
-  if (chn >= 0)         /* 一般看板 */
+  if (chn >= 0)		/* 一般看板 */
   {
-    pbno = bshm->mantime[chn]; //smiler 1107
+    pbno = bshm->mantime[chn];	//smiler 1107
     if (mode)
       class_item_bar(brd, cnt, chn, brdpost ,pbno, in_favor(brd->brdname), 0);	//smiler 1107
     else
@@ -1640,7 +1621,7 @@ class_bar(xo, mode)
   {
     short *chx;
     char *img, *str;
-                                                                                
+
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
@@ -1727,9 +1708,9 @@ class_body(xo)
       if (chn >= 0)		/* 一般看板 */
       {
 	 /*smiler.070724: 我的最愛看板板名上色 */
-         BRD *bhdr;
-         bhdr = bshm->bcache + chn;
-         class_item(cnt, chn, brdpost, in_favor(bhdr->brdname), 0);
+	 BRD *bhdr;
+	 bhdr = bshm->bcache + chn;
+	 class_item(cnt, chn, brdpost, in_favor(bhdr->brdname), 0);
       }
       else			/* 分類群組 */
       {
@@ -1925,7 +1906,7 @@ class_yank(xo)
                   除了防止找出的作者看板列表消失, 也防踢人  */
   if (xo->key >= 0)
     return XO_NONE;
-    
+
   class_flag ^= BFO_YANK;
   return class_init(xo);
 }
@@ -2143,15 +2124,15 @@ add_class(brd,class_name)
 {
   HDR hdr;
   char fpath[64];
-  
+
   sprintf(fpath,"gem/@/@%s",class_name);
 
   /* 加入適當的分類 */
-                                                                                
+
   brd2gem(brd, &hdr);
   rec_add(fpath, &hdr, sizeof(HDR));
   rec_sync(fpath, sizeof(HDR), hdr_cmp, NULL);
-                                                                                
+
 //  vmsg("新板成立，程式自動加入 Class 群組成功\");
 }
 

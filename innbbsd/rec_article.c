@@ -24,7 +24,7 @@ static char bbs_dog_str[80];
 static char bbs_dog_title[80];
 
 /* ----------------------------------------------------- */
-/* board：shm 部份須與 cache.c 相容                      */
+/* board：shm 部份須與 cache.c 相容			 */
 /* ----------------------------------------------------- */
 
 
@@ -143,6 +143,7 @@ update_btime(brdname)
   } while (++brdp < bend);
 }
 
+
 /* smiler.080830 : 看門狗 */
 static int
 IS_BRD_DOG_FOOD(fpath, board)
@@ -155,28 +156,28 @@ IS_BRD_DOG_FOOD(fpath, board)
   FILE *fp;
   brd_fpath(fpath_filter, board, FN_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0; 
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0; 
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-	if(filter[0]=='\0' || filter[0]=='\n')
-		continue;
-	else
-		filter[strlen(filter) - 1] = '\0';
+    if (filter[0]=='\0' || filter[0]=='\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	if(f_str_sub_space_lf(fpath, filter))
-	{
-		strcpy(bbs_dog_str, filter);
-		fclose(fp);
-	    return 1;
-	}
+    if (f_str_sub_space_lf(fpath, filter))
+    {
+      strcpy(bbs_dog_str, filter);
+      fclose(fp);
+      return 1;
+    }
   }
 
   fclose(fp);
   return 0;
-
 }
+
 
 static int
 IS_BBS_DOG_FOOD(fpath)
@@ -188,28 +189,28 @@ IS_BBS_DOG_FOOD(fpath)
   FILE *fp;
   sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
 
-  if(!(fp = fopen(fpath_filter, "r")))
-	  return 0;
+  if (!(fp = fopen(fpath_filter, "r")))
+    return 0;
 
-  while(fgets(filter, 70, fp))
+  while (fgets(filter, 70, fp))
   {
-	if(filter[0]=='\0' || filter[0]=='\n')
-		continue;
-	else
-		filter[strlen(filter) - 1] = '\0';
+    if (filter[0]=='\0' || filter[0]=='\n')
+      continue;
+    else
+      filter[strlen(filter) - 1] = '\0';
 
-	if(f_str_sub_all_chr(fpath, filter))
-	{
-		strcpy(bbs_dog_str, filter);
-		fclose(fp);
-	    return 1;
-	}
+    if (f_str_sub_all_chr(fpath, filter))
+    {
+      strcpy(bbs_dog_str, filter);
+      fclose(fp);
+      return 1;
+    }
   }
 
   fclose(fp);
   return 0;
-
 }
+
 
 static void
 copy_post_to_deletelog(hdr, fpath)
@@ -219,12 +220,12 @@ copy_post_to_deletelog(hdr, fpath)
   char folder[64];
   HDR post;
 
-  brd_fpath(folder, "Deletelog", FN_DIR);
+  brd_fpath(folder, BN_DELLOG, FN_DIR);
   hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
   memcpy(post.owner, hdr->owner, TTLEN + 140);
   rec_bot(folder, &post, sizeof(HDR));
-
 }
+
 
 /* smiler.070916 */
 static void
@@ -236,7 +237,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
-  short posted=0; /* HBrian.080801: 文章是否有寫入(下面那個大if) */
+  short posted = 0;	/* HBrian.080801: 文章是否有寫入(下面那個大if) */
 
   char fpath_log[64];
   char content_log[256];
@@ -269,10 +270,10 @@ bbspost_topic_add(board, addr, nick ,board_from)
       fprintf(fp, "發信站: %.40s\n\n", DATE);
 
     /* chuan: header 跟 body 要空行隔開 */
-	if(strcmp(board_from,"nthu")==0)
-        fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板 , 原看板文章自動刪除  *** <\033[0m\n\n",board_from);
-	else
-        fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板  *** <\033[0m\n\n",board_from);
+    if (strcmp(board_from,"nthu")==0)
+      fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板 , 原看板文章自動刪除  *** <\033[0m\n\n",board_from);
+    else
+      fprintf(fp, "\033[30;1m> ***  系統自動轉載自 %s 看板  *** <\033[0m\n\n",board_from);
     /* fprintf(fp, "%s", BODY); */
 
     for (str = BODY; cc = *str; str++)
@@ -283,7 +284,6 @@ bbspost_topic_add(board, addr, nick ,board_from)
 	if (str >= BODY + 2 && str[-1] == '.' && str[-2] == '\n')
 	  continue;
       }
-
       fputc(cc, fp);
     }
 
@@ -300,60 +300,58 @@ bbspost_topic_add(board, addr, nick ,board_from)
   str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
   str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
 
-  if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
+  if ((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath))	/* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
-	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
-	f_cat(fpath_log, content_log);
+    brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+    f_cat(fpath_log, content_log);
 
-	sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
-	sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
-	f_cat(fpath_log, content_log);
+    sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
+    f_cat(fpath_log, content_log);
 
-	copy_post_to_deletelog(&hdr, fpath);
-	unlink(fpath);
-	update_btime("Deletelog");
+    copy_post_to_deletelog(&hdr, fpath);
+    unlink(fpath);
+    update_btime(BN_DELLOG);
 
-    HISadd(MSGID, "Deletelog", hdr.xname);
-    
+    HISadd(MSGID, BN_DELLOG, hdr.xname);
+
     /* HBrian.080801 : 紀錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
       posted, hdr.xname, MSGID, SUBJECT);
   }
-  else if(IS_BRD_DOG_FOOD(fpath, board))
+  else if (IS_BRD_DOG_FOOD(fpath, board))
   {
-	brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
-	f_cat(fpath_log, content_log);
+    brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+    f_cat(fpath_log, content_log);
 
-	sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
-	sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
-	f_cat(fpath_log, content_log);
+    sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
+    f_cat(fpath_log, content_log);
 
-	copy_post_to_deletelog(&hdr, fpath);
-	unlink(fpath);
-	update_btime("Deletelog");
+    copy_post_to_deletelog(&hdr, fpath);
+    unlink(fpath);
+    update_btime(BN_DELLOG);
 
-    HISadd(MSGID, "Deletelog", hdr.xname);
-    
+    HISadd(MSGID, BN_DELLOG, hdr.xname);
+
     /* HBrian.080801 : 紀錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
       posted, hdr.xname, MSGID, SUBJECT);
   }
   else
   {
+    rec_bot(folder, &hdr, sizeof(HDR));
 
-     rec_bot(folder, &hdr, sizeof(HDR));
+    update_btime(board);
 
-     update_btime(board);
+    HISadd(MSGID, board, hdr.xname);
 
-     HISadd(MSGID, board, hdr.xname);
-  
-     /* HBrian.080801 : 紀錄文章 */
-     bbslog("topic_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
-       posted, hdr.xname, board, MSGID, SUBJECT);
+    /* HBrian.080801 : 紀錄文章 */
+    bbslog("topic_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, board, MSGID, SUBJECT);
   }
-
 }
 
 /* smiler.080101: 確定是否為title MI5 的轉信文 */
@@ -361,46 +359,47 @@ int
 IS_MI5(s)
   char *s;
 {
-    char * find_M;
-    int  FIND_MI5;
-    int i;
-    FIND_MI5=0;
-	if((strchr(s,'M') || strchr(s,'m')) && (strchr(s,'I') || strchr(s,'i')) && strchr(s,'5'))
+  char * find_M;
+  int  FIND_MI5;
+  int i;
+
+  FIND_MI5 = 0;
+  if ((strchr(s, 'M') || strchr(s, 'm')) && (strchr(s, 'I') || strchr(s, 'i')) && strchr(s, '5'))
+  {
+    find_M=strchr(s,'M');
+    //find_m=strchr(s,'m');
+    for (i = 0; i <= 1; i++)
     {
-	 find_M=strchr(s,'M');
-	   //find_m=strchr(s,'m');
-	 for(i=0;i<=1;i++)
-	 {
-	   
-	   if(find_M)
-	   {
-		   while(1)
-		   {
-		     find_M++;
-			 if(( (*find_M) == 'I') || ( (*find_M) == 'i'))
-			 {
-				 while(1)
-				 {
-					 find_M++;
-					 if((*find_M) == '5')
-						 FIND_MI5=1;
-                     if( (( (*find_M) <='Z') && ((*find_M) >= 'A')) || (((*find_M) <='z') && ((*find_M) >= 'a')) )
-				         break;
-			         else if((*find_M)=='\0')
-				         break;
-				 }
-			 }
-			 else if( (( (*find_M) <='Z') && ((*find_M) >= 'A')) || (((*find_M) <='z') && ((*find_M) >= 'a')) )
-				 break;
-			 else if((*find_M)=='\0')
-				 break;
-		   }
-	   }
-       find_M=strchr(s,'m');
-	 }
+      if (find_M)
+      {
+	while (1)
+	{
+	  find_M++;
+	  if ((*find_M == 'I') || (*find_M == 'i'))
+	  {
+	    while (1)
+	    {
+	      find_M++;
+	      if (*find_M == '5')
+		FIND_MI5 = 1;
+	      if (((*find_M <= 'Z') && (*find_M >= 'A')) || ((*find_M <= 'z') && (*find_M >= 'a')))
+		break;
+	      else if (*find_M=='\0')
+		break;
+	    }
+	  }
+	  else if (((*find_M <= 'Z') && (*find_M >= 'A')) || ((*find_M <= 'z') && (*find_M >= 'a')))
+	    break;
+	  else if (*find_M == '\0')
+	    break;
+	}
+      }
+      find_M = strchr(s,'m');
     }
-	return FIND_MI5;
+  }
+  return FIND_MI5;
 }
+
 
 /* smiler.080203: 各板自訂擋信機制 */
 static int
@@ -416,7 +415,7 @@ belong_spam(filelist, addr, nick)
   rc = 0;
   if (fp = fopen(filelist, "r"))
   {
-    str_ncpy(user, addr, sizeof(user));  /* 防止字串太長蓋過頭 */
+    str_ncpy(user, addr, sizeof(user));	/* 防止字串太長蓋過頭 */
     if (host = (char *) strchr(user, '@'))
     {
       *host = '\0';
@@ -426,38 +425,39 @@ belong_spam(filelist, addr, nick)
     checknum = 0;
     while (fgets(buf, 80, fp))
     {
-      if (buf[0] == '#')        /* 加 # 是註解 */
-        continue;
+      if (buf[0] == '#')	/* 加 # 是註解 */
+	continue;
 
-      if (++checknum >= 100)    /* 限 100 條 rule */
-        break;
+      if (++checknum >= 100)	/* 限 100 條 rule */
+	break;
 
       type = (char *) strtok(buf, " \t\r\n");
       if (type && *type)
       {
-        spam = (char *) strtok(NULL, " \t\r\n");
-        if (spam && *spam)
-        {
-          /* nick、host 可以是 NULL，故要檢查 */
-          str_lowest(spam, spam);
-          if ((!strcmp(type, "user") && str_sub(user, spam)) ||
-            (!strcmp(type, "host") && host && str_sub(host, spam)) ||
-            (!strcmp(type, "nick") && nick && str_sub(nick, spam)) ||
-            (!strcmp(type, "subj") && str_sub(SUBJECT, spam)) ||
-            (!strcmp(type, "site") && str_sub(SITE, spam)) ||
-            (!strcmp(type, "from") && str_sub(FROM, spam)) ||
-            (!strcmp(type, "msgi") && str_str(MSGID, spam)))
-          {
-            rc = 1;
-            break;
-          }
-        }
+	spam = (char *) strtok(NULL, " \t\r\n");
+	if (spam && *spam)
+	{
+	  /* nick、host 可以是 NULL，故要檢查 */
+	  str_lowest(spam, spam);
+	  if ((!strcmp(type, "user") && str_sub(user, spam)) ||
+	    (!strcmp(type, "host") && host && str_sub(host, spam)) ||
+	    (!strcmp(type, "nick") && nick && str_sub(nick, spam)) ||
+	    (!strcmp(type, "subj") && str_sub(SUBJECT, spam)) ||
+	    (!strcmp(type, "site") && str_sub(SITE, spam)) ||
+	    (!strcmp(type, "from") && str_sub(FROM, spam)) ||
+	    (!strcmp(type, "msgi") && str_str(MSGID, spam)))
+	  {
+	    rc = 1;
+	    break;
+	  }
+	}
       }
     }
     fclose(fp);
   }
   return rc;
 }
+
 
 static void
 bbspost_add(board, addr, nick)
@@ -466,7 +466,7 @@ bbspost_add(board, addr, nick)
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
-  short posted=0; /* HBrian.080801 : 紀錄文章是否有被此func發出 */
+  short posted = 0;	/* HBrian.080801 : 紀錄文章是否有被此func發出 */
 
   char fpath_log[64];
   char content_log[256];
@@ -476,52 +476,49 @@ bbspost_add(board, addr, nick)
   brdp = bshm->bcache;
   bend = brdp + bshm->number;
 
-  char board2[30];                // smiler.070916
-  strcpy(board2,"nthu.forsale");  // smiler.070916
-  //strcpy(board2,"forsale");     // smiler.080820: 依站務要求改轉文至 nthu.forsale // smiler.080705:依站務要求改轉錄至 forsale
+  char board2[30];		// smiler.070916
+  strcpy(board2,"nthu.forsale");// smiler.070916
+  //strcpy(board2,"forsale");	// smiler.080820: 依站務要求改轉文至 nthu.forsale // smiler.080705:依站務要求改轉錄至 forsale
 
   /* smiler.080203: 各板自訂擋信機制 */
-  brd_fpath(fpath, board, "spam");                /* 每個板自己的 spam */
+  brd_fpath(fpath, board, "spam");	/* 每個板自己的 spam */
   if (belong_spam(fpath, addr, nick))
   {
-      board = "deleted";                          // 把有濾掉的信送去 deleted 板
+    board = "deleted";		// 把有濾掉的信送去 deleted 板
   }
 
   /* 寫入文章內容 */
 
   brd_fpath(folder, board, FN_DIR);
 
-  brd_fpath(folder, board, FN_DIR);
-
   /* smiler.070916 */
-  if(strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清"))
+  if (strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清"))
   {
-	  //if( (!strstr(board,"P_")) && (!strstr(board,"R_")) && 
-	  //	  (!strstr(board,"LAB_")) && (!strstr(board,"G_")) && (strcmp(board,board2)) )
-	  /* smiler.080820: 依站務要求僅 nctu nthu 可轉文至 nthu.forsale */
-	  if( (!strcmp(board,"nctu")) || (!strcmp(board,"nthu")) )
-         bbspost_topic_add(board2, addr, nick , board);
+    //if( (!strstr(board,"P_")) && (!strstr(board,"R_")) && 
+    //	  (!strstr(board,"LAB_")) && (!strstr(board,"G_")) && (strcmp(board,board2)) )
+    /* smiler.080820: 依站務要求僅 nctu nthu 可轉文至 nthu.forsale */
+    if (!strcmp(board,"nctu") || !strcmp(board,"nthu"))
+      bbspost_topic_add(board2, addr, nick , board);
   }
-  if(!( (strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清")) 
-	  && (strcmp(board,"nthu")==0) ) )
+  if (!((strstr(SUBJECT,"賣") || strstr(SUBJECT,"售") || strstr(SUBJECT,"出清")) 
+    && (strcmp(board,"nthu") == 0)))
   {
     if (fp = fdopen(hdr_stamp(folder, 'A', &hdr, fpath), "w"))
-	{
-      posted = 1; /* HBrian.080801 */
+    {
+      posted = 1;	/* HBrian.080801 */
       fprintf(fp, "發信人: %.50s 看板: %s\n", FROM, board);
       fprintf(fp, "標  題: %.70s\n", SUBJECT);
       if (SITE)
-        fprintf(fp, "發信站: %.27s (%.40s)\n", SITE, DATE);
+	fprintf(fp, "發信站: %.27s (%.40s)\n", SITE, DATE);
       else
-        fprintf(fp, "發信站: %.40s\n", DATE);
+	fprintf(fp, "發信站: %.40s\n", DATE);
       fprintf(fp, "轉信站: %.70s\n\n", PATH);
 
       fprintf(fp, "%s", BODY);	/* chuan: header 跟 body 要空行格開 */
       fclose(fp);
-	}
+    }
 
     /* 造 HDR */
-
     hdr.xmode = POST_INCOME;
 
     /* Thor.980825: 防止字串太長蓋過頭 */
@@ -530,70 +527,71 @@ bbspost_add(board, addr, nick)
     str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
     str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
 
-	do
-	{
+    do
+    {
       if (!strcmp(board, brdp->brdname))
-	  {
-        mybattr = brdp->battr;
-        break;
-	  }
-	} while (++brdp < bend);
+      {
+	mybattr = brdp->battr;
+	break;
+      }
+    } while (++brdp < bend);
 
-	if((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
-	{
-		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
-	    f_cat(fpath_log, content_log);
+    if ((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
+    {
+      brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+      sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+      f_cat(fpath_log, content_log);
 
-		sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
-	    sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
-	    f_cat(fpath_log, content_log);
+      sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+      sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
+      f_cat(fpath_log, content_log);
 
-		copy_post_to_deletelog(&hdr, fpath);
-		unlink(fpath);
-		update_btime("Deletelog");
+      copy_post_to_deletelog(&hdr, fpath);
+      unlink(fpath);
+      update_btime(BN_DELLOG);
 
-        HISadd(MSGID, "Deletelog", hdr.xname);
-    
-        /* HBrian.080801 : 紀錄文章 */
-        bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
-          posted, hdr.xname, MSGID, SUBJECT);
-	}
-	else if(IS_BRD_DOG_FOOD(fpath, board))
-	{
-		brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
-	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
-	    f_cat(fpath_log, content_log);
+      HISadd(MSGID, BN_DELLOG, hdr.xname);
 
-		sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
-	    sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
-	    f_cat(fpath_log, content_log);
+      /* HBrian.080801 : 紀錄文章 */
+      bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, MSGID, SUBJECT);
+    }
+    else if (IS_BRD_DOG_FOOD(fpath, board))
+    {
+      brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
+      sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
+      f_cat(fpath_log, content_log);
 
-		copy_post_to_deletelog(&hdr, fpath);
-		unlink(fpath);
-		update_btime("Deletelog");
+      sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
+      sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
+      f_cat(fpath_log, content_log);
 
-        HISadd(MSGID, "Deletelog", hdr.xname);
-    
-        /* HBrian.080801 : 紀錄文章 */
-        bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
-          posted, hdr.xname, MSGID, SUBJECT);
-	}
+      copy_post_to_deletelog(&hdr, fpath);
+      unlink(fpath);
+      update_btime(BN_DELLOG);
+
+      HISadd(MSGID, BN_DELLOG, hdr.xname);
+
+      /* HBrian.080801 : 紀錄文章 */
+      bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, MSGID, SUBJECT);
+    }
     else
-	{
-        rec_bot(folder, &hdr, sizeof(HDR));
+    {
+      rec_bot(folder, &hdr, sizeof(HDR));
 
-        update_btime(board);
+      update_btime(board);
 
-        HISadd(MSGID, board, hdr.xname);
-    
-        /* HBrian.080801 : 紀錄文章 */
-        bbslog("bbspost_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
-          posted, hdr.xname, board, MSGID, SUBJECT);
-	}
+      HISadd(MSGID, board, hdr.xname);
 
-  } // smiler.070916                                  
+      /* HBrian.080801 : 紀錄文章 */
+      bbslog("bbspost_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
+      posted, hdr.xname, board, MSGID, SUBJECT);
+    }
+
+  } // smiler.070916
 }
+
 
 /* ----------------------------------------------------- */
 /* process cancel write					 */
@@ -880,7 +878,7 @@ receive_article()
       str_decode(poolx);
       str_ansi(myfrom, poolx, 128);	/* 雖然 bbspost_add() 發信人所需的長度只需要 50，但是 str_from() 需要長一些 */
       FROM = myfrom;
-      
+
       str_ncpy(poolx, PATH, 255);
       str_decode(poolx);
       str_ansi(mypath, poolx, 128);
@@ -917,10 +915,9 @@ receive_article()
 
       firstboard = 0;
     }
-    if(! IS_MI5(SUBJECT) )
+    if (!IS_MI5(SUBJECT))
       bbspost_add(nf->board, myaddr, mynick);
   }		/* for board1,board2,... */
 
   return 0;
 }
-
