@@ -341,7 +341,7 @@ outs_footer(buf, lino, fsize)
   sprintf(buf, FOOTER_MORE, (lino - 2) / PAGE_SCROLL + 1, ((foff - fimage) * 100) / fsize);
   outs(buf);
 
-  for (i = b_cols + sizeof(COLOR1) * 5 + sizeof(COLOR2) * 5 - strlen(buf); i > 3; i--)
+  for (i = b_cols + sizeof(COLOR1) + sizeof(COLOR9) * 6 + sizeof(COLOR2) * 6 - strlen(buf); i > 3; i--)
   {
     /* 填滿最後的空白顏色，最後留一個空白 */
     outc(' ');
@@ -370,7 +370,7 @@ more_slideshow()
 
       ch = KEY_PGDN;
     }
-  }  
+  }
   else
   {
     struct timeval tv[9] =
@@ -521,7 +521,7 @@ more(fpath, footer)
 
     outc('\n');
 
-    
+
     /* ------------------------------------------------- */
     /* 依 shift 來決定動作				 */
     /* ------------------------------------------------- */

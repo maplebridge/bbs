@@ -162,7 +162,7 @@ COLOR1 " 連署機制 " COLOR9 " (ry)"COLOR2"加入連署 "COLOR9"(kj)"COLOR2"上下篇 "CO
 //COLOR1 " 瀏覽 P.%d (%d%%) " COLOR2 " (h)說明 [PgUp][PgDn][0][$]移動 (/n)搜尋 (C)暫存 (←q)結束 "
 
 #define FOOTER_MORE	\
-COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 \033[m" COLOR9 "(@)"COLOR2"動畫播放\033[m" COLOR2 " "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  "
+COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 " COLOR9 "(@)"COLOR2"動畫播放" COLOR2 " "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  "
 
 #define FOOTER_VEDIT	\
 COLOR1 " %s " COLOR9 " (^Z)"COLOR2"說明 "COLOR9"(^W)"COLOR2"符號 "COLOR9"(^L)"COLOR2"重繪 "COLOR9"(^X)"COLOR2"檔案處理 ║"COLOR9"%s"COLOR2"│"COLOR9"%s"COLOR2"║"COLOR9"%5d:%3d"COLOR2"    \033[m"

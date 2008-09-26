@@ -179,11 +179,14 @@ mf_item_bar(xo, mode)
     if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
     {
       unread = mf_urifolder(fpath);
-      sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", unread, mode ? "" : "\033[m");
+      if (unread > 99)
+	sprintf(fpath, "%s%s%s", mode ? "" : "\033[1;33m", "Ãz", mode ? "" : "\033[m");
+      else
+	sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", unread, mode ? "" : "\033[m");
     }
     prints("%s%6d%c%-2s%s %-66.54s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
       num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
-      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? ((unread > 99) ? "Ãz" : unread ? fpath : "") : "",
+      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (unread ? fpath : "") : "",
       "¡»", mf->title);
   }
   else if (mftype & MF_BOARD)

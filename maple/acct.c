@@ -1022,6 +1022,39 @@ brd_new(brd)
 }
 
 
+static int
+brd_innchange(oldname, newname)	/* itoc.020117: 異動 innd/newsfeeds.bbs 中的看板 */
+  char *oldname;
+  char *newname;	/* 若為 NULL，表示要刪除看板 */
+{
+  int pos, ch = 0;
+  char *folder = "innd/newsfeeds.bbs";
+  newsfeeds_t nf;
+
+  pos = 0;
+  while (!rec_get(folder, &nf, sizeof(newsfeeds_t), pos))
+  {
+    if (!strcmp(nf.board, oldname))
+    {
+      if (newname)	/* 看板更名 */
+      {
+	strcpy(nf.board, newname);
+	rec_put(folder, &nf, sizeof(newsfeeds_t), pos, NULL);
+	ch = 1;
+      }
+      else		/* 看板刪除 */
+      {
+	rec_del(folder, sizeof(newsfeeds_t), pos, NULL);
+	ch = 1;
+	continue;	/* rec_del 以後不需要 pos++ */
+      }
+    }
+    pos++;
+  }
+  return ch;
+}
+
+
 static void
 brd_classchange(folder, oldname, newbrd)	/* itoc.020117: 異動 @Class 中的看板 */
   char *folder;
@@ -1099,6 +1132,9 @@ brd_edit(bno)
 	f_rm(src);
 	f_rm(src + 4);
 	brd_classchange("gem/@/@"CLASS_INIFILE, bname, NULL);	/* itoc.020117: 刪除 @Class 中的看板精華區捷徑 */
+	/* if (!(bhdr->battr & BRD_NOTRAN)) */	/* 有可能只設定轉入不轉出，直接去 newsfeeds.bbs 找 */
+	if (brd_innchange(bname, NULL))
+	  vmsg("轉信資料已一併刪除！");
 	memset(&newbh, 0, sizeof(BRD));
 	sprintf(newbh.title, "[%s] deleted by %s", bname, cuser.userid);
 	memcpy(bhdr, &newbh, sizeof(BRD));
@@ -1131,6 +1167,9 @@ brd_edit(bno)
 	  rename(src, dst);
 	  rename(src + 4, dst + 4);
 	  brd_classchange("gem/@/@"CLASS_INIFILE, bname, &newbh);/* itoc.050329: 異動 @Class 中的看板精華區捷徑 */
+	  /* if (!(bhdr->battr & BRD_NOTRAN)) */	/* 有可能只設定轉入不轉出，直接去 newsfeeds.bbs 找 */
+	  if (brd_innchange(bname, newbh.brdname))
+	    vmsg("轉信資料已一併更改！");
 
 	  /* itoc.050520: 改了板名會造成看板不是按字母排序，所以要修正 numberOld */
 	  if (bshm->numberOld > bno)

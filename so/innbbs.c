@@ -210,6 +210,25 @@ nf_query(nf)
 }
 
 
+static int
+has_inn(brdname)
+  char *brdname;
+{
+  int pos;
+  char *folder = "innd/newsfeeds.bbs";
+  newsfeeds_t nf;
+
+  pos = 0;
+  while (!rec_get(folder, &nf, sizeof(newsfeeds_t), pos))
+  {
+    if (!strcmp(nf.board, brdname))
+      return pos;
+    pos++;
+  }
+  return -1;
+}
+
+
 static int	/* 1:成功 0:失敗 */
 nf_add(fpath, old, pos)
   char *fpath;
@@ -229,8 +248,19 @@ nf_add(fpath, old, pos)
     nf.high = INT_MAX;		/* 第一次取信強迫 reload */
   }
 
-  if ((brd = ask_board(nf.board, BRD_L_BIT, NULL)) &&
-    vget(b_lines, 0, "英文站名：", nf.path, sizeof(nf.path), GCARRY) &&
+//  if ((brd = ask_board(nf.board, BRD_L_BIT | GCARRY, NULL)) &&
+  if (!(brd = ask_board(nf.board, BRD_L_BIT | GCARRY, NULL)))
+    return 0;
+
+  if (!old && (high = has_inn(nf.board)) >= 0)	/* 借用 high */
+  {
+    char buf[80];
+    sprintf(buf, "此看板已有轉信資料 [第 %d 項]，是否要另外新增？ A)新增 Q)取消 [Q] ", high + 1);
+    if (vans(buf) != 'a')
+      return 0;
+  }
+
+  if (vget(b_lines, 0, "英文站名：", nf.path, sizeof(nf.path), GCARRY) &&
     vget(b_lines, 0, "群組：", nf.newsgroup, /* sizeof(nf.newsgroup) */ 70, GCARRY))
   {
     if (!vget(b_lines, 0, "字集 [" MYCHARSET "]：", nf.charset, sizeof(nf.charset), GCARRY))

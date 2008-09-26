@@ -329,7 +329,7 @@ post_viewpal(xo)
   if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)	/* 有些名單的 size 為 0 */
     unlink(fpath);
 
-  if(dashf(fpath_org))
+  if(dashf(fpath))
   {
     xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath);
     xt->key = PALTYPE_BPAL;
@@ -953,7 +953,10 @@ check_crosspost(fpath, bno)
   blist = (bshm->bcache + bno)->BM;
   if (HAS_PERM(PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
     return 0;
-  else if (acl_has(FN_ETC_NOCROSSPOST, "", cuser.userid) > 0)
+
+  /* FN_ETC_NOCROSSPOST 存放允許 cross-post 的特例名單 */
+  str_lower(folder, cuser.userid);
+  if (acl_has(FN_ETC_NOCROSSPOST, "", folder) > 0)
     return 0;
 
   if (checksum_find(fpath))
