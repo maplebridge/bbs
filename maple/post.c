@@ -2101,14 +2101,14 @@ post_history(xo, hdr)	/* 將 hdr 這篇加入 brh */
   HDR *hdr;
 {
   int fd;
-  time_t prev, chrono, next, this;
+  time_t prev, chrono, maxchrono, next, this;
   HDR buf;
 
-  chrono = BMAX(hdr->chrono, hdr->stamp);
+  maxchrono = BMAX(hdr->chrono, hdr->stamp);
 
   chrono = hdr->chrono;
   if (!brh_unread(chrono))	/* 若 hdr->chrono 已在 brh 中，就接者把 hdr->stamp 加入 brh 中 */
-    chrono = BMAX(hdr->chrono, hdr->stamp);
+    chrono = maxchrono;
 
 add_brh:
   if (!brh_unread(chrono))	/* 如果已在 brh 中，就無需動作 */
@@ -2138,7 +2138,10 @@ add_brh:
     brh_add(prev, chrono, next);
   }
 
-  chrono = BMAX(hdr->chrono, hdr->stamp);
+  if (chrono == maxchrono)
+    return;
+
+  chrono = maxchrono;
   goto add_brh;		/* 再檢查一次 hdr->stamp */
 }
 

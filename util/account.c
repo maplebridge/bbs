@@ -1101,6 +1101,11 @@ main(argc, argv)
     sprintf(title, "%s寄信記錄", date);
     keeplog(FN_RUN_MAIL_LOG, BN_SECURITY, title, 2);
 
+#ifdef LOG_BRD_USIES
+    system("bin/acl-sort " FN_RUN_BRDUSIES " > " FN_RUN_BRDUSIES ".log; bin/usies-sort " FN_RUN_BRDUSIES ".log > " FN_RUN_BRDUSIES "; bin/topbrd");
+    unlink(FN_RUN_BRDUSIES);
+#endif
+
 #ifdef HAVE_ANONYMOUS
 //    sprintf(title, "%s匿名文章發表", date);             /* smiler.070602:取消於log板顯示匿名 */
 //    keeplog(FN_RUN_ANONYMOUS, BN_SECURITY, title, 2);
@@ -1126,6 +1131,10 @@ main(argc, argv)
     sprintf(title, "%s上站人次統計", date);
     keeplog(fn_today, NULL, title, 1);
 
+#ifdef LOG_BRD_USIES
+//    sprintf(title, "%s熱門看板", date);
+//    keeplog("gem/@/@-topbrd", NULL, title, 2);
+#endif
 
     /* ------------------------------------------------- */
     /* 每週一凌晨零時做的事				 */

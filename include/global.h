@@ -132,6 +132,10 @@
 
 #define FN_RUN_ADMIN	"run/admin.log"	/* 站長行為記錄 */
 
+#ifdef LOG_BRD_USIES
+#define FN_RUN_BRDUSIES	"run/brd_usies"	/* 看板閱讀記錄 */
+#endif
+
 #ifdef LOG_SONG_USIES
 #define FN_RUN_SONGUSIES "run/song_usies" /* 點歌記錄 */
 #endif

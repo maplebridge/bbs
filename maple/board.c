@@ -993,6 +993,18 @@ czh_load()
 
 /*-------------------------------------------------------*/
 
+#ifdef LOG_BRD_USIES	/* lkchu.981201: 看板閱讀記錄 */
+static void
+brd_usies()
+{
+  char buf[256];
+
+  sprintf(buf, "%s %s (%s)\n", currboard, cuser.userid, Now());
+  f_cat(FN_RUN_BRDUSIES, buf);
+}
+#endif
+
+
 int
 last_nobottom(folder)	/* 找看板最後一篇非置底文的位置 */
   char *folder;
@@ -1073,6 +1085,11 @@ XoPost(bno)
     else if (bits & BRD_W_BIT)
       bbstate |= STAT_POST;
 
+#ifdef LOG_BRD_USIES
+  /* lkchu.981201: 閱讀看板記錄 */
+  brd_usies();
+#endif
+
     /* itoc.050613.註解: 人氣的減少不是在離開看板時，而是在進入新的看板或是離站時，
        這是為了避免 switch 跳看板會算錯人氣 */
     if (currbno >= 0)
@@ -1083,14 +1100,14 @@ XoPost(bno)
     currbattr = brd->battr;
     strcpy(currboard, brd->brdname);
     str = brd->BM;
-    char BMstr[17];/*by ryancid 砍到剩16*/
+    char BMstr[17];	/*by ryancid 砍到剩16*/
     strncpy(BMstr, str, 16);
-    if(strlen(str)>16)
+    if (strlen(str) > 16)
     {
-      BMstr[14]=0xA1;
-      BMstr[15]=0x4B;
+      BMstr[14] = 0xA1;
+      BMstr[15] = 0x4B;
     }/*印出...*/
-    BMstr[16]='\0';
+    BMstr[16] = '\0';
     sprintf(currBM, "板主：%s", *str <= ' ' ? "徵求中" : BMstr);/**/
 #ifdef HAVE_BRDMATE
     strcpy(cutmp->reading, currboard);
