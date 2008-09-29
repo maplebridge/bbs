@@ -753,20 +753,6 @@ rss_help(xo)
 }
 
 
-int rss_main()
-{
-  XO *xo;
-  char rss_fpath[64];
-  brd_fpath(rss_fpath,currboard,FN_RSS);
-  xz[XZ_RSS - XO_ZONE].xo = xo = xo_new(rss_fpath);
-  xo->key = XZ_RSS;
-  xo->pos = 0;
-  xover(XZ_RSS);
-  free(xo);
-  return 0;
-}
-
-
 KeyFunc rss_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -796,3 +782,16 @@ KeyFunc rss_cb[] =
   'h', rss_help
 };
 
+
+int rss_main()
+{
+  XO *xo;
+  char rss_fpath[64];
+  brd_fpath(rss_fpath,currboard,FN_RSS);
+  xz[XZ_RSS - XO_ZONE].xo = xo = xo_new(rss_fpath);
+  xo->key = XZ_RSS;
+  xo->pos = 0;
+  xover(XZ_RSS);
+  free(xo);
+  return 0;
+}

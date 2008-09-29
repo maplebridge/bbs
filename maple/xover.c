@@ -1183,7 +1183,6 @@ extern KeyFunc pal_cb[];
 extern KeyFunc f_pal_cb[];
 extern KeyFunc bmw_cb[];
 extern KeyFunc post_cb[];
-extern KeyFunc rss_cb[];
 
 XZ xz[] =
 {
@@ -1193,17 +1192,17 @@ XZ xz[] =
   {NULL, NULL, M_PAL, FEETER_ALOHA},	/* XZ_ALOHA */
   {NULL, NULL, M_VOTE, FEETER_VOTE},	/* XZ_VOTE */
   {NULL, bmw_cb, M_BMW, FEETER_BMW},	/* XZ_BMW */
-  {NULL, NULL, M_MF, FEETER_MF},		/* XZ_MF */
+  {NULL, NULL, M_MF, FEETER_MF},	/* XZ_MF */
   {NULL, NULL, M_COSIGN, FEETER_COSIGN},/* XZ_COSIGN */
   {NULL, NULL, M_SONG, FEETER_SONG},	/* XZ_SONG */
   {NULL, NULL, M_READA, FEETER_NEWS},	/* XZ_NEWS */
   {NULL, NULL, M_READA, FEETER_XPOST},	/* XZ_XPOST */
   {NULL, NULL, M_RMAIL, FEETER_MBOX},	/* XZ_MBOX */
   {NULL, post_cb, M_READA, FEETER_POST},/* XZ_POST */
-  {NULL, NULL, M_GEM, FEETER_GEM},		/* XZ_GEM */
+  {NULL, NULL, M_GEM, FEETER_GEM},	/* XZ_GEM */
   {NULL, NULL, M_PAL, FEETER_BITLBEE},	/* XZ_BITLBEE */
   {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL},/* XZ_FAKE_PAL */
-  {NULL, rss_cb, M_RSS, FEETER_RSS}		/* XZ_RSS */
+  {NULL, NULL, M_RSS, FEETER_RSS}	/* XZ_RSS */
 };
 
 
