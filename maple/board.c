@@ -25,7 +25,7 @@ time_t brd_visit[MAXBOARD];		/* 最近瀏覽時間 */
 static char *class_img = NULL;
 static XO board_xo;
 
-static inline int in_favor(char *brdname); /* smiler.070724 */
+inline int in_favor(char *brdname);	/* smiler.070724 */
 
 
 //********/* smiler.070602: for xsort 起始處 */********/
@@ -835,7 +835,7 @@ brh_save()
   BRD *bhdr, *bend;
   char *bits;
 
-  /* Thor.980830: lkchu patch:  還沒 load 就不用 save */ 
+  /* Thor.980830: lkchu patch:  還沒 load 就不用 save */
   if (!(base = brh_base))
     return;
 
@@ -1286,7 +1286,7 @@ XoClass(chn)
 {
   XO xo, *xt;
 
-  /* Thor.980727: 解決 XO xo的不確定性, 
+  /* Thor.980727: 解決 XO xo的不確定性,
                   class_load內部會 initial xo.max, 其他不確定 */
   xo.pos = xo.top = 0;
 
@@ -1737,8 +1737,8 @@ class_body(xo)
 	img = class_img;
 	chx = (short *) img + (CH_END - chn);
 	str = img + *chx;
-	prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n", 
-	  cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ', 
+	prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
+	  cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
 	  str, str[BNLEN + 4] & 7, str + BNLEN + 1, str + BNLEN + 1 + BCLEN + 1);
       }
       chp++;
@@ -1752,7 +1752,7 @@ class_body(xo)
 
 #ifdef AUTO_JUMPBRD
   /* itoc.010910: 下一個未讀板在本頁，要把游標移過去 */
-  outf(FEETER_CLASS);   
+  outf(FEETER_CLASS);
   return nextpos ? nextpos + XO_MOVE : XO_NONE;
 #else
   /* return XO_NONE; */
@@ -1766,8 +1766,8 @@ class_neck(xo)
   XO *xo;
 {
   move(1, 0);
-  prints(NECKER_CLASS, 
-    class_flag & UFO_BRDPOST ? "總數" : "編號", 
+  prints(NECKER_CLASS,
+    class_flag & UFO_BRDPOST ? "總數" : "編號",
     d_cols >> 1, "", d_cols - (d_cols >> 1), "");
   return class_body(xo);
 }
@@ -1808,7 +1808,7 @@ class_namemode(xo)		/* itoc.010413: 看板依照字母/分類排列 */
 {
   static time_t last = 0;
   time_t now;
- 
+
   if (time(&now) - last < 10)
   {
     vmsg("每十秒鐘只能切換一次");
@@ -2221,7 +2221,7 @@ class_browse(xo)
     /*=====================================*/
     /* smiler.070602: for熱門看板 */
     short *chx;
-    char *img, *str;    
+    char *img, *str;
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
@@ -2306,7 +2306,7 @@ class_switch(xo)
 
 
 
-static inline int
+inline int
 in_favor(brdname)
   char *brdname;
 {
@@ -2336,10 +2336,10 @@ in_favor(brdname)
 }
 
 
-static int 
+static int
 class_addMF(xo)
-  XO *xo;  
-{    
+  XO *xo;
+{
   short *chp;
   int chn;
   MF mf;
@@ -2347,10 +2347,10 @@ class_addMF(xo)
 
   if (!cuser.userlevel)
     return XO_NONE;
-  
+
   chp = (short *) xo->xyz + xo->pos;
   chn = *chp;
-      
+
   if (chn >= 0)		/* 一般看板 */
   {
     BRD *bhdr;
@@ -2431,7 +2431,6 @@ MFclass_browse(name)
   }
   return 0;
 }
-  
 #endif  /* MY_FAVORITE */
 
 
@@ -2531,7 +2530,7 @@ XoAuthor(xo)
   xo_a.key = 1;			/* all boards */
   /* Thor.990621: 所有的class,board列表下, key < 0, 以 1 與正常模式區分
                   使其不能跑 XO_INIT(裏面的class_load), 如 class_yank,
-                  除了防止找出的作者看板列表消失, 也防踢人 */ 
+                  除了防止找出的作者看板列表消失, 也防踢人 */
   xo_a.xyz = (char *) chp;
 
   xoTmp = xz[XZ_CLASS - XO_ZONE].xo;	/* Thor.980701: 記下原來的class_xo */

@@ -1,4 +1,4 @@
-/* smiler.080912: 比較檔案中是否有 tag 字串，可略過 "標點符號" 以及 "ansi" 部分 
+/* smiler.080912: 比較檔案中是否有 tag 字串，可略過 "半形標點符號" 以及 "ansi" 部分 
    現階段應用於 BBS_DOG 各檔案內容分析程式。
 */
 
@@ -9,145 +9,114 @@ int			/* 1: found 0: none */
 f_str_sub_all_chr(fpath, tag)
   char *fpath;
   char *tag;
-{ 
+{
   FILE *fp;
   fpos_t pos;
-  int cc, c1, c2;
+  int cc;		/* cc 放 fpath 讀出來的字元 */
+  int c1, c2;		/* c1 c2 放 tag 讀出來的字元 */
   char *p2;
   int in_chi = 0;	/* 1: 前一碼是中文字 */
   int in_chii;		/* 1: 前一碼是中文字 */
-  int ansi = 0;		/* 判斷是否為 ansi code */
 
   if (!(fp = fopen(fpath, "r")))
     return 0;
 
-  cc = *tag++;
+  c1 = *tag++;
 
-  while (c1 = fgetc(fp))
+  while ((cc = fgetc(fp)) != EOF)
   {
-    if (feof(fp))
-    {
-      fclose(fp);
-      return 0;
-    }
-
-    if (in_chi)
+    if (in_chi)		/* 跳過中文字後半字符 */
     {
       in_chi ^= 1;
+      continue;
     }
-    else
+
+    if (cc & 0x80)
+      in_chi ^= 1;
+    else if (cc >= 'A' && cc <= 'Z')	/* 換為小寫 */
+      cc |= 0x20;
+
+    if (c1 < 0)
+      c1 += 256;
+
+    if (cc != c1)	/* 已經 miss 掉了就跳往下一個 cc 吧 */
+      continue;
+
+    fgetpos (fp, &pos);	/* current position in the file */
+    p2 = tag;
+
+    do
     {
-      if (c1 & 0x80)
-	in_chi ^= 1;
-      else if(c1 >= 'A' && c1 <= 'Z')
-	c1 |= 0x20;
-
-      if (cc < 0)
-	cc = 256 + cc;
-
-      if (c1 == cc)
+      if (!(c2 = *p2++))
       {
-	fgetpos (fp, &pos);
-	p2 = tag;
-
-	do
-	{
-	  c2 = *p2;
-	  if (c2 < 0)
-	    c2 = 256 + c2;
-
-	  if (!c2)
-	    return 1;
- 
-	  p2++;
-	  c1 = fgetc(fp);
-	  if (feof(fp))
-	  {
-	    fclose(fp);
-	    return 0;
-	  }
-
-	  if (c1 == '\033')
-	    ansi = 1;
-
-	  while (ansi)
-	  {
-	    c1 = fgetc(fp);
-	    if (feof(fp))
-	    {
-	      fclose(fp);
-	      return 0;
-	    }
-
-	    if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
-	    {
-	      ansi = 0;
-	      c1 = fgetc(fp);
-	      if (feof(fp))
-	      {
-		fclose(fp);
-		return 0;
-	      }
-	    }
-	  }
-
-	  if (in_chii || c1 & 0x80)
-	    in_chii ^= 1;
-	  else if(c1 >= 'A' && c1 <= 'Z')
-	    c1 |= 0x20;
-
-	  while ((c1 != c2) && 
-	    ((c1 == '`')  || (c1 == '~') || (c1 == '!')  || (c1 == '@')  || (c1 == '#')
-	    || (c1 == '$')  || (c1 == '%') || (c1 == '^')  || (c1 == '&')  || (c1 == '*')
-	    || (c1 == '(')  || (c1 == ')') || (c1 == '-')  || (c1 == '_')  || (c1 == '=')
-	    || (c1 == '+')  || (c1 == '[') || (c1 == ']')  || (c1 == '\{') || (c1 == '}')
-	    || (c1 == '\\') || (c1 == '|') || (c1 == ';') || (c1 == ':')  || (c1 == '\'')
-	    || (c1 == '\"') || (c1 == ',') || (c1 == '<')  || (c1 == '.')  || (c1 == '>')
-	    || (c1 == '/')  || (c1 == '?') || (c1 == '\n') || (c1 == ' ')  || (c1 == '\033') ))
-	  {
-	    if (c1 == '\033')
-	      ansi = 1;
-
-	    while (ansi)
-	    {
-	      c1 = fgetc(fp);
-	      if (feof(fp))
-	      {
-		fclose(fp);
-		return 0;
-	      }
-
-	      if ((c1 < '0' || c1 > '9') && c1 != ';' && c1 != '[')
-	      {
-		ansi = 0;
-		c1 = fgetc(fp);
-		if (feof(fp))
-		{
-		  fclose(fp);
-		  return 0;
-		}
-	      }
-	    }
-
-	    c1 = fgetc(fp);
-	    if (feof(fp))
-	    {
-	      fclose(fp);
-	      return 0;
-	    }
-
-	    if (in_chii || c1 & 0x80)
-	      in_chii ^= 1;
-	    else if(c1 >= 'A' && c1 <= 'Z')
-	      c1 |= 0x20;
-	  }
-	} while (c1 == c2); 
-
-	fsetpos (fp, &pos);
-
+	fclose(fp);
+	return 1;
       }
-    }
+
+      if (c2 < 0)
+	c2 += 256;
+
+      if ((cc = fgetc(fp)) == EOF)
+      {
+	fclose(fp);
+	return 0;
+      }
+
+#if 0
+      if (cc == '\033')		/* 跳過 ansi */
+      {
+	while ((cc = fgetc(fp)) != EOF)
+	{
+	  if ((cc < '0' || cc > '9') && cc != ';' && cc != '[')
+	    break;
+        }
+      }
+
+      if ((cc = fgetc(fp)) == EOF)
+      {
+	fclose(fp);
+	return 0;
+      }
+
+      if (in_chii || cc & 0x80)
+	in_chii ^= 1;
+      else if (cc >= 'A' && cc <= 'Z')
+	cc |= 0x20;
+#endif
+      while ((cc != c2) && 
+	((cc == '`')  || (cc == '~') || (cc == '!')  || (cc == '@')  || (cc == '#')
+	|| (cc == '$')  || (cc == '%') || (cc == '^')  || (cc == '&')  || (cc == '*')
+	|| (cc == '(')  || (cc == ')') || (cc == '-')  || (cc == '_')  || (cc == '=')
+	|| (cc == '+')  || (cc == '[') || (cc == ']')  || (cc == '\{') || (cc == '}')
+	|| (cc == '\\') || (cc == '|') || (cc == ';') || (cc == ':')  || (cc == '\'')
+	|| (cc == '\"') || (cc == ',') || (cc == '<')  || (cc == '.')  || (cc == '>')
+	|| (cc == '/')  || (cc == '?') || (cc == '\n') || (cc == ' ')  || (cc == '\033') ))
+      {
+	if (cc == '\033')	/* 跳過 ansi */
+	{
+	  while ((cc = fgetc(fp)) != EOF)
+	  {
+	    if ((cc < '0' || cc > '9') && cc != ';' && cc != '[')
+	      break;
+	  }
+	}
+
+	if ((cc = fgetc(fp)) == EOF)
+	{
+	  fclose(fp);
+	  return 0;
+	}
+
+	if (in_chii || cc & 0x80)
+	  in_chii ^= 1;
+	else if (cc >= 'A' && cc <= 'Z')
+	  cc |= 0x20;
+      }
+    } while (cc == c2); 
+
+    fsetpos (fp, &pos);	/* set the current position in the file */
   }
+
   fclose(fp);
   return 0;
 }
@@ -165,15 +134,16 @@ f_f_str_sub_all_chr(fpath, tag_fpath)
   if (!(fp = fopen(tag_fpath,"r")))
     return 0;
 
-  while (fgets(str, 73, fp))
+  while (fgets(str, sizeof(str), fp))
   {
     str[strlen(str) - 1] = '\0';
     if (f_str_sub_space_lf(fpath, str))
     {
-      fclose(fp);
-      return 1;
+      ans = 1;
+      break;
     }
   }
+
   fclose(fp);
-  return 0;
+  return ans;
 }

@@ -1226,15 +1226,22 @@ mf_nextunread(xo)
   XO *xo;
 {
   int max, pos, bno;
-  MF *mf;
+  MF *mf, origmf;
+  char folder[64];
+  int reload = 0;
+  int originpos;
 
   max = xo->max;
   pos = xo->pos;
   mf = (MF *) xo_pool + (xo->pos - xo->top);
 
+  originpos = pos;
+  memcpy(&origmf, mf, sizeof(MF));
+
   while (++pos < max)
   {
     bno = brd_bno((++mf)->xname);
+pagewrap:
     if (bno >= 0 && !(brd_bits[bno] & BRD_Z_BIT))	/* 跳過分類及 zap 掉的看板 */
     {
       BRD *brd;
@@ -1248,10 +1255,49 @@ mf_nextunread(xo)
 #else
       if (brd->blast > brd_visit[bno])
 #endif
-	return pos + XO_MOVE;
+      {
+	xo->pos = pos;
+	if (!reload)
+	{
+	  move(3 + originpos % XO_TALL, 0);
+	  mf_item(originpos + 1, &origmf);
+	  return pos + XO_MOVE;
+	}
+	return mf_body(xo);
+      }
+    }
+    else if (mf->mftype & MF_FOLDER)
+    {
+      mf_fpath(folder, cuser.userid, mf->xname);
+      if (mf_urifolder(folder))
+      {
+	xo->pos = pos;
+	if (!reload)
+	{
+	  move(3 + originpos % XO_TALL, 0);
+	  mf_item(originpos + 1, &origmf);
+	  return pos + XO_MOVE;
+	}
+	return mf_body(xo);
+      }
+    }
+    if ((pos == xo->top + XO_TALL) && (pos < max))
+    {
+      reload = 1;
+      xo->pos = pos;
+      xo->pos++;
+      xo_load(xo, sizeof(MF));
+      mf = (MF *) xo_pool;
+      bno = brd_bno(mf->xname);
+      goto pagewrap;
     }
   }
 
+  if (reload)	/* 翻頁後找不到要還原 */
+  {
+    xo->pos = originpos;
+    xo_load(xo, sizeof(MF));
+  }
   return XO_NONE;
 }
 

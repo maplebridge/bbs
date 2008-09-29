@@ -701,10 +701,11 @@ ve_line(this, str)
 
 
 static void
-show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
+show_sign(ch)		/* itoc.000319: 顯示簽名檔的內容 */
+  char ch;
 {
-  int fd, len, i, j;
-  char fpath[64], buf[10], ch, *str;
+  int fd, len, i;
+  char fpath[64], buf[10], *str;
 
   clear();
 
@@ -712,18 +713,15 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
   usr_fpath(fpath, cuser.userid, buf);	/* itoc.020123: 各個簽名檔檔案分開 */
   len = strlen(fpath) - 1;
 
-  j=0;
-
-  for (ch = '1'; ch <= '9'; ch++)	/* 九個簽名檔 */
+  for (; ch <= '9'; ch++)	/* 九個簽名檔 */
   {
     fpath[len] = ch;
 
     fd = open(fpath, O_RDONLY);
     if (fd >= 0)
     {
-	  j++;
       mgets(-1);
-      move((j - 1) * (MAXSIGLINES + 1), 0);
+      move(((ch - '1') % 3) * (MAXSIGLINES + 1), 0);
       prints("\033[1;36m【 簽名檔 %c 】\033[m\n", ch);
 
       for (i = 1; i <= MAXSIGLINES; i++)
@@ -733,14 +731,8 @@ show_sign()		/* itoc.000319: 顯示簽名檔的內容 */
 	prints("%s\n", str);
       }
 
-	  if(!(j%3))               /* smiler.080901: 每三個簽名檔印一頁 */
-	  {
-		  j=0;
-		  vmsg(NULL);
-		  move(0, 0);
-		  clrtobot();
-	  }
-
+      if (((ch - '0') % 3) == 0)
+	break;
     }
   }
 }
@@ -1111,7 +1103,7 @@ ve_quote(this)
   FILE *fp;
   textline *next;
   char *str, buf[ANSILINELEN];
-  static char msg[] = "選擇簽名檔 (1...9 0=不加 r=亂數)[0]：";
+  static char msg[] = "選擇簽名檔 (1 ~ 9, 0=不加 r=亂數 n=換頁)[0]：";
 
   next = this->next;
 
@@ -1194,13 +1186,22 @@ ve_quote(this)
 #else
   if (!(cuser.ufo & UFO_NOSIGN))					/* itoc.000320: 不使用簽名檔 */
 #endif
-  {    
+  {
+    int topsig = 1;	/* LHD.031107: 本頁最上面的簽名檔 */
+show_sign:
     if (cuser.ufo & UFO_SHOWSIGN)	/* itoc.000319: 顯示簽名檔的內容 */
-      show_sign();
+      show_sign('0' + topsig);
 
-    msg[33] = op = cuser.signature + '0';
-    if (fd = vget(b_lines, 0, msg, buf, 3, DOECHO))
+    msg[41] = op = cuser.signature + '0';
+    outz(msg);
+    if (fd = vkey())
     {
+      if (fd == 'n')	/* LHD.031107: 按 n 循環換頁 */
+      {
+	topsig = (topsig + 3) % 9;
+	goto show_sign;
+      }
+
       if (op != fd && ((fd >= '0' && fd <= '9') || fd == 'r'))
       {
 	cuser.signature = fd - '0';

@@ -40,8 +40,8 @@ pid2user(pid)
   {
     if (utmp->pid == pid)
     {
-      printf("使用者代號: %s 狀態: %s [%d] 。 (來自 %s)\n",
-	utmp->userid, ModeTypeTable[utmp->mode], utmp->mode, utmp->from);
+      printf("使用者代號: %s 狀態: %s [%d] 。 (來自 %s)\n現正閱\讀看板: %s\n",
+	utmp->userid, ModeTypeTable[utmp->mode], utmp->mode, utmp->from, utmp->reading);
       offset = 2;
       break;
     }

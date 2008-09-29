@@ -121,7 +121,7 @@ mirror(fpath, line)
 
       strcpy(buf + size, tmp);
       size += strlen(tmp);
-  
+
       if (line)
       {
 	/* 動態看板，最多 line 列 */

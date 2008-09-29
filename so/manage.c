@@ -145,23 +145,23 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
 	  cancel_post(hdr);
 
 	  /* smiler.1111: 若deletelog_use有啟動,則將這筆被刪的資料備份至Deletelog板 */
-      if(deletelog_use)
+	  if (deletelog_use)
 	  {
-         hdr_fpath(copied, fpath, hdr);
-         brd_fpath(Deletelog_folder,BN_DELLOG, FN_DIR);
-         hdr_stamp(Deletelog_folder, HDR_COPY | 'A', &Deletelog_hdr, copied);
-         strcpy(Deletelog_hdr.title , hdr->title);
-         strcpy(Deletelog_hdr.owner , cuser.userid);
-         strcpy(Deletelog_hdr.nick  , cuser.username);
-         Deletelog_hdr.xmode = POST_OUTGO;
-         rec_bot(Deletelog_folder, &Deletelog_hdr, sizeof(HDR));
-         btime_update(brd_bno(BN_DELLOG));
+	    hdr_fpath(copied, fpath, hdr);
+	    brd_fpath(Deletelog_folder,BN_DELLOG, FN_DIR);
+	    hdr_stamp(Deletelog_folder, HDR_COPY | 'A', &Deletelog_hdr, copied);
+	    strcpy(Deletelog_hdr.title , hdr->title);
+	    strcpy(Deletelog_hdr.owner , cuser.userid);
+	    strcpy(Deletelog_hdr.nick  , cuser.username);
+	    Deletelog_hdr.xmode = POST_OUTGO;
+	    rec_bot(Deletelog_folder, &Deletelog_hdr, sizeof(HDR));
+	    btime_update(brd_bno(BN_DELLOG));
 	  }
 
 	  hdr_fpath(fold, fpath, hdr);
 	  unlink(fold);
-      if (xmode & POST_RESTRICT)
-        RefusePal_kill(currboard, hdr);
+	  if (xmode & POST_RESTRICT)
+	    RefusePal_kill(currboard, hdr);
 
 	}
       }
@@ -173,7 +173,7 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       if (fsize)
 	rename(fnew, fpath);
       else
-  contWhileOuter:
+contWhileOuter:
 	unlink(fnew);
 
       btime_update(brd_bno(currboard));
@@ -194,9 +194,8 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
 /* ----------------------------------------------------- */
 
 
-static int
-post_brdtitle(xo)
-  XO *xo;
+int
+post_brdtitle()
 {
   BRD *oldbrd, newbrd;
 
@@ -215,7 +214,7 @@ post_brdtitle(xo)
     }
   }
 
-  return XO_HEAD;	/* itoc.011125: 要重繪中文板名 */
+  return 0;
 }
 
 
@@ -224,9 +223,8 @@ post_brdtitle(xo)
 /* ----------------------------------------------------- */
 
 
-static int
-post_memo_edit(xo)
-  XO *xo;
+int
+post_memo_edit()
 {
   int mode;
   char fpath[64];
@@ -240,21 +238,20 @@ post_memo_edit(xo)
     if (mode == 'd')
     {
       unlink(fpath);
-      return XO_HEAD;
+      return 0;
     }
 
     if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
       vmsg(msg_cancel);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 
 /* smiler.080203: 各板自訂擋信機制 */
-static int
-post_spam_edit(xo)
-  XO *xo;
+int
+post_spam_edit()
 {
   int mode;
   char fpath[64];
@@ -277,7 +274,7 @@ post_spam_edit(xo)
     }
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 #ifdef POST_PREFIX
@@ -286,8 +283,7 @@ post_spam_edit(xo)
 /* ----------------------------------------------------- */
 
 static int
-post_prefix_edit(xo)
-  XO *xo;
+post_prefix_edit()
 {
 #define NUM_PREFIX      8
   int i;
@@ -300,19 +296,19 @@ post_prefix_edit(xo)
   };
 
   if (!(bbstate & STAT_BOARD))
-    return XO_NONE;
+    return 0;
 
   i = vans("類別 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (i == 'q')
-    return XO_HEAD;
+    return 0;
 
   brd_fpath(fpath, currboard, "prefix");
 
   if (i == 'd')
   {
     unlink(fpath);
-    return XO_HEAD;
+    return 0;
   }
 
   i = 0;
@@ -357,14 +353,13 @@ post_prefix_edit(xo)
     fclose(fp);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 #endif      /* POST_PREFIX */
 
 
-static int
-post_brd_prefix(xo)
-  XO *xo;
+int
+post_brd_prefix()
 {
   BRD *oldbrd, newbrd;
 
@@ -381,9 +376,9 @@ post_brd_prefix(xo)
     newbrd.battr |= BRD_PREFIX;
     break;
   case '3':
-    post_prefix_edit(xo);
+    post_prefix_edit();
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -392,7 +387,7 @@ post_brd_prefix(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 
@@ -402,9 +397,8 @@ post_brd_prefix(xo)
 
 
 #ifdef HAVE_SCORE
-static int
-post_battr_noscore(xo)
-  XO *xo;
+int
+post_battr_noscore()
 {
   BRD *oldbrd, newbrd;
 
@@ -420,7 +414,7 @@ post_battr_noscore(xo)
     newbrd.battr |= BRD_NOSCORE;
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -429,20 +423,20 @@ post_battr_noscore(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 #endif	/* HAVE_SCORE */
 
-static int
-post_rlock(xo)
-  XO *xo;
+
+int
+post_rlock()
 {
   BRD *oldbrd, newbrd;
 
   oldbrd = bshm->bcache + currbno;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_HEAD; 
+    return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -455,7 +449,7 @@ post_rlock(xo)
     newbrd.battr |= BRD_NOL;
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -464,20 +458,19 @@ post_rlock(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 
-static int
-post_vpal(xo)
-  XO *xo;
+int
+post_vpal()
 {
   BRD *oldbrd, newbrd;
 
   oldbrd = bshm->bcache + currbno;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_HEAD; 
+    return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -490,7 +483,7 @@ post_vpal(xo)
     newbrd.battr |= BRD_SHOWPAL;
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -499,13 +492,12 @@ post_vpal(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 1;
 }
 
 
-static int
-post_noforward(xo)
-  XO *xo;
+int
+post_noforward()
 {
   BRD *oldbrd, newbrd;
 
@@ -521,7 +513,7 @@ post_noforward(xo)
     newbrd.battr |= BRD_NOFORWARD;
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -530,13 +522,12 @@ post_noforward(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 
-static int
-post_showturn(xo)
-  XO *xo;
+int
+post_showturn()
 {
   BRD *oldbrd, newbrd;
 
@@ -552,7 +543,7 @@ post_showturn(xo)
     newbrd.battr &= ~BRD_SHOWTURN;
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -561,7 +552,7 @@ post_showturn(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 /* ----------------------------------------------------- */
@@ -569,9 +560,8 @@ post_showturn(xo)
 /* ----------------------------------------------------- */
 
 
-static int
-post_changeBM(xo)
-  XO *xo;
+int
+post_changeBM()
 {
   char buf[80], userid[IDLEN + 2], *blist;
   BRD *oldbrd, newbrd;
@@ -582,10 +572,10 @@ post_changeBM(xo)
 
   blist = oldbrd->BM;
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
-    return XO_HEAD;
+    return 0;
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_HEAD;
+    return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
@@ -658,7 +648,7 @@ post_changeBM(xo)
     sprintf(currBM, "板主：%s", newbrd.BM);
   }
 
-  return XO_HEAD;	/* 要重繪檔頭的板主 */
+  return 0;
 }
 
 
@@ -668,9 +658,8 @@ post_changeBM(xo)
 /* ----------------------------------------------------- */
 
 
-static int
-post_brdlevel(xo)
-  XO *xo;
+int
+post_brdlevel()
 {
   BRD *oldbrd, newbrd;
 
@@ -678,12 +667,12 @@ post_brdlevel(xo)
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
   if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return XO_HEAD;
+    return 0;
 
   if (oldbrd->battr & BRD_IAS)	/* 藝文館看板不允許隨意更動 */
   {
     vmsg("藝文館看板如需更動屬性請向館務申請!!");
-    return XO_HEAD;
+    return 0;
   }
 
   switch (vans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
@@ -707,7 +696,7 @@ post_brdlevel(xo)
     break;
 
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -716,7 +705,7 @@ post_brdlevel(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 #endif	/* HAVE_MODERATED_BOARD */
 
@@ -741,9 +730,8 @@ bpal_cache(fpath)
 extern XZ xz[];
 
 
-static int
-XoBM(xo)
-  XO *xo;
+int
+XoBM()
 {
   BRD *oldbrd;
   oldbrd = bshm->bcache + currbno;
@@ -764,7 +752,7 @@ XoBM(xo)
 
   free(xt);
 
-  return XO_INIT;
+  return 1;
 }
 #endif	/* HAVE_MODERATED_BOARD */
 
@@ -774,8 +762,7 @@ XoBM(xo)
 /* ----------------------------------------------------- */
 
 static int
-post_bbs_dog(xo)
-  XO *xo;
+post_bbs_dog()
 {
   BRD *oldbrd, newbrd;
 
@@ -791,7 +778,7 @@ post_bbs_dog(xo)
     newbrd.battr &= (~BRD_BBS_DOG);
     break;
   default:
-    return XO_HEAD;
+    return 0;
   }
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
@@ -800,12 +787,12 @@ post_bbs_dog(xo)
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
+
 static int
-post_article_filter(xo)
-  XO *xo;
+post_article_filter()
 {
 #define	NUM_DOG		10
 #define	LEN_DOG_NAME	70
@@ -894,7 +881,7 @@ post_article_filter(xo)
     case 'd':
       unlink(fpath);
     case 'q':
-      return XO_INIT;
+      return 0;
     }
 
     if (!vget(b_lines, 0, "◎ 選則修改 1)~10) (Q)離開 [Q]", input, 3, DOECHO))
@@ -905,7 +892,7 @@ post_article_filter(xo)
       break;
   } while(choose);
 
-  return XO_HEAD;
+  return 0;
 }
 
 /* smiler.080831: 板主自定 可讀/可寫/可列
@@ -925,8 +912,7 @@ post_article_filter(xo)
 */
 
 static int
-post_my_level(xo, fname)
-  XO *xo;
+post_my_level(fname)
   char *fname;
 {
   FILE *fr, *fw;
@@ -949,12 +935,12 @@ post_my_level(xo, fname)
     clear();
 
     if (!(fr = fopen(fpath_r, "r")))
-      return XO_HEAD;
+      return 0;
 
     if (!(fw = fopen(fpath_w, "w")))
     {
       fclose(fr);
-      return XO_HEAD;
+      return 0;
     }
 
     i = 3;
@@ -1075,24 +1061,23 @@ post_my_level(xo, fname)
     case 's':
       unlink(fpath_r);
       rename(fpath_w, fpath_r);
-      return XO_INIT;
+      return 0;
 
     case 'e':
       continue;
 
     default:
       unlink(fpath_w);
-      return XO_HEAD;
+      return 0;
     }
  }
 
- return XO_HEAD;
+ return 0;
 }
 
 
 static int
-post_view_bbs_dog_log(xo)
-  XO *xo;
+post_view_bbs_dog_log()
 {
   char fpath[64],warn[64];
 
@@ -1114,16 +1099,15 @@ post_view_bbs_dog_log(xo)
     break;
   }
 
-  return XO_HEAD;
+  return 0;
 }
 
 /* ----------------------------------------------------- */
 /* 板主選單						 */
 /* ----------------------------------------------------- */
 
-static int
-post_guard_dog(xo)
-  XO *xo;
+int
+post_guard_dog()
 {
   char fpath[64];
   char *menu[] = 
@@ -1145,22 +1129,23 @@ post_guard_dog(xo)
   switch (pans(3, 20, "BBS 看門狗", menu))
   {
   case 'b':
-    return post_bbs_dog(xo);
+    return post_bbs_dog();
   case 'p':
-    return post_article_filter(xo);
+    return post_article_filter();
   case 'w':
-    return post_my_level(xo, FN_NO_WRITE);
+    return post_my_level(FN_NO_WRITE);
   case 'r':
-    return post_my_level(xo, FN_NO_READ);
+    return post_my_level(FN_NO_READ);
   case 'l':
-    return post_my_level(xo, FN_NO_LIST);
+    return post_my_level(FN_NO_LIST);
   case 'v':
-    return post_view_bbs_dog_log(xo);
+    return post_view_bbs_dog_log();
   }
-  return XO_HEAD;
+  return 0;
 }
 
 
+#if 0
 int
 post_manage(xo)
   XO *xo;
@@ -1274,3 +1259,4 @@ post_manage(xo)
 
   return XO_HEAD;
 }
+#endif

@@ -299,7 +299,7 @@ vs_head(title, mid)
   }
 
 /*20070325	dexter:buf + len  modified to buf+len+2	*/
-/*		not knowing why it works. :p		*/  
+/*		not knowing why it works. :p		*/
 
 #endif
 
@@ -509,7 +509,7 @@ static MENU menu_system[] =
   "Xfile      【 系統檔案 】",
 
   menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
-  "系統維護" 
+  "系統維護"
 };
 
 
@@ -911,7 +911,7 @@ static MENU menu_game1[] =
   "bin/mine.so:main_mine", 0, - M_GAME,
   "5Mine      【 亂踩地雷 】",
 
-  "bin/fantan.so:main_fantan", 0, - M_GAME, 
+  "bin/fantan.so:main_fantan", 0, - M_GAME,
   "6Fantan    【 番攤接龍 】",
 
   "bin/dragon.so:main_dragon", 0, - M_GAME,
@@ -1145,7 +1145,7 @@ static MENU menu_main[] =
   "Favorite  【 自訂討論區 】",
 #endif
 
-  menu_mail, 0, M_MMENU, 
+  menu_mail, 0, M_MMENU,
   "Mail      【 信件工具區 】",
 
   menu_thala, 0, M_TMENU,
@@ -1154,7 +1154,7 @@ static MENU menu_main[] =
   menu_user, 0, M_UMENU,
   "User      【 個人工具區 】",
 /* HAVE_EXTERNAL*/
-#ifdef HAVE_EXTERNAL 
+#ifdef HAVE_EXTERNAL
   menu_tool, 0, M_XMENU,
   "Xyz       【 特殊招待所 】",
 #endif

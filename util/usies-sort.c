@@ -14,7 +14,7 @@
 //#include <stdio.h>
 #include "bbs.h"
 
-#define NUM_BADBOARD	6000	/* 低於 6000 人次的板列入低使用率 */
+#define NUM_BADBOARD	100000	/* 低於 100000 人次的板列入低使用率 */
 #define NUM_DROPBOARD	20	/* 低於 20 人次的板不列入記錄 */
 #define BRD_TIMES	(BBSHOME "/run/brd_times.log")	/*qazq:加入看板閱讀次數紀錄*/
 

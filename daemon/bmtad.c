@@ -1266,7 +1266,7 @@ IS_MAIL_BBS_DOG_FOOD(fpath)
   if (!(fp = fopen(fpath_filter, "r")))
     return 0;
 
-  while (fgets(filter, 70, fp))
+  while (fgets(filter, sizeof(filter), fp))
   {
     if(filter[0] == '\0' || filter[0] == '\n')
       continue;

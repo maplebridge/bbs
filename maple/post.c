@@ -63,288 +63,6 @@ change_stamp(folder, hdr)
 }
 
 
-static void
-RefusePal_fpath(fpath, board, mode, hdr)
-  char *fpath;
-  char *board;
-  char mode;	/* 'C':Cansee  'R':Refimage */
-  HDR *hdr;
-{
-  sprintf(fpath, "brd/%s/RefusePal_DIR/%s_%s",
-    board, mode == 'C' ? "Cansee" : "Refimage", hdr->xname);
-}
-
-
-void
-RefusePal_kill(board, hdr)	/* amaki.030322: 用來砍名單小檔 */
-  char *board;
-  HDR *hdr;
-{
-  char fpath[64];
-
-  RefusePal_fpath(fpath, board, 'C', hdr);
-  unlink(fpath);
-  RefusePal_fpath(fpath, board, 'R', hdr);
-  unlink(fpath);
-}
-
-
-int	/* -1:L文  1:F文  0:普通文 */
-RefusePal_level(board, hdr)	//smiler 1108
-  char *board;
-  HDR *hdr;
-{
-  int fsize;
-  char fpath[64];
-  int *fimage;
-
-  if(! hdr->xmode & POST_RESTRICT)
-     return 0;
-  else
-  {
-    RefusePal_fpath(fpath, board, 'R', hdr);	//0709
-    if (dashf(fpath))
-    {
-      if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
-	return 1;
-      if (fimage = (int *) f_img(fpath, &fsize))
-      {
-	fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
-	free(fimage);
-	//return fsize;				//0709
-	if (fsize)
-	  return fsize;
-      }
-    }
-    //els					//0709
-    return -1;
-  }
-}
-
-
-int	/* 1:在可見名單上 0:不在可見名單上 */
-RefusePal_belong(board, hdr)
-  char *board;
-  HDR *hdr;
-{
-  int fsize;
-  char fpath[64];
-  int *fimage;
-
-  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
-    return 1;
-
-  //RefusePal_fpath(fpath, board, 'C', hdr);  //smiler 1109
-  RefusePal_fpath(fpath, board, 'R', hdr);  //smiler 1109
-  if (fimage = (int *) f_img(fpath, &fsize))
-  {
-    fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
-    free(fimage);
-    return fsize;
-  }
-  return 0;
-}
-
-
-static void
-refusepal_cache(hdr, board)
-  HDR *hdr;
-  char *board;
-{
-  int fd, max;
-  char fpath[64];
-  int pool[PAL_MAX];
-
-  RefusePal_fpath(fpath, board, 'C', hdr);
-
-  if (max = image_pal(fpath, pool))
-  {
-    RefusePal_fpath(fpath, board, 'R', hdr);
-    if ((fd = open(fpath, O_WRONLY | O_CREAT | O_TRUNC, 0600)) >= 0)
-    {
-      write(fd, pool, max * sizeof(int));
-      close(fd);
-    }
-  }
-  else
-    RefusePal_kill(board, hdr);
-}
-
-
-static int
-XoBM_add_pal(xo)
-  XO *xo;
-{
-  int ans;
-  char fpath[64];
-  XO *xt;
-
-  if (!(bbstate & STAT_BM))
-    return XO_NONE;
-
-  ans = vans("◎選擇板友特別名單 1~8？[Q] ");
-  if (ans < '9' && ans > '0')
-  {
-    sprintf(fpath, "brd/%s/friend_%c", currboard, ans);
-    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
-    xt->key = PALTYPE_BPAL;	//smiler 1106
-    xover(XZ_PAL);
-    free(xt);
-    return XO_INIT;
-  }
-  else
-    return XO_FOOT;
-}
-
-
-static int
-XoBM_Refuse_pal(xo)
-  XO *xo;
-{
-  XO *xt, *xr;
-  HDR *hdr;
-  char fpath[64];
-  char fpath_friend[64];
-  char tmp[64], tmp2[64];
-  int ans, ans2, ans3;
-  int pos, cur;		//smiler 1108
-  pos = xo->pos;	//smiler 1108
-  cur = pos - xo->top;	//smiler 1108
-
-  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
-
-  if (!(hdr->xmode & POST_RESTRICT))
-    return XO_NONE;
-
-  if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
-    return XO_NONE;
-
-  sprintf(fpath, "brd/%s/RefusePal_DIR", currboard);
-  if (!dashd(fpath))
-    mkdir(fpath, 0700);
-  RefusePal_fpath(fpath, currboard, 'C', hdr);
-
-  ans=ans2=ans3=0;
-
-  if((bbstate & STAT_BM))
-    ans3 = vans("◎選擇 1)好友 2)板友 3)任意編輯名單 [Q] ");
-  else
-    ans3 = '1';
-
-  switch (ans3)
-  {
-  case '1':
-    ans2 = vans("◎選擇 1~5)好友群組名單 6)任意編輯名單 [Q] ");
-    if (ans2 == '6')
-      ans = '9';
-    else if (ans2 > '6' || ans2 <'1')
-      ans=-1;
-    break;
-
-  case '2':
-    ans = vans("◎選擇 0)板友名單 1~8)板友特別名單 9)任意編輯名單 [Q] ");
-    if (ans > '9' || ans < '0')
-      ans = -1;
-    break;
-
-  case '3':
-    ans = '9';
-    break;
-
-  default:
-    return XO_FOOT;
-  }
-
-  if (ans == -1)
-    return XO_FOOT;
-
-  if (ans == 0)	//好友名單
-  {
-    if (ans2 < '6' && ans2 > '0')	//1~5
-    {
-      str_lower(tmp2, cuser.userid);
-      sprintf(fpath_friend, "usr/%c/%s/list.%c", tmp2[0], tmp2, ans2);
-    }
-  }
-  else	//板友名單
-  {
-    if (ans == '0')
-      brd_fpath(fpath_friend, currboard, "friend");
-    else if (ans < '9' && ans > '0')	//1~8
-      sprintf(fpath_friend, "brd/%s/friend_%c", currboard, ans);
-  }
-
-  if (ans == '9')	/* 編輯新名單 */
-  {
-    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
-    xt->key = PALTYPE_BPAL;	//smiler 1106
-    xover(XZ_PAL);
-    refusepal_cache(hdr, currboard);
-    free(xt);
-  }
-  else
-  {
-    if (!dashf(fpath_friend))
-    {
-      xz[XZ_PAL - XO_ZONE].xo = xr = xo_new(fpath_friend);
-      if (ans2 == '0')
-	xr->key = PALTYPE_PAL;
-      else if (ans2 > '0')
-	xr->key = PALTYPE_LIST;	//smiler 1106
-      else
-	xr->key = PALTYPE_BPAL;
-      xover(XZ_PAL);
-      free(xr);
-    }
-    sprintf(tmp,"cp %s %s", fpath_friend, fpath);
-    system(tmp);
-    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
-    xt->key = PALTYPE_BPAL;	//smiler 1106
-    xover(XZ_PAL);
-    refusepal_cache(hdr, currboard);
-    free(xt);
-  }
-
-  move(3 + cur, 7);	//smiler 1108
-  outc('F');		//smiler 1108
-  return XO_INIT;
-}
-
-
-static int
-post_viewpal(xo)
-  XO *xo;
-{
-  XO *xt;
-  char fpath[64];
-  struct stat st;
-
-  if (!cuser.userlevel)
-    return XO_NONE;
-
-  if(!(bbstate & STAT_BM) && (currbattr & BRD_SHOWPAL))
-    return XO_NONE;
-
-  brd_fpath(fpath, currboard, "friend");
-  if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)	/* 有些名單的 size 為 0 */
-    unlink(fpath);
-
-  if(dashf(fpath))
-  {
-    xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath);
-    xt->key = PALTYPE_BPAL;
-    xover(XZ_FAKE_PAL);
-    free(xt);
-    return XO_INIT;
-  }
-  else
-  {
-    vmsg("本板尚未設定板友名單 !!");
-    return XO_NONE;
-  }
-}
-
-
 static int
 IS_BIGGER_AGE(age)
   int age;
@@ -471,136 +189,6 @@ IS_WELCOME(board, fname)
 }
 
 
-static int
-post_show_dog(xo, fname)
-  XO *xo;
-  char *fname;
-{
-  FILE *fp;
-  char fpath[64];
-
-  int wi = 0;
-
-  brd_fpath(fpath, currboard, fname);
-
-  if(!(fp = fopen(fpath, "r")))
-  return 0;
-
-  clear();
-  move(1, 0);
-  prints("\033[1;33m %s \033[m\n\n", (!strcmp(fname, FN_NO_WRITE)) ? "發文推文條件限制" :
-				!strcmp(fname, FN_NO_READ ) ? "進入看板條件限制" :
-				!strcmp(fname, FN_NO_LIST ) ? "看板列表顯示本板" : "");
-
-  fscanf(fp, "%d", &wi);
-  prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
-
-  fscanf(fp, "%d", &wi);
-  prints("%s性別限制 : [%s] \033[m\n",
-    (wi == 0) ? COLOR_ACP : (wi == cuser.sex + 1) ? COLOR_ACP : COLOR_NOT_ACP,
-    (wi == 0) ? "不限" : (wi == 1) ? "中性" : (wi == 2) ? "男性" : "女性");
-
-  fscanf(fp, "%d", &wi);
-  prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n",
-    (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s違規次數 <  [%d次] (0：不限) \033[m\n",
-    (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fscanf( fp, "%d", &wi);
-  prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fclose(fp);
-
-  return vmsg(NULL);
-}
-
-
-static int
-post_showbm(xo)
-  XO *xo;
-{
-  BRD  *brd;
-  brd = bshm->bcache + currbno;
-
-  clear();
-
-  move(0, 0);
-  prints("看板英文板名: %s\n",brd->brdname);
-  prints("看板分類    : %s\n",brd->class);
-  prints("看板中文板名: %s\n",brd->title);
-  prints("看板板主名單: %s\n",brd->BM);
-
-  if (brd->bvote == 0)
-    prints("看板活動舉辦: 無投票舉辦\n");
-  else if (brd->bvote == -1)
-    prints("看板活動舉辦: 有賭盤舉辦\n");
-  else
-    prints("看板活動舉辦: 有投票舉辦\n");
-
-//#define BRD_NOZAP   0x01    /* 不可 zap */
-  prints("看板可否被z : %s\n", (currbattr & BRD_NOZAP) ? "不可" : "可");
-//#define BRD_NOTRAN  0x02    /* 不轉信 */
-  prints("看板可否轉信: %s轉信\n", (currbattr & BRD_NOTRAN) ? "不" : "可");
-//#define BRD_NOCOUNT 0x04    /* 不計文章發表篇數 */
-  prints("文章發表篇數: %s記錄\n", (currbattr & BRD_NOCOUNT) ? "不" : "");
-//#define BRD_NOSTAT  0x08    /* 不納入熱門話題統計 */
-  prints("熱門話題統計: %s記錄\n", (currbattr & BRD_NOSTAT) ? "不" : "");
-//#define BRD_NOVOTE  0x10    /* 不公佈投票結果於 [record] 板 */
-  prints("投摽結果公佈: %s公佈投票結果於 [record] 板\n", (currbattr & BRD_NOVOTE) ? "不" : "");
-//#define BRD_ANONYMOUS   0x20    /* 匿名看板 */
-  prints("匿名看板   ?: %s\n", (currbattr & BRD_ANONYMOUS) ? "是" : "否");
-//#define BRD_NOSCORE 0x40    /* 不評分看板 */
-  prints("看板可否推文: %s\n", (currbattr & BRD_NOSCORE) ? "否" : "可");
-//#define BRD_NOL     0x100   /* 不可鎖文 */
-  prints("看板鎖文限制: %s\n", (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
-//#define BRD_SHOWPAL 0x200   /* 顯示板友名單 */
-  prints("顯示板友名單: %s\n", (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單(ctrl^g)");
-  prints("顯示轉錄紀錄: 轉錄文章%s顯示記錄\n", (currbattr & BRD_SHOWTURN) ? "" : "不");
-//#define BRD_PUBLIC  0x80    /* 公眾板 */
-  prints("是否為公眾板: ");
-  if(currbattr & BRD_PUBLIC)
-  {
-    prints("是公眾板\n");
-    prints("===>\n");
-    prints("   公眾板板主,\n");
-    prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
-    prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
-    prints("   公眾板使用者,\n");
-    prints("     不得鎖文\n");
-  }
-  else
-    prints("非公眾板\n");
-
-  vmsg(NULL);
-
-  post_show_dog(xo, FN_NO_WRITE);
-  post_show_dog(xo, FN_NO_READ);
-  post_show_dog(xo, FN_NO_LIST);
-
-  return XO_HEAD;
-}
-
-
 /* smiler.080830 : 看門狗 */
 static int
 IS_BRD_DOG_FOOD(fpath, board)
@@ -649,7 +237,7 @@ IS_BBS_DOG_FOOD(fpath)
   if (!(fp = fopen(fpath_filter, "r")))
     return 0;
 
-  while (fgets(filter, 70, fp))
+  while (fgets(filter, sizeof(filter), fp))
   {
     if (filter[0] == '\0' || filter[0] == '\n')
       continue;
@@ -1000,7 +588,7 @@ log_anonymous(fname)
 {
   char buf[512];
 
-  sprintf(buf, "%s %-13s(%s)\n%-13s %s %s\n", 
+  sprintf(buf, "%s %-13s(%s)\n%-13s %s %s\n",
     Now(), cuser.userid, fromhost, currboard, fname, ve_title);
   f_cat(FN_RUN_ANONYMOUS, buf);
 }
@@ -1025,6 +613,7 @@ do_unanonymous(fpath)
   btime_update(brd_bno(BN_UNANONYMOUS));
 }
 #endif
+
 
 static void
 copy_post_IAS(hdr, fpath)
@@ -1062,13 +651,6 @@ do_post(xo, title)
   char fpath[64], *folder, *nick, *rcpt;
   int mode;
   time_t spendtime;
-
-  /* smiler.080820: 依站務要求改轉文至 nthu.forsale */
-  /* smiler.080705: 依站務要求改轉文至 forsale */
-  /* smiler.070916: for 轉文至 nthu.forsale */
-  HDR  hdr2;
-  char fpath2[64], folder2[64];	// smiler.070916
-  char board_from[30];		// smiler.070916
 
   if (!(bbstate & STAT_POST))
   {
@@ -1167,15 +749,6 @@ do_post(xo, title)
   folder = xo->dir;
   hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
 
-  strcpy(fpath2,fpath);				// smiler.070916
-  strcpy(folder2,folder);			// smiler.070916
-  folder2[4]='\0';				// smiler.070916
-  strcat(folder2,"nthu.forsale/.DIR");		//smiler.080820 // smiler.070916 
-  //strcat(folder2,"forsale/.DIR");		// smiler.080705
-  hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);	// smiler.070916
-  strcpy(board_from, folder + 4);			// smiler.070916
-  board_from[strlen(board_from) - 5] = '\0';	// smiler.070916
-
   /* set owner to anonymous for anonymous board */
 
 #ifdef HAVE_ANONYMOUS
@@ -1211,35 +784,50 @@ do_post(xo, title)
   strcpy(hdr.nick, nick);
   strcpy(hdr.title, title);
 
-  hdr2.xmode = mode;		// smiler.070916
-  strcpy(hdr2.owner, rcpt);	// smiler.070916
-  strcpy(hdr2.nick, nick);	// smiler.070916
-  strcpy(hdr2.title, title);	// smiler.070916
-
   rec_bot(folder, &hdr, sizeof(HDR));
   btime_update(currbno);
-
-  /* smiler 0916 */
-  if ((strstr(hdr2.title,"賣") || strstr(hdr2.title,"售") || strstr(hdr2.title,"出清")) && 
-    strcmp(currboard,"nthu.forsale") && strcmp(currboard,"deleted") && strcmp(currboard,BN_DELLOG) && strcmp(currboard,BN_EDITLOG))
-  {
-    //if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) && 
-    //   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
-    //   (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) && 
-    //   (!strstr(board_from,BN_DELLOG)) && (!strstr(board_from,BN_EDITLOG)) )
-    /* smiler.080820: 依站務要求僅 nctu nthu 轉買賣文至 nthu.forsale */
-    if ((!strcmp(board_from,"nctu")) || (!strcmp(board_from,"nthu")))
-    {
-      rec_bot(folder2, &hdr2, sizeof(HDR));
-      btime_update(brd_bno("nthu.forsale"));
-      //btime_update(brd_bno("forsale"));
-    }
-  }
 
   if (mode & POST_OUTGO)
     outgo_post(&hdr, currboard);
 
   post_history(xo, &hdr);
+
+#if 1
+  /* smiler.080820: 依站務要求改轉文至 nthu.forsale */
+  if (strstr(hdr.title, "賣") || strstr(hdr.title, "售") || strstr(hdr.title, "出清"))
+  {
+    /* smiler.080820: 依站務要求改轉文至 nthu.forsale */
+    /* smiler.080705: 依站務要求改轉文至 forsale */
+    /* smiler.070916: for 轉文至 nthu.forsale */
+    HDR  hdr2;
+    char fpath2[64], folder2[64];	// smiler.070916
+    char board_from[30];		// smiler.070916
+
+    //if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) &&
+    //   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
+    //   (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) &&
+    //   (!strstr(board_from,BN_DELLOG)) && (!strstr(board_from,BN_EDITLOG)) )
+
+    /* smiler.080820: 依站務要求僅 nctu nthu 轉買賣文至 nthu.forsale */
+    if ((!strcmp(board_from, "nctu")) || (!strcmp(board_from, "nthu")))
+    {
+      strcpy(fpath2, fpath);			// smiler.070916
+      brd_fpath(folder2, "nthu.forsale", FN_DIR);
+      //brd_fpath(folder2, "forsale", FN_DIR);	// smiler.080705
+      hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);	// smiler.070916
+      strcpy(board_from, currboard);			// smiler.070916
+
+      hdr2.xmode = mode;		// smiler.070916
+      strcpy(hdr2.owner, rcpt);	// smiler.070916
+      strcpy(hdr2.nick, nick);	// smiler.070916
+      strcpy(hdr2.title, title);	// smiler.070916
+
+      rec_bot(folder2, &hdr2, sizeof(HDR));
+      btime_update(brd_bno("nthu.forsale"));
+      //btime_update(brd_bno("forsale"));
+    }
+  }
+#endif
 
   clear();
   outs("順利貼出文章，");
@@ -1320,7 +908,7 @@ static int
 chkrestrict(hdr)
   HDR *hdr;
 {
-  //return !(hdr->xmode & POST_RESTRICT) || 
+  //return !(hdr->xmode & POST_RESTRICT) ||
   //  !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
   return !(hdr->xmode & POST_RESTRICT) || RefusePal_belong(currboard, hdr);
 }
@@ -1802,12 +1390,12 @@ post_attr(hdr)
   unread = ((USR_SHOW & USR_SHOW_POST_MODIFY_UNREAD) && attr && brh_unread(BMAX(hdr->chrono, hdr->stamp))) ? 1 : 0;
 
 #ifdef HAVE_REFUSEMARK
-  if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
+  if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
   {
     attr |= 'F',
     strcpy(attr_tmp, "\033[1;33m");
   }
-  else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr)==(-1) ) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+  else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
     attr |= 'L';
     strcpy(attr_tmp, "\033[1;34m");
@@ -2170,7 +1758,7 @@ post_browse(xo)
 
     hdr_fpath(fpath, dir, hdr);
 
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if ((key = more(fpath, FOOTER_POST)) < 0)
       break;
 
@@ -2227,8 +1815,8 @@ re_key:
       {
 	FILE *fp;
 	if (fp = tbf_open())
-	{ 
-	  f_suck(fp, fpath); 
+	{
+	  f_suck(fp, fpath);
 	  fclose(fp);
 	}
       }
@@ -2565,15 +2153,15 @@ post_cross(xo)
 
       /* itoc.040228: 如果是從精華區轉錄出來的話，會顯示轉錄自 [currboard] 看板，
 	 然而 currboard 未必是該精華區的看板。不過不是很重要的問題，所以就不管了 :p */
-      fprintf(fpw, "※ 本文轉錄自 [%s] %s\n\n", 
-	*dir == 'u' ? cuser.userid : method == 2 ? "秘密" : tmpboard, 
+      fprintf(fpw, "※ 本文轉錄自 [%s] %s\n\n",
+	*dir == 'u' ? cuser.userid : method == 2 ? "秘密" : tmpboard,
 	*dir == 'u' ? "信箱" : "看板");
 
       /* Kyo.051117: 若是從秘密看板轉出的文章，刪除文章第一行所記錄的看板名稱 */
       finish = 0;
       if ((method == 2) && (fpr = fopen(fpath, "r")))
       {
-	if (fgets(buf, sizeof(buf), fpr) && 
+	if (fgets(buf, sizeof(buf), fpr) &&
 	  ((ptr = strstr(buf, str_post1)) || (ptr = strstr(buf, str_post2))) && (ptr > buf))
 	{
 	  ptr[-1] = '\n';
@@ -2929,51 +2517,235 @@ post_bottom(xo)
 
 
 #ifdef HAVE_REFUSEMARK
-static int
-post_friend(xo)
-  XO *xo;
-{
+static void
+RefusePal_fpath(fpath, board, mode, hdr)
+  char *fpath;
+  char *board;
+  char mode;	/* 'C':Cansee  'R':Refimage */
   HDR *hdr;
-  int pos, cur;
+{
+  sprintf(fpath, "brd/%s/RefusePal_DIR/%s_%s",
+    board, mode == 'C' ? "Cansee" : "Refimage", hdr->xname);
+}
 
-  if (!cuser.userlevel)	/* itoc.020114: guest 不能對其他 guest 的文章加密 */
-    return XO_NONE;
 
-  if (currbattr & BRD_PUBLIC)
-    return XO_NONE;
+void
+RefusePal_kill(board, hdr)	/* amaki.030322: 用來砍名單小檔 */
+  char *board;
+  HDR *hdr;
+{
+  char fpath[64];
 
-  if (!(bbstate & STAT_BM) && (currbattr & BRD_NOL))
-    return XO_NONE;
+  RefusePal_fpath(fpath, board, 'C', hdr);
+  unlink(fpath);
+  RefusePal_fpath(fpath, board, 'R', hdr);
+  unlink(fpath);
+}
 
-  pos = xo->pos;
-  cur = pos - xo->top;
-  hdr = (HDR *) xo_pool + cur;
 
-  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+int	/* -1:加密(L)文  1:好友(F)文  0:普通文 */
+RefusePal_level(board, hdr)	//smiler 1108
+  char *board;
+  HDR *hdr;
+{
+  int fsize;
+  char fpath[64];
+  int *fimage;
+  struct stat st;
+
+  if (!(hdr->xmode & POST_RESTRICT))
+    return 0;
+
+  RefusePal_fpath(fpath, board, 'R', hdr);	//0709
+  if (dashf(fpath))	/* 有 POST_RESTRICT 而 pal 檔不存在的就是加密(L)文 */
   {
-    if (hdr->xmode & POST_RESTRICT)
-    {
-      if (RefusePal_level(currboard, hdr)== -1)	// L 文不可按 l 取消
-	return XO_NONE;
-
-       if (vans("要解除此篇文章鎖定，您確定嗎(y/N)？[N] ") != 'y')
-	return XO_FOOT;
-
-      RefusePal_kill(currboard, hdr);
+    if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)
+    {	/* 有些名單的 size 為 0 */
+      unlink(fpath);
+      return -1;
     }
 
-    hdr->xmode ^= POST_RESTRICT;
-    hdr->xmode ^= POST_FRIEND;	/* smiler 1108 */
-    currchrono = hdr->chrono;
-    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
+    if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+      return 1;
 
-    if (hdr->xmode & POST_RESTRICT)
-      return XoBM_Refuse_pal(xo);
-
-    move(3 + cur, 7);
-    outs(post_attr(hdr));
+    if (fimage = (int *) f_img(fpath, &fsize))
+    {
+      fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
+      free(fimage);
+      if (fsize)
+	return fsize;
+    }
   }
-  return XO_NONE;
+
+  return -1;
+}
+
+
+int	/* 1:在可見名單上 0:不在可見名單上 */
+RefusePal_belong(board, hdr)
+  char *board;
+  HDR *hdr;
+{
+  int fsize;
+  char fpath[64];
+  int *fimage;
+
+  if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
+    return 1;
+
+  //RefusePal_fpath(fpath, board, 'C', hdr);	//smiler 1109
+  RefusePal_fpath(fpath, board, 'R', hdr);	//smiler 1109
+  if (fimage = (int *) f_img(fpath, &fsize))
+  {
+    fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
+    free(fimage);
+    return fsize;
+  }
+  return 0;
+}
+
+
+static void
+refusepal_cache(hdr, board)
+  HDR *hdr;
+  char *board;
+{
+  int fd, max;
+  char fpath[64];
+  int pool[PAL_MAX];
+
+  RefusePal_fpath(fpath, board, 'C', hdr);
+
+  if (max = image_pal(fpath, pool))
+  {
+    RefusePal_fpath(fpath, board, 'R', hdr);
+    if ((fd = open(fpath, O_WRONLY | O_CREAT | O_TRUNC, 0600)) >= 0)
+    {
+      write(fd, pool, max * sizeof(int));
+      close(fd);
+    }
+  }
+  else
+    RefusePal_kill(board, hdr);
+}
+
+
+static int
+XoBM_Refuse_pal(xo)
+  XO *xo;
+{
+  XO *xt, *xr;
+  HDR *hdr;
+  char fpath[64];
+  char fpath_friend[64];
+  int ans, ans2;
+  int pos, cur;		//smiler 1108
+  pos = xo->pos;	//smiler 1108
+  cur = pos - xo->top;	//smiler 1108
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+//  if (!(hdr->xmode & POST_RESTRICT))
+//    return XO_NONE;
+
+  if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
+    return XO_NONE;
+
+  brd_fpath(fpath, currboard, "RefusePal_DIR");
+  if (!dashd(fpath))
+    mkdir(fpath, 0700);
+  RefusePal_fpath(fpath, currboard, 'C', hdr);
+
+  if (dashf(fpath))	/* 修改舊的名單 */
+    ans = '3';
+  else if (bbstate & STAT_BM)
+    ans = vans("◎選擇 1)好友 2)板友 3)編輯新名單 Q)直接加密 [Q] ");
+  else
+    ans = '1';
+
+  switch (ans)
+  {
+  case '1':
+    ans = vans("◎選擇 1~5)好友群組名單 6)編輯新名單 Q)直接加密 [Q] ");
+    if (ans < '1' || ans > '6')
+      ans = -1;
+    else if (ans == '6')
+      ans2 = '9';
+    else	/* 1-5, 引入個人好友群組名單 */
+      ans2 = 0;
+    break;
+
+  case '2':
+    ans2 = vans("◎選擇 0)板友名單 1~8)板友特別名單 9)編輯新名單 Q)直接加密 [Q] ");
+    if (ans2 < '0' || ans2 > '9')
+      ans = -1;
+    break;
+
+  case '3':
+    ans2 = '9';
+    break;
+
+  default:
+    return XO_FOOT;
+  }
+
+  if (ans == -1)
+    return XO_FOOT;
+
+  if (!ans2)		/* ans:1-5, ans2 尚未選擇, 引入個人好友群組名單 */
+  {
+    usr_fpath(fpath_friend, cuser.userid, "list.0");
+    fpath_friend[strlen(fpath_friend) - 1] = ans;
+  }
+  else if (ans2 != '9')	/* 引入板友/板友特別名單 */
+  {
+    if (ans2 == '0')	/* 引入板友名單 */
+      brd_fpath(fpath_friend, currboard, "friend");
+    else
+      sprintf(fpath_friend, "brd/%s/friend_%c", currboard, ans2);
+  }
+  else			/* (ans2 = '9') 編輯新名單 */
+  {
+    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+    xt->key = PALTYPE_BPAL;	//smiler 1106
+    xover(XZ_PAL);
+    refusepal_cache(hdr, currboard);
+    free(xt);
+  }
+
+  if (ans2 != '9')
+  {
+    if (!dashf(fpath_friend))
+    {
+      xz[XZ_PAL - XO_ZONE].xo = xr = xo_new(fpath_friend);
+//      if (ans == '0')	/* 引入個人好友名單 */
+//	xr->key = PALTYPE_PAL;
+      if (!ans2)	/* 引入個人好友群組名單 */
+	xr->key = PALTYPE_LIST;
+      else		/* 引入板友/板友特別名單 */
+	xr->key = PALTYPE_BPAL;
+      xover(XZ_PAL);
+      free(xr);
+    }
+    f_cp(fpath_friend, fpath, O_TRUNC);
+    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+    xt->key = PALTYPE_BPAL;	//smiler 1106
+    xover(XZ_PAL);
+    refusepal_cache(hdr, currboard);
+    free(xt);
+  }
+
+//  move(3 + cur, 7);	//smiler 1108
+//  outc('F');		//smiler 1108
+  return XO_INIT;
+}
+
+
+static int
+post_oldrefuse(xo)
+  XO *xo;
+{
+  return vmsg("此功\能已整合至 L 按鍵了哦！");
 }
 
 
@@ -2982,14 +2754,15 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   XO *xo;
 {
   HDR *hdr;
-  int pos, cur;
+  int pos, cur, ans;
 
   if (!cuser.userlevel) /* itoc.020114: guest 不能對其他 guest 的文章加密 */
     return XO_NONE;
 
   if (currbattr & BRD_PUBLIC)
     return XO_NONE;
-  if((!(bbstate & STAT_BM)) && (currbattr & BRD_NOL) )
+
+  if ((currbattr & BRD_NOL) && !(bbstate & STAT_BM))
     return XO_NONE;
 
   pos = xo->pos;
@@ -2998,13 +2771,49 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
 
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
   {
-    if (hdr->xmode & POST_RESTRICT)
+    switch (RefusePal_level(currboard, hdr))
     {
-      if (RefusePal_level(currboard, hdr) == 1)	// F 文不可按 L 取消
-	return XO_NONE;
-   }
+    case 0:	/* 一般文章 */
+      ans = vans("將此篇文章 1)加密 2)設為好友文 Q)取消？[Q] ");
+      break;
 
-    hdr->xmode ^= POST_RESTRICT;
+    case -1:	/* 加密(L)文章 */
+      ans = vans("將此篇文章 1)解密 2)設為好友文 Q)取消？[Q] ");
+      break;
+
+    case 1:	/* 好友(F)文章 */
+      if ((ans =
+  vans("將此篇文章 1)加密/解密(將砍除可見好友名單) 2)修改可見好友名單 Q)取消？[Q] ")) == '1')
+      {
+	ans = vans("將此篇文章 1)加密 2)解密 (加解密都將砍除可見好友名單) Q)取消？[Q] ");
+	if ((ans == '1') || (ans == '2'))
+	{
+	  hdr->xmode &= ~POST_FRIEND;
+	  RefusePal_kill(currboard, hdr);
+	  if (ans == '1')		/* 先拿掉, 待會再加回去 */
+	    hdr->xmode ^= POST_RESTRICT;
+	  else
+	    ans = '1';
+	}
+      }
+      break;
+    }
+
+    switch (ans)
+    {
+    case '1':	/* 執行加解密動作 */
+      hdr->xmode ^= POST_RESTRICT;
+      break;
+
+    case '2':	/* 編輯可見好友名單 */
+      hdr->xmode |= (POST_RESTRICT | POST_FRIEND);
+      XoBM_Refuse_pal(xo);
+      break;
+
+    default:	/* 取消動作 */
+      return XO_FOOT;
+    }
+
     currchrono = hdr->chrono;
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
 
@@ -3012,7 +2821,32 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
     outs(post_attr(hdr));
   }
 
-  return XO_NONE;
+  return (ans == '2') ? XO_INIT : XO_FOOT;
+}
+
+
+static int
+XoBM_add_pal()
+{
+  int ans;
+  char fpath[64];
+  XO *xt;
+
+  if (!(bbstate & STAT_BM))
+    return 0;
+
+  ans = vans("◎編輯板友特別名單 1~8？[Q] ");
+  if (ans > '0' && ans < '9')
+  {
+    sprintf(fpath, "brd/%s/friend_%c", currboard, ans);
+    xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+    xt->key = PALTYPE_BPAL;	//smiler 1106
+    xover(XZ_PAL);
+    free(xt);
+    return 1;
+  }
+  else
+    return 0;
 }
 #endif
 
@@ -3407,8 +3241,9 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
 /* ----------------------------------------------------- */
 
 
+#ifdef DO_POST_FILTER
 static int
-find_xname_by_chrono(chrono, xpath, mode)
+find_xname_by_chrono(chrono, xpath, mode)	/* 配合看門狗，修改文章後找副本一併修改 */
   time_t chrono;
   char *xpath;
   int mode;	/* 0: 從原文找置底  1: 從置底找原文 */
@@ -3448,6 +3283,7 @@ find_xname_by_chrono(chrono, xpath, mode)
 
   return find;
 }
+#endif
 
 
 int
@@ -3852,8 +3688,8 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d %02d:%02d:%02d\033[m\n", 
-      verb, userid, maxlen, reason, 
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d %02d:%02d:%02d\033[m\n",
+      verb, userid, maxlen, reason,
       ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
     fclose(fp);
   }
@@ -3986,7 +3822,7 @@ post_append_score(xo, choose)
     ptime = localtime(&now);
 
     fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
-      verb, userid, maxlen, reason, 
+      verb, userid, maxlen, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     fclose(fp);
   }
@@ -4026,6 +3862,32 @@ post_score(xo)
 {
   return post_append_score(xo, 0);
 }
+
+
+static int
+post_noscore(xo)
+  XO *xo;
+{
+  HDR *hdr;
+  int pos, cur;
+
+  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章加密 */
+    return XO_NONE;
+
+  pos = xo->pos;
+  cur = pos - xo->top;
+  hdr = (HDR *) xo_pool + cur;
+
+  if (HAS_PERM(PERM_ALLBOARD) || !strcmp(hdr->owner, cuser.userid))
+  {
+    hdr->xmode ^= POST_NOSCORE;
+    currchrono = hdr->chrono;
+    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
+    move(3 + cur, 7);
+    outs(post_attr(hdr));
+  }
+  return XO_NONE;
+}
 #endif	/* HAVE_SCORE */
 
 
@@ -4056,38 +3918,394 @@ post_noforward(xo)
 
 
 static int
-post_noscore(xo)
+post_addMF(xo)
   XO *xo;
 {
-  HDR *hdr;
-  int pos, cur;
+  MF mf;
+  char fpath[64];
 
-  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章加密 */
+  if (!cuser.userlevel)
     return XO_NONE;
 
-  pos = xo->pos;
-  cur = pos - xo->top;
-  hdr = (HDR *) xo_pool + cur;
-
-  if (HAS_PERM(PERM_ALLBOARD) || !strcmp(hdr->owner, cuser.userid))
+  if (!in_favor(currboard))
   {
-    hdr->xmode ^= POST_NOSCORE;
-    currchrono = hdr->chrono;
-    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
-    move(3 + cur, 7);
-    outs(post_attr(hdr));
+    memset(&mf, 0, sizeof(MF));
+    time(&mf.chrono);
+    mf.mftype = MF_BOARD;
+    strcpy(mf.xname, currboard);
+
+    mf_fpath(fpath, cuser.userid, FN_MF);
+    rec_add(fpath, &mf, sizeof(MF));
+    vmsg("已將此看板加入我的最愛");
   }
-  return XO_NONE;
+  else
+  {
+    vmsg("此看板已在最愛中。若要重覆加入，請進我的最愛裡新增");
+  }
+
+  return XO_FOOT;
 }
 
 
 static int
-post_help(xo)
+post_oldbm(xo)
   XO *xo;
 {
-  xo_help("post");
-  /* return post_head(xo); */
-  return XO_HEAD;		/* itoc.001029: 與 xpost_help 共用 */
+  return vmsg("此功\能已整合至 i / B 了哦！");
+}
+
+
+static int
+post_viewpal()
+{
+  XO *xt;
+  char fpath[64];
+  struct stat st;
+
+  if (!cuser.userlevel)
+    return 0;
+
+  if((currbattr & BRD_SHOWPAL) && !(bbstate & STAT_BM))
+    return 0;
+
+  brd_fpath(fpath, currboard, "friend");
+  if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)	/* 有些名單的 size 為 0 */
+    unlink(fpath);
+
+  if (dashf(fpath))
+  {
+    xz[XZ_FAKE_PAL - XO_ZONE].xo = xt = xo_new(fpath);
+    xt->key = PALTYPE_BPAL;
+    xover(XZ_FAKE_PAL);
+    free(xt);
+    return 1;
+  }
+
+  vmsg("本板尚未設定板友名單 !!");
+  return 0;
+}
+
+
+static int
+post_show_dog(fname)
+  char *fname;
+{
+  FILE *fp;
+  char fpath[64];
+
+  int wi = 0;
+
+  brd_fpath(fpath, currboard, fname);
+
+  if (!(fp = fopen(fpath, "r")))
+    return vmsg("目前無此設定！");
+
+  clear();
+  move(1, 0);
+  prints("\033[1;33m %s \033[m\n\n", (!strcmp(fname, FN_NO_WRITE)) ? "發文推文條件限制" :
+				!strcmp(fname, FN_NO_READ ) ? "進入看板條件限制" :
+				!strcmp(fname, FN_NO_LIST ) ? "看板列表顯示本板" : "");
+
+  fscanf(fp, "%d", &wi);
+  prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s性別限制 : [%s] \033[m\n",
+    (wi == 0) ? COLOR_ACP : (wi == cuser.sex + 1) ? COLOR_ACP : COLOR_NOT_ACP,
+    (wi == 0) ? "不限" : (wi == 1) ? "中性" : (wi == 2) ? "男性" : "女性");
+
+  fscanf(fp, "%d", &wi);
+  prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n",
+    (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s違規次數 <  [%d次] (0：不限) \033[m\n",
+    (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fscanf(fp, "%d", &wi);
+  prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+
+  fclose(fp);
+
+  return vmsg(NULL);
+}
+
+
+#if 0
+static int
+post_showbm(xo)
+  XO *xo;
+{
+  BRD  *brd;
+  brd = bshm->bcache + currbno;
+
+  clear();
+
+  move(0, 0);
+  prints("看板英文板名: %s\n",brd->brdname);
+  prints("看板分類    : %s\n",brd->class);
+  prints("看板中文板名: %s\n",brd->title);
+  prints("看板板主名單: %s\n",brd->BM);
+
+  if (brd->bvote == 0)
+    prints("看板活動舉辦: 無投票舉辦\n");
+  else if (brd->bvote == -1)
+    prints("看板活動舉辦: 有賭盤舉辦\n");
+  else
+    prints("看板活動舉辦: 有投票舉辦\n");
+
+//#define BRD_NOZAP   0x01    /* 不可 zap */
+  prints("看板可否被z : %s\n", (currbattr & BRD_NOZAP) ? "不可" : "可");
+//#define BRD_NOTRAN  0x02    /* 不轉信 */
+  prints("看板可否轉信: %s轉信\n", (currbattr & BRD_NOTRAN) ? "不" : "可");
+//#define BRD_NOCOUNT 0x04    /* 不計文章發表篇數 */
+  prints("文章發表篇數: %s記錄\n", (currbattr & BRD_NOCOUNT) ? "不" : "");
+//#define BRD_NOSTAT  0x08    /* 不納入熱門話題統計 */
+  prints("熱門話題統計: %s記錄\n", (currbattr & BRD_NOSTAT) ? "不" : "");
+//#define BRD_NOVOTE  0x10    /* 不公佈投票結果於 [record] 板 */
+  prints("投摽結果公佈: %s公佈投票結果於 [record] 板\n", (currbattr & BRD_NOVOTE) ? "不" : "");
+//#define BRD_ANONYMOUS   0x20    /* 匿名看板 */
+  prints("匿名看板   ?: %s\n", (currbattr & BRD_ANONYMOUS) ? "是" : "否");
+//#define BRD_NOSCORE 0x40    /* 不評分看板 */
+  prints("看板可否推文: %s\n", (currbattr & BRD_NOSCORE) ? "否" : "可");
+//#define BRD_NOL     0x100   /* 不可鎖文 */
+  prints("看板鎖文限制: %s\n", (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
+//#define BRD_SHOWPAL 0x200   /* 顯示板友名單 */
+  prints("顯示板友名單: %s\n", (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單");
+  prints("顯示轉錄紀錄: 轉錄文章%s顯示記錄\n", (currbattr & BRD_SHOWTURN) ? "" : "不");
+//#define BRD_PUBLIC  0x80    /* 公眾板 */
+  prints("是否為公眾板: ");
+  if(currbattr & BRD_PUBLIC)
+  {
+    prints("是公眾板\n");
+    prints("===>\n");
+    prints("   公眾板板主,\n");
+    prints("     不得任意更改板主名單,看板公開/隱藏/好友設定\n");
+    prints("     若需更改相關設定,請洽楓橋驛站站務部\n");
+    prints("   公眾板使用者,\n");
+    prints("     不得鎖文\n");
+  }
+  else
+    prints("非公眾板\n");
+
+//  vmsg(NULL);
+  int reload = 0;
+  while (1)
+  {
+    if (currbattr & BRD_SHOWPAL)
+      outz("觀看 1)看板發文限制 2)看板讀取限制 3)顯示看板限制 ");
+    else
+      outz("觀看 1)看板發文限制 2)看板讀取限制 3)顯示看板限制 4)板友名單 ");
+
+    switch (vkey())
+    {
+    case '1':
+      post_show_dog(FN_NO_WRITE);
+      break;
+    case '2':
+      post_show_dog(FN_NO_READ);
+      break;
+    case '3':
+      post_show_dog(FN_NO_LIST);
+      break;
+    case '4':
+      reload = post_viewpal();
+      break;
+    default:
+      return reload ? XO_INIT : XO_HEAD;
+    }
+  }
+
+  return XO_NONE;	/* 以防萬一 */
+}
+#endif
+
+
+static int post_rss();
+
+static int
+post_ishowbm(xo)
+  XO *xo;
+{
+  BRD  *brd;
+  brd = bshm->bcache + currbno;
+  int isbm;
+  int ch, reload = 0;
+  char *mark;
+
+  isbm = (bbstate & STAT_BM);
+  if (isbm)
+    mark = "\033[1;33m";
+  else
+    mark = "\033[0;30m";
+
+  while (1)
+  {
+    currbattr = brd->battr;	/* post_manage()更改後尚未更新, 重新載入確保是最新的 */
+    clear();
+    move(0, 0);
+    prints("   - 英文板名: %-13s", brd->brdname);
+    prints("                   - 看板分類: %s\n", brd->class);
+    prints(" %s%s - 中文板名: %s\n", mark, "b\033[m", brd->title);
+    prints(" %s%s - 板主名單: %s\n", mark, "m\033[m", brd->BM);
+    prints(" %s%s - 看板屬性: %s\n", mark, "i\033[m",
+      (brd->readlevel == PERM_SYSOP) ? "秘密" :
+      (brd->readlevel == PERM_BOARD) ? "好友" : "公開");
+
+    prints("   - 匿名看板: %s匿名%s",
+      (currbattr & BRD_ANONYMOUS) ? "可" : "不可",
+      (currbattr & BRD_ANONYMOUS) ? "  " : "");
+    prints("                        - 活動舉辦: %s舉辦\n",
+      (brd->bvote == 0) ? "無投票/賭盤" : (brd->bvote == -1) ? "有賭盤" : "有投票");
+
+    prints("   - 是否轉信: %s轉信", (currbattr & BRD_NOTRAN) ? "不" : "有");
+    prints("                          - 可否被 Z: %s\n",
+      (currbattr & BRD_NOZAP) ? "不可" : "可");
+    prints("   - 文章篇數: %s記錄", (currbattr & BRD_NOCOUNT) ? "不" : "有");
+    prints("                          - 熱門話題: %s統計\n",
+      (currbattr & BRD_NOSTAT) ? "不" : "參與");
+//  prints("   - 投票結果公佈: %s公佈投票結果於 [record] 板\n",
+//    (currbattr & BRD_NOVOTE) ? "不" : "");
+    prints(" %s%s - 可否推文: %s\n", mark, "e\033[m",
+      (currbattr & BRD_NOSCORE) ? "否" : "可");
+    prints(" %s%s - 鎖文限制: %s\n", mark, "x\033[m",
+      (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定");
+    prints(" %s%s - 板友名單: %s\n", mark, "v\033[m",
+      (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單");
+    prints(" %s%s - 轉錄設定: %s轉錄", mark, "f\033[m",
+      (currbattr & BRD_NOFORWARD) ? "禁止" : "允許\");
+    prints("                      %s%s - 轉錄文章%s顯示記錄\n", mark, "a\033[m",
+      (currbattr & BRD_SHOWTURN) ? "" : "不");
+    prints("   - 公眾看板: ");
+    if (currbattr & BRD_PUBLIC)
+    {
+      prints("是公眾板\n===>\n"
+	"   公眾板板主,\n"
+	"       不得任意更改板主名單,看板公開/隱藏/好友設定\n"
+	"       若需更改相關設定,請洽楓橋驛站站務部\n"
+	"   公眾板使用者,\n"
+	"       不得鎖文\n");
+    }
+    else
+    prints("非公眾板\n");
+
+    move(b_lines - 5, 0);
+    prints("%s\n", MSG_SEPERATOR);
+    if (isbm)
+    {
+      prints("名單編輯與其它:\n"
+	"                "
+	"%sw%s - 進板畫面   %so%s - 板友名單   %sk%s - 板友特別名單\n"
+	"                "
+	"%sp%s - 文章類別   %ss%s - 擋信列表   %sg%s - BBS 看門狗   %sr%s - RSS 設定\n",
+	mark, "\033[m", mark, "\033[m", mark, "\033[m",
+	mark, "\033[m", mark, "\033[m", mark, "\033[m", mark, "\033[m");
+    }
+
+    move(b_lines, 0);
+    prints("      觀看看板: 1)發文限制 2)讀取限制 3)顯示限制 ");
+    if (isbm)
+      prints("4)板友名單 ");
+    else
+      prints("4)RSS 設定 %s", !(currbattr & BRD_SHOWPAL) ? "5)板友名單 " : "");
+
+    ch = vkey();
+    if (!isbm && (ch < '1' || ch > '5'))
+      return reload ? XO_INIT : XO_HEAD;
+
+    if (isbm && (ch == '5'))
+      return reload ? XO_INIT : XO_HEAD;
+
+    if (isbm && ch == '4')
+      ch = '5';
+
+    move(b_lines, 0);
+    clrtoeol();
+    switch (ch |= 0x20)
+    {
+    case '1':
+      post_show_dog(FN_NO_WRITE);
+      break;
+    case '2':
+      post_show_dog(FN_NO_READ);
+      break;
+    case '3':
+      post_show_dog(FN_NO_LIST);
+      break;
+    case '4':
+    case 'r':
+      reload = post_rss(xo);
+      break;
+    case '5':
+      reload = post_viewpal() ? 1 : reload;
+      break;
+
+    case 'b':
+      DL_func("bin/manage.so:post_brdtitle");
+      break;
+    case 'm':
+      DL_func("bin/manage.so:post_changeBM");
+      break;
+    case 'i':
+      DL_func("bin/manage.so:post_brdlevel");
+      break;
+    case 'e':
+      DL_func("bin/manage.so:post_battr_noscore");
+      break;
+    case 'x':
+      DL_func("bin/manage.so:post_rlock");
+      break;
+    case 'v':
+      reload = DL_func("bin/manage.so:post_vpal") ? 1 : reload;
+      break;
+    case 'f':
+      DL_func("bin/manage.so:post_noforward");
+      break;
+    case 'a':
+      DL_func("bin/manage.so:post_showturn");
+      break;
+    case 'w':
+      DL_func("bin/manage.so:post_memo_edit");
+      break;
+    case 'o':
+      reload = DL_func("bin/manage.so:XoBM") ? 1 : reload;
+      break;
+    case 'k':
+      reload = XoBM_add_pal() ? 1 : reload;
+      break;
+    case 'p':
+      DL_func("bin/manage.so:post_brd_prefix");
+      break;
+    case 's':
+      DL_func("bin/manage.so:post_spam_edit");
+      break;
+    case 'g':
+      DL_func("bin/manage.so:post_guard_dog");
+      break;
+    default:
+      return reload ? XO_INIT : XO_HEAD;
+    }
+  }
+
+  return XO_NONE;	/* 以防萬一 */
 }
 
 
@@ -4153,133 +4371,26 @@ post_filename(xo)	/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
 {
   cuser.ufo ^= UFO_FILENAME;
   cutmp->ufo = cuser.ufo;
-  return XO_INIT;
+  return XO_HEAD;
 }
 
 
 static int
-post_rss(xo)
-  XO *xo;
+post_rss()
 {
   more("gem/@/@rss.info", NULL);
   rss_main();
-  return XO_INIT;
+  return 1;
 }
 
 
 static int
-post_sibala(xo)
+post_help(xo)
   XO *xo;
 {
-  FILE *fp, *fp2;
-  HDR hdr;
-  struct tm *ptime;
-  time_t now;
-  char fname_sibala[32], fpath[64], fpath_tmp[64], buf[64], title[64], folder[64];
-  int i, j, k, num_sibala, num_sibala_face;
-
-  sprintf(fname_sibala, "%s.sibala", cuser.userid);
-  brd_fpath(fpath, currboard, fname_sibala);
-
-  num_sibala = 0;
-  num_sibala_face = 0;
-
-  fp = fopen(fpath, "w");
-
-  fprintf(fp, "丟骰人   : %s\n", cuser.userid);
-  fprintf(fp, "來源     : %s\n", fromhost);
-  fprintf(fp, "來源     : %s\n", get_my_ip());
-
-  time(&now);
-  ptime = localtime(&now);
-  fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
-  ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
-
-  clear();
-  move(i = 3, 0);
-  if (!vget(i,0, "輸入標題名稱 : ", title, 60, DOECHO))
-  {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
-  }
-  fprintf(fp, "標題名稱 : %s\n", title);
-
-  i += 2;
-  if (!vget(i,0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
-  {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
-  }
-  fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
-
-  i += 2;
-  if (!vget(i,0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
-  {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
-  }
-  fprintf(fp, "丟骰次數 : %d\n", num_sibala);
-
-  j = 0;
-  sprintf(fpath_tmp, "%s.tmp", fpath);
-  fp2 = fopen(fpath_tmp, "w");
-  srand (time(NULL));
-  for (i=0; i < num_sibala; i++)
-  {
-    k = rand()%num_sibala_face + 1;
-    j = j + k;
-    fprintf(fp2, "第 %4d 次丟骰結果 : %4d  加總 : %d\n", i+1, k, j);
-  }
-
-  sprintf(buf, "丟骰結果 : %d\n", j);
-  fprintf(fp, "%s", buf);
-  vmsg(buf);
-
-  fclose(fp2);
-  fclose(fp);
-
-  sprintf(buf, "/bin/cat %s >> %s",fpath_tmp, fpath);
-  system(buf);
-
-  if (!(bbstate & STAT_POST))	/* 在 currboard 沒有發表權限，故寄回信箱 */
-  {
-    usr_fpath(folder, cuser.userid, fn_dir);
-    hdr_stamp(folder, HDR_COPY, &hdr, fpath);
-    strcpy(hdr.owner, "丟骰結果");
-    strcpy(hdr.nick,  "賭神");
-    hdr.xmode = MAIL_READ | MAIL_NOREPLY;
-    sprintf(hdr.title, "%s : %s", cuser.userid, title);
-    rec_add(folder, &hdr, sizeof(HDR));
-    vmsg("您沒有在此發表文章的權限，丟骰結果已寄回您的信箱");
-  }
-  else		/* 貼回原看板上 */
-  {
-    hdr_stamp(xo->dir, HDR_COPY | 'A', &hdr, fpath);
-    strcpy(hdr.owner, "丟骰結果");
-    strcpy(hdr.nick,  "賭神");
-    sprintf(hdr.title, "%s : %s", cuser.userid, title);
-    rec_bot(xo->dir, &hdr, sizeof(HDR));
-
-    btime_update(brd_bno(currboard));
-  }
-
-  /* 貼至 log 板做記錄 */
-  brd_fpath(folder, "log", ".DIR");
-
-  hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
-  strcpy(hdr.owner, "丟骰結果");
-  strcpy(hdr.nick,  "賭神");
-  sprintf(hdr.title, "%s : %s", cuser.userid, title);
-  rec_bot(folder, &hdr, sizeof(HDR));
-
-  btime_update(brd_bno("log"));
-
-  unlink(fpath_tmp);
-  unlink(fpath);
-  return XO_INIT;
+  xo_help("post");
+  /* return post_head(xo); */
+  return XO_HEAD;		/* itoc.001029: 與 xpost_help 共用 */
 }
 
 
@@ -4297,7 +4408,6 @@ KeyFunc post_cb[] =
   's', post_switch,
   KEY_TAB, post_gem,
   'z', post_gem,
-  'o', post_noforward,
   'f', post_filename,
   'y', post_reply,
   'd', post_delete,
@@ -4311,10 +4421,11 @@ KeyFunc post_cb[] =
   'M', post_mark_good,
   '_', post_bottom,
   'D', post_rangedel,
-  'S', post_rss,
+  'o', post_noforward,
 #ifdef HAVE_SCORE
   '%', post_score,
   'e', post_e_score,
+  Ctrl('E'), post_noscore,
 #endif
 
   'w', post_write,
@@ -4322,21 +4433,11 @@ KeyFunc post_cb[] =
   'b', post_memo,
   'c', post_copy,
   'g', gem_gather,
-  'G', post_sibala,
 
-  Ctrl('P'), post_add,
-  Ctrl('D'), post_prune,
-  Ctrl('Q'), xo_uquery,
-  Ctrl('O'), xo_usetup,
-  Ctrl('E'), post_noscore,
-  Ctrl('F'), XoBM_add_pal,
-  'O', XoBM_Refuse_pal,
-  Ctrl('G'), post_viewpal,
-  Ctrl('B'), post_showbm,
-  Ctrl('S'), post_state,
 #ifdef HAVE_REFUSEMARK
   'L', post_refuse,
-  'l', post_friend,
+  'l', post_oldrefuse,
+  'O', post_oldrefuse,
 #endif
 
 #ifdef HAVE_LABELMARK
@@ -4344,16 +4445,8 @@ KeyFunc post_cb[] =
   Ctrl('N'), post_delabel,
 #endif
 
-  'B' | XO_DL, (void *) "bin/manage.so:post_manage",
-  'R' | XO_DL, (void *) "bin/vote.so:vote_result",
-  'V' | XO_DL, (void *) "bin/vote.so:XoVote",
-
-#ifdef HAVE_TERMINATOR
-  Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
-#endif
-
   '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
-  '!', XoRXsearch, 
+  '!', XoRXsearch,
   '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
   'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
 
@@ -4366,6 +4459,29 @@ KeyFunc post_cb[] =
   'f', XoXfull,			/* itoc.030608: 全文搜尋 */
   'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
   'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
+#endif
+
+  Ctrl('P'), post_add,
+  Ctrl('D'), post_prune,
+  Ctrl('Q'), xo_uquery,
+  Ctrl('O'), xo_usetup,
+
+  Ctrl('S'), post_state,
+
+  Ctrl('F'), post_addMF,
+//  Ctrl('F'), post_oldbm,
+  'S', post_oldbm,
+  Ctrl('G'), post_oldbm,
+  Ctrl('B'), post_oldbm,
+  'i', post_ishowbm,
+  'B', post_ishowbm,
+//  'B' | XO_DL, (void *) "bin/manage.so:post_manage",
+  'R' | XO_DL, (void *) "bin/vote.so:vote_result",
+  'V' | XO_DL, (void *) "bin/vote.so:XoVote",
+  'G' | XO_DL, (void *) "bin/xyz.so:post_sibala",
+
+#ifdef HAVE_TERMINATOR
+  Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
 #endif
 
 #ifdef HAVE_XYNEWS
@@ -4393,6 +4509,7 @@ KeyFunc xpost_cb[] =
   'X', post_forward,
   KEY_TAB, post_gem,
   'z', post_gem,
+  'f', post_filename,
   'o', post_noforward,
   'c', post_copy,
   'g', gem_gather,
@@ -4404,17 +4521,23 @@ KeyFunc xpost_cb[] =
 #ifdef HAVE_SCORE
   '%', post_score,
   'e', post_e_score,
+  Ctrl('E'), post_noscore,
 #endif
+
   'w', post_write,
+
 #ifdef HAVE_REFUSEMARK
   'L', post_refuse,
+  'l', post_oldrefuse,
+  'O', post_oldrefuse,
 #endif
+
 #ifdef HAVE_LABELMARK
   'n', post_label,
 #endif
 
   '/', XOXpost_search_all,  /* smiler.070201: 搜尋功能整合 */
-  '!', XoRXsearch, 
+  '!', XoRXsearch,
   '~', XoXselect,
   'a', XoXauthor,
 #if 0
@@ -4431,7 +4554,6 @@ KeyFunc xpost_cb[] =
   Ctrl('D'), post_prune,
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
-  Ctrl('E'), post_noscore,
 
   'h', post_help		/* itoc.030511: 共用即可 */
 };

@@ -1345,8 +1345,8 @@ igetch()
 
 
 #ifdef TIME_KICKER
-//    if(cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
-	if(1)
+//    if (cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
+    if (1)
     {
 	  if (idle > IDLE_TIMEOUT)
 	  {

@@ -231,9 +231,9 @@ song_item_bar(xo, mode)
   else if (xmode & GEM_BOARD)           /*         看板:■ */
     gtype += 2;
 
-  prints("%s%6d%c \241%c %-.*s%s",
+  prints("%s%6d%c \241%c %-*.*s%s",
     mode ? UCBAR[UCBAR_SONG] : "",         //這裡是光棒的顏色，可以自己改
-    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 80, d_cols + 80,
+    xo->pos + 1, xmode & GEM_RESTRICT ? ')' : ' ', gtype, d_cols + 67, d_cols + 67,
     (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK : hdr->title,
     mode ? "\033[m" : "");
 

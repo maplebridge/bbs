@@ -123,8 +123,8 @@ can_see(my, up)
   urufo = up->ufo;
 
   /* smiler.080806: 對方是否設我為特殊好友，若有，則必可看到對方 */
-  if(is_super_ogood(up))
-	  return 1;
+  if (is_super_ogood(up))
+    return 1;
 
   /* smiler.080806: 兩者是否看同一看板，且我是板主 */
   if(my->reading && up->reading)
@@ -214,7 +214,7 @@ bmw_send(callee, bmw)
 
   *mhead = *bmw;
   ushm->mbase = mslot[i] = mhead;
-  /* Thor.981206: 需注意, 若ushm mapping不同, 
+  /* Thor.981206: 需注意, 若ushm mapping不同,
                   則不同隻 bbsd 互call會core dump,
                   除非這也用offset, 不過除了 -i, 應該是非必要 */
 
@@ -772,8 +772,7 @@ bmw_rqst()
       bmw_request = 1;		/* 要求更新 */
 
     /* Thor.980827: 為了防止列印一半(more)時水球而後列印超過範圍踢人, 故存下游標位置 */
-    cursor_save(); 
-
+    cursor_save();
 
     //sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
     if (mptr->nick[0]=='\0')
@@ -1064,7 +1063,7 @@ bmw_store(fpath)
 
     fprintf(fp, "              == 水球記錄 %s ==\n\n", Now());
 
-    while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW)) 
+    while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW))
     {
       //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
       if (bmw.nick[0]=='\0')
@@ -1127,7 +1126,7 @@ bmw_save_user(xo)
 
 	fprintf(fp, "       == 與 %s 丟的水球紀錄 %s ==\n\n", acct.userid, Now());
 
-	while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW)) 
+	while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW))
 	{
 	  if (bmw.sender == acct.userno || bmw.recver == acct.userno)
 	  {
@@ -1228,7 +1227,7 @@ KeyFunc bmw_cb[] =
   't', bmw_tag,
   Ctrl('D'), bmw_prune,
   'C', bmw_clear,
-  
+
   'h', bmw_help
 };
 

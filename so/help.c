@@ -17,10 +17,10 @@ do_help(path)	/* itoc.021122: 說明文件 */
 {
   char *str;
   char fpath[64];
-  char fpath_help_all[64];                       //smiler.070927
+  char fpath_help_all[64];	//smiler.070927
   int num, pageno, pagemax, redraw, reload;
   int ch, cur, i;
-  int j;                                         //smiler.080201
+  int j;			//smiler.080201
   struct stat st;
   PAL *pal;
 
@@ -34,7 +34,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
   pal = NULL;
 
   sprintf(fpath_help_all, "etc/help/%s/%s.hlp", path, path);
-  more(fpath_help_all, NULL);                    //smiler.070927
+  more(fpath_help_all, NULL);		//smiler.070927
 
   do
   {
@@ -77,15 +77,15 @@ do_help(path)	/* itoc.021122: 說明文件 */
 
       outf(FEETER_HELP);
       move(3 + cur, 0);
-      if(cuser.ufo & UFO_LIGHTBAR)
+      if (cuser.ufo & UFO_LIGHTBAR)
       {
-        j = pageno * XO_TALL + cur;
-        clrtoeol();
-        prints("\033[1;42m%6d    %-14s%-54s\033[m", j+1,
-        pal[j].userid, pal[j].ship);
+	j = pageno * XO_TALL + cur;
+	clrtoeol();
+	prints("\033[1;42m%6d    %-14s%-*s\033[m",
+	  j + 1, pal[j].userid, d_cols + 54, pal[j].ship);
       }
       else
-        outc('>');
+	outc('>');
       redraw = 0;
     }
 
@@ -104,9 +104,9 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     case Ctrl('P'):
-      if (HAS_PERM(PERM_ALLADMIN))
+      if (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM))
       {
-        PAL new;
+	PAL new;
 
 	memset(&new, 0, sizeof(PAL));
 
@@ -130,7 +130,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     case 'd':
-      if (HAS_PERM(PERM_ALLADMIN))
+      if (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM))
       {
 	if (vans(msg_del_ny) == 'y')
 	{
@@ -147,7 +147,7 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     case 'T':
-      if (HAS_PERM(PERM_ALLADMIN))
+      if (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM))
       {
 	i = cur + pageno * XO_TALL;
 	if (vget(b_lines, 0, "標題：", pal[i].ship, sizeof(pal[0].ship), GCARRY))
@@ -157,18 +157,18 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     case 'E':
-      if (HAS_PERM(PERM_ALLADMIN))
+      if (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM))
       {
 	i = cur + pageno * XO_TALL;
 	strcpy(str, pal[i].userid);
-	vedit(fpath, HAS_PERM(PERM_ALLADMIN) ? 0 : -1);
+	vedit(fpath, (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM)) ? 0 : -1);
 	strcpy(str, fn_dir);
 	redraw = 1;
       }
       break;
 
     case 'm':
-      if (HAS_PERM(PERM_ALLADMIN))
+      if (HAS_PERM(PERM_ALLADMIN) || HAS_PERM(PERM_ATOM))
       {
 	char buf[40], ans[5];
 
@@ -206,23 +206,23 @@ do_help(path)	/* itoc.021122: 說明文件 */
       break;
 
     default:
-      if(cuser.ufo & UFO_LIGHTBAR)
+      if (cuser.ufo & UFO_LIGHTBAR)
       {
-         move(3 + cur, 0); //smiler.071220
-         j = pageno * XO_TALL + cur;
-         clrtoeol();
-         prints("%6d    %-14s%s\n", j+1, pal[j].userid, pal[j].ship);
+	move(3 + cur, 0);	//smiler.071220
+	clrtoeol();
+	j = pageno * XO_TALL + cur;
+	prints("%6d    %-14s%s\n", j + 1, pal[j].userid, pal[j].ship);
       }
 
       ch = xo_cursor(ch, pagemax, num, &pageno, &cur, &redraw);
 
-      if(cuser.ufo & UFO_LIGHTBAR)
+      if (cuser.ufo & UFO_LIGHTBAR)
       {
-        move(3 + cur, 0);
-        j = pageno * XO_TALL + cur;
-        clrtoeol();
-        prints("\033[1;42m%6d    %-14s%-54s\033[m", j+1,
-                 pal[j].userid, pal[j].ship);
+	move(3 + cur, 0);
+	clrtoeol();
+	j = pageno * XO_TALL + cur;
+	prints("\033[1;42m%6d    %-14s%-*s\033[m",
+	  j + 1, pal[j].userid, d_cols + 54, pal[j].ship);
       }
       break;
     }
