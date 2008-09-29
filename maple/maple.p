@@ -182,9 +182,6 @@ int post_score(XO *xo);
 void hdr_outs_bar(HDR *hdr, int cc);
 void post_history(XO *xo, HDR *hdr);
 
-/* rss.c */
-int rss_main(void);
-
 /* talk.c */
 char *bmode(UTMP *up, int simple);
 void frienz_sync(char *fpath);

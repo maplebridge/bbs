@@ -457,7 +457,7 @@ gem_log(folder, action, hdr)
   /* mv @log @log.old */
   str_folder(fpath1, folder, "@/@log");
   str_folder(fpath2, folder, "@/@log.old");
-  f_mv(fpath1, fpath2);  
+  f_mv(fpath1, fpath2);
 
   if (!(fp1 = fopen(fpath1, "a")))
     return;
@@ -508,14 +508,14 @@ gem_add(xo, gtype)
   {
     gtype = vans((level & GEM_X_BIT) ?
       /* "新增 A)rticle B)oard C)lass D)ata F)older L)ine P)aste Q)uit [Q] " : */
-      "新增 (A)文章 (B)看板 (C)分類 (D)資料 (F)卷宗 (L)分隔 (P)貼複 (Q)取消？[Q] " : 
+      "新增 (A)文章 (B)看板 (C)分類 (D)資料 (F)卷宗 (L)分隔 (P)貼複 (Q)取消？[Q] " :
       "新增 (A)文章 (F)卷宗 (L)分隔 (P)貼複 (Q)取消？[Q] ");
   }
 
   if (gtype == 'p')
     return gem_paste(xo);
 
-  if (gtype != 'a' && gtype != 'f' && gtype != 'l' && 
+  if (gtype != 'a' && gtype != 'f' && gtype != 'l' &&
     (!(level & GEM_X_BIT) || (gtype != 'b' && gtype != 'c' && gtype != 'd')))
     return XO_FOOT;
 
@@ -867,7 +867,7 @@ gem_browse(xo)
 
     /* browse article */
 
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if ((xmode = more(fpath, FOOTER_GEM)) < 0)
       break;
 
@@ -1079,7 +1079,7 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
   HDR *gbuf, buf;
 
   /* smiler.080614 : 收錄精華記錄，但因對folder無效，目前取消掉 */
-  int can_show=1;  
+  int can_show = 1;
   char fpath[64];
   FILE *fp;
 
@@ -1128,8 +1128,8 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	    time(&now);
 	    ptime = localtime(&now);
 
-	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
-	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n",
+	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華",
 	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 	    fclose(fp);
 	  }
@@ -1178,8 +1178,8 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	    time(&now);
 	    ptime = localtime(&now);
 
-	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n", 
-	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華", 
+	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n",
+	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華",
 	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 	    fclose(fp);
 	  }

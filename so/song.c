@@ -272,7 +272,7 @@ song_body(xo)
   clrtobot();
 
   /* return XO_NONE; */
-  return XO_FOOT;	/* itoc.010403: 把 b_lines 填上 feeter */  
+  return XO_FOOT;	/* itoc.010403: 把 b_lines 填上 feeter */
 }
 
 
@@ -527,7 +527,7 @@ song_order(xo)
 
     if (!strchr(rcpt, '@'))
     {
-      /* 站內的寄信處理.... */ 
+      /* 站內的寄信處理.... */
       /* 加入文章檔案 */
 
       if (acct_load(&acct, rcpt) < 1)

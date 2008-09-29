@@ -4379,7 +4379,7 @@ static int
 post_rss()
 {
   more("gem/@/@rss.info", NULL);
-  rss_main();
+  DL_func(bin/rss.so:rss_main");
   return 1;
 }
 

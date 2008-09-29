@@ -13,7 +13,7 @@
 #if 0
 /*
 smiler.080203:
-1.字典相關功能，請見 http://dict.tw/doc/Dict_BSD.htm 
+1.字典相關功能，請見 http://dict.tw/doc/Dict_BSD.htm
   以及 http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/dict.html
 
 2.iconv.h 相關編碼問題，請見 http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/converter.html

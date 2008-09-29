@@ -3,7 +3,7 @@
 kill `ps -auxwww | grep bbsd | awk '{print $2}'`
 
 # for freebsd only
-for i in `ipcs | grep bbs | awk '{print $3}'`
+for i in `ipcs | grep maple | awk '{print $3}'`
 do
   if [ $OSTYPE = "FreeBSD" ]; then
          ipcrm -M $i

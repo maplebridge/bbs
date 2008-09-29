@@ -255,9 +255,9 @@ bsmtp(fpath, title, rcpt, method)
     archiv32(stamp, msgid);
 
     /* Thor.990125: 儘可能的像 RFC 822 及 sendmail 的作法, 免得別人不接:p */
-    fprintf(fw, "From: \"%s\" <%s>\r\nTo: %s\r\n", 
+    fprintf(fw, "From: \"%s\" <%s>\r\nTo: %s\r\n",
 #ifdef EMAIL_JUSTIFY
-      method & MQ_JUSTIFY ? "BBS Register" : 
+      method & MQ_JUSTIFY ? "BBS Register" :
 #endif
       cuser.username, from, rcpt);
     /* itoc.030411: mail 輸出 RFC 2047 */
@@ -271,7 +271,7 @@ bsmtp(fpath, title, rcpt, method)
       "X-Disclaimer: [%s] 對本信內容恕不負責\r\n\r\n",
       cuser.userid, cuser.username,
       Atime(&stamp), msgid, str_host,
-      method & MQ_ATTACH ? "application/x-gzip" : "text/plain", MYCHARSET, 
+      method & MQ_ATTACH ? "application/x-gzip" : "text/plain", MYCHARSET,
       str_site);
 
 #ifdef EMAIL_JUSTIFY
@@ -313,7 +313,7 @@ bsmtp(fpath, title, rcpt, method)
       buf[8] = '\0';	/* Thor.990413: buf 用不到了，借來用用 */
       prichro = chrono32(buf);
       archiv32(str_hash(msgid, prichro), buf);
-      fprintf(fw,"※ X-Sign: %s$%s %s\r\n", 
+      fprintf(fw,"※ X-Sign: %s$%s %s\r\n",
 	msgid, genpasswd(buf), Btime(&stamp));
     }
 #endif
@@ -349,8 +349,8 @@ smtp_log:
   /* 記錄寄信						 */
   /* --------------------------------------------------- */
 
-  sprintf(buf, "%s %-13s%c> %s\n%s\t%s\n\t%s\n", 
-    Btime(&stamp), cuser.userid, (method & MQ_JUSTIFY) ? '=' : '-', rcpt, 
+  sprintf(buf, "%s %-13s%c> %s\n%s\t%s\n\t%s\n",
+    Btime(&stamp), cuser.userid, (method & MQ_JUSTIFY) ? '=' : '-', rcpt,
     sock >= 0 ? "" : from, title, fpath);
   f_cat(FN_RUN_MAIL_LOG, buf);
 
@@ -1243,7 +1243,7 @@ multi_send(title)
     vmsg(msg_cancel);
     return -1;
   }
-  
+
   return 0;
 }
 
@@ -1353,7 +1353,7 @@ mbox_item_bar(xo, mode)
 
 #ifdef OVERDUE_MAILDEL
   xmode = hdr->xmode;
-  prints(xmode & MAIL_DELETE ? 
+  prints(xmode & MAIL_DELETE ?
     "%s%6d%c\033[1;5;41m%c\033[m%s " : "%s%6d%c%c%s ",
     mode ? UCBAR[UCBAR_MAIL] : "",
     num, tag_char(hdr->chrono), mbox_attr(xmode),
@@ -1603,8 +1603,8 @@ re_key:
       {
 	FILE *fp;
 	if (fp = tbf_open())
-	{ 
-	  f_suck(fp, fpath); 
+	{
+	  f_suck(fp, fpath);
 	  fclose(fp);
 	}
       }
@@ -1924,7 +1924,7 @@ static KeyFunc mbox_cb[] =
   'f', XoXfull,			/* itoc.030608: 全文搜尋 */
   'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
   'L', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
-  '!', XoRXsearch, 
+  '!', XoRXsearch,
 
   Ctrl('D'), mbox_prune,
   Ctrl('Q'), xo_uquery,
@@ -1978,7 +1978,7 @@ KeyFunc xmbox_cb[] =
   'f', XoXfull,
   'G', XoXmark,
   'L', XoXlocal,
-  '!', XoRXsearch, 
+  '!', XoRXsearch,
 
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,

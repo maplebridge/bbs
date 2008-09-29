@@ -24,7 +24,7 @@ nl_item(num, nl)
   int num;
   nodelist_t *nl;
 {
-  prints("%6d %-13s%-*.*s %s(%d)\n", num, 
+  prints("%6d %-13s%-*.*s %s(%d)\n", num,
     nl->name, d_cols + 45, d_cols + 45, nl->host, nl->xmode & INN_USEIHAVE ? "IHAVE" : "POST", nl->port);
 }
 
@@ -35,7 +35,7 @@ nl_query(nl)
 {
   move(3, 0);
   clrtobot();
-  prints("\n\n轉信站台：%s\n站台位址：%s\n站台協定：%s(%d)\n被 餵 信：%s", 
+  prints("\n\n轉信站台：%s\n站台位址：%s\n站台協定：%s(%d)\n被 餵 信：%s",
     nl->name, nl->host, nl->xmode & INN_USEIHAVE ? "IHAVE" : "POST", nl->port, nl->xmode & INN_FEEDED ? "是" : "否");
   vmsg(NULL);
 }
@@ -150,7 +150,7 @@ nf_item(num, nf)
     outgo = income = 'X';
   }
 
-  prints("%6d %-13s%-*.*s %c-%c %-13s %.7s\n", num, 
+  prints("%6d %-13s%-*.*s %c-%c %-13s %.7s\n", num,
     nf->path, d_cols + 32, d_cols + 32, nf->newsgroup, outgo, income, nf->board, nf->charset);
 }
 
@@ -200,9 +200,9 @@ nf_query(nf)
   move(3, 0);
   clrtobot();
   prints("\n\n轉信站台：%s\n站台位址：%s\n站台協定：%s(%d)\n"
-    "轉信群組：%s%s\n本站看板：%s (%s%s)\n使用字集：%s", 
-    nf->path, nl.host, nl.xmode & INN_USEIHAVE ? "IHAVE" : "POST", nl.port, 
-    nf->newsgroup, nf->xmode & INN_ERROR ? " (\033[1;33m此群組不存在\033[m)" : "", 
+    "轉信群組：%s%s\n本站看板：%s (%s%s)\n使用字集：%s",
+    nf->path, nl.host, nl.xmode & INN_USEIHAVE ? "IHAVE" : "POST", nl.port,
+    nf->newsgroup, nf->xmode & INN_ERROR ? " (\033[1;33m此群組不存在\033[m)" : "",
     nf->board, outgo, income, nf->charset);
   if (rc && !(nl.xmode & INN_FEEDED))
     prints("\n目前篇數：%d", nf->high);
@@ -322,7 +322,7 @@ ncm_item(num, ncm)
   int num;
   ncmperm_t *ncm;
 {
-  prints("%6d %-*.*s%-23.23s %s\n", num, 
+  prints("%6d %-*.*s%-23.23s %s\n", num,
     d_cols + 44, d_cols + 44, ncm->issuer, ncm->type, ncm->perm ? "○" : "╳");
 }
 
@@ -333,7 +333,7 @@ ncm_query(ncm)
 {
   move(3, 0);
   clrtobot();
-  prints("\n\n發行站台：%s\n砍信種類：%s\n允許\砍信：%s", 
+  prints("\n\n發行站台：%s\n砍信種類：%s\n允許\砍信：%s",
     ncm->issuer, ncm->type, ncm->perm ? "○" : "╳");
   vmsg(NULL);
 }
@@ -343,7 +343,7 @@ static int	/* 1:成功 0:失敗 */
 ncm_add(fpath, old, pos)
   char *fpath;
   ncmperm_t *old;
-  int pos; 
+  int pos;
 {
   ncmperm_t ncm;
 
@@ -424,8 +424,8 @@ spam_item(num, spam)
 
   path = spam->path;
   board = spam->board;
-  prints("%6d %-13s%-13s[%s] 包含 %.*s\n", 
-    num, *path ? path : "所有站台", *board ? board : "所有看板", 
+  prints("%6d %-13s%-13s[%s] 包含 %.*s\n",
+    num, *path ? path : "所有站台", *board ? board : "所有看板",
     spam_compare(spam->xmode), d_cols + 30, spam->detail);
 }
 
@@ -441,7 +441,7 @@ spam_query(spam)
 
   move(3, 0);
   clrtobot();
-  prints("\n\n適用站台：%s\n適用看板：%s\n比較項目：%s\n比較內容：%s", 
+  prints("\n\n適用站台：%s\n適用看板：%s\n比較項目：%s\n比較內容：%s",
     *path ? path : "所有站台", *board ? board : "所有看板", spam_compare(spam->xmode), spam->detail);
   vmsg("若滿足此規則，會被視為廣告而無法轉信進來");
 }
@@ -451,7 +451,7 @@ static int	/* 1:成功 0:失敗 */
 spam_add(fpath, old, pos)
   char *fpath;
   spamrule_t *old;
-  int pos; 
+  int pos;
 {
   spamrule_t spam;
 

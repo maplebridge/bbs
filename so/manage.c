@@ -69,9 +69,9 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
   if (type < '1' || type > '3')
     return XO_FOOT;
 
-  sprintf(buf, "刪除%s：%.35s 於%s板，確定嗎(Y/N)？[N] ", 
-    mode == 1 ? "作者" : mode == 2 ? "標題" : "條件", 
-    mode == 1 ? keyOwner : mode == 2 ? keyTitle : "自定", 
+  sprintf(buf, "刪除%s：%.35s 於%s板，確定嗎(Y/N)？[N] ",
+    mode == 1 ? "作者" : mode == 2 ? "標題" : "條件",
+    mode == 1 ? keyOwner : mode == 2 ? keyTitle : "自定",
     type == '1' ? "轉信" : type == '2' ? "非轉信" : "所有看");
 
   if (vans(buf) == 'y')
@@ -126,7 +126,7 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       {
 	xmode = hdr->xmode;
 
-	if ((xmode & POST_MARKED) || 
+	if ((xmode & POST_MARKED) ||
 	  ((mode & 1) && strcmp(keyOwner, hdr->owner)) ||
 	  ((mode & 2) && strcmp(keyTitle, str_ttl(hdr->title))))
 	{
@@ -268,7 +268,7 @@ post_spam_edit()
     }
     else
     {
-      more("etc/help/post/post_spam_ed",NULL); 
+      more("etc/help/post/post_spam_ed",NULL);
       if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
 	vmsg(msg_cancel);
     }
@@ -1110,7 +1110,7 @@ int
 post_guard_dog()
 {
   char fpath[64];
-  char *menu[] = 
+  char *menu[] =
   {
     "BQ",
     "BBSdog  BBS看門狗計畫",
@@ -1152,7 +1152,7 @@ post_manage(xo)
 {
   BRD *brd;
 #ifdef POPUP_ANSWER
-  char *menu[] = 
+  char *menu[] =
   {
     "BQ",
     "BTitle  修改看板主題",
