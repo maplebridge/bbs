@@ -70,6 +70,9 @@ IS_BIGGER_AGE(age)
   time_t now;
   struct tm *ptime;
 
+  if (!cuser.year || !cuser.month || !cuser.day)	/* 生日未填 */
+    return 0;
+
   time(&now);
   ptime = localtime(&now);
 
@@ -676,38 +679,59 @@ do_post(xo, title)
   }
   else		/* itoc.020113: 新文章選擇標題分類 */
   {
-#define NUM_PREFIX 8
-    if(!(currbattr & BRD_PREFIX))
+#define NUM_PREFIX	8
+    if(!(currbattr & BRD_NOPREFIX))
     {
       FILE *fp;
-      char prefix[NUM_PREFIX][10];
-      char *prefix_default[NUM_PREFIX] = {"[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "};
+      char prefix[NUM_PREFIX][8];
+      char *prefix_default[NUM_PREFIX] =
+	{"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
 
       for (mode = 0; mode < NUM_PREFIX; mode++)
 	strcpy(prefix[mode], prefix_default[mode]);
-      brd_fpath(fpath, currboard, "prefix");
+
+      brd_fpath(fpath, currboard, "prefix.new");
       if (fp = fopen(fpath, "r"))
       {
+	int len = 6, pnum;
+	move(21, 0);
+	prints("類別：");
+
+	/* 載入設定檔 */
 	for (mode = 0; mode < NUM_PREFIX; mode++)
 	{
-	  if (fscanf(fp, "%9s", fpath) != 1)
+//	  if (fscanf(fp, "%9s", fpath) != 1)
+//	    break;
+//	  strcpy(prefix[mode], fpath);
+	  if (!fgets(fpath, 6, fp))
 	    break;
+	  if (strlen(fpath) == 1)	/* '\n' */
+	    break;
+	  fpath[strlen(fpath) - 1] = '\0';
 	  strcpy(prefix[mode], fpath);
+	  prints("%d.%s ", mode + 1, fpath);
+	  len += (3 + strlen(fpath));
+	  pnum = mode;
 	}
 	fclose(fp);
       }
+      else	/* 沒有設定檔, 使用預設 */
+      {
+	pnum = NUM_PREFIX;
+	for (mode = 0; mode < NUM_PREFIX; mode++)
+	  prints("%d.%s ", mode + 1, prefix[mode]);
+      }
 
-      move(21, 0);
-      outs("類別：");
-      for (mode = 0; mode < NUM_PREFIX; mode++)
-	prints("%d.%s", mode + 1, prefix[mode]);
-      mode = vget(20, 0, "請選擇文章類別（按 Enter 跳過）：", fpath, 3, DOECHO) - '1';
-      if (mode >= 0 && mode < NUM_PREFIX)		/* 輸入數字選項 */
-	rcpt = prefix[mode];
-      else					/* 空白跳過 */
+      mode = vget(20, len, "", fpath, 3, DOECHO) - '1';
+      if (mode >= 0 && mode < pnum)	/* 輸入數字選項 */
+      {
+	sprintf(fpath, "[%s] ", prefix[mode]);
+	rcpt = fpath;
+      }
+      else				/* 空白跳過 */
 	rcpt = NULL;
     }
-    else
+    else	/* 看板設定不使用文章類別 */
       rcpt = NULL;
   }
 

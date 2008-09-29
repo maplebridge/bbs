@@ -26,7 +26,7 @@
 #define BRD_PUBLIC	0x80	/* 公眾板 */
 #define BRD_NOL		0x00000100	/* 不可鎖文 */
 #define	BRD_SHOWPAL	0x00000200	/* 顯示板友名單 */
-#define BRD_PREFIX	0x00000400	/* 是否啟動看板 POST_PREFIX 功能:0 啟動 :1 關閉 */
+#define BRD_NOPREFIX	0x00000400	/* 是否啟動看板 POST_PREFIX 功能:0 啟動 :1 關閉 */
 #define BRD_NOFORWARD	0x00000800  /* 是否看板可轉錄  0:可  1:否 */
 #define BRD_SHOWTURN	0x00001000	/* 是否看板要show轉錄記錄  0:否  1:要 */
 #define BRD_IAS		0x00002000	/* 藝文館看板 */
@@ -56,7 +56,7 @@ static char *battr_tbl[NUMBATTRS] =
   "公眾板",		/* BRD_PUBLIC */
   "不可鎖文",		/* BRD_NOL */
   "顯示板友名單",		/* BRD_SHOWPAL */
-  "停止POST_PREFIX", 	/* BRD_PREFIX */
+  "停止使用文章類別", 	/* BRD_NOPREFIX */
   "看板禁轉",		/* BRD_NOFORWARD */
   "轉錄記錄",		/* BRD_SHOWTURN */
   "藝文館看板",		/* BRD_IAS */

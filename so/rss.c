@@ -789,6 +789,7 @@ int rss_main()
   char rss_fpath[64];
   brd_fpath(rss_fpath,currboard,FN_RSS);
   xz[XZ_RSS - XO_ZONE].xo = xo = xo_new(rss_fpath);
+  xz[XZ_RSS - XO_ZONE].cb = rss_cb;
   xo->key = XZ_RSS;
   xo->pos = 0;
   xover(XZ_RSS);

@@ -285,13 +285,13 @@ post_spam_edit()
 static int
 post_prefix_edit()
 {
-#define NUM_PREFIX      8
+#define NUM_PREFIX	8
   int i;
   FILE *fp;
-  char fpath[64], buf[20], prefix[NUM_PREFIX][20], *menu[NUM_PREFIX + 3];
+  char fpath[64], buf[20], prefix[NUM_PREFIX][16], *menu[NUM_PREFIX + 3];
   char *prefix_def[NUM_PREFIX] =   /* 預設的類別 */
   {
-    "[閒聊] ", "[公告] ", "[問題] ", "[建議] ", "[討論] ", "[心得] ", "[請益] ", "[情報] "
+    "閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"
    // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
   };
 
@@ -303,7 +303,7 @@ post_prefix_edit()
   if (i == 'q')
     return 0;
 
-  brd_fpath(fpath, currboard, "prefix");
+  brd_fpath(fpath, currboard, "prefix.new");
 
   if (i == 'd')
   {
@@ -317,17 +317,29 @@ post_prefix_edit()
   {
     for (; i < NUM_PREFIX; i++)
     {
-      if (fscanf(fp, "%10s", buf) != 1)
-        break;
+      if (!fgets(buf, 6, fp))
+	break;
+      if (strlen(buf) == 1)
+	break;
+      buf[strlen(buf) - 1] = '\0';
       sprintf(prefix[i], "%d.%s", i + 1, buf);
     }
     fclose(fp);
   }
 
   /* 填滿至 NUM_PREFIX 個 */
-  for (; i < NUM_PREFIX; i++)
-    sprintf(prefix[i], "%d.%s", i + 1, prefix_def[i]);
+  if (!i)	/* 都沒有才 initialize */
+  {
+    for (; i < NUM_PREFIX; i++)
+      sprintf(prefix[i], "%d.%s", i + 1, prefix_def[i]);
+  }
+  else
+  {
+    for (; i < NUM_PREFIX; i++)
+      sprintf(prefix[i], "%d.%s", i + 1, "");
+  }
 
+#ifdef POPUP_ANSWER
   menu[0] = "10";
   for (i = 1; i <= NUM_PREFIX; i++)
     menu[i] = prefix[i - 1];
@@ -341,21 +353,41 @@ post_prefix_edit()
     if (i >= 1 && i <= NUM_PREFIX)
     {
       strcpy(buf, prefix[i - 1] + 2);
-      if (vget(b_lines, 0, "類別：", buf, 10, GCARRY))
+      vget(b_lines, 0, "類別：", buf, 5, GCARRY);	/* 留白就清空 */
         strcpy(prefix[i - 1] + 2, buf);
     }
   } while (i);
+#else
+  for (i = 0; i < NUM_PREFIX; i++)
+    menu[i] = prefix[i];
+
+  do
+  {
+    move(b_lines - 2, 0);
+    clrtobot();
+    for (i = 0; i < NUM_PREFIX; i++)
+      prints("%s ", menu[i]);
+    vget(b_lines - 1, 0, "請選擇您要更改的項目(1 ~ 8，或輸入 0 離開)", buf, 3, DOECHO);
+    i = atoi(buf);
+    if (i >= 1 && i <= NUM_PREFIX)
+    {
+      strcpy(buf, prefix[i - 1] + 2);
+      vget(b_lines, 0, "類別：", buf, 5, GCARRY);	/* 留白就清空 */
+	strcpy(prefix[i - 1] + 2, buf);
+    }
+  } while (i);
+#endif
 
   if (fp = fopen(fpath, "w"))
   {
     for (i = 0; i < NUM_PREFIX; i++)
-      fprintf(fp, "%s ", prefix[i] + 2);
+      fprintf(fp, "%s\n", prefix[i] + 2);
     fclose(fp);
   }
 
   return 0;
 }
-#endif      /* POST_PREFIX */
+#endif	/* POST_PREFIX */
 
 
 int
@@ -370,10 +402,10 @@ post_brd_prefix()
   switch (vans("使用文章類別 (1)使用 (2)不使用 (3)設定類別 (Q)取消？[Q] "))
   {
   case '1':
-    newbrd.battr &= ~BRD_PREFIX;
+    newbrd.battr &= ~BRD_NOPREFIX;
     break;
   case '2':
-    newbrd.battr |= BRD_PREFIX;
+    newbrd.battr |= BRD_NOPREFIX;
     break;
   case '3':
     post_prefix_edit();
@@ -912,15 +944,25 @@ post_article_filter()
 */
 
 static int
-post_my_level(fname)
-  char *fname;
+post_my_level(fname, title)
+  char *fname, *title;
 {
   FILE *fr, *fw;
-  char fpath_r[64], fpath_w[64], buf[64], wd[64];
+  char fpath_r[64], fpath_w[64], wd[64], buf[16];
   int i, wi;
 
   brd_fpath(fpath_r, currboard, fname);
   sprintf(fpath_w, "%s.tmp", fpath_r);
+
+  sprintf(wd, "%s E)編輯 D)刪除 Q)取消 [E] ", title);
+  switch (vans(wd))
+  {
+  case 'd':
+    if (dashf(fpath_r))
+      unlink(fpath_r);
+  case 'q':
+    return 0;
+  }
 
   if (!dashf(fpath_r))
   {
@@ -943,6 +985,8 @@ post_my_level(fname)
       return 0;
     }
 
+    move(1, 0);
+    prints(" - \033[1;33m%s\033[m", title);
     i = 3;
     fscanf(fr, "%d", &wi);
     sprintf(wd, "年齡限制 >= [%2d歲]：", wi);
@@ -1133,11 +1177,11 @@ post_guard_dog()
   case 'p':
     return post_article_filter();
   case 'w':
-    return post_my_level(FN_NO_WRITE);
+    return post_my_level(FN_NO_WRITE, "發文限制");
   case 'r':
-    return post_my_level(FN_NO_READ);
+    return post_my_level(FN_NO_READ, "閱\讀限制");
   case 'l':
-    return post_my_level(FN_NO_LIST);
+    return post_my_level(FN_NO_LIST, "列出限制");
   case 'v':
     return post_view_bbs_dog_log();
   }
