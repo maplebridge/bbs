@@ -329,7 +329,7 @@ bmw_edit(up, hint, bmw)
 #ifdef HAVE_BITLBEE
   if(bmw->nick[0] != '\0')	/* smiler.080319: 有存在nick, 表示此bmw為傳送msn */
   {
-    static void (*p)() = DL_get("bin/bitlbee.so:bit_reply");
+    void (*p)() = DL_get("bin/bitlbee.so:bit_reply");
     sprintf(fpath, "確定要送出《MSN》給 %s 嗎(Y/N)？[Y] ", bmw->nick );
     if (vans(fpath) != 'n')
       (*p)(bmw->nick, bmw->msg);
@@ -778,17 +778,17 @@ bmw_rqst()
 
       /* lkchu.981230: 利用 xover 整合 bmw */
       usr_fpath(buf, cuser.userid, fn_bmw);
-      rec_add(buf, mptr, sizeof(BMW));
-
-      /* itoc.020126: 加入 FN_AMW */
-
-//#ifdef HAVE_BITLBEE
-#if 0
-      if (mptr->nick[0] != '\0')
-	fprintf(fp, MSN_FORMAT " %s\n", mptr->nick, mptr->msg, Btime(&mptr->btime));
-      else
+#ifdef HAVE_BITLBEE
+//      if (mptr->nick[0] != '\0')
+//	fprintf(fp, MSN_FORMAT " %s\n", mptr->nick, mptr->msg, Btime(&mptr->btime));
+//      else
+      if (mptr->nick[0] == '\0')	/* 只有水球才記錄至 fn_amw/fn_bmw */
 #endif
+      {
+	rec_add(buf, mptr, sizeof(BMW));
+      /* itoc.020126: 加入 FN_AMW */
 	fprintf(fp, BMW_FORMAT " %s\n", mptr->userid, mptr->msg, Btime(&mptr->btime));
+      }
 
       bmw_lslot[locus++] = *mptr;	/* structure copy */
     } while (++i < j);
@@ -1098,11 +1098,12 @@ bmw_store(fpath)
 
     while (read(fd, &bmw, sizeof(BMW)) == sizeof(BMW))
     {
-      //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-      if (bmw.nick[0]=='\0')
-	fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-      else
+#ifdef HAVE_BITLBEE
+      if (bmw.nick[0] != '\0')
 	fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+      else
+#endif
+	fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
     }
     fclose(fp);
   }
@@ -1164,10 +1165,12 @@ bmw_save_user(xo)
 	  if (bmw.sender == acct.userno || bmw.recver == acct.userno)
 	  {
 	    //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-	    if (bmw.nick[0]=='\0')
-	      fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
-	    else
+#ifdef HAVE_BITLBEE
+	    if (bmw.nick[0] !='\0')
 	      fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+	    else
+#endif
+	      fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
 	  }
 	}
 	fclose(fp);
@@ -1407,13 +1410,39 @@ bit_main()
 int
 bit_display()
 {
+  int op;
   char fpath[64];
+  struct stat st;
 
+  /* lkchu.981201: 放進私人信箱內/清除/保留 */
   usr_fpath(fpath, cuser.userid, FN_MSN);
   if (!dashf(fpath))
-    return vmsg("尚無 MSN 訊息記錄！");
+    vmsg("尚無 MSN 訊息記錄！");
 
-  more(fpath, NULL);
+  if (!stat(fpath, &st) && S_ISREG(st.st_mode))
+  {
+     if (!st.st_size)	/* itoc.020711: 如果 bmw size 是 0 就清除 */
+    {
+      op = 'c';
+    }
+    else
+    {
+      more(fpath, (char *) -1);
+      op = vans("MSN 訊息記錄處理 (M)移至備忘錄 (R)保留 (C)清除？[R] ");
+    }
+
+    switch (op)
+    {
+    case 'm':
+      mail_self(fpath, cuser.userid, [備 忘 錄] MSN 訊息紀錄, 0);
+
+    case 'c':
+      unlink(fpath);
+    default:
+      break;
+    }
+  }
+
   return XO_INIT;
 }
 #endif

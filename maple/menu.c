@@ -653,7 +653,7 @@ static MENU menu_msn[] =
 {
   bit_main,   PERM_BASIC, M_LUSERS,
   "MSN     【 MSN Messenger 】",
-  bit_desplay, PERM_BASIC, M_LUSERS,
+  bit_display, PERM_BASIC, M_LUSERS,
   "Log     【 回顧 MSN 訊息 】",
   menu_thala, PERM_MENU + 'M', M_TMENU,
   "即時通訊"

@@ -24,6 +24,8 @@ extern int bit_sock;
 /* 預設上線最多 250 位 */
 static BITUSR bit_pool[250];
 
+void bit_abort(void);
+
 
 static
 bit_fgets()
@@ -69,11 +71,12 @@ bit_item_bar(xo, mode)
   //pp = bit_pool + xo->pos - xo->top;
   pp = bit_pool + xo->pos;
 
-  prints("%s%5d   \033[1;37m%-18.17s\033[m%s  \033[30;1m%-34.33s\033[m%s ",
+  prints("%s%5d   \033[1;37m%-18.17s\033[m%s  \033[1;%dm%-*.*s\033[m%s ",
     mode ? UCBAR[UCBAR_USR] : "", xo->pos + 1, pp->nick,
-    mode ? UCBAR[UCBAR_USR] : "", pp->addr, mode ? UCBAR[UCBAR_USR] : "");
+    mode ? UCBAR[UCBAR_USR] : "", mode ? 37 : 30,
+    d_cols + 34, d_cols + 33, pp->addr, mode ? UCBAR[UCBAR_USR] : "");
 
-  prints("\033[1;%-15.15s\033[m",
+  prints("\033[1;%-18.18s\033[m",
     strstr(pp->status, "Online") ? "36m線上" :
     strstr(pp->status, "Away") ? "33m離開" :
     strstr(pp->status, "Busy") ? "31m忙碌" :
@@ -234,7 +237,7 @@ bit_reply(nick, msg)
   char *msg;
 {
   char hint[30];
-  char str[65], file[128];
+  char file[128];
   FILE *fp;
 
   sprintf(hint, "★<%s> ", nick);
@@ -420,6 +423,7 @@ bit_close()
 }
 
 
+#if 0
 static int
 bit_test()
 {
@@ -428,6 +432,7 @@ bit_test()
   vmsg(smiler_buf);
   return XO_INIT;
 }
+#endif
 
 
 static KeyFunc bit_cb[] = {
