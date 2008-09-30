@@ -227,6 +227,16 @@ copy_post_to_deletelog(hdr, fpath)
 }
 
 
+static int currchrono;
+
+static int
+reccmpchrono(hdr)
+  HDR *hdr;
+{
+  return hdr->chrono == currchrono;
+}
+
+
 /* smiler.070916 */
 static void
 bbspost_topic_add(board, addr, nick ,board_from)
@@ -282,12 +292,13 @@ bbspost_topic_add(board, addr, nick ,board_from)
       board_from, strcmp(board_from, "nthu") ? "" : " , 原看板文章自動刪除");
     f_cat(fpath, content_log);
 
-#if 0
+#if 1
     if (!(hdr.xmode & POST_SCORE))
     {
       hdr.score = 0;
       hdr.xmode |= POST_SCORE;
-      rec_put(folder, &hdr, sizeof(HDR), pos, NULL);
+      currchrono = hdr.chrono;
+      rec_put(folder, &hdr, sizeof(HDR), pos, reccmpchrono);
     }
 #endif
     return;
