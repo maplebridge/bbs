@@ -27,27 +27,22 @@
 /* ------------------------------------------------------*/
 
 #define SCHOOLNAME	"清大資工"		/* 組織名稱 */
-#define BBSNAME         "楓橋驛站"		/* 中文站名 */
+#define BBSNAME		"楓橋驛站"		/* 中文站名 */
 #define BBSNAME2	"MapleBBS"		/* 英文站名 */
 #define SYSOPNICK	"大家的好幫手"		/* sysop 的暱稱 */
 #define TAG_VALID	"["BBSNAME2"]To"	/* 身分認證函 token */
 
-//#define MYIPADDR	"220.132.144.144"               /* IP address */
-//#define MYHOSTNAME	"220-132-144-144.HINET-IP.hinet.net"    /* 網路地址 FQDN */
-
-#define MYIPADDR        "140.114.87.5"	/* IP address */
-#define MYHOSTNAME      "bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
+#define MYIPADDR	"140.114.87.5"		/* IP address */
+#define MYHOSTNAME	"bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 
 #define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, "nthucs.twbbs.org",\
-                         "bbs.iMaple.tw", \
+                         "bbs.iMaple.tw", "iMaple.tw", \
                          NULL}
 
 #define MYCHARSET	"big5"			/* BBS 所使用的字集 */
 
-//#define BBSHOME		"/home/bbs"		/* BBS 的家 */
-//#define BAKPATH		"/home/bbs/bak"		/* 備份檔的路徑 */
-#define BBSHOME	"/home/maple"		/* BBS 的家 */
-#define BAKPATH	"/bak/maple"		/* 備份檔的路徑 */
+#define BBSHOME		"/home/maple"		/* BBS 的家 */
+#define BAKPATH		"/bak/maple"		/* 備份檔的路徑 */
 
 
 #define BBSUID		10000
@@ -70,7 +65,7 @@
 #define	HAVE_RLIMIT		/* 採用 resource limit，Cygwin 不能用 */
 #endif
 
-#undef	MODE_STAT               /* 觀察及統計 user 的生態，以做為經營方針 */
+#undef	MODE_STAT		/* 觀察及統計 user 的生態，以做為經營方針 */
 
 #undef	SYSOP_CHECK_MAIL	/* itoc.001029: 站長可以讀取使用者信箱 */
 
@@ -115,19 +110,21 @@
 
 #define	HAVE_LIST		/* itoc.010923: 群組名單 */
 
-#define HAVE_ALOHA              /* itoc.001202: 上站通知 */
+#define HAVE_ALOHA		/* itoc.001202: 上站通知 */
 
-#undef	LOGIN_NOTIFY            /* 系統協尋網友 */
+#undef	LOGIN_NOTIFY		/* 系統協尋網友 */
 
 #if (defined(HAVE_ALOHA) || defined(LOGIN_NOTIFY))
 #define	HAVE_NOALOHA		/* itoc.010716: 上站不通知/協尋 */
 #endif
 
-#define	LOG_BMW                 /* lkchu.981201: 水球記錄處理 */
+#define	LOG_BMW			/* lkchu.981201: 水球記錄處理 */
 
 #ifdef LOG_BMW
 #define	RETAIN_BMW		/* itoc.021102: 水球存證 */
 #endif
+
+#define HAVE_BITLBEE		/* bitlbee.c MSN 功能 */
 
 #define	LOG_TALK		/* lkchu.981201: 聊天記錄處理 */
 
@@ -139,7 +136,7 @@
 
 #define	HAVE_CHANGE_NICK	/* 使用者名單 ^N 永久更改暱稱 */
 
-#define	HAVE_CHANGE_FROM        /* 使用者名單 ^F 暫時更改故鄉 */
+#define	HAVE_CHANGE_FROM	/* 使用者名單 ^F 暫時更改故鄉 */
 
 #define	HAVE_CHANGE_ID		/* 使用者名單 ^D 暫時更改 ID */
 
@@ -169,7 +166,7 @@
 #define	HAVE_UNANONYMOUS_BOARD	/* itoc.020602: 反匿名板，必須有開 BN_UNANONYMOUS */
 #endif
 
-#define	SHOW_USER_IN_TEXT       /* 在文件中 Ctrl+Q 可顯示 User 的名字 */
+#define	SHOW_USER_IN_TEXT	/* 在文件中 Ctrl+Q 可顯示 User 的名字 */
 
 #undef	ANTI_PHONETIC		/* itoc.030503: 禁用注音文 */
 
@@ -177,7 +174,7 @@
 
 #define	SLIDE_SHOW		/* itoc.030411: 自動播放文章 */
 
-#undef	COLOR_HEADER            /* lkchu.981201: 變換彩色標頭 */
+#undef	COLOR_HEADER		/* lkchu.981201: 變換彩色標頭 */
 
 #undef	CURSOR_BAR		/* itoc.010113: 選單光棒，若開啟選單光棒，選單就不能有顏色控制碼 */
 #ifndef CURSOR_BAR
@@ -188,7 +185,7 @@
 
 #define	HAVE_DECLARE		/* 使 title 中有 [] 更明顯，且日期上色 */
 
-#define	HAVE_POPUPMENU          /* 蹦出式選單 */
+#define	HAVE_POPUPMENU		/* 蹦出式選單 */
 
 #ifdef HAVE_POPUPMENU
 #define	POPUP_ANSWER		/* 蹦出式選單 -- 詢問選項 */

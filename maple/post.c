@@ -70,7 +70,7 @@ IS_BIGGER_AGE(age)
   time_t now;
   struct tm *ptime;
 
-  if (!cuser.year || !cuser.month || !cuser.day)	/* 生日未填 */
+  if (age && !cuser.year)	/* 生日未填 */
     return 0;
 
   time(&now);
@@ -683,6 +683,7 @@ do_post(xo, title)
     if(!(currbattr & BRD_NOPREFIX))
     {
       FILE *fp;
+      int len = 6, pnum;
       char prefix[NUM_PREFIX][8];
       char *prefix_default[NUM_PREFIX] =
 	{"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
@@ -690,19 +691,15 @@ do_post(xo, title)
       for (mode = 0; mode < NUM_PREFIX; mode++)
 	strcpy(prefix[mode], prefix_default[mode]);
 
+      move(21, 0);
+      prints("類別：");
+
       brd_fpath(fpath, currboard, "prefix.new");
       if (fp = fopen(fpath, "r"))
       {
-	int len = 6, pnum;
-	move(21, 0);
-	prints("類別：");
-
 	/* 載入設定檔 */
 	for (mode = 0; mode < NUM_PREFIX; mode++)
 	{
-//	  if (fscanf(fp, "%9s", fpath) != 1)
-//	    break;
-//	  strcpy(prefix[mode], fpath);
 	  if (!fgets(fpath, 6, fp))
 	    break;
 	  if (strlen(fpath) == 1)	/* '\n' */
@@ -711,7 +708,7 @@ do_post(xo, title)
 	  strcpy(prefix[mode], fpath);
 	  prints("%d.%s ", mode + 1, fpath);
 	  len += (3 + strlen(fpath));
-	  pnum = mode;
+	  pnum = mode + 1;
 	}
 	fclose(fp);
       }
@@ -719,10 +716,13 @@ do_post(xo, title)
       {
 	pnum = NUM_PREFIX;
 	for (mode = 0; mode < NUM_PREFIX; mode++)
+	{
 	  prints("%d.%s ", mode + 1, prefix[mode]);
+	  len += (3 + strlen(prefix[mode]));
+	}
       }
 
-      mode = vget(20, len, "", fpath, 3, DOECHO) - '1';
+      mode = vget(21, len, "", fpath, 3, DOECHO) - '1';
       if (mode >= 0 && mode < pnum)	/* 輸入數字選項 */
       {
 	sprintf(fpath, "[%s] ", prefix[mode]);

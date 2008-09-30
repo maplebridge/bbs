@@ -10,6 +10,9 @@
 
 #include "bbs.h"
 
+
+#ifdef HAVE_BITLBEE
+
 extern XZ xz[];
 
 static XO bit_xo;
@@ -107,7 +110,7 @@ bit_body(xo)
 }
 
 
-/* static */int
+static int
 bit_head(xo)
   XO *xo;
 {
@@ -451,10 +454,10 @@ static KeyFunc bit_cb[] = {
 
 
 void
-bit_rqst ()
+bit_rqst()
 {
-  char *nick, *msg, send[600], file[128];
   FILE *fp;
+  char *nick, *msg/*, send[600]*/, file[128];
 
   while (fgets(buf, sizeof (buf), fr))
   {
@@ -464,7 +467,7 @@ bit_rqst ()
       *msg++;
       nick = strtok(buf, "!");
       *nick++;
-      sprintf(send, "\033[1;33;46m★%s (@msn) \033[37;45m %s \033[m", nick, msg);
+//      sprintf(send, "\033[1;33;46m★%s (@msn) \033[37;45m %s \033[m", nick, msg);
 
       usr_fpath(file, cuser.userid, FN_MSN);
       fp = fopen(file, "a");
@@ -486,11 +489,11 @@ bit_rqst ()
 	str_ncpy(bmw_msg, msg, 48);
 
       bmw_msg[strlen(bmw_msg)-1] = '\0';/* smiler.080319:處理bmw_msg結尾有 '\n' */
-      strcpy(bmw.nick, nick);		/* smiler.080319: 用於 bmw介面 reply msn*/
+      strcpy(bmw.nick, nick);		/* smiler.080319: 用於bmw介面 reply msn */
       strcpy(bmw.msg, bmw_msg);
       bit_bmw_edit(up, buf, &bmw);
       /***********************************/
-      cursor_restore ();
+      cursor_restore();
       refresh();
       bell();
       if (strlen(msg) >= 49)   /* 長度超過水球容許範圍,才印出 */
@@ -548,7 +551,7 @@ bit_main()
       /* 前面 login 有 9 行 configure, 略過 */
       while (i < 13)
       {
-	bit_fgets ();
+	bit_fgets();
 	if (sock <= 0)
 	  return 0;
         i++;
@@ -584,3 +587,4 @@ bit_main()
 
   return 0;
 }
+#endif

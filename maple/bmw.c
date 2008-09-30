@@ -24,8 +24,10 @@ extern BCACHE *bshm;
 #define BMW_FORMAT	"\033[1;33;46m★%s \033[37;45m %s \033[m"	/* 收到的水球 */
 #define BMW_FORMAT2	"\033[1;33;41m☆%s \033[34;47m %s \033[m"	/* 送出的水球 */
 
+#ifdef HAVE_BITLBEE
 #define MSN_FORMAT	"\033[1;33;42m(MSN)%s \033[37;45m %s \033[m"	/* 收到的MSN水球 */
 #define MSN_FORMAT2	"\033[1;33;43m(MSN)%s \033[34;47m %s \033[m"	/* 送出的MSN水球 */
+#endif
 
 static int bmw_locus = 0;		/* 總共保存幾個水球 (保留最近收到 BMW_LOCAL_MAX 個) */
 static BMW bmw_lslot[BMW_LOCAL_MAX];	/* 保留收到的水球 */
@@ -243,10 +245,12 @@ bmw_display(max)	/* itoc.010313: display 以前的水球 */
     bmw = &bmw_lslot[max];
     move(i, 0);
     clrtoeol();
-	if(bmw->nick[0]=='\0')
+#ifdef HAVE_BITLBEE
+    if(bmw->nick[0] != '\0')
+      prints("  " MSN_FORMAT, bmw->nick, bmw->msg);
+    else
+#endif
       prints("  " BMW_FORMAT, bmw->userid, bmw->msg);
-	else
-       prints("  " MSN_FORMAT, bmw->nick, bmw->msg);
     i++;
   }
 
@@ -322,13 +326,15 @@ bmw_edit(up, hint, bmw)
     }
   }
 
-  if(bmw->nick[0]!='\0')  /* smiler.080319: 有存在nick, 表示此bmw為傳送msn */
+#ifdef HAVE_BITLBEE
+  if(bmw->nick[0] != '\0')	/* smiler.080319: 有存在nick, 表示此bmw為傳送msn */
   {
      sprintf(fpath, "確定要送出《MSN》給 %s 嗎(Y/N)？[Y] ", bmw->nick );
      if (vans(fpath) != 'n')
-       bit_reply (bmw->nick, bmw->msg);
+       bit_reply(bmw->nick, bmw->msg);
   }
   else  /*  傳送水球 */
+#endif
   {
     sprintf(fpath, "確定要送出《水球》給 %s 嗎(Y/N)？[Y] ", up ? up->userid : "廣播");
     if (vans(fpath) != 'n')
@@ -375,11 +381,13 @@ bmw_edit(up, hint, bmw)
       usr_fpath(fpath, userid, fn_amw);
       if (fp = fopen(fpath, "a"))
       {
-	//fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
-	if (bmw->nick[0]=='\0')
-	  fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
-	else
+//#ifdef HAVE_BITLBEE
+#if 0
+	if (bmw->nick[0] != '\0')
 	  fprintf(fp, MSN_FORMAT2 " %s\n", bmw->nick, bmw->msg, Btime(&bmw->btime));
+	else
+#endif
+	  fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
         fclose(fp);
       }
 
@@ -399,11 +407,13 @@ bmw_edit(up, hint, bmw)
       strcpy(bmw_lword[i].msg, bmw->msg);
     }
   }
+
   if (bbsmode != M_BMW_REPLY)
     restore_foot(slp, 2);
 }
 
 
+#ifdef HAVE_BITLBEE
 /* smiler.080319 */
 void
 bit_bmw_edit(up, hint, bmw)
@@ -418,7 +428,7 @@ bit_bmw_edit(up, hint, bmw)
 
   recver = up ? up->userno : 0;
 
-  if(1)
+  if (1)
   {
     int i;
 
@@ -455,6 +465,8 @@ bit_bmw_edit(up, hint, bmw)
     strcpy(bmw_lword[i].msg, bmw->msg);
   }
 }
+#endif
+
 
 static void
 bmw_outz()
@@ -470,11 +482,12 @@ bmw_outz()
   bmw = &bmw_lslot[bmw_pos];
   move(b_lines, 0);
   clrtoeol();
-  //prints(BMW_FORMAT, bmw->userid, bmw->msg);
-  if (!bmw->nick[0])
-    prints(BMW_FORMAT, bmw->userid, bmw->msg);
+#ifdef HAVE_BITLBEE
+  if (bmw->nick[0])
+    prints(MSN_FORMAT, bmw->nick, bmw->msg);
   else
-      prints(MSN_FORMAT, bmw->nick, bmw->msg);
+#endif
+    prints(BMW_FORMAT, bmw->userid, bmw->msg);
 
   /* itoc.030621: 由保留的送出水球中，找出上次回這人的水球是什麼 */
   for (i = bmw_locat; i >= 0; i--)
@@ -485,11 +498,13 @@ bmw_outz()
   }
   move(b_lines - 1, 0);
   clrtoeol();
-  //prints(BMW_FORMAT2, bmw->userid, i >= 0 ? benz->msg : "【您最近沒有傳水球給這位使用者】");
-  if(bmw->nick[0]=='\0')
-      prints(BMW_FORMAT2, bmw->userid, i >= 0 ? benz->msg : "【您最近沒有傳水球給這位使用者】");
+#ifdef HAVE_BITLBEE
+  if (bmw->nick[0] != '\0')
+    prints(MSN_FORMAT2,
+      bmw->nick, i >= 0 ? benz->msg : "【您最近沒有傳 MSN 訊息給這位使用者】");
   else
-      prints(MSN_FORMAT2, bmw->nick, i >= 0 ? benz->msg : "【您最近沒有傳 MSN 訊息給這位使用者】");
+#endif
+    prints(BMW_FORMAT2, bmw->userid, i >= 0 ? benz->msg : "【您最近沒有傳水球給這位使用者】");
 }
 
 
@@ -501,7 +516,9 @@ can_reply(uhead, pos)
   int userno;
   BMW *bmw;
   UTMP *up;
-  static UTMP bit_usr; /* smiler.080324 */
+#ifdef HAVE_BITLBEE
+  static UTMP bit_usr;	/* smiler.080324 */
+#endif
 
   bmw = &bmw_lslot[pos];
 
@@ -522,16 +539,18 @@ can_reply(uhead, pos)
   if (bmw->caller != up || up->status & STATUS_REJECT)
     return NULL;
 
-  if (strcmp(cuser.userid,up->userid))
-     return up;
-  else
+#ifdef HAVE_BITLBEE
+  if (!strcmp(cuser.userid, up->userid))
   {
     strcpy(bit_usr.userid, up->userid);
-    strcpy(bit_usr.from, bmw->nick);    /* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
+    strcpy(bit_usr.from, bmw->nick);	/* smiler.080327: 借用from來存取bmw->nick 以便回覆msn */
     bit_usr.userno = up->userno;
     bit_usr.pid = up->pid;
     return &bit_usr;
   }
+#endif
+
+  return up;
 }
 
 
@@ -639,7 +658,9 @@ bmw_reply()
   screenline slt[3];
 #endif
 
+#ifdef HAVE_BITLBEE
   bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+#endif
 
   cursor_save();
 
@@ -653,15 +674,6 @@ bmw_reply()
     cursor_restore();
     refresh();
     return;
-  }
-
-  /* smiler.080324 */
-  if(strcmp(cuser.userid,up->userid))
-    sprintf(buf, "★[%s]", up->userid);
-  else
-  {
-    strcpy(bmw.nick, up->from);
-    sprintf(buf, "★[%s]", bmw.nick);
   }
 
   tmpmode = bbsmode;	/* lkchu.981201: 儲存 bbsmode */
@@ -684,6 +696,17 @@ bmw_reply()
     save_foot(slt);
 
   bmw_outz();
+
+#ifdef HAVE_BITLBEE
+  /* smiler.080324 */
+  if (!strcmp(cuser.userid, up->userid))
+  {
+    strcpy(bmw.nick, up->from);
+    sprintf(buf, "★[%s]", bmw.nick);
+  }
+  else
+#endif
+    sprintf(buf, "★[%s]", up->userid);
   bmw_edit(up, buf, &bmw);
 
 #ifdef BMW_DISPLAY
@@ -757,11 +780,15 @@ bmw_rqst()
       rec_add(buf, mptr, sizeof(BMW));
 
       /* itoc.020126: 加入 FN_AMW */
-      //fprintf(fp, BMW_FORMAT " %s\n", mptr->userid, mptr->msg, Btime(&mptr->btime));
-      if(mptr->nick[0]=='\0')
-         fprintf(fp, BMW_FORMAT " %s\n", mptr->userid, mptr->msg, Btime(&mptr->btime));
+
+//#ifdef HAVE_BITLBEE
+#if 0
+      if (mptr->nick[0] != '\0')
+	fprintf(fp, MSN_FORMAT " %s\n", mptr->nick, mptr->msg, Btime(&mptr->btime));
       else
-         fprintf(fp, MSN_FORMAT " %s\n", mptr->nick, mptr->msg, Btime(&mptr->btime));
+#endif
+	fprintf(fp, BMW_FORMAT " %s\n", mptr->userid, mptr->msg, Btime(&mptr->btime));
+
       bmw_lslot[locus++] = *mptr;	/* structure copy */
     } while (++i < j);
 
@@ -774,11 +801,12 @@ bmw_rqst()
     /* Thor.980827: 為了防止列印一半(more)時水球而後列印超過範圍踢人, 故存下游標位置 */
     cursor_save();
 
-    //sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
-    if (mptr->nick[0]=='\0')
-      sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
-    else
+#ifdef HAVE_BITLBEE
+    if (mptr->nick[0] != '\0')
       sprintf(buf, MSN_FORMAT, mptr->nick, mptr->msg);
+    else
+#endif
+      sprintf(buf, BMW_FORMAT, mptr->userid, mptr->msg);
 
     outz(buf);
 
@@ -793,11 +821,13 @@ bmw_rqst()
     cutmp->bmw_count++;
 #endif
   }
+#ifdef HAVE_BITLBEE
   else
-	  bit_rqst();
+    bit_rqst();
+#endif
 }
 
-/* smiler.080319 */
+
 void
 do_write(up)
   UTMP *up;
@@ -807,7 +837,9 @@ do_write(up)
     BMW bmw;
     char buf[20];
 
-    bmw.nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+#ifdef HAVE_BITLBEE
+    bmw.nick[0] = '\0';	/* smiler.080319: for msn^bmw detect */
+#endif
     sprintf(buf, "★[%s]", up->userid);
     bmw_edit(up, buf, &bmw);
 

@@ -279,17 +279,98 @@ post_spam_edit()
 
 #ifdef POST_PREFIX
 /* ----------------------------------------------------- */
-/* 板主功能 : 修改發文類別					 */
+/* 板主功能 : 修改發文類別				 */
 /* ----------------------------------------------------- */
+
+#define NUM_PREFIX	8
+
+static int
+post_template_edit()
+{
+  FILE *fp;
+  int i, ans, pnum;
+  char buf[64], fpath[64];
+  char prefix[NUM_PREFIX][16];
+  char *prefix_def[NUM_PREFIX] =	/* 預設的類別 */
+  {"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
+
+  if (!(bbstate & STAT_BOARD))
+    return 0;
+
+  move(b_lines - 1, 0);
+  clrtoeol();
+  prints("類別: ");
+
+  i = 0;
+  ans = 6;
+  brd_fpath(fpath, currboard, "prefix.new");
+  if (fp = fopen(fpath, "r"))
+  {
+    for (; i < NUM_PREFIX; i++)
+    {
+      if (!fgets(buf, 6, fp))
+	break;
+      if (strlen(buf) == 1)
+	break;
+      buf[strlen(buf) - 1] = '\0';
+      sprintf(prefix[i], "%s", buf);
+      prints("%d.%s ", i + 1, buf);
+      pnum = i + 1;
+      ans += (3 + strlen(buf));
+    }
+    fclose(fp);
+  }
+  else		/* 都沒有才 initialize */
+  {
+    pnum = NUM_PREFIX;
+    for (; i < NUM_PREFIX; i++)
+    {
+      sprintf(prefix[i], "%s", prefix_def[i]);
+      prints("%d.%s ", i + 1, buf);
+      ans += (3 + strlen(buf));
+    }
+  }
+  move(b_lines, 0);
+  clrtoeol();
+
+  i = vget(b_lines - 1, ans, "", fpath, 3, DOECHO) - '1';
+  if (i < 0 || i >= pnum)
+    return 0;
+
+  sprintf(buf, "範本 %d.[%s] D)刪除 E)修改 Q)取消？[Q] ", i + 1, prefix[i]);
+  ans = vans(buf);
+
+  if (ans == 'd')
+  {
+    unlink(fpath);
+    return 0;
+  }
+
+  if (ans != 'e')
+    return 0;
+
+  brd_fpath(fpath, currboard, "prefix");
+  if (!dashd(fpath))
+    mkdir(fpath, 0700);
+
+  sprintf(buf, "prefix/template_%d", i + 1);
+
+  brd_fpath(fpath, currboard, buf);
+
+  if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
+    vmsg(msg_cancel);
+
+  return 0;
+}
+
 
 static int
 post_prefix_edit()
 {
-#define NUM_PREFIX	8
-  int i;
   FILE *fp;
+  int i;
   char fpath[64], buf[20], prefix[NUM_PREFIX][16], *menu[NUM_PREFIX + 3];
-  char *prefix_def[NUM_PREFIX] =   /* 預設的類別 */
+  char *prefix_def[NUM_PREFIX] =	/* 預設的類別 */
   {
     "閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"
    // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
@@ -298,12 +379,7 @@ post_prefix_edit()
   if (!(bbstate & STAT_BOARD))
     return 0;
 
-  i = vans("類別 (D)刪除 (E)修改 (Q)取消？[E] ");
-
-  if (i == 'q')
-    return 0;
-
-  brd_fpath(fpath, currboard, "prefix.new");
+  i = vans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
 
   if (i == 'd')
   {
@@ -311,8 +387,11 @@ post_prefix_edit()
     return 0;
   }
 
-  i = 0;
+  if (i != 'e')
+    return 0;
 
+  i = 0;
+  brd_fpath(fpath, currboard, "prefix.new");
   if (fp = fopen(fpath, "r"))
   {
     for (; i < NUM_PREFIX; i++)
