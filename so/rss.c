@@ -116,7 +116,7 @@ rss_item_bar(xo, mode)
   prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "¢ã"    : "¡°",		//3*3=9
 			    (rss->xmode & RSS_TXT)   ? "¢â"    : "¢Ö",
 			    (rss->xmode & RSS_START) ? "¡»"    : "¡º");
-  prints("%-42.40s",rss->url);						//42
+  prints("%-*.*s", d_cols + 42, d_cols + 41, rss->url);			//42
   prints("%s", ((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
 
   return 0;

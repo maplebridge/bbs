@@ -1428,13 +1428,13 @@ bit_display()
     else
     {
       more(fpath, (char *) -1);
-      op = vans("MSN 訊息記錄處理 (M)移至備忘錄 (R)保留 (C)清除？[R] ");
+      op = vans("◎MSN 訊息記錄處理 (M)移至備忘錄 (R)保留 (C)清除？[R] ");
     }
 
     switch (op)
     {
     case 'm':
-      mail_self(fpath, cuser.userid, [備 忘 錄] MSN 訊息紀錄, 0);
+      mail_self(fpath, cuser.userid, "[備 忘 錄] MSN 訊息紀錄", 0);
 
     case 'c':
       unlink(fpath);
@@ -1443,6 +1443,6 @@ bit_display()
     }
   }
 
-  return XO_INIT;
+  return XO_BODY;
 }
 #endif

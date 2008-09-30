@@ -184,10 +184,10 @@ mf_item_bar(xo, mode)
       else
 	sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", unread, mode ? "" : "\033[m");
     }
-    prints("%s%6d%c%-2s%s %-66.54s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
+    prints("%s%6d%c%-2s%s %-*.*s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
       num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
       (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (unread ? fpath : "") : "",
-      "◆", mf->title);
+      "◆", d_cols + 66, d_cols + 65, mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -217,32 +217,33 @@ mf_item_bar(xo, mode)
 
     if (invalid)        /* itoc.010821: 被砍的看板要另外印 */
     {
-      prints("%s       %c \033[36m%-13s%-56s\033[m", mode ?
-        UCBAR[UCBAR_BRD] : "", label ? 'T' : ' ', mf->xname, "<已改名或被刪除，請將本捷徑刪除>");
+      prints("%s       %c \033[36m%-13s%-*.*s\033[m", mode ?
+	UCBAR[UCBAR_BRD] : "", label ? 'T' : ' ', mf->xname,
+	d_cols + 56, d_cols + 55, "<已改名或被刪除，請將本捷徑刪除>");
     }  /* 長度好難調 乾脆自己改了= =*/
   }
   else if (mftype & MF_GEM)
   {
-    prints("%s%6d%c  %s %-66.54s\033[m",
+    prints("%s%6d%c  %s %-*.*s\033[m",
       mode ? UCBAR[UCBAR_BRD] : "",
-      brdpost ? 0 : num,
-      mftype & MF_MARK ? ')' : label ? 'T' : ' ', "■", mf->title);
+      brdpost ? 0 : num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
+      "■", d_cols + 66, d_cols + 65, mf->title);
   }
   else  if (mftype & MF_LINE)		/* qazq.040721: 分隔線 */
   {
-    prints("%s%6d%c  %-69.54s\033[m",
+    prints("%s%6d%c  %-*.*s\033[m",
       mode ? UCBAR[UCBAR_BRD] : "",
-      brdpost ? 0 : num,
-      label ? 'T' : ' ', mf->title);
+      brdpost ? 0 : num, label ? 'T' : ' ',
+      d_cols + 69, d_cols + 68, mf->title);
   }
   else /* if (mftype & MF_CLASS) */	/* LHD.051007: 分類群組 */
   {
     char cname[BNLEN + 2];
 
     sprintf(cname, "%s/", mf->xname);
-    prints("%s%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s%-51s\033[m",
+    prints("%s%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s%-*.*s\033[m",
       mode ? UCBAR[UCBAR_BRD] : "",num, label ? 'T' : ' ', cname, mf->class[3] & 7,
-      mf->class, mode ? UCBAR[UCBAR_BRD] : "", mf->title);
+      mf->class, mode ? UCBAR[UCBAR_BRD] : "", d_cols + 51, d_cols + 50, mf->title);
   }
   return XO_NONE;
 }

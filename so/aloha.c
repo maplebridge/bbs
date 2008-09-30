@@ -136,12 +136,12 @@ aloha_item_bar(xo, mode)
   online = utmp_get(aloha->userno, NULL);
 #endif
 
-  prints("%s%6d%c   %s%-14s%s%54s%s",
+  prints("%s%6d%c   %s%-14s%s%*.*s%s",
     mode ? UCBAR[UCBAR_ALOHA] : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, tag_char(aloha->userno),
     online ? "\033[33m" : "",
-    aloha->userid, "",
-    online ? "\033[37m" : "",
+    aloha->userid, online ? "\033[37m" : "",
+    d_cols + 54, d_cols + 53, "",
     mode ? "\033[m" : "");
 
   return XO_NONE;

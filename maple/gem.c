@@ -99,11 +99,11 @@ gem_item_bar(xo, mode)
 
   /* itoc.000319: 限制級文章保密 */
   if ((xmode & GEM_RESTRICT) && !(level & GEM_M_BIT))
-    prints("%-67s%s", "<資料保密>", mode ? "\033[m" : "");
+    prints("%-*.*s%s", "<資料保密>", d_cols + 67, d_cols + 66, mode ? "\033[m" : "");
   else if (gtype == 0)
-    prints("%-67.64s%s", hdr->title, mode ? "\033[m" : "");
+    prints("%-*.*s%s", d_cols + 67, d_cols + 66, hdr->title, mode ? "\033[m" : "");
   else
-    prints("%-46.45s%-13s%-8.8s%s", hdr->title,
+    prints("%-*.*s%-13s%-8.8s%s", d_cols + 46, d_cols + 45, hdr->title,
       (gtype == 1 ? hdr->xname : hdr->owner), hdr->date, mode ? "\033[m" : "");
 
   return XO_NONE;

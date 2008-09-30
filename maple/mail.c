@@ -1364,9 +1364,9 @@ mbox_item_bar(xo, mode)
 #endif
 
   if (mode)
-    hdr_outs_bar(hdr, 47);
+    hdr_outs_bar(hdr, d_cols + 47);
   else
-    hdr_outs(hdr, 47);
+    hdr_outs(hdr, d_cols + 47);
 
   return XO_NONE;
 }

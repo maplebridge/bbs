@@ -386,14 +386,14 @@ pal_item_bar(xo, mode)
   online = utmp_get(pal->userno, NULL);
 #endif
 
-  prints("%s%6d%c%-3s%s%-14s%s%-54s%s",
+  prints("%s%6d%c%-3s%s%-14s%s%-*.*s%s",
     mode ? UCBAR[UCBAR_PAL] : "",	//這裡是光棒的顏色，可以自己改。
     xo->pos + 1, tag_char(pal->userno),
     pal->ftype & PAL_BAD ? "Ｘ": pal->ftype & PAL_MATE ? "△" : "",
     online ? COLOR7 : "",
     pal->userid,
     online ? COLOR7 : "",
-    pal->ship,
+    d_cols + 54, d_cols + 53, pal->ship,
     mode ? "\033[m" : "");
 
   return XO_NONE;

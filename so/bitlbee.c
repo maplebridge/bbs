@@ -48,8 +48,8 @@ bit_item(num, pp)
   int num;
   BITUSR *pp;
 {
-  prints("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;%-15.14s\033[m \n",
-    num, pp->nick, pp->addr,
+  prints("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-*.*s\033[m \033[1;%-18.17s\033[m \n",
+    num, pp->nick, d_cols + 34, d_cols + 33, pp->addr,
     strstr(pp->status, "Online") ? "36m線上" :
     strstr(pp->status, "Away") ? "33m離開" :
     strstr(pp->status, "Busy") ? "31m忙碌" :
@@ -97,9 +97,9 @@ bit_body(xo)
   BITUSR *pp;
   int num, max, tail;
 
-  pp = &bit_pool[xo->top];
   max = xo->max;
   num = xo->top;
+  pp = &bit_pool[num];
   tail = num + XO_TALL;
   if (max > tail)
     max = tail;
@@ -124,7 +124,8 @@ bit_head(xo)
   move(1, 0);
   prints(
     " [w]傳訊 [c]改暱稱 [^k]斷線 [a]增刪聯絡人 [d]刪除聯絡人 [l]msn紀錄 [h]說明   \n"
-    "\033[30;47m 編號   代   號             信          箱                     狀  態         \033[m");
+    "\033[30;47m 編號   代   號             信          箱%-*.*s狀  態         \033[m",
+    d_cols + 21, d_cols + 21, "");
 
   return bit_body(xo);
 }
@@ -226,7 +227,8 @@ bit_write(xo)
   }
 
   vs_restore(sl);
-  return XO_INIT;
+  return bit_body(xo);
+//  return XO_INIT;
 }
 
 
@@ -440,9 +442,9 @@ static KeyFunc bit_cb[] = {
   XO_ITEM, bit_item_bar,
 #endif
   XO_INIT, bit_set,	/* bit_init */
-  XO_LOAD, bit_head,	/* bit_load */
+  XO_LOAD, bit_body,	/* bit_load */
   XO_HEAD, bit_head,
-  XO_BODY, bit_body,
+//  XO_BODY, bit_body,
 
   'b', bit_unblock,	/* 解除封鎖 */
   'B', bit_block,	/* 封鎖連絡人 */

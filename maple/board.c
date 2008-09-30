@@ -1642,12 +1642,12 @@ class_bar(xo, mode)
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
-    prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s\033[m%s%-51s%s",
+    prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s\033[m%s%-*.*s%s",
       mode ? UCBAR[UCBAR_BRD] : "",
       cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
       str, str[BNLEN + 4] & 7,str + BNLEN + 1,
       mode ? UCBAR[UCBAR_BRD] : "",
-      str + BNLEN + 1 + BCLEN + 1,
+      d_cols + 51, d_cols + 50, str + BNLEN + 1 + BCLEN + 1,
       mode ? "\033[m" : "");
   }
   return XO_NONE;

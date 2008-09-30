@@ -1584,9 +1584,9 @@ post_item_bar(xo, mode)
     prints("%s%10s",mode ? UCBAR[UCBAR_POST] : "", hdr->xname);
 
   if (mode)
-    hdr_outs_bar(hdr, 45);	/* 少一格來放分數 */
+    hdr_outs_bar(hdr, d_cols + 45);	/* 少一格來放分數 */
   else
-    hdr_outs(hdr, 45);
+    hdr_outs(hdr, d_cols + 45);
 
 #else
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
@@ -1612,9 +1612,9 @@ post_item_bar(xo, mode)
     prints("%s%10s",mode ? UCBAR[UCBAR_POST] : "",hdr->xname);
 
   if (mode)
-    hdr_outs_bar(hdr, 47);
+    hdr_outs_bar(hdr, d_cols + 47);
   else
-    hdr_outs(hdr, 47);
+    hdr_outs(hdr, d_cols + 47);
 #endif
 
   move(xo->pos - xo->top + 3, 0);
