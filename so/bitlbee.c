@@ -1,11 +1,11 @@
 /*-------------------------------------------------------*/
-/* bitlbee.c   ( NTHU CS MapleBBS Ver 3.10 )             */
+/* bitlbee.c   ( NTHU CS MapleBBS Ver 3.10 )		 */
 /*-------------------------------------------------------*/
-/* author : ono.bbs@lexel.twbbs.org                      */
-/* modify : smiler.bbs@bbs.cs.nthu.edu.tw                */
-/* target : MSN on MapleBBS                              */
-/* create : 05/06/08                                     */
-/* update : 08/02/18                                     */
+/* author : ono.bbs@lexel.twbbs.org			 */
+/* modify : smiler.bbs@bbs.cs.nthu.edu.tw		 */
+/* target : MSN on MapleBBS				 */
+/* create : 05/06/08					 */
+/* update : 08/02/18					 */
 /*-------------------------------------------------------*/
 
 #include "bbs.h"
@@ -18,7 +18,7 @@ extern XZ xz[];
 static XO bit_xo;
 static FILE *fw, *fr;
 static char buf[512];
-static int sock = 0;
+extern int bit_sock;
 
 
 /* 預設上線最多 250 位 */
@@ -33,10 +33,10 @@ bit_fgets()
   fgets(buf, sizeof (buf), fr);
   tmp = strstr(buf, "Logged out");
 
-  if(tmp)
+  if (tmp)
   {
     bit_abort();
-    vmsg ("您在其他地方登入 msn！");
+    vmsg ("連線中斷！您已在其他地方登入 msn！");
   }
 }
 
@@ -49,12 +49,12 @@ bit_item(num, pp)
   prints("%5d   \033[1;37m%-18.17s\033[m  \033[30;1m%-34.33s\033[m \033[1;%-15.14s\033[m \n",
     num, pp->nick, pp->addr,
     strstr(pp->status, "Online") ? "36m線上" :
-    strstr(pp->status,"Away") ? "33m離開" :
-    strstr(pp->status,"Busy") ? "31m忙碌" : 
-    strstr(pp->status,"Idle") ? "34m閒置" :
-    strstr(pp->status,"Right") ? "35m馬上回來" :
-    strstr(pp->status,"Phone") ? "32m電話中" :
-    strstr(pp->status,"Lunch") ? "0m外出吃飯" : pp->status);
+    strstr(pp->status, "Away") ? "33m離開" :
+    strstr(pp->status, "Busy") ? "31m忙碌" :
+    strstr(pp->status, "Idle") ? "34m閒置" :
+    strstr(pp->status, "Right") ? "35m馬上回來" :
+    strstr(pp->status, "Phone") ? "32m電話中" :
+    strstr(pp->status, "Lunch") ? "m外出吃飯" : pp->status);
 }
 
 
@@ -62,7 +62,7 @@ bit_item(num, pp)
 static int
 bit_item_bar(xo, mode)
   XO *xo;
-  int mode;     /* 1:上光棒  0:去光棒 */
+  int mode;	/* 1:上光棒  0:去光棒 */
 {
   BITUSR *pp;
 
@@ -75,14 +75,14 @@ bit_item_bar(xo, mode)
 
   prints("\033[1;%-15.15s\033[m",
     strstr(pp->status, "Online") ? "36m線上" :
-    strstr(pp->status,"Away") ? "33m離開" :
-    strstr(pp->status,"Busy") ? "31m忙碌" :
-    strstr(pp->status,"Idle") ? "34m閒置" :
-    strstr(pp->status,"Right") ? "35m馬上回來" :
-    strstr(pp->status,"Phone") ? "32m電話中" :
-    strstr(pp->status,"Lunch") ? "37m外出吃飯" : "");
+    strstr(pp->status, "Away") ? "33m離開" :
+    strstr(pp->status, "Busy") ? "31m忙碌" :
+    strstr(pp->status, "Idle") ? "34m閒置" :
+    strstr(pp->status, "Right") ? "35m馬上回來" :
+    strstr(pp->status, "Phone") ? "32m電話中" :
+    strstr(pp->status, "Lunch") ? "37m外出吃飯" : "");
 
-    return XO_NONE;
+  return XO_NONE;
 }
 #endif
 
@@ -93,6 +93,7 @@ bit_body(xo)
 {
   BITUSR *pp;
   int num, max, tail;
+
   pp = &bit_pool[xo->top];
   max = xo->max;
   num = xo->top;
@@ -106,6 +107,7 @@ bit_body(xo)
     bit_item(++num, pp++);
   } while (num < max);
   clrtobot();
+
   return XO_FOOT;
 }
 
@@ -139,7 +141,7 @@ bit_set(xo)
   do
   {
     bit_fgets();
-    if (sock <= 0)
+    if (bit_sock <= 0)
       return XO_QUIT;
     tmp = strstr(buf, "Nick");
   }
@@ -148,7 +150,7 @@ bit_set(xo)
   for (;;)
   {
     bit_fgets ();
-    if (sock <= 0)
+    if (bit_sock <= 0)
       return XO_QUIT;
 
     tmp = strstr(buf, "MSN");
@@ -231,7 +233,7 @@ bit_reply(nick, msg)
   char *nick;
   char *msg;
 {
-  char hint[30]; 
+  char hint[30];
   char str[65], file[128];
   FILE *fp;
 
@@ -248,7 +250,7 @@ bit_reply(nick, msg)
 
 
 static int
-bit_allow(xo)
+bit_unblock(xo)
   XO *xo;
 {
   if (vans("確定要解除封鎖他 (Y/N)？[N]") == 'y')
@@ -296,7 +298,7 @@ bit_save(xo)
 
 
 static int
-bit_remv(xo)
+bit_delpal(xo)
   XO *xo;
 {
   int pos;
@@ -314,9 +316,10 @@ bit_remv(xo)
 }
 
 
+#if 0
 static int
-bit_onick (xo)
-     XO *xo;
+bit_onick(xo)
+  XO *xo;
 {
   int pos;
   char *nick, str[10];
@@ -337,13 +340,13 @@ bit_onick (xo)
   fflush(fw);
 
   bit_fgets();
-  if (sock <= 0)
+  if (bit_sock <= 0)
     return XO_QUIT;
 
   while (!strstr(buf, "Nick"))
   {
     bit_fgets();
-    if (sock <= 0)
+    if (bit_sock <= 0)
       return XO_QUIT;
 
   };
@@ -352,9 +355,11 @@ bit_onick (xo)
 
   return XO_INIT;
 }
+#endif
+
 
 static int
-bit_mynick ()
+bit_mynick()
 {
   char nick[40];
 
@@ -369,8 +374,9 @@ bit_mynick ()
   return XO_FOOT;
 }
 
+
 static int
-bit_add ()
+bit_addpal()
 {
   char addr[40];
 
@@ -383,27 +389,17 @@ bit_add ()
   return XO_INIT;
 }
 
-/* static */ int
-bit_recall()
-{
-  char fpath[64];
-
-  usr_fpath(fpath, cuser.userid, FN_MSN);
-  more(fpath, NULL);
-  return XO_INIT;
-}
-
 
 void
 bit_abort()
 {
-  if (sock > 0)
+  if (bit_sock > 0)
   {
     fprintf(fw, "QUIT :bye\r\n");
     fflush(fw);
     fclose(fw);
     fclose(fr);
-    sock = 0;
+    bit_sock = 0;
   }
 }
 
@@ -411,6 +407,9 @@ bit_abort()
 static int
 bit_close()
 {
+  if (vans("確定要中斷 MSN 連線？(y/N) [N]") != 'y')
+    return XO_FOOT;
+
   bit_abort();
 
   zmsg("請稍候 ..... ");
@@ -430,6 +429,7 @@ bit_test()
   return XO_INIT;
 }
 
+
 static KeyFunc bit_cb[] = {
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, bit_item_bar,
@@ -439,16 +439,16 @@ static KeyFunc bit_cb[] = {
   XO_HEAD, bit_head,
   XO_BODY, bit_body,
 
-  'b', bit_allow,
-  'B', bit_block,
-  'a', bit_add,
-  'd', bit_remv,
-  'l', bit_recall,
+  'b', bit_unblock,	/* 解除封鎖 */
+  'B', bit_block,	/* 封鎖連絡人 */
+  'a', bit_addpal,	/* 新增連絡人 */
+  'd', bit_delpal,	/* 刪除連絡人 */
+  'l', bit_display,	/* 回顧 FN_MSN 訊息 */
 //  's', bit_save,
 //  'n', bit_onick,
-  'c', bit_mynick,
-  'w', bit_write,
-  Ctrl ('K'), bit_close,
+  'c', bit_mynick,	/* 更改自己的暱稱 */
+  'w', bit_write,	/* 送 MSN 訊息 */
+  Ctrl ('K'), bit_close,/* 中斷連線 */
   'h', bit_help
 };
 
@@ -496,7 +496,7 @@ bit_rqst()
       cursor_restore();
       refresh();
       bell();
-      if (strlen(msg) >= 49)   /* 長度超過水球容許範圍,才印出 */
+      if (strlen(msg) >= 49)	/* 長度超過水球容許範圍,才印出 */
 	vmsg("MSN訊息過長，請至【 回顧 msn 訊息 】觀看完整訊息 !!");
       break;
     }
@@ -505,32 +505,30 @@ bit_rqst()
 
 
 int
-bit_main()
+bit_start(account, pass)
+  char *account, *pass;
 {
   int i = 0;
-  char *tmp, account[50], pass[30];
+  char *tmp;
 
-  if (sock <= 0)
+  if (bit_sock <= 0)
   {
-    if (!vget(b_lines - 1, 0, "輸入 msn 帳號：", account, 45, DOECHO))
-      return 0;
-
-    if (!vget(b_lines - 1, 0, "輸入密碼：", pass, 25, NOECHO))
+    if (!account || !pass)	/* 以防萬一 */
       return 0;
 
     move(b_lines - 1, 0);
     sleep(1);
     clrtoeol();
-    sock = dns_open("127.0.0.1", 6667);
+    bit_sock = dns_open("127.0.0.1", 6667);
     zmsg("連接中 :p");
     sleep(1);
 
-    if (sock > 0)
+    if (bit_sock > 0)
     {
       zmsg("登入中，快了別急，本來登入就要等一下咩 :p (想像小綠人在轉 ^^O)");
 
-      fr = fdopen(sock, "r");
-      fw = fdopen(sock, "w");
+      fr = fdopen(bit_sock, "r");
+      fw = fdopen(bit_sock, "w");
 
       fprintf(fw, "NICK %d\r\n", cutmp->pid);
       fflush(fw);
@@ -552,29 +550,29 @@ bit_main()
       while (i < 13)
       {
 	bit_fgets();
-	if (sock <= 0)
+	if (bit_sock <= 0)
 	  return 0;
-        i++;
+	i++;
       }
 
       /* root 再設定 mode, 略過 */
       while (bit_fgets())
       {
-	if (sock <= 0)
+	if (bit_sock <= 0)
 	  return XO_QUIT;
 
 	tmp = strstr(buf, "Error");
 
 	if (tmp)
 	{
-	  sock = 0;
+	  bit_sock = 0;
 	  return vmsg("帳號或密碼輸入錯誤喔 :p");
-        }
+	}
       }
     }
   }
 
-  if (sock > 0)
+  if (bit_sock > 0)
   {
     xz[XZ_BITLBEE - XO_ZONE].xo = &bit_xo;
     xz[XZ_BITLBEE - XO_ZONE].cb = bit_cb;
@@ -583,7 +581,7 @@ bit_main()
     xover(XZ_BITLBEE);
   }
   else
-    vmsg("無法開啟連線，請至 sysop 版回報");
+    vmsg("無法開啟連線，請至 sysop 板回報");
 
   return 0;
 }

@@ -23,13 +23,6 @@ void blog(char *mode, char *msg);
 void u_exit(char *mode);
 void abort_bbs(void);
 
-/* bitlbee.c */
-int bit_main(void);
-void bit_rqst(void);
-void bit_abort(void);
-int bit_recall (void);
-void bit_reply (char *nick, char *msg);
-
 /* bmw.c */
 int can_override(UTMP *up);
 int can_see(UTMP *my, UTMP *up);
@@ -43,6 +36,9 @@ void do_write(UTMP *up);
 void bmw_log(void);
 int t_bmw(void);
 int t_display(void);
+/* bmw.c: HAVE_BITLBEE */
+int bit_main(void);
+int bit_display(void);
 
 /* board.c */
 inline void btime_refresh(BRD *brd);

@@ -306,7 +306,7 @@ bmw_edit(up, hint, bmw)
       bmw_request = 0;
       bmw_pos = bmw_locus - 1;
       //if (cuser.ufo & UFO_BMWDISPLAY)
-	  if(1)
+      if (1)
 	bmw_display(bmw_pos);
       bmw_reply_CtrlRT(ch);
       continue;
@@ -329,9 +329,10 @@ bmw_edit(up, hint, bmw)
 #ifdef HAVE_BITLBEE
   if(bmw->nick[0] != '\0')	/* smiler.080319: 有存在nick, 表示此bmw為傳送msn */
   {
-     sprintf(fpath, "確定要送出《MSN》給 %s 嗎(Y/N)？[Y] ", bmw->nick );
-     if (vans(fpath) != 'n')
-       bit_reply(bmw->nick, bmw->msg);
+    static void (*p)() = DL_get("bin/bitlbee.so:bit_reply");
+    sprintf(fpath, "確定要送出《MSN》給 %s 嗎(Y/N)？[Y] ", bmw->nick );
+    if (vans(fpath) != 'n')
+      (*p)(bmw->nick, bmw->msg);
   }
   else  /*  傳送水球 */
 #endif
@@ -823,7 +824,7 @@ bmw_rqst()
   }
 #ifdef HAVE_BITLBEE
   else
-    bit_rqst();
+    DL_func("bin/bitlbee.so:bit_rqst");
 #endif
 }
 
@@ -1361,5 +1362,58 @@ bmw_log()
       break;
     }
   }
+}
+#endif
+
+
+#ifdef HAVE_BITLBEE
+
+int bit_sock = 0;	/* originally in bitlbee.c */
+
+
+
+int
+bit_main()
+{
+  void (*p)();
+  char account[50], pass[30];
+
+#if 0		/* 確定登入了再載入, 以減少記憶體之使用 */
+  if (!(p = DL_get("bin/bitlbee.so:bit_start")))
+    return vmsg("此功能暫時無法使用，請至 sysop 板回報！");
+#endif
+
+  if (bit_sock <= 0)
+  {
+    if (!vget(b_lines - 1, 0, "輸入 msn 帳號：", account, 45, DOECHO))
+      return 0;
+
+    if (!vget(b_lines - 1, 0, "輸入密碼：", pass, 25, NOECHO))
+      return 0;
+
+    if (p = DL_get("bin/bitlbee.so:bit_start"))
+      (*p)(account, pass); 
+  }
+  else		/* 已經登入了 */
+  {
+    if (p = DL_get("bin/bitlbee.so:bit_start"))
+      (*p)(NULL, NULL);
+  }
+
+  return 0;
+}
+
+
+int
+bit_display()
+{
+  char fpath[64];
+
+  usr_fpath(fpath, cuser.userid, FN_MSN);
+  if (!dashf(fpath))
+    return vmsg("尚無 MSN 訊息記錄！");
+
+  more(fpath, NULL);
+  return XO_INIT;
 }
 #endif

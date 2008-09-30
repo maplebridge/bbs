@@ -457,7 +457,9 @@ typedef struct
 static MENU menu_main[];
 static MENU menu_system[];
 static MENU menu_thala[];
+#ifdef HAVE_BITLBEE
 static MENU menu_msn[];
+#endif
 
 /* ----------------------------------------------------- */
 /* administrator's maintain menu			 */
@@ -645,22 +647,28 @@ static MENU menu_talk[] =
   "楓人楓語"
 };
 
+
+#ifdef HAVE_BITLBEE
 static MENU menu_msn[] =
 {
   bit_main,   PERM_BASIC, M_LUSERS,
   "MSN     【 MSN Messenger 】",
-  bit_recall, PERM_BASIC, M_LUSERS,
-  "Log     【 回顧 msn 訊息 】",
+  bit_desplay, PERM_BASIC, M_LUSERS,
+  "Log     【 回顧 MSN 訊息 】",
   menu_thala, PERM_MENU + 'M', M_TMENU,
   "即時通訊"
 };
+#endif
+
 
 static MENU menu_thala[] =
 {
   menu_talk, 0, M_TMENU,
   "TALK         【 楓人楓語 】 ",
+#ifdef HAVE_BITLBEE
   menu_msn,  PERM_BASIC, M_TMENU,
   "MSN          【 即時通訊 】 ",
+#endif
   menu_main, PERM_MENU + 'T', M_TMENU,
   "休閒聊天"
 };
@@ -1378,6 +1386,7 @@ menu()
 	  }
 	  goto every_key;
 
+#ifdef HAVE_BITLBEE
 	case Ctrl('N'):           //MSN
 	  if(cuser.userlevel)
 	  {
@@ -1385,6 +1394,7 @@ menu()
 	    bit_main();
 	  }
 	  goto every_key;
+#endif
 
     /* itoc.010911: Select everywhere，不再限制是在 M_0MENU */
     case Ctrl('S'):

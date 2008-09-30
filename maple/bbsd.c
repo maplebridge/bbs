@@ -137,14 +137,19 @@ void
 u_exit(mode)
   char *mode;
 {
+#ifdef HAVE_BITLBEE
+  extern bit_sock;
+#endif
   int fd, diff;
   char fpath[80];
   ACCT tuser;
 
   if (currbno >= 0 && bshm->mantime[currbno] > 0)
     bshm->mantime[currbno]--;	/* 退出最後看的那個板 */
-
-  bit_abort();          /* 登出 msn */
+#ifdef HAVE_BITLBEE
+  if (bit_sock > 0)
+    DL_func("bin/bitlbee.so:bit_abort");	/* 登出 msn */
+#endif
   utmp_free(cutmp);		/* 釋放 UTMP shm */
 
   diff = (time(&cuser.lastlogin) - ap_start) / 60;

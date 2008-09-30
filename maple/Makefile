@@ -14,11 +14,11 @@
 
 SRC =	acct.c bbsd.c bmw.c board.c cache.c edit.c favor.c \
 	gem.c mail.c menu.c more.c pal.c post.c talk.c ulist.c \
-	user.c visio.c window.c xover.c xpost.c vers.c bitlbee.c
+	user.c visio.c window.c xover.c xpost.c vers.c
 
 OBJ =	acct.o bbsd.o bmw.o board.o cache.o edit.o favor.o \
 	gem.o mail.o menu.o more.o pal.o post.o talk.o ulist.o \
-	user.o visio.o window.o xover.o xpost.o vers.o bitlbee.o
+	user.o visio.o window.o xover.o xpost.o vers.o
 
 EXE =	bbsd
 
