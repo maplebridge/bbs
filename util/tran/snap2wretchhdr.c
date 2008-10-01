@@ -90,7 +90,7 @@ main(argc, argv)
 
     sprintf(buf, BBSHOME"/brd");
     chdir(buf);
-    
+
     /*if (!(dirp = opendir(".")))
       continue;*/
     dirp = opendir(".");
@@ -143,7 +143,7 @@ main(argc, argv)
 
 	}
 
-    closedir(dirp);    
+    closedir(dirp);
 
 
   return 0;

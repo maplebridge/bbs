@@ -6,17 +6,19 @@
 /* ------------------------------------------ */
 
 
+#include <stdio.h>
 #include <time.h>
+#include "dao.h"
 
 
 void
 str_stamp(str, chrono)
   char *str;
-  time_t *chrono;
+  time4_t *chrono;
 {
   struct tm *ptime;
 
-  ptime = localtime(chrono);
+  ptime = localtime4(chrono);
   /* Thor.990329: y2k */
   sprintf(str, "%02d/%02d/%02d",
     ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);

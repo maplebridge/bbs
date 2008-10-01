@@ -52,7 +52,7 @@ int main()
     {
       printf("%s\n",brd.brdname);	/*debug*/
       brd.readlevel = brd.readlevel | 0xF8000000;
-      brd.postlevel = brd.postlevel | 0xF8000000;     
+      brd.postlevel = brd.postlevel | 0xF8000000;
     }
     brd.btime = ntohl(bh.btime);
     brd.bpost = ntohl(bh.bpost);
@@ -79,4 +79,3 @@ usint transbattr(usint originbattr)
   }
   newbattr |= 0x80;
 }
-

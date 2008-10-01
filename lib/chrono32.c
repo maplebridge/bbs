@@ -1,11 +1,11 @@
 #include "dao.h"
 
 
-time_t
+time4_t
 chrono32(str)
   char *str;		/* M0123456 */
 {
-  time_t chrono;
+  time4_t chrono;
   int ch;
 
   chrono = 0;

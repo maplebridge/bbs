@@ -18,7 +18,7 @@ extern char xo_pool[];
 char brd_bits[MAXBOARD];
 
 #ifndef ENHANCED_VISIT
-time_t brd_visit[MAXBOARD];		/* 最近瀏覽時間 */
+time4_t brd_visit[MAXBOARD];		/* 最近瀏覽時間 */
 #endif
 
 
@@ -234,8 +234,8 @@ main()
 
 typedef struct BoardReadingHistory
 {
-  time_t bstamp;		/* 建立看板的時間, unique */	/* Thor.brh_tail */
-  time_t bvisit;		/* 上次閱讀時間 */		/* Thor.980904: 沒在讀時放上次讀的時間, 正在讀時放 bhno */
+  time4_t bstamp;		/* 建立看板的時間, unique */	/* Thor.brh_tail */
+  time4_t bvisit;		/* 上次閱讀時間 */		/* Thor.980904: 沒在讀時放上次讀的時間, 正在讀時放 bhno */
   int bcount;			/* Thor.980902: 沒用到 */
 
   /* --------------------------------------------------- */
@@ -251,13 +251,13 @@ typedef struct BoardReadingHistory
 #define BRH_PAGE	2048		/* Thor.980902.註解: 每次多配量, 用不到了 */
 #define	BRH_MASK	0x7fffffff	/* Thor.980902.註解: 最大量為2038年1月中*/
 #define	BRH_SIGN	0x80000000	/* Thor.980902.註解: zap及壓final專用 */
-#define	BRH_WINDOW	(sizeof(BRH) + sizeof(time_t) * BRH_MAX * 2)
+#define	BRH_WINDOW	(sizeof(BRH) + sizeof(time4_t) * BRH_MAX * 2)
 
 
 static int *brh_base;		/* allocated memory */
 static int *brh_tail;		/* allocated memory */
 static int brh_size;		/* allocated memory size */
-static time_t brh_expire;
+static time4_t brh_expire;
 
 
 static int *
@@ -303,7 +303,7 @@ brh_put()
 
     n = *++list;   /* Thor.980904: 正讀時是bhno */
     brd_bits[n] |= BRD_H_BIT;
-    time((time_t *) list);    /* Thor.980904.註解: bvisit time */
+    time4((time4_t *) list);    /* Thor.980904.註解: bvisit time */
 
     item = *++list;
     head = ++list;
@@ -334,7 +334,7 @@ brh_put()
 
 void
 brh_get(bstamp, bhno)
-  time_t bstamp;		/* board stamp */
+  time4_t bstamp;		/* board stamp */
   int bhno;
 {
   int *head, *tail;
@@ -355,7 +355,7 @@ brh_get(bstamp, bhno)
     while (head < tail)
     {
       item = head[2];
-      size = item * sizeof(time_t) + sizeof(BRH);
+      size = item * sizeof(time4_t) + sizeof(BRH);
 
       if (bstamp == *head)
       {
@@ -402,7 +402,7 @@ brh_get(bstamp, bhno)
 
 int
 brh_unread(chrono)
-  time_t chrono;
+  time4_t chrono;
 {
   int *head, *tail, item;
 
@@ -446,7 +446,7 @@ brh_visit(mode)
   }
   else
   {
-    time((time_t *)list);
+    time4((time4_t *)list);
   }
   /* *++list = mode; */
   *++list = 0;	/* itoc.010207: 強定為 0, for 部分 visit */
@@ -455,7 +455,7 @@ brh_visit(mode)
 
 int
 brh_add(prev, chrono, next)
-  time_t prev, chrono, next;
+  time4_t prev, chrono, next;
 {
   int *base, *head, *tail, item, final, begin;
 
@@ -660,7 +660,7 @@ Ben_Perm(bno, ulevel)
 
 int
 bstamp2bno(stamp)
-  time_t stamp;
+  time4_t stamp;
 {
   BRD *brd;
   int bno, max;
@@ -688,11 +688,11 @@ brh_load()
   char *bits;
 
   int size, *base;
-  time_t expire;
+  time4_t expire;
   char fpath[64];
 
 #ifndef ENHANCED_VISIT
-  time_t *bstp;
+  time4_t *bstp;
 #endif
 
   memset(bits = brd_bits, 0, sizeof(brd_bits));
@@ -814,7 +814,7 @@ brh_load()
 	  head[2] = n;
 	}
 
-	n = n * sizeof(time_t) + sizeof(BRH);
+	n = n * sizeof(time4_t) + sizeof(BRH);
 	if (base != head)
 	  memcpy(base, head, n);
 	base = (int *) ((char *) base + n);
@@ -849,7 +849,7 @@ brh_save()
   while (head < tail)
   {
     bhno = bstamp2bno(*head);
-    size = head[2] * sizeof(time_t) + sizeof(BRH);
+    size = head[2] * sizeof(time4_t) + sizeof(BRH);
     if (bhno >= 0 && !(bits[bhno] & BRD_Z_BIT))
     {
       if (base != head)
@@ -861,7 +861,7 @@ brh_save()
 
   /* save zap record */
 
-  tail = brh_alloc(base, sizeof(time_t) * MAXBOARD);
+  tail = brh_alloc(base, sizeof(time4_t) * MAXBOARD);
 
   bhdr = bshm->bcache;
   bend = bhdr + bshm->number;
@@ -1165,7 +1165,7 @@ brd_force()			/* itoc.010407: 強制閱讀公告板，且強迫讀最後一篇 */
       xover(XZ_POST);
 
 #ifndef ENHANCED_VISIT
-      time(&brd_visit[bno]);
+      time4(&brd_visit[bno]);
 #endif
     }
   }
@@ -1326,7 +1326,7 @@ btime_refresh(brd)
     int fd, fsize;
     char folder[64];
     struct stat st;
-    time_t maxchrono;
+    time4_t maxchrono;
 
     brd->btime = 1;
     brd_fpath(folder, brd->brdname, fn_dir);
@@ -1352,7 +1352,7 @@ btime_refresh(brd)
 #else
 	brd->bpost = fsize / sizeof(HDR);
 	lseek(fd, fsize - sizeof(HDR), SEEK_SET);
-	read(fd, &brd->blast, sizeof(time_t));
+	read(fd, &brd->blast, sizeof(time4_t));
 #endif
       }
       else
@@ -2034,7 +2034,7 @@ class_visit(xo)		/* itoc.010128: 看板列表設定看板已讀 */
     brh_get(brd->bstamp, chn);
     brh_visit(0);
 #ifndef ENHANCED_VISIT
-    time(&brd_visit[chn]);
+    time4(&brd_visit[chn]);
 #endif
   }
   return class_body(xo);
@@ -2251,7 +2251,7 @@ class_browse(xo)
       return XO_FOOT;
     xover(XZ_POST);
 #ifndef ENHANCED_VISIT
-    time(&brd_visit[chn]);
+    time4(&brd_visit[chn]);
 #endif
   }
 
@@ -2277,7 +2277,7 @@ Select()
     XoPost(bno);
     xover(XZ_POST);
 #ifndef ENHANCED_VISIT
-    time(&brd_visit[bno]);
+    time4(&brd_visit[bno]);
 #endif
   }
   else
@@ -2360,7 +2360,7 @@ class_addMF(xo)
     if (!in_favor(bhdr->brdname))
     {
       memset(&mf, 0, sizeof(MF));
-      time(&mf.chrono);
+      time4(&mf.chrono);
       mf.mftype = MF_BOARD;
       strcpy(mf.xname, bhdr->brdname);
 
@@ -2383,7 +2383,7 @@ class_addMF(xo)
     str = img + *chx;
 
     memset(&mf, 0, sizeof(MF));
-    time(&mf.chrono);
+    time4(&mf.chrono);
     mf.mftype = MF_CLASS;
     ptr = strchr(str, '/');
     strncpy(mf.xname, str, ptr - str);

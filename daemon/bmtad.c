@@ -1472,7 +1472,7 @@ bbs_valid(ap)
 
   /* ¥£§…≈v≠≠ */
   acct.userlevel |= PERM_VALID;
-  time(&acct.tvalid);
+  time4(&acct.tvalid);
   lseek(fd, 0, SEEK_SET);
   write(fd, &acct, sizeof(ACCT));
   close(fd);

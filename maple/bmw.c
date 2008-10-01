@@ -174,7 +174,7 @@ bmw_send(callee, bmw)
   BMW *mpool, *mhead, *mtail, **mslot;
   int i;
   pid_t pid;
-  time_t texpire;
+  time4_t texpire;
 
   if ((callee->userno != bmw->recver) || (pid = callee->pid) <= 0)
     return 1;
@@ -200,7 +200,7 @@ bmw_send(callee, bmw)
 
   /* find available BMW slot in pool */
 
-  texpire = time(&bmw->btime) - BMW_EXPIRE;
+  texpire = time4(&bmw->btime) - BMW_EXPIRE;
 
   mpool = ushm->mpool;
   mhead = ushm->mbase;
@@ -374,7 +374,7 @@ bmw_edit(up, hint, bmw)
 	sprintf(bmw->userid, "%s> ", cuser.userid);
       }
 
-      time(&bmw->btime);
+      time4(&bmw->btime);
       usr_fpath(fpath, userid, fn_bmw);
       rec_add(fpath, bmw, sizeof(BMW));
 
@@ -858,7 +858,7 @@ bmw_item(num, bmw)
   int num;
   BMW *bmw;
 {
-  struct tm *ptime = localtime(&bmw->btime);
+  struct tm *ptime = localtime4(&bmw->btime);
 
   if (bmw->sender == cuser.userno)	/* 送出的水球 */
   {
@@ -885,7 +885,7 @@ bmw_item_bar(xo, mode)
   //bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
 
   bmw = (BMW *) xo_pool + (xo->pos - xo->top);
-  ptime = localtime(&bmw->btime);
+  ptime = localtime4(&bmw->btime);
 
   if (bmw->sender == cuser.userno)  /* 送出的水球 */
   {

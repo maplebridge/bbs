@@ -61,7 +61,7 @@ zone      :=  "UT" / "GMT" / "EST" / "EDT" / "CST" / "CDT" / "MST" / "MDT" / "PS
 
 #endif
 
-static time_t datevalue;
+static time4_t datevalue;
 
 static void
 parse_date()		/* 把符合 "dd mmm yyyy hh:mm:ss" 的格式，轉成 time_t */
@@ -114,7 +114,7 @@ parse_date()		/* 把符合 "dd mmm yyyy hh:mm:ss" 的格式，轉成 time_t */
   else
   {
     /* 如果分析失敗，那麼拿現在時間來當發文時間 */
-    time(&datevalue);
+    time4(&datevalue);
     /* bbslog("<rec_article> :Warn: parse_date 錯誤：%s\n", DATE); */
   }
 }

@@ -230,7 +230,7 @@ struct chicken
  int classO;
  
  /* ---小雞的時間--- */
- time_t bbtime;
+ time4_t bbtime;
 };
 typedef struct chicken chicken;
 
@@ -258,7 +258,7 @@ transpip(userid)
     /* 讀出舊小雞資料 */
 
     fgets(buf, 20, fp);
-    d.bbtime = (time_t) atoi(buf);
+    d.bbtime = (time4_t) atoi(buf);
 
     fscanf(fp,
       "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d "

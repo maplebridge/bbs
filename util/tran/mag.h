@@ -22,7 +22,7 @@
 
 #endif
 
-      
+
 #include "bbs.h"
 
 
@@ -41,7 +41,7 @@
 typedef struct
 {
   char userid[14];
-  time_t firstlogin;
+  time4_t firstlogin;
   char termtype[16];
   unsigned int numlogins;
   unsigned int numposts;
@@ -52,8 +52,8 @@ typedef struct
   char lasthost[40];
   char realemail[40];
   unsigned userlevel;
-  time_t lastlogin;
-  time_t stay;
+  time4_t lastlogin;
+  time4_t stay;
   char realname[40];
   char address[80];
   char email[80];

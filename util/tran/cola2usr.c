@@ -78,9 +78,9 @@ creat_dirs(old)
   SCHEMA slot;
   int fd;
   char fpath[64];
-  time_t now;
+  time4_t now;
 
-  time(&now);
+  time4(&now);
 
   memset(&new, 0, sizeof(new));
   memset(&slot, 0, sizeof(slot));
@@ -162,7 +162,7 @@ trans_plans(old)
 /* ----------------------------------------------------- */
 
 
-static time_t
+static time4_t
 trans_hdr_chrono(filename)
   char *filename;
 {
@@ -171,7 +171,7 @@ trans_hdr_chrono(filename)
   /* M.1087654321.A ©Î M.987654321.A */
   str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
 
-  return (time_t) atoi(time_str);
+  return (time4_t) atoi(time_str);
 }
 
 
@@ -183,7 +183,7 @@ trans_mail(old)
   char *ptr, index[64], folder[64], buf[64], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
   sprintf(index, COLABBS_HOME "/%s/mail/.DIR", old->blank2);
   usr_fpath(folder, old->userid, FN_DIR);

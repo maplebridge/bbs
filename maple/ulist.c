@@ -153,10 +153,10 @@ ulist_item(num, up, slot, now, sysop)
   int num;
   UTMP *up;
   int slot;
-  time_t now;
+  time4_t now;
   int sysop;
 {
-  time_t diff, ftype;
+  time4_t diff, ftype;
   int userno, ufo;
   char pager, buf[64], *fcolor;
 
@@ -258,7 +258,7 @@ ulist_item_bar(xo, mode)
   XO *xo;
   int mode;	/* 1:上光棒  0:去光棒 */
 {
-  time_t diff, ftype;
+  time4_t diff, ftype;
   int userno, ufo;
   char pager, buf[64], *fcolor;
   UTMP *up;
@@ -279,7 +279,7 @@ ulist_item_bar(xo, mode)
   else
   {
 #ifdef DETAIL_IDLETIME
-    if ((diff = time(NULL) - up->idle_time) >= 60)   /* 超過 60 秒才算閒置 */
+    if ((diff = time4(NULL) - up->idle_time) >= 60)   /* 超過 60 秒才算閒置 */
       sprintf(buf, "%3d'%02d", diff / 60, diff % 60);
 #else
     if (diff = up->idle_time)
@@ -375,7 +375,7 @@ ulist_body(xo)
   int seesupercloak;
 #endif
 #ifdef DETAIL_IDLETIME
-  time_t now;
+  time4_t now;
 #endif
 
   max = xo->max;
@@ -402,7 +402,7 @@ ulist_body(xo)
   seesupercloak = cuser.ufo & UFO_SUPERCLOAK;
 #endif
 #ifdef DETAIL_IDLETIME
-  time(&now);
+  time4(&now);
 #endif
 
   move(3, 0);

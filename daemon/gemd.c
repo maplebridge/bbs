@@ -48,8 +48,8 @@ typedef struct Agent
   int state;
   int sock;
   int sno;
-  time_t tbegin;		/* 建立 connection 的時間 */
-  time_t uptime;
+  time4_t tbegin;		/* 建立 connection 的時間 */
+  time4_t uptime;
 
   FILE *stream;
   char zone[64];

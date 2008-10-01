@@ -522,7 +522,7 @@ spam_search(spam, key)
   spamrule_t *spam;
   char *key;
 {
-  return (int) (str_str(spam->detail, key));
+  return str_str(spam->detail, key) ? 1 : 0;
 }
 
 

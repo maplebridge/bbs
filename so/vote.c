@@ -487,7 +487,7 @@ delvch(xo, vch)
     if ((fd = open(fpath, O_RDONLY)) >= 0)
     {
       memset(&paycheck, 0, sizeof(PAYCHECK));
-      time(&paycheck.tissue);
+      time4(&paycheck.tissue);
       sprintf(paycheck.reason, "[退款] %s", currboard);
 
       while (read(fd, &vlog, sizeof(VLOG)) == sizeof(VLOG))
@@ -1004,7 +1004,7 @@ vlog_pay(fpath, choice, fp, vch)/* 賠錢給押對的使用者 */
     fprintf(fp, "板主 %s 抽頭，可獲得 %d 銀幣\n", vch->owner, money);
 
     memset(&paycheck, 0, sizeof(PAYCHECK));
-    time(&paycheck.tissue);
+    time4(&paycheck.tissue);
     paycheck.money = money;
     sprintf(paycheck.reason, "[抽頭] %s", currboard);
     usr_fpath(buf, vch->owner, FN_PAYCHECK);

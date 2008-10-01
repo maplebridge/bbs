@@ -14,6 +14,9 @@
 #include <sys/types.h>
 
 
+#include "time4.h"
+
+
 /* ----------------------------------------------------- */
 /* DIR of post / mail struct : 256 bytes		 */
 /* ----------------------------------------------------- */
@@ -21,7 +24,7 @@
 
 typedef struct
 {
-  time_t chrono;		/* timestamp */
+  time4_t chrono;		/* timestamp */
   int xmode;
 
   int xid;			/* reserved */

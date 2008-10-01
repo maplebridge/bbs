@@ -63,10 +63,10 @@ static void
 chat_record()
 {
   FILE *fp;
-  time_t now;
+  time4_t now;
   char buf[80];
 
-  time(&now);
+  time4(&now);
 
   if (fp = frec)
   {

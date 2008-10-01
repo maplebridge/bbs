@@ -96,8 +96,8 @@ struct ChatUser
   int uflag;
   int clitype;			/* Xshadow: client type. 1 for common client,
 				 * 0 for bbs only client */
-  time_t tbegin;
-  time_t uptime;
+  time4_t tbegin;
+  time4_t uptime;
   int sno;
   int xdata;
   int retry;

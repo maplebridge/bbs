@@ -14,7 +14,7 @@
 
 static int ndir;
 static int nfile;
-static time_t chrono;
+static time4_t chrono;
 static int level;
 static char gpath[1024];
 static char tmp_name[128];
@@ -36,7 +36,7 @@ new_class()
   HDR hdr;
 
   memset(&hdr, 0, sizeof(HDR));
-  time(&hdr.chrono);
+  time4(&hdr.chrono);
   strcpy(hdr.owner, STR_SYSOP);
   strcpy(hdr.nick, SYSOPNICK);
   str_stamp(hdr.date, &hdr.chrono);
@@ -62,7 +62,7 @@ tran_group(title, fname, flag)
   char buf[1024];
 
   memset(&hdr, 0, sizeof(HDR));
-  time(&hdr.chrono);
+  time4(&hdr.chrono);
   strcpy(hdr.owner, STR_SYSOP);
   strcpy(hdr.nick, SYSOPNICK);
   str_stamp(hdr.date, &hdr.chrono);

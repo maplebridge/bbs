@@ -160,7 +160,7 @@ bsmtp(fpath, title, rcpt, method)
   int method;
 {
   int sock;
-  time_t stamp;
+  time4_t stamp;
   FILE *fp, *fr, *fw;
   char *str, buf[512], from[80], msgid[80];
 #ifdef EMAIL_JUSTIFY
@@ -168,7 +168,7 @@ bsmtp(fpath, title, rcpt, method)
 #endif
 
   cuser.numemails++;		/* 記錄使用者共寄出幾封 Internet E-mail */
-  time(&stamp);
+  time4(&stamp);
 
 #ifdef EMAIL_JUSTIFY
 
@@ -308,7 +308,7 @@ bsmtp(fpath, title, rcpt, method)
     if (!(method & MQ_JUSTIFY) && !rec_get(FN_RUN_PRIVATE, buf, 8, 0))
     /* Thor.990413: 除了認證函外, 其他信件都要加sign */
     {
-      time_t prichro;
+      time4_t prichro;
 
       buf[8] = '\0';	/* Thor.990413: buf 用不到了，借來用用 */
       prichro = chrono32(buf);
@@ -488,8 +488,8 @@ m_zip()			/* itoc.010228: 打包資料 */
 int
 m_verify()
 {
-  time_t prichro;	/* 系統的 private chrono */
-  time_t chrono;
+  time4_t prichro;	/* 系統的 private chrono */
+  time4_t chrono;
   char key[9], sign[68], *p;
 
   vmsg("請輸入信末 X-Sign 以進行驗證");
@@ -554,7 +554,7 @@ m_quota()
 {
   usint status;
   int fd, count, fsize, limit, xmode;
-  time_t mail_due, mark_due;
+  time4_t mail_due, mark_due;
   struct stat st;
   HDR *head, *tail;
   char *base, *folder, date[9];
@@ -576,12 +576,13 @@ m_quota()
     if ((fsize = read(fd, base, fsize)) >= sizeof(HDR))
     {
       int prune;		/* number of pruned mail */
+      time4_t temp;
 
-      limit = time(0);
+      limit = time4(0);
       mail_due = limit - MAIL_DUE * 86400;
       mark_due = limit - MARK_DUE * 86400;
-      st.st_mtime = limit + CHECK_PERIOD;
-      str_stamp(date, &st.st_mtime);
+      temp = st.st_mtime = limit + CHECK_PERIOD;
+      str_stamp(date, &temp);
 
       limit = cuser.userlevel;
       limit = (limit & (PERM_ALLADMIN | PERM_MBOX)) ? MAX_BBSMAIL : (limit & PERM_VALID) ? MAX_VALIDMAIL : MAX_NOVALIDMAIL;

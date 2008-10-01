@@ -106,7 +106,7 @@ trans_acct(old, new)
   new->tcheck = ntohl(old->tcheck);
   new->tvalid = ntohl(old->tvalid);
   new->staytime = ntohl(old->staytime)/60;
-  
+
   str_ncpy(new->lasthost, old->lasthost, sizeof(new->lasthost));
   str_ncpy(new->email, old->email, sizeof(new->email));
   new->email[strlen(old->email)] = '\0';

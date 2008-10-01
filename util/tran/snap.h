@@ -49,13 +49,13 @@ typedef struct			/* 要和舊版程式 struct 一樣 */
   int numlogins;
   int numposts;
   usint ufo;
-  time_t firstlogin;
-  time_t lastlogin;
-  time_t staytime;		/* 總共停留時間 */
-  time_t tcheck;		/* time to check mbox/pal */
+  time4_t firstlogin;
+  time4_t lastlogin;
+  time4_t staytime;		/* 總共停留時間 */
+  time4_t tcheck;		/* time to check mbox/pal */
   char lasthost[32];
   int numemail;			/* 寄發 Inetrnet E-mail 次數 */
-  time_t tvalid;		/* 通過認證、更改 mail address 的時間 */
+  time4_t tvalid;		/* 通過認證、更改 mail address 的時間 */
   char email[60];
   char address[60];
   char justify[60];		/* FROM of replied justify mail */
@@ -63,7 +63,7 @@ typedef struct			/* 要和舊版程式 struct 一樣 */
   char ident[66];
   char cmode[20];               /* 自訂動態 */
   char cfrom[34];               /* 自訂來源 */
-  time_t vtime;			/* validate time */
+  time4_t vtime;		/* validate time */
   int money;                    /* 金錢 */
   char pmail[60];               /* 預設寄信信箱 */
   char rmail[60];               /* 預設轉記信箱 */
@@ -95,17 +95,17 @@ typedef struct
   int numposts;			/* 發表次數 */
   int numemails;		/* 寄發 Inetrnet E-mail 次數 */
 
-  time_t firstlogin;		/* 第一次上站時間 */
-  time_t lastlogin;		/* 上一次上站時間 */
-  time_t tcheck;		/* 上次 check 信箱/朋友名單的時間 */
-  time_t tvalid;		/* 若停權，停權期滿的時間；
+  time4_t firstlogin;		/* 第一次上站時間 */
+  time4_t lastlogin;		/* 上一次上站時間 */
+  time4_t tcheck;		/* 上次 check 信箱/朋友名單的時間 */
+  time4_t tvalid;		/* 若停權，停權期滿的時間；
                                    若未停權且通過認證，通過認證的時間；
                                    若未停權且未通過認證，認證函的 time-seed */
   usint staytime;			/* 總共停留時間 */
 
   char lasthost[30];		/* 上次登入來源 */
   char email[56];		/* 目前登記的電子信箱 */
-}      ACCT_080827;
+}	ACCT_080827;
 
 /* ----------------------------------------------------- */
 /* PAL : friend struct : 64 bytes                        */
@@ -157,52 +157,52 @@ typedef struct
 //
 //  uschar bvote;			/* 共有幾項投票舉行中 */
 //
-//  time_t bstamp;		/* 建立看板的時間, unique */
+//  time4_t bstamp;		/* 建立看板的時間, unique */
 //  usint readlevel;		/* 閱讀文章的權限 */
 //  usint postlevel;		/* 發表文章的權限 */
 //  usint battr;			/* 看板屬性 */
-//  time_t btime;			/* .DIR 的 st_mtime */
+//  time4_t btime;			/* .DIR 的 st_mtime */
 // int bpost;			/* 共有幾篇 post */
-//  time_t blast;			/* 最後一篇 post 的時間 */
+//  time4_t blast;			/* 最後一篇 post 的時間 */
 //}	boardheader;
 
 typedef struct//maple
 {
-  char brdname[12 + 1];      /* board ID */
+  char brdname[12 + 1];		/* board ID */
   char title[47 + 1];
   char bottom;
-  char BM[36 + 1];           /* BMs' uid, token '/' */
-  char bclass[5];               /* 看板分類 */
-            
-  uschar bvote;                 /* 共有幾項投票舉行中 */
-             
-  time_t bstamp;                /* 建立看板的時間, unique */
-  usint readlevel;              /* 閱讀文章的權限 */
-  usint postlevel;              /* 發表文章的權限 */
-  usint battr;                  /* 看板屬性 */
-  time_t btime;                 /* .DIR 的 st_mtime */
-  int bpost;                    /* 共有幾篇 post */
-  time_t blast;                 /* 最後一篇 post 的時間 */
+  char BM[36 + 1];		/* BMs' uid, token '/' */
+  char bclass[5];		/* 看板分類 */
+
+  uschar bvote;			/* 共有幾項投票舉行中 */
+
+  time4_t bstamp;		/* 建立看板的時間, unique */
+  usint readlevel;		/* 閱讀文章的權限 */
+  usint postlevel;		/* 發表文章的權限 */
+  usint battr;			/* 看板屬性 */
+  time4_t btime;		/* .DIR 的 st_mtime */
+  int bpost;			/* 共有幾篇 post */
+  time4_t blast;	/* 最後一篇 post 的時間 */
   char pad[120];
-} 	boardheader;
+}	boardheader;
 
 //typedef struct BoardHeader
 //{
-//  char brdname[BNLEN + 1];      /* board name */
+//  char brdname[BNLEN + 1];	/* board name */
 //  char class[BCLEN + 1];
 //  char title[BTLEN + 1];
-//  char BM[BMLEN + 1];           /* BMs' uid, token '/' */
-//        
-//  char bvote;                   /* 0:無投票 -1:有賭盤(可能有投票) 1:有投票 */
-//          
-//  time_t bstamp;                /* 建立看板的時間, unique */
-//  usint readlevel;              /* 閱讀文章的權限 */
-//  usint postlevel;              /* 發表文章的權限 */
-//  usint battr;                  /* 看板屬性 */
-//  time_t btime;                 /* -1:bpost/blast 需要更新 */
-//  int bpost;                    /* 共有幾篇 post */
-//  time_t blast;                 /* 最後一篇 post 的時間 */
-//}           BRD;
+//  char BM[BMLEN + 1];		/* BMs' uid, token '/' */
+//
+//  char bvote;			/* 0:無投票 -1:有賭盤(可能有投票) 1:有投票 */
+//
+//  time4_t bstamp;		/* 建立看板的時間, unique */
+//  usint readlevel;		/* 閱讀文章的權限 */
+//  usint postlevel;		/* 發表文章的權限 */
+//  usint battr;		/* 看板屬性 */
+//  time4_t btime;		/* -1:bpost/blast 需要更新 */
+//  int bpost;			/* 共有幾篇 post */
+//  time4_t blast;		/* 最後一篇 post 的時間 */
+//}	BRD;
 
 
 
@@ -211,15 +211,15 @@ typedef struct//maple
 /* ----------------------------------------------------- */
 typedef struct
 {
-  time_t chrono;		/* timestamp */
+  time4_t chrono;		/* timestamp */
   int xmode;
 
   int xid;			/* reserved */
 
   char xname[28];		/* 檔案名稱 */
-  
-  time_t ochrono;		/* 最原始的 timestamp */
-  
+
+  time4_t ochrono;		/* 最原始的 timestamp */
+
   char owner[80];		/* 作者 (E-mail address) */
   char nick[50];		/* 暱稱 */
 
@@ -230,12 +230,12 @@ typedef struct
   char title[73];		/* 主題 (TTLEN + 1) */
 
   int score;
-  
+
 }          LEXEL_HDR;
 
 typedef struct
 {
-  time_t chrono;		/* timestamp */
+  time4_t chrono;		/* timestamp */
   int xmode;
 
   int xid;			/* reserved */
@@ -254,20 +254,20 @@ typedef struct
 
 typedef struct
 {
-  time_t chrono;                /* timestamp */
+  time4_t chrono;                /* timestamp */
   char buf1[4];
   int xmode;
-                                                                                
+
   int xid;                      /* reserved */
-                                                                                
+
   char xname[32];
   char owner[76];
-  time_t stamp;
+  time4_t stamp;
   char nick[49];
   char score;
-                                                                                
+
   char date[9];                 /* 96/12/31 */
-                                                                                
+
   char title[73];
   char buf2[4];
 }     WRETCH_HDR;
@@ -278,15 +278,15 @@ typedef struct
 /* ----------------------------------------------------- */
 typedef struct
 {
-  time_t chrono;		/* timestamp */
+  time4_t chrono;		/* timestamp */
   int xmode;
 
   int xid;			/* reserved */
 
   char xname[28];		/* 檔案名稱 */
-  
-  time_t ochrono;		/* 最原始的 timestamp */
-  
+
+  time4_t ochrono;		/* 最原始的 timestamp */
+
   char owner[80];		/* 作者 (E-mail address) */
   char nick[50];		/* 暱稱 */
 

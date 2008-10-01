@@ -29,7 +29,7 @@ SRC =	\
 	str_ncpy.c str_passwd.c str_stamp.c str_str.c str_sub.c str_tail.c \
 	str_time.c str_trim.c str_ttl.c \
 	\
-	archiv32.c chrono32.c hash32.c radix32.c \
+	archiv32.c chrono32.c hash32.c radix32.c time4.c \
 	\
 	f_cat.c f_cp.c f_img.c f_ln.c f_lock.c f_map.c f_mode.c f_mv.c f_new.c \
 	f_path.c f_rm.c f_suck.c mak_dirs.c \
@@ -60,7 +60,7 @@ OBJ =	\
 	str_ncpy.o str_passwd.o str_stamp.o str_str.o str_sub.o str_tail.o \
 	str_time.o str_trim.o str_ttl.o \
 	\
-	archiv32.o chrono32.o hash32.o radix32.o \
+	archiv32.o chrono32.o hash32.o radix32.o time4.o \
 	\
 	f_cat.o f_cp.o f_img.o f_ln.o f_lock.o f_map.o f_mode.o f_mv.o f_new.o \
 	f_path.o f_rm.o f_suck.o mak_dirs.o \

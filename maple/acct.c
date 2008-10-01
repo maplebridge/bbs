@@ -340,7 +340,7 @@ acct_show(u, adm)
   {
     /* yiting: 顯示停權天數 */
     outs("  \033[32m停權天數：\033[37m");
-    if ((diff = u->tvalid - time(0)) < 0)
+    if ((diff = u->tvalid - time4(0)) < 0)
     {
       outs("停權期限已到，可自行申請復權\n");
     }
@@ -672,7 +672,7 @@ set_perm:
 
 	/* itoc.011120: 站長放水加上認證通過權限，要附加改認證時間 */
 	if ((i & PERM_VALID) && !(num & PERM_VALID))
-	  time(&x.tvalid);
+	  time4(&x.tvalid);
 
 	/* itoc.050413: 如果站長手動停權，就要由站長才能來復權 */
 	if ((i & PERM_ALLDENY) && (i & PERM_ALLDENY) != (num & PERM_ALLDENY))
@@ -992,7 +992,7 @@ brd_new(brd)
   if (vans(msg_sure_ny) != 'y')
     return -1;
 
-  time(&brd->bstamp);
+  time4(&brd->bstamp);
   if ((bno = brd_bno("")) >= 0)
   {
     rec_put(FN_BRD, brd, sizeof(BRD), bno, NULL);

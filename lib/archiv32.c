@@ -3,7 +3,7 @@
 
 void
 archiv32(chrono, fname)
-  time_t chrono;	/* 32 bits */
+  time4_t chrono;	/* 32 bits */
   char *fname;		/* 7 chars */
 {
   char *str;

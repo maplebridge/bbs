@@ -45,8 +45,8 @@ struct userec
   usint userlevel;
   unsigned short numlogins;
   unsigned short numposts;
-  time_t firstlogin;
-  time_t lastlogin;
+  time4_t firstlogin;
+  time4_t lastlogin;
   char lasthost[16];
   char remoteuser[8];
   char email[50];
@@ -87,10 +87,10 @@ struct boardheader
   char title[49];
   char BM[39];			/* BMs' uid, token '/' */
   char pad[11];
-  time_t bupdate;		/* note update time */
+  time4_t bupdate;		/* note update time */
   char pad2[3];
   uschar bvote;			/* Vote flags */
-  time_t vtime;			/* Vote close time */
+  time4_t vtime;			/* Vote close time */
   usint level;
 };
 typedef struct boardheader boardheader;

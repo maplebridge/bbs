@@ -20,7 +20,7 @@ x_give()
   char folder[64], fpath[64], reason[40];
   HDR hdr;
   FILE *fp;
-  time_t now;
+  time4_t now;
   PAYCHECK paycheck;
 
   if (!vget(13, 0, "您要把錢轉給誰呢？", userid, IDLEN + 1, DOECHO))
@@ -69,7 +69,7 @@ x_give()
     dollar -= dollar / 10 + ((dollar % 10) ? 1 : 0);	/* 10% 手續費 */
 
     /* itoc.020831: 加入匯錢記錄 */
-    time(&now);
+    time4(&now);
     sprintf(buf, "%-13s轉給 %-13s計 %d %s (%s)\n",
       cuser.userid, userid, dollar, !way ? "銀" : "金", Btime(&now));
     f_cat(FN_RUN_BANK_LOG, buf);
@@ -88,7 +88,7 @@ x_give()
     }
 
     memset(&paycheck, 0, sizeof(PAYCHECK));
-    time(&paycheck.tissue);
+    time4(&paycheck.tissue);
     if (!way)
       paycheck.money = dollar;
     else
@@ -516,7 +516,7 @@ b_celebrate()
 {
   char foo[56];
   char *domain;
-  int fp;
+  FILE *fp;
 
   str_lower(foo, cuser.email);
 

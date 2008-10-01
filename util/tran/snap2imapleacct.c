@@ -112,8 +112,8 @@ trans_acct(old, new)
   str_ncpy(new->email, old->email, sizeof(new->email));
 
   /* smiler.080827:以下為 080827 新增欄位 */
-  new->good_article=0;
-  new->poor_article=0;
+  new->good_article = 0;
+  new->poor_article = 0;
   new->violation = 0;
   new->reserved_1 = 0;
   new->reserved_2 = 0;

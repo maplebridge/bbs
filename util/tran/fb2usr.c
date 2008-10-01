@@ -131,13 +131,13 @@ creat_dirs(old)
 
   new.firstlogin = old->firstlogin;
   new.lastlogin = old->lastlogin;
-  time(&new.tcheck);
-  time(&new.tvalid);
+  time4(&new.tcheck);
+  time4(&new.tvalid);
 
   str_ncpy(new.lasthost, old->lasthost, sizeof(new.lasthost));
   str_ncpy(new.email, old->email, sizeof(new.email));
 
-  slot.uptime = time(0);
+  slot.uptime = time4(0);
   strcpy(slot.userid, new.userid);
 
   fd = open(FN_SCHEMA, O_RDWR | O_CREAT, 0600);
@@ -174,9 +174,9 @@ trans_mail(old)
   char index[64], folder[64], buf[64], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
-  time(&chrono);
+  time4(&chrono);
 
   sprintf(index, OLD_BBSHOME "/mail/%c/%s/.DIR", *uperid, old->userid);
   usr_fpath(folder, old->userid, FN_DIR);

@@ -15,7 +15,7 @@ extern FCACHE *fshm;
 
 
 #ifndef ENHANCED_VISIT
-extern time_t brd_visit[];
+extern time4_t brd_visit[];
 #endif
 
 
@@ -30,7 +30,7 @@ extern time_t brd_visit[];
 
 typedef struct
 {
-  time_t tpad;
+  time4_t tpad;
   char msg[400];
 }      Pad;
 
@@ -116,7 +116,7 @@ pad_draw()
       return 0;
   } while (cc == 'e');
 
-  time(&pad.tpad);
+  time4(&pad.tpad);
 
   /* itoc.020812.註解: 改版面的時候要注意 struct Pad.msg[] 是否夠大 */
   str = pad.msg;
@@ -1430,7 +1430,7 @@ menu()
 	  XoPost(currbno);
 	  xover(XZ_POST);
 #ifndef ENHANCED_VISIT
-	  time(&brd_visit[currbno]);
+	  time4(&brd_visit[currbno]);
 #endif
 	}
 	goto every_key;

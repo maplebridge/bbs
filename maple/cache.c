@@ -19,7 +19,7 @@
 
 #ifdef MODE_STAT 
 UMODELOG modelog; 
-time_t mode_lastchange; 
+time4_t mode_lastchange; 
 #endif
 
 
@@ -110,9 +110,9 @@ utmp_mode(mode)
   if (bbsmode != mode)
   {
 #ifdef MODE_STAT
-    time_t now;
+    time4_t now;
 
-    time(&now);
+    time4(&now);
     modelog.used_time[bbsmode] += (now - mode_lastchange);
     mode_lastchange = now;
 #endif
@@ -395,7 +395,7 @@ bshm_init()
 void
 bshm_reload()		/* 開板以後，重新載入 bshm */
 {
-  time_t *uptime;
+  time4_t *uptime;
   int fd;
   BRD *head, *tail;
 
@@ -416,7 +416,7 @@ bshm_reload()		/* 開板以後，重新載入 bshm */
   }
 
   /* 等所有 boards 資料更新後再設定 uptime */
-  time(uptime);
+  time4(uptime);
 
   /* itoc.040314: 板主更改看板敘述或是站長更改看板時才會把 bpost/blast 寫進 .BRD 中
      所以 .BRD 裡的 bpost/blast 未必是對的，要重新 initial。

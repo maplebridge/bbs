@@ -66,7 +66,7 @@
 
 typedef struct
 {
-  time_t chrono;		/* timestamp */
+  time4_t chrono;		/* timestamp */
   int xmode;
 
   int xid;			/* reserved */

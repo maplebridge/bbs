@@ -93,7 +93,7 @@ hdr_stamp(folder, token, hdr, fpath)
     family = ++fname;
   }
 
-  chrono = time(0);
+  chrono = time4(0);
 
   for (;;)
   {
@@ -116,7 +116,7 @@ hdr_stamp(folder, token, hdr, fpath)
     {
       memset(hdr, 0, sizeof(HDR));
       hdr->chrono = chrono;
-      str_stamp(hdr->date, &hdr->chrono);
+      str_stamp(hdr->date, (time4_t *) &hdr->chrono);
       strcpy(hdr->xname, --fname);
       break;
     }

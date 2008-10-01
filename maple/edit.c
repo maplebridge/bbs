@@ -1373,12 +1373,12 @@ void
 ve_header(fp)
   FILE *fp;
 {
-  time_t now;
+  time4_t now;
   char *title;
 
   title = ve_title;
   title[72] = '\0';
-  time(&now);
+  time4(&now);
 
   if (curredit & EDIT_MAIL)
   {

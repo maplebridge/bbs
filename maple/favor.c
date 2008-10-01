@@ -26,7 +26,7 @@ extern BCACHE *bshm;
 extern int class_flag;
 
 #ifndef ENHANCED_VISIT
-extern time_t brd_visit[];
+extern time4_t brd_visit[];
 #endif
 
 #ifdef AUTO_JUMPBRD
@@ -429,7 +429,7 @@ mf_add(xo)
   if (ans != 'b' && ans != 'f' && ans != 'g' && ans != 'l')
     return XO_FOOT;
 
-  time(&mf.chrono);
+  time4(&mf.chrono);
 
   if (ans == 'b' || ans == 'g')
   {
@@ -795,7 +795,7 @@ mf_browse(xo)
     XoPost(bno);
     xover(XZ_POST);
 #ifndef ENHANCED_VISIT
-    time(&brd_visit[bno]);
+    time4(&brd_visit[bno]);
 #endif
 
 #ifdef AUTO_JUMPBRD
@@ -874,7 +874,7 @@ mf_do_paste(dstDir, mf, pos)
   if (xmode & MF_FOLDER)	/* 卷宗/分類 */
   {
     /* 在複製/貼上後一律變成卷宗，因為分類是站長專用特殊用途的 */
-    time(&fmf.chrono);			/* 造一個新的 chrono */
+    time4(&fmf.chrono);			/* 造一個新的 chrono */
     if ((fsize = mf_stamp(&fmf)) < 0)
       return;
     close(fsize);
@@ -967,7 +967,7 @@ mf_paste(xo)
   }
 
   memcpy(&mf, &mftmp, sizeof(MF));
-  time(&mf.chrono);			/* 造一個新的 chrono */
+  time4(&mf.chrono);			/* 造一個新的 chrono */
 
   /* itoc.010726.註解: 若是 MF_FOLDER，則換個檔名再貼上，一個卷宗一個檔案 */
   /* itoc.010726.註解: 卷宗複製貼上，裡面的東西並沒有貼上，懶得寫 recursive 的程式 :p */
@@ -1191,7 +1191,7 @@ mf_visit(xo)		/* itoc.010402: 看板列表設定看板已讀 */
     brh_get(brd->bstamp, bno);
     brh_visit(0);
 #ifndef ENHANCED_VISIT
-    time(&brd_visit[bno]);
+    time4(&brd_visit[bno]);
 #endif
   }
   return mf_body(xo);

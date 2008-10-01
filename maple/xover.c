@@ -300,7 +300,7 @@ TagItem TagList[TAG_MAX];	/* ascending list */
 
 int
 Tagger(chrono, recno, op)
-  time_t chrono;
+  time4_t chrono;
   int recno;
   int op;			/* op : TAG_NIN / TOGGLE / INSERT */
 /* ----------------------------------------------------- */

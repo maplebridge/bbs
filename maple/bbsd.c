@@ -48,7 +48,7 @@ char passbuf[PSWDLEN + 1];
 
 #ifdef MODE_STAT
 extern UMODELOG modelog;
-extern time_t mode_lastchange;
+extern time4_t mode_lastchange;
 #endif
 
 #define	ChangeLoging	0;	/* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
@@ -127,7 +127,7 @@ blog(mode, msg)		/* BBS 一般記錄 */
 void
 log_modes()
 {
-  time(&modelog.logtime);
+  time4(&modelog.logtime);
   rec_add(FN_RUN_MODE_CUR, &modelog, sizeof(UMODELOG));
 }
 #endif
@@ -152,7 +152,7 @@ u_exit(mode)
 #endif
   utmp_free(cutmp);		/* 釋放 UTMP shm */
 
-  diff = (time(&cuser.lastlogin) - ap_start) / 60;
+  diff = (time4(&cuser.lastlogin) - ap_start) / 60;
   sprintf(fpath, "Stay: %d (%d)", diff, currpid);
   blog(mode, fpath);
 
@@ -682,12 +682,12 @@ login_user(content)
 	{
 	  FILE *fp;
 	  char parentid[IDLEN + 1], buf[80];
-	  time_t now;
+	  time4_t now;
 
 	  /* itoc.010820: 記錄保人於保證人及被保人 */
 	  strcpy(parentid, cuser.userid);
 	  acct_apply();
-	  time(&now);
+	  time4(&now);
 
 	  /* itoc.010820.註解: 把對方 log 在行首，在 reaper 時可以方便砍 tree */
 	  sprintf(buf, "%s 於 %s 介紹此人(%s)加入本站\n", parentid, Btime(&now), cuser.userid);
@@ -915,7 +915,7 @@ login_status(multi)
     status |= STATUS_COINLOCK;
 
   /* itoc.011022: 加入生日旗標 */
-  ptime = localtime(&ap_start);
+  ptime = localtime4(&ap_start);
   if (cuser.day == ptime->tm_mday && cuser.month == ptime->tm_mon + 1)
     status |= STATUS_BIRTHDAY;
 
@@ -1203,7 +1203,7 @@ tn_main()
   }
 #endif
 
-  time(&ap_start);
+  time4(&ap_start);
 
   /* smiler.070602:更改進站版面配置 */
   int len;

@@ -446,7 +446,7 @@ VAR usint bbstate;		/* bbs operatine state */
 VAR ACCT cuser;			/* current user structure */
 VAR UTMP *cutmp;		/* current user temporary */
 
-VAR time_t ap_start;		/* 進站時刻 */
+VAR time4_t ap_start;		/* 進站時刻 */
 VAR int total_user;		/* 使用者自以為的站上人數 */
 
 VAR int b_lines;		/* bottom line */
@@ -463,7 +463,7 @@ VAR char quote_nick[80];
 VAR char hunt[32];		/* hunt keyword */
 
 VAR int curredit;		/* current edit mode */
-VAR time_t currchrono;		/* current file timestamp */
+VAR time4_t currchrono;		/* current file timestamp */
 VAR char currtitle[80];		/* currently selected article title */
 
 VAR int currbno;		/* currently selected board bno */

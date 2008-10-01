@@ -566,7 +566,7 @@ check_crosspost(fpath, bno)
     cuser.userlevel |= PERM_DENYPOST;
     if (acct_load(&acct, cuser.userid) >= 0)
     {
-      acct.tvalid = time(NULL) + CROSSPOST_DENY_DAY * 86400;
+      acct.tvalid = time4(NULL) + CROSSPOST_DENY_DAY * 86400;
       acct_setperm(&acct, PERM_DENYPOST, PERM_POST);
     }
     board_main();
@@ -1713,7 +1713,7 @@ post_history(xo, hdr)	/* 將 hdr 這篇加入 brh */
   HDR *hdr;
 {
   int fd;
-  time_t prev, chrono, maxchrono, next, this;
+  time4_t prev, chrono, maxchrono, next, this;
   HDR buf;
 
   maxchrono = BMAX(hdr->chrono, hdr->stamp);
@@ -3268,7 +3268,7 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
 #ifdef DO_POST_FILTER
 static int
 find_xname_by_chrono(chrono, xpath, mode)	/* 配合看門狗，修改文章後找副本一併修改 */
-  time_t chrono;
+  time4_t chrono;
   char *xpath;
   int mode;	/* 0: 從原文找置底  1: 從置底找原文 */
 {
@@ -3954,7 +3954,7 @@ post_addMF(xo)
   if (!in_favor(currboard))
   {
     memset(&mf, 0, sizeof(MF));
-    time(&mf.chrono);
+    time4(&mf.chrono);
     mf.mftype = MF_BOARD;
     strcpy(mf.xname, currboard);
 
@@ -4339,6 +4339,7 @@ post_state(xo)
 {
   HDR *hdr;
   char fpath[64], *dir;
+  time4_t temp;
   struct stat st;
 
   if (!HAS_PERM(PERM_ALLBOARD))
@@ -4353,7 +4354,10 @@ post_state(xo)
 
   prints("========  基本資料 ========\n");
   if (!stat(fpath, &st))
-    prints("\n時間戳記 : %s\n檔案大小 : %d\n", Btime(&st.st_mtime), st.st_size);
+  {
+    temp = st.st_mtime;
+    prints("\n時間戳記 : %s\n檔案大小 : %d\n", Btime(&temp), st.st_size);
+  }
 
   prints("DIR 位置 : %s\n", dir);
   prints("檔案名稱 : %s\n", hdr->xname);

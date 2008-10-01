@@ -224,11 +224,11 @@ creat_dirs(old)
   new.numemails = 0;
   new.firstlogin = old->firstlogin;
   new.lastlogin = old->lastlogin;
-  new.tcheck = time(&new.tvalid);
+  new.tcheck = time4(&new.tvalid);
   str_ncpy(new.lasthost, old->lasthost, sizeof(new.lasthost));
   str_ncpy(new.email, old->email, sizeof(new.email));
 
-  slot.uptime = time(0);
+  slot.uptime = time4(0);
   strcpy(slot.userid, new.userid);
 
   fd = open(FN_SCHEMA, O_RDWR | O_CREAT, 0600);
@@ -318,7 +318,7 @@ trans_plans(old)
 /* ----------------------------------------------------- */
 
 
-static time_t
+static time4_t
 trans_hdr_chrono(filename)
   char *filename;
 {
@@ -327,7 +327,7 @@ trans_hdr_chrono(filename)
   /* M.1087654321.A 或 M.987654321.A */
   str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
 
-  return (time_t) atoi(time_str);
+  return (time4_t) atoi(time_str);
 }
 
 
@@ -339,7 +339,7 @@ trans_mail(old)
   char index[64], folder[64], buf[64], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
   sprintf(index, OLD_BBSHOME "/home/%s/.DIR", old->userid);
   usr_fpath(folder, old->userid, FN_DIR);
@@ -352,7 +352,7 @@ trans_mail(old)
 
       if (dashf(buf))	/* 文章檔案在才做轉換 */
       {
-	char new_name[10] = "@";      
+	char new_name[10] = "@";
 
 	/* 轉換文章 .DIR */
 	memset(&hdr, 0, sizeof(HDR));
@@ -392,7 +392,7 @@ trans_man_stamp(folder, token, hdr, fpath, time)
   int token;
   HDR *hdr;
   char *fpath;
-  time_t time;
+  time4_t time;
 {
   char *fname, *family;
   int rc;
@@ -442,7 +442,7 @@ transman(index, folder)
   char *ptr, buf[256], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
   if ((fd = open(index, O_RDONLY)) >= 0)
   {

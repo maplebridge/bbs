@@ -319,7 +319,7 @@ gem_hdr_stamp(folder, token, hdr, fpath)
   int Token;		/* token 的大寫 */
   char *ptr;		/* token 所在處 */
   char *pool = "FAL";
-  static time_t chrono0;
+  static time4_t chrono0;
 
   flink = NULL;
   if (token & (HDR_LINK | HDR_COPY))
@@ -350,7 +350,7 @@ gem_hdr_stamp(folder, token, hdr, fpath)
   ptr = fname;
   fname++;
 
-  chrono = time(0);
+  chrono = time4(0);
 
   /* itoc.060605: 由於精華區往往有大量複製貼上，所以就乾脆把上一次最後的 chrono 記下來，這次就不用從頭 try */
   if (chrono <= chrono0)
@@ -414,7 +414,7 @@ brd2gem(brd, gem)
   HDR *gem;
 {
   memset(gem, 0, sizeof(HDR));
-  time(&gem->chrono);
+  time4(&gem->chrono);
   str_stamp(gem->date, &gem->chrono);
   strcpy(gem->xname, brd->brdname);
   sprintf(gem->title, "%-13s%-5s%s", brd->brdname, brd->class, brd->title);
@@ -549,7 +549,7 @@ gem_add(xo, gtype)
       }
 
       memset(&hdr, 0, sizeof(HDR));
-      time(&hdr.chrono);
+      time4(&hdr.chrono);
       str_stamp(hdr.date, &hdr.chrono);
       sprintf(hdr.xname, "@%s", fpath);
       if (gtype == 'c')
@@ -752,7 +752,8 @@ gem_state(xo)
 
     if (!stat(fpath, &st))
     {
-      prints("\nTime: %s", Btime(&st.st_mtime));
+      time4_t temp = st.st_mtime;
+      prints("\nTime: %s", Btime(&temp));
       prints("\nSize: %d", st.st_size);
     }
 
@@ -1244,7 +1245,7 @@ gem_extend(xo, num)
 {
   char *dir, fpath[64], gpath[64];
   FILE *fp;
-  time_t chrono;
+  time4_t chrono;
   HDR *hdr;
 
   if (!(hdr = gem_check(xo, fpath, GEM_PLAIN)))

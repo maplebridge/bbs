@@ -44,9 +44,9 @@
 //#define VAC_OCCUPY	180	/* 已完成身分認證的使用者保留 180 天 */
 
 
-//static time_t due_newusr;
-static time_t due_forfun;
-static time_t due_occupy;
+//static time4_t due_newusr;
+static time4_t due_forfun;
+static time4_t due_occupy;
 
 
 static int visit = 0;	/* 總 ID 的數目 */
@@ -59,7 +59,7 @@ static FILE *flog;
 static FILE *flst;
 
 #ifdef CHECK_LAZYBM
-static time_t due_lazybm;
+static time4_t due_lazybm;
 static int lazybm = 0;	/* 偷懶板主的數目 */
 static FILE *fbm;
 #endif
@@ -92,7 +92,7 @@ userno_free(uno)
   /* Thor.981205: 用 fcntl 取代flock, POSIX標準用法 */
   f_exlock(fd);
 
-  time(&schema.uptime);
+  time4(&schema.uptime);
   off = (uno - 1) * sizeof(SCHEMA);
   if (lseek(fd, off, SEEK_SET) < 0)
     exit(2);
@@ -133,11 +133,11 @@ levelmsg(str, level)
 static void
 datemsg(str, chrono)
   char *str;
-  time_t *chrono;
+  time4_t *chrono;
 {
   struct tm *t;
 
-  t = localtime(chrono);
+  t = localtime4(chrono);
   /* Thor.990329: y2k */
   sprintf(str, "%02d/%02d/%02d%3d:%02d:%02d ",
     t->tm_year % 100, t->tm_mon + 1, t->tm_mday,
@@ -371,7 +371,7 @@ reaper(fpath, lowid)
   int fd, userno;
 //  int login;
   usint ulevel;
-  time_t life;
+  time4_t life;
   char buf[256], data[40];
   ACCT acct;
 
@@ -522,7 +522,7 @@ int
 main()
 {
   int ch;
-  time_t start, end;
+  time4_t start, end;
   struct tm *ptime;
   struct stat st;
   char *fname, fpath[256];
@@ -569,8 +569,8 @@ main()
   init_bshm();
   collect_allBM();
 
-  time(&start);
-  ptime = localtime(&start);
+  time4(&start);
+  ptime = localtime4(&start);
 
   /* itoc.011002.註解: 不能在一開學就馬上 apply 嚴格的時間限制，
      否則很多 user 會因為整個暑假沒有上站，在一開學就被 reaper 掉 */   
@@ -625,7 +625,7 @@ main()
   fprintf(flst, "\nManager: %d\n", manager);
   fclose(flst);
 
-  time(&end);
+  time4(&end);
   fprintf(flog, "# 開始時間：%s\n", Btime(&start));
   fprintf(flog, "# 結束時間：%s\n", Btime(&end));
   end -= start;

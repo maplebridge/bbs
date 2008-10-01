@@ -262,10 +262,10 @@ rss_add(xo)
       break;
   }
 
-  time(&(rss.chrono));
+  time4(&(rss.chrono));
   struct tm *ptime;
 
-  ptime = localtime(&(rss.chrono));
+  ptime = localtime4(&(rss.chrono));
   sprintf(rss.date,"%02d/%02d/%02d",ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 
   sprintf(rss.owner,cuser.userid);
@@ -431,7 +431,7 @@ rss_edit(xo)
   sprintf(mrss.modified,"start");	/* smiler.080823: 將 feed->modified 清掉，重新記錄 */
 
   struct tm *ptime;
-  ptime = localtime(&(mrss.chrono));
+  ptime = localtime4(&(mrss.chrono));
   sprintf(mrss.date,"%02d/%02d/%02d",ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
@@ -487,7 +487,7 @@ rss_url(xo)
   sprintf(mrss.modified,"start");              /* smiler.080823: 初始rss.modified */
 
   struct tm *ptime;
-  ptime = localtime(&(mrss.chrono));
+  ptime = localtime4(&(mrss.chrono));
   sprintf(mrss.date,"%02d/%02d/%02d",ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
@@ -523,7 +523,7 @@ rss_bookmark(xo)
     strcpy(mrss.bookmark," ");
 
   struct tm *ptime;
-  ptime = localtime(&(mrss.chrono));
+  ptime = localtime4(&(mrss.chrono));
   sprintf(mrss.date,"%02d/%02d/%02d",ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
 
   if (memcmp(frss, &mrss, sizeof(RSS)) && vans(msg_sure_ny) == 'y')
@@ -716,7 +716,7 @@ rss_browse(xo)
   struct tm *ptime;
 
   rss = (RSS *) xo_pool + (xo->pos - xo->top);
-  ptime = localtime(&(rss->chrono));
+  ptime = localtime4(&(rss->chrono));
 
   if ((!(bbstate & STAT_BOARD)) && (rss->xmode & RSS_RESTRICT))
     return XO_NONE;

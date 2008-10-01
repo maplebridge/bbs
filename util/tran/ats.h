@@ -18,7 +18,7 @@
   5. 必須在 usr 及 brd 都轉完才可以轉換 pal
   6. 必須在 usr 轉完才可以轉換 bmw
   7. 建議轉換順序為 usr -> brd -> gem -> mf -> pal -> bmw
-          
+
 #endif
 
 
@@ -75,8 +75,8 @@ struct userec {
   usint userlevel;
   unsigned long int numlogins;
   unsigned long int numposts;
-  time_t firstlogin;
-  time_t lastlogin;
+  time4_t firstlogin;
+  time4_t lastlogin;
   char lasthost[80];
   char remoteuser[8];
   char email[50];
@@ -259,10 +259,10 @@ struct boardheader {
   char title[ABTLEN + 1];
   char BM[AIDLEN * 3 + 3];       /* BMs' uid, token '/' */
   char pad[11];
-  time_t bupdate;               /* note update time */
+  time4_t bupdate;               /* note update time */
   char pad2[3];
   uschar bvote;                 /* Vote flags */
-  time_t vtime;                 /* Vote close time */
+  time4_t vtime;                 /* Vote close time */
   usint level;
   char document[128 * 3];       /* add extra document */
   char station[16];

@@ -119,7 +119,7 @@ verify_user(str)
 	  {
 	    /* ¥£§…≈v≠≠ */
 	    acct.userlevel |= PERM_VALID;
-	    time(&acct.tvalid);
+	    time4(&acct.tvalid);
 	    lseek(fd, (off_t) 0, SEEK_SET);
 	    write(fd, &acct, sizeof(ACCT));
 

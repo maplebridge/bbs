@@ -161,7 +161,7 @@ init_allbrd()
 static void
 init_bshm()
 {
-  time_t *uptime;
+  time4_t *uptime;
   int n, turn;
 
   bshm = shm_new(BRDSHM_KEY, sizeof(BCACHE));
@@ -198,7 +198,7 @@ init_bshm()
 
     /* 等所有 boards 資料更新後再設定 uptime */
 
-    time(uptime);
+    time4(uptime);
     fprintf(stderr, "[account]\tCACHE\treload bcache\n");
     return;
   }
@@ -560,7 +560,7 @@ closepolls()
   f_unlock(dirty);
 
   close(dirty);
-  time(&bshm->uptime);
+  time4(&bshm->uptime);
 }
 
 

@@ -83,10 +83,10 @@ typedef struct
   int numposts;			/* 發表次數 */
   int numemails;		/* 寄發 Inetrnet E-mail 次數 */
 
-  time_t firstlogin;		/* 第一次上站時間 */
-  time_t lastlogin;		/* 上一次上站時間 */
-  time_t tcheck;		/* 上次 check 信箱/朋友名單的時間 */
-  time_t tvalid;		/* 若停權，停權期滿的時間；
+  time4_t firstlogin;		/* 第一次上站時間 */
+  time4_t lastlogin;		/* 上一次上站時間 */
+  time4_t tcheck;		/* 上次 check 信箱/朋友名單的時間 */
+  time4_t tvalid;		/* 若停權，停權期滿的時間；
                                    若未停權且通過認證，通過認證的時間；
                                    若未停權且未通過認證，認證函的 time-seed */
   usint staytime;			/* 總共停留時間 */
@@ -104,7 +104,7 @@ typedef struct
 
 typedef struct			/* 16 bytes */
 {
-  time_t uptime;
+  time4_t uptime;
   char userid[IDLEN];
 }      SCHEMA;
 
@@ -117,7 +117,7 @@ typedef struct			/* 16 bytes */
 typedef struct	/* 註冊表單 (Register From) 256 bytes */
 {
   int userno;
-  time_t rtime;
+  time4_t rtime;
   char userid[IDLEN + 1];
   char agent[IDLEN + 1];
   char nouse[20];
@@ -142,9 +142,9 @@ typedef struct	/* 註冊表單 (Register From) 256 bytes */
 
 typedef struct VoteControlHeader
 {
-  time_t chrono;		/* 投票開辦時間 */	/* Thor: 為 key 而且 match HDR chrono */
-  time_t bstamp;		/* 看板辨識代碼 */	/* Thor: 為 key */
-  time_t vclose;		/* 投票結束時間 */
+  time4_t chrono;		/* 投票開辦時間 */	/* Thor: 為 key 而且 match HDR chrono */
+  time4_t bstamp;		/* 看板辨識代碼 */	/* Thor: 為 key */
+  time4_t vclose;		/* 投票結束時間 */
 
   char xname[32];		/* 主檔名 */		/* Thor: match HDR 的 xname */
   char date[9];			/* 開始日期 */		/* Thor: match HDR 的 date */
@@ -228,7 +228,7 @@ typedef struct
 
 typedef struct
 {
-  time_t btime;
+  time4_t btime;
   UTMP *caller;			/* who call-in me ? */
   int sender;			/* calling userno */
   int recver;			/* called userno */
@@ -295,7 +295,7 @@ typedef struct
 
 typedef struct
 {
-  time_t tissue;		/* 發支票時間 */
+  time4_t tissue;		/* 發支票時間 */
   int money;
   int gold;
   char reason[20];
@@ -317,7 +317,7 @@ struct UTMP
   usint ufo;			/* the same as ACCT.ufo */
   usint status;			/* status */
 
-  time_t idle_time;		/* active time for last event */
+  time4_t idle_time;		/* active time for last event */
   u_long in_addr;		/* Internet address */
   int sockport;			/* socket port for talk */
   UTMP *talker;			/* who talk-to me ? */
@@ -355,13 +355,13 @@ typedef struct BoardHeader
 
   char bvote;			/* 0:無投票 -1:有賭盤(可能有投票) 1:有投票 */
 
-  time_t bstamp;		/* 建立看板的時間, unique */
+  time4_t bstamp;		/* 建立看板的時間, unique */
   usint readlevel;		/* 閱讀文章的權限 */
   usint postlevel;		/* 發表文章的權限 */
   usint battr;			/* 看板屬性 */
-  time_t btime;			/* -1:bpost/blast 需要更新 */
+  time4_t btime;			/* -1:bpost/blast 需要更新 */
   int bpost;			/* 共有幾篇 post */
-  time_t blast;			/* 最後一篇 post 的時間 */
+  time4_t blast;			/* 最後一篇 post 的時間 */
 }           BRD;
 
 
@@ -406,7 +406,7 @@ typedef	struct
 
 typedef struct MF
 {
-  time_t chrono;		/* 建立時間 */
+  time4_t chrono;		/* 建立時間 */
   int mftype;			/* type */
   char xname[BNLEN + 1];	/* 板名或檔名 */
   char class[BCLEN + 1];	/* 分類 */
@@ -436,8 +436,8 @@ typedef struct NewBoardHeader
   char brdname[BNLEN + 1];
   char class[BCLEN + 1];
   char title[BTLEN + 1];
-  time_t btime;
-  time_t etime;
+  time4_t btime;
+  time4_t etime;
   char xname[32];
   char owner[IDLEN + 1];
   char date[9];
@@ -464,7 +464,7 @@ typedef struct NewBoardHeader
 
 typedef struct SONGDATA
 {
-  time_t chrono;
+  time4_t chrono;
   int count;		/* 被點次數 */
   char title[80];
 }	SONGDATA;
@@ -536,7 +536,7 @@ typedef struct
   int number;			/* 全部看板的數目 */
   int numberOld;		/* 剛開站時看板的數目 */
   int min_chn;			/* 記錄總共有幾個分類 */
-  time_t uptime;
+  time4_t uptime;
 } BCACHE;
 
 
@@ -609,7 +609,7 @@ typedef struct
 
 typedef struct
 {
-  time_t chrono;
+  time4_t chrono;
   int recno;
 }      TagItem;
 
@@ -624,7 +624,7 @@ typedef struct
   char author[IDLEN + 1];
   char board[BNLEN + 1];
   char title[66];
-  time_t date;		/* last post's date */
+  time4_t date;		/* last post's date */
   int number;		/* post number */
 } POSTLOG;
 
@@ -637,15 +637,15 @@ typedef struct
 
 typedef struct
 {
-  time_t logtime;
-  time_t used_time[M_MAX + 1];	/* itoc.010901: depend on mode.h */
+  time4_t logtime;
+  time4_t used_time[M_MAX + 1];	/* itoc.010901: depend on mode.h */
 } UMODELOG;
 
 
 typedef struct
 {
-  time_t logtime;
-  time_t used_time[M_MAX + 1];	/* itoc.010901: depend on mode.h */
+  time4_t logtime;
+  time4_t used_time[M_MAX + 1];	/* itoc.010901: depend on mode.h */
   int count[30];
   int usercount;
 } MODELOG;
@@ -660,7 +660,7 @@ typedef struct
 
 typedef struct
 {
-  time_t chrono;	/* >=0:stamp -1:cancel */
+  time4_t chrono;	/* >=0:stamp -1:cancel */
   char board[BNLEN + 1];
 
   /* 以下欄位的大小與 HDR 相同 */
@@ -735,7 +735,7 @@ typedef struct
 
 typedef struct
 {
-  time_t btime;
+  time4_t btime;
   char nick[20];
   char addr[56];
   char status[10];
@@ -750,7 +750,7 @@ typedef struct
 typedef struct
 {
   char bookmark[IDLEN + 1];
-  time_t chrono;
+  time4_t chrono;
   int  xmode;
   int  xid;			/* reserved */
   char owner[IDLEN + 1];	/* 作者ID */

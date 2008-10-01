@@ -20,6 +20,12 @@ int dns_mx(char *domain, char *mxlist);
 int dns_smtp(char *host);
 #endif
 
+#ifdef TIMET64
+/* time4.c */
+struct tm *localtime4(const time4_t *t);
+time4_t time4(time4_t *ptr);
+#endif
+
 /* str_ansi.c */
 void str_ansi(char *dst, char *str, int max);
 /* str_cat.c */
@@ -55,7 +61,7 @@ void str_ncpy(char *dst, char *src, int n);
 char *genpasswd(char *pw);
 int chkpasswd(char *passwd, char *test);
 /* str_stamp.c */
-void str_stamp(char *str, time_t *chrono);
+void str_stamp(char *str, time4_t *chrono);
 /* str_str.c */
 char *str_str(char *str, char *tag);
 /* str_sub.c */
@@ -63,8 +69,8 @@ char *str_sub(char *str, char *tag);
 /* str_tail.c */
 char *str_tail(char *str);
 /* str_time.c */
-char *Atime(time_t *clock);
-char *Btime(time_t *clock);
+char *Atime(time4_t *clock);
+char *Btime(time4_t *clock);
 char *Now(void);
 /* str_trim.c */
 void str_trim(char *buf);
@@ -72,9 +78,9 @@ void str_trim(char *buf);
 char *str_ttl(char *title);
 
 /* archiv32.c */
-void archiv32(time_t chrono, char *fname);
+void archiv32(time4_t chrono, char *fname);
 /* chrono32.c */
-time_t chrono32(char *str);
+time4_t chrono32(char *str);
 /* hash32.c */
 int hash32(unsigned char *str);
 /* radix32.c */

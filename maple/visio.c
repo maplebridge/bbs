@@ -1311,7 +1311,7 @@ igetch()
 	      idle = 0;
 
 #ifdef DETAIL_IDLETIME
-	      time(&cutmp->idle_time);	/* 若 #define DETAIL_IDLETIME，則 idle_time 表示開始閒置的時間(秒) */
+	      time4(&cutmp->idle_time);	/* 若 #define DETAIL_IDLETIME，則 idle_time 表示開始閒置的時間(秒) */
 #else
 	      cutmp->idle_time = 0;	/* 若 #undef DETAIL_IDLETIME，則 idle_time 表示已經閒置了多久(分) */
 #endif
@@ -1353,7 +1353,7 @@ igetch()
 	    outs("★ 超過閒置時間！");
 	    refresh();
 	    abort_bbs();
-  	  }
+	  }
 	  else if (idle >= IDLE_TIMEOUT - IDLE_WARNOUT)	/* itoc.001222: 閒置過久警告 */
 	  {
 	    bell();		/* itoc.010315: 叫一下 :p */

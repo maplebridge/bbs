@@ -30,7 +30,7 @@
 #include "ats.h"
 
 
-static time_t
+static time4_t
 trans_hdr_chrono(filename)
   char *filename;
 {
@@ -39,14 +39,14 @@ trans_hdr_chrono(filename)
   /* M.1087654321.A 或 M.987654321.A */
   str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
 
-  return (time_t) atoi(time_str);
+  return (time4_t) atoi(time_str);
 }
 
 
 static void
 trans_hdr_stamp(folder, t, hdr, fpath)
   char *folder;
-  time_t t;
+  time4_t t;
   HDR *hdr;
   char *fpath;
 {
@@ -96,14 +96,14 @@ static void
 transbrd(bh)
   boardheader *bh;
 {
-  static time_t stamp = 0;
+  static time4_t stamp = 0;
 
   int fd;
   char index[64], folder[64], buf[64], fpath[64];
   fileheader fh;
   HDR hdr;
   BRD newboard;
-  time_t chrono;
+  time4_t chrono;
 
   printf("轉換 %s 看板\n", bh->brdname);
 
@@ -115,7 +115,7 @@ transbrd(bh)
   }
 
   if (!stamp)
-    time(&stamp);
+    time4(&stamp);
 
   /* 轉換 .BRD */
 

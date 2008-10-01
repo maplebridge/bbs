@@ -47,8 +47,8 @@ struct userec
   usint userlevel;                /* 使用者權限   4 bytes */
   ushort numlogins;               /* 上站次數     2 bytes */
   ushort numposts;                /* POST次數     2 bytes */
-  time_t firstlogin;              /* 註冊時間     4 bytes */
-  time_t lastlogin;               /* 前次上站     4 bytes */
+  time4_t firstlogin;             /* 註冊時間     4 bytes */
+  time4_t lastlogin;              /* 前次上站     4 bytes */
   char lasthost[24];              /* 上站地點    24 bytes */
   char vhost[24];                 /* 虛擬網址    24 bytes */
   char email[50];                 /* E-MAIL      50 bytes */
@@ -74,7 +74,7 @@ struct userec
   unsigned long int goldmoney;    /* 風塵金幣     8 bytes */
   unsigned long int silvermoney;  /* 銀幣         8 bytes */
   unsigned long int exp;          /* 經驗值       8 bytes */
-  time_t dtime;                   /* 存款時間     4 bytes */
+  time4_t dtime;                  /* 存款時間     4 bytes */
   int limitmoney;                 /* 金錢下限     4 bytes */
 };
 typedef struct userec userec;
@@ -106,15 +106,15 @@ struct boardheader
   char title[49];               /* 看板中文名稱    49 bytes */
   char BM[39];                  /* 板主ID和"/"     39 bytes */
   usint brdattr;                /* 看板的屬性       4 bytes */
-  time_t bupdate;               /* note update time 4 bytes */
+  time4_t bupdate;              /* note update time 4 bytes */
   uschar bvote;                 /* Vote flags       1 bytes */
-  time_t vtime;                 /* Vote close time  4 bytes */
+  time4_t vtime;                /* Vote close time  4 bytes */
   usint level;                  /* 可以看此板的權限 4 bytes */
   unsigned long int totalvisit; /* 總拜訪人數       8 bytes */
   unsigned long int totaltime;  /* 總停留時間       8 bytes */
   char lastvisit[13];           /* 最後看該板的人  13 bytes */
-  time_t opentime;              /* 開板時間         4 bytes */
-  time_t lastime;               /* 最後拜訪時間     4 bytes */
+  time4_t opentime;             /* 開板時間         4 bytes */
+  time4_t lastime;              /* 最後拜訪時間     4 bytes */
   char passwd[14];              /* 密碼            14 bytes */
   unsigned long int postotal;   /* 總水量 :p        8 bytes */
   usint maxpost;                /* 文章上限         4 bytes */

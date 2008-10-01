@@ -38,13 +38,13 @@ typedef struct			/* 要和新版程式 struct 一樣 */
 
   char bvote;			/* 0:無投票 -1:有賭盤(可能有投票) 1:有投票 */
 
-  time_t bstamp;		/* 建立看板的時間, unique */
+  time4_t bstamp;		/* 建立看板的時間, unique */
   usint readlevel;		/* 閱讀文章的權限 */
   usint postlevel;		/* 發表文章的權限 */
   usint battr;			/* 看板屬性 */
-  time_t btime;			/* -1:bpost/blast 需要更新 */
+  time4_t btime;		/* -1:bpost/blast 需要更新 */
   int bpost;			/* 共有幾篇 post */
-  time_t blast;			/* 最後一篇 post 的時間 */
+  time4_t blast;		/* 最後一篇 post 的時間 */
 }	NEW;
 
 
@@ -62,13 +62,13 @@ typedef struct			/* 要和舊版程式 struct 一樣 */
 
   char bvote;			/* 0:無投票 -1:有賭盤(可能有投票) 1:有投票 */
 
-  time_t bstamp;		/* 建立看板的時間, unique */
+  time4_t bstamp;		/* 建立看板的時間, unique */
   usint readlevel;		/* 閱讀文章的權限 */
   usint postlevel;		/* 發表文章的權限 */
   usint battr;			/* 看板屬性 */
-  time_t btime;			/* -1:bpost/blast 需要更新 */
+  time4_t btime;		/* -1:bpost/blast 需要更新 */
   int bpost;			/* 共有幾篇 post */
-  time_t blast;			/* 最後一篇 post 的時間 */
+  time4_t blast;		/* 最後一篇 post 的時間 */
 }	OLD;
 
 

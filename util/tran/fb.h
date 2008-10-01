@@ -80,7 +80,7 @@ static BITS perm[] =
 struct userec
 {				/* Structure used to hold information in */
   char userid[15];
-  time_t firstlogin;
+  time4_t firstlogin;
   char lasthost[16];
   unsigned int numlogins;
   unsigned int numposts;
@@ -91,20 +91,20 @@ struct userec
   char termtype[16];
   char reginfo[80 - 16];
   unsigned int userlevel;
-  time_t lastlogin;
-  time_t stay;
+  time4_t lastlogin;
+  time4_t stay;
   char realname[40];
   char address[80];
   char email[80 - 12];
   unsigned int nummails;
-  time_t lastjustify;
+  time4_t lastjustify;
   char gender;
   unsigned char birthyear;
   unsigned char birthmonth;
   unsigned char birthday;
   int signature;
   unsigned int userdefine;
-  time_t notedate;
+  time4_t notedate;
   int noteline;
 };
 typedef struct userec userec;

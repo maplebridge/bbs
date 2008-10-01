@@ -641,7 +641,7 @@ scan_register_form(fd)
       /* 提升權限 */
       sprintf(buf, "REG: %s:%s:%s:by %s", rform.phone, rform.career, rform.address, agent);
       justify_log(acct.userid, buf);
-      time(&acct.tvalid);
+      time4(&acct.tvalid);
       /* itoc.041025: 這個 acct_setperm() 並沒有緊跟在 acct_load() 後面，中間隔了一個 vans()，
          這可能造成拿舊 acct 去覆蓋新 .ACCT 的問題。不過因為是站長才有的權限，所以就不改了 */
       acct_setperm(&acct, PERM_VALID, 0);

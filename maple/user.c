@@ -537,7 +537,7 @@ do_pop3(addr)		/* itoc.010821: 改寫一下 :) */
       strcpy(cuser.email, addr);
       if (acct_load(&acct, cuser.userid) >= 0)
       {
-	time(&acct.tvalid);
+	time4(&acct.tvalid);
 	acct_setperm(&acct, PERM_VALID, 0);
       }
 
@@ -715,7 +715,7 @@ u_register()
 
   rform.userno = cuser.userno;
   strcpy(rform.userid, cuser.userid);
-  time(&rform.rtime);
+  time4(&rform.rtime);
   rec_add(FN_RUN_RFORM, &rform, sizeof(RFORM));
   return 0;
 }
@@ -755,7 +755,7 @@ u_verify()
 	justify_log(cuser.userid, buf);
 	if (acct_load(&acct, cuser.userid) >= 0)
 	{
-	  time(&acct.tvalid);
+	  time4(&acct.tvalid);
 	  acct_setperm(&acct, PERM_VALID, 0);
 	}
 
@@ -795,7 +795,7 @@ u_deny()
     {
       if (acct_load(&acct, cuser.userid) >= 0)
       {
-	time(&acct.tvalid);
+	time4(&acct.tvalid);
 #ifdef JUSTIFY_PERIODICAL
 	/* xeon.050112: 在認證快到期前時 Cross-Post，然後 tvalid 就會被設定到未來時間，
 	   等復權時間到了去復權，這樣就可以避過重新認證，所以復權後要重新認證。 */

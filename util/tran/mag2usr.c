@@ -69,7 +69,7 @@ trans_acct()
 
       new.firstlogin = old.firstlogin;
       new.lastlogin = old.lastlogin;
-      new.tcheck = time(&new.tvalid);
+      new.tcheck = time4(&new.tvalid);
 
       str_ncpy(new.lasthost, old.lasthost, sizeof(new.lasthost));
       str_ncpy(new.email, old.email, sizeof(new.email));
@@ -104,7 +104,7 @@ trans_acct()
 /*-------------------------------------------------------*/
 
 
-static time_t
+static time4_t
 trans_hdr_chrono(filename)
   char *filename;
 {
@@ -113,7 +113,7 @@ trans_hdr_chrono(filename)
   /* M.1087654321.A ©Î M.987654321.A */
   str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
 
-  return (time_t) atoi(time_str);
+  return (time4_t) atoi(time_str);
 }
 
 
@@ -175,7 +175,7 @@ trans_mail(userid)
   char ch, index[64], folder[64], buf[64], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
   ch = userid[0];
   if (ch >= 'a' && ch <= 'z')	/* ´«¤j¼g */

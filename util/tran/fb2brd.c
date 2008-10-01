@@ -20,7 +20,7 @@
 static inline void
 trans_hdr_stamp(folder, t, hdr, fpath)
   char *folder;
-  time_t t;
+  time4_t t;
   HDR *hdr;
   char *fpath;
 {
@@ -70,7 +70,7 @@ static void
 transbrd(bh)
   boardheader *bh;
 {
-  static time_t stamp = 0;
+  static time4_t stamp = 0;
 
   int fd;
   char *ptr, index[64], folder[64], buf[64], fpath[64];
@@ -78,7 +78,7 @@ transbrd(bh)
   HDR hdr;
   BRD newboard;
   BITS *p;
-  time_t chrono;
+  time4_t chrono;
 
   printf("轉換 %s 看板\n", bh->filename);
 
@@ -90,7 +90,7 @@ transbrd(bh)
   }
 
   if (!stamp)
-    time(&stamp);
+    time4(&stamp);
 
   /* 轉換 .BRD */
 
@@ -165,7 +165,7 @@ transbrd(bh)
 	/* 轉換文章 .DIR */
 	memset(&hdr, 0, sizeof(HDR));
 	stat(buf, &st);
-	chrono = st.st_mtime;
+	chrono = (time4_t) st.st_mtime;
 	trans_hdr_stamp(folder, chrono, &hdr, fpath);
 	str_ncpy(hdr.owner, fh.owner, sizeof(hdr.owner));
 	str_ansi(hdr.title, fh.title, sizeof(hdr.title));

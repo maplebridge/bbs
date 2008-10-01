@@ -37,7 +37,7 @@ brd_2_gem(brd, gem)
   HDR *gem;
 {
   memset(gem, 0, sizeof(HDR));
-  time(&gem->chrono);
+  time4(&gem->chrono);
   strcpy(gem->xname, brd->brdname);
   sprintf(gem->title, "%-13s%-5s%s", brd->brdname, brd->class, brd->title);
   gem->xmode = GEM_BOARD | GEM_FOLDER;

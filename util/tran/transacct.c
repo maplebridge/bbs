@@ -58,10 +58,10 @@ typedef struct			/* 要和新版程式 struct 一樣 */
   int numposts;			/* 發表次數 */
   int numemails;		/* 寄發 Inetrnet E-mail 次數 */
  
-  time_t firstlogin;		/* 第一次上站時間 */
-  time_t lastlogin;		/* 上一次上站時間 */
-  time_t tcheck;		/* 上次 check 信箱/好友名單的時間 */
-  time_t tvalid;		/* 通過認證的時間 */
+  time4_t firstlogin;		/* 第一次上站時間 */
+  time4_t lastlogin;		/* 上一次上站時間 */
+  time4_t tcheck;		/* 上次 check 信箱/好友名單的時間 */
+  time4_t tvalid;		/* 通過認證的時間 */
 
   char lasthost[30];		/* 上次登入來源 */
   char email[60];		/* 目前登記的電子信箱 */
@@ -97,10 +97,10 @@ typedef struct			/* 要和舊版程式 struct 一樣 */
   int numposts;			/* 發表次數 */
   int numemails;		/* 寄發 Inetrnet E-mail 次數 */
  
-  time_t firstlogin;		/* 第一次上站時間 */
-  time_t lastlogin;		/* 上一次上站時間 */
-  time_t tcheck;		/* 上次 check 信箱/好友名單的時間 */
-  time_t tvalid;		/* 通過認證的時間 */
+  time4_t firstlogin;		/* 第一次上站時間 */
+  time4_t lastlogin;		/* 上一次上站時間 */
+  time4_t tcheck;		/* 上次 check 信箱/好友名單的時間 */
+  time4_t tvalid;		/* 通過認證的時間 */
 
   char lasthost[30];		/* 上次登入來源 */
   char email[60];		/* 目前登記的電子信箱 */

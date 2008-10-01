@@ -31,7 +31,7 @@
 /* ----------------------------------------------------- */
 
 
-static time_t
+static time4_t
 trans_hdr_chrono(filename)
   char *filename;
 {
@@ -40,7 +40,7 @@ trans_hdr_chrono(filename)
   /* M.1087654321.A ©Î M.987654321.A */
   str_ncpy(time_str, filename + 2, filename[2] == '1' ? 11 : 10);
 
-  return (time_t) atoi(time_str);
+  return (time4_t) atoi(time_str);
 }
 
 
@@ -50,7 +50,7 @@ trans_man_stamp(folder, token, hdr, fpath, time)
   int token;
   HDR *hdr;
   char *fpath;
-  time_t time;
+  time4_t time;
 {
   char *fname, *family;
   int rc;
@@ -105,7 +105,7 @@ transman(index, folder)
   char *ptr, buf[1024], fpath[64];
   fileheader fh;
   HDR hdr;
-  time_t chrono;
+  time4_t chrono;
 
   if ((fd = open(index, O_RDONLY)) >= 0)
   {

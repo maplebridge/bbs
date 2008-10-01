@@ -25,7 +25,7 @@
   6. 將新版的 gem/@/ 下的這些檔案複製過來
      @apply @e-mail @goodbye @index @justify @newuser @opening.0
      @opening.1 @opening.2 @post @re-reg @tryout @welcome
-            
+
   7. 上 BBS 站，在 (A)nnounce 裡面，建以下二個卷宗的所有資料
      {話題} 熱門討論
      {排行} 統計資料
@@ -56,22 +56,22 @@ typedef struct
   int numlogins;		/* user login times */
   int numposts;			/* user post times */
   usint ufo;			/* user basic flags */
-  time_t firstlogin;		/* user first login time */
-  time_t lastlogin;		/* user last login time */
-  time_t staytime;		/* user total stay time */
-  time_t tcheck;		/* time to check mbox/pal */
+  time4_t firstlogin;		/* user first login time */
+  time4_t lastlogin;		/* user last login time */
+  time4_t staytime;		/* user total stay time */
+  time4_t tcheck;		/* time to check mbox/pal */
   char lasthost[32];		/* user last login remote host */
   int numemail;			/* 寄發 Inetrnet E-mail 次數 */
-  time_t tvalid;		/* 通過認證、更改 mail address 的時間 */
+  time4_t tvalid;		/* 通過認證、更改 mail address 的時間 */
   char email[60];		/* user email */
   char address[60];		/* user address */
   char justify[60];		/* FROM of replied justify mail */
   char vmail[60];		/* 通過認證之 email */
-  time_t deny;			/* user violatelaw time */
+  time4_t deny;			/* user violatelaw time */
   int request;			/* 點歌系統 */
   usint ufo2;			/* 延伸的個人設定 */
   char ident[108];		/* user remote host ident */
-  time_t vtime;			/* validate time */
+  time4_t vtime;		/* validate time */
 }	userec;
 
 
@@ -90,13 +90,13 @@ typedef struct
 
   uschar bvote;			/* 共有幾項投票舉行中 */
 
-  time_t bstamp;		/* 建立看板的時間, unique */
+  time4_t bstamp;		/* 建立看板的時間, unique */
   usint readlevel;		/* 閱讀文章的權限 */
   usint postlevel;		/* 發表文章的權限 */
   usint battr;			/* 看板屬性 */
-  time_t btime;			/* .DIR 的 st_mtime */
+  time4_t btime;		/* .DIR 的 st_mtime */
   int bpost;			/* 共有幾篇 post */
-  time_t blast;			/* 最後一篇 post 的時間 */
+  time4_t blast;		/* 最後一篇 post 的時間 */
   usint expiremax;		/* Expire Max Post */
   usint expiremin;		/* Expire Min Post */
   usint expireday;		/* Expire old Post */
@@ -139,7 +139,7 @@ typedef struct
 
 typedef struct
 {
-  time_t chrono;                /* timestamp */
+  time4_t chrono;               /* timestamp */
   int xmode;
 
   int xid;                      /* reserved 保留*/
