@@ -243,8 +243,6 @@ vs_head(title, mid)
   char buf[40], ttl[60];
   int spc, len;
 
-  char tmp[100];
-
   int broken=0;
 
   if (mid)	/* xxxx_head() ³£¬O¥Î vs_head(title, str_site); */

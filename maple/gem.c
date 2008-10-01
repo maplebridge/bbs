@@ -827,7 +827,7 @@ gem_browse(xo)
 {
   HDR *hdr;
   int op, xmode;
-  char fpath[64], title[TTLEN + 1], *ptr;
+  char fpath[64], title[TTLEN + 1];
 
   op = 0;
 
@@ -1072,7 +1072,7 @@ gbuf_malloc(num)
 void
 gem_buffer(dir, hdr, fchk ,gem_mode)
   char *dir;
-  HDR *hdr;			/* NULL 代表放入 TagList, 否則將傳入的放入 */
+  HDR *hdr;		/* NULL 代表放入 TagList, 否則將傳入的放入 */
   int (*fchk)();	/* 允許放入 gbuf 的條件 */
   int gem_mode;     /* 0:其他 1:from 看板 */
 {
@@ -1080,9 +1080,9 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
   HDR *gbuf, buf;
 
   /* smiler.080614 : 收錄精華記錄，但因對folder無效，目前取消掉 */
-  int can_show = 1;
-  char fpath[64];
-  FILE *fp;
+//  int can_show = 1;
+//  char fpath[64];
+//  FILE *fp;
 
   if (hdr)
   {

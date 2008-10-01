@@ -36,6 +36,7 @@ init_bshm()
 }
 
 
+#if 0
 static BRD *
 brd_get(bname)
   char *bname;
@@ -51,6 +52,7 @@ brd_get(bname)
   } while (++bhdr < tail);
   return NULL;
 }
+#endif
 
 
 static void

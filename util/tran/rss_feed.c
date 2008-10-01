@@ -40,9 +40,7 @@ main(argc, argv)
 
     while (de = readdir(dirp))
     {
-      int fd;
       char *str;
-
 
       str = de->d_name;
       if (*str <= ' ' ||  *str == '.')

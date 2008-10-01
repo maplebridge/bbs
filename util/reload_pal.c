@@ -91,7 +91,6 @@ acct_userno(userid)
   int userno;
   char fpath[64];
   char fpath2[64];
-  char fn_acct[10];
 
   usr_fpath(fpath2, userid, FN_ACCT);
   sprintf(fpath,"../%s",fpath2);
@@ -141,7 +140,6 @@ main(argc, argv)
   }
 
   char buf[64];
-  char buf2[64];
   char make_bakup[64];
 
   struct dirent *de;
@@ -154,9 +152,7 @@ main(argc, argv)
 
   while (de = readdir(dirp))
   {
-    int fd;
     char *str;
-
 
     str = de->d_name;
     if (*str <= ' ' ||  *str == '.')

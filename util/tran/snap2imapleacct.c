@@ -19,6 +19,8 @@
 #define FN_DIR_TMP      ".DIR.tmp"
 #define FN_ACCT_080827	".ACCT_080827"
 
+
+#if 0
 static usint
 transfer_ufo(oldufo)
   usint oldufo;
@@ -65,6 +67,7 @@ transfer_ufo(oldufo)
 
   return ufo;
 }
+#endif
 
 
 /* ----------------------------------------------------- */
@@ -121,6 +124,8 @@ trans_acct(old, new)
   new->reserved[0] = '\0';
 }
 
+
+#if 0
 static void
 trans_hdr(old, new)
   MAPLECS_HDR *old;
@@ -139,12 +144,12 @@ trans_hdr(old, new)
 
   /*handle score
   old->score = ntohl(old->score);
-  if(old->score > 126)
-          new->score = 127;
-  else if(old->score < -127)
-          new->score = -128;
+  if (old->score > 126)
+    new->score = 127;
+  else if (old->score < -127)
+    new->score = -128;
   else
-          new->score = old->score;*/
+    new->score = old->score;*/
 
   new->score = 0;
 
@@ -166,6 +171,8 @@ trans_pal(old, new)
   str_ncpy(new->ship, old->ship, sizeof(new->ship));
   new->userno = ntohl(old->userno);
 }
+#endif
+
 
 int
 main(argc, argv)
@@ -174,12 +181,12 @@ main(argc, argv)
 {
   ACCT new;
   char c;
-  HDR hdr;
-  PAL new_pal;
-  FILE *fp;
-  
+//  HDR hdr;
+//  PAL new_pal;
+//  FILE *fp;
+
   /*printf("%d\n", argc);*/
-  
+
   if (argc > 2)
   {
     printf("Usage: %s [userid]\n", argv[0]);
@@ -189,8 +196,8 @@ main(argc, argv)
   for (c = 'a'; c <= 'z'; c++)
   {
     char buf[64];
-    char buf2[64];
-	char buf3[64];
+//    char buf2[64];
+    char buf3[64];
     struct dirent *de;
     DIR *dirp;
 
@@ -204,8 +211,8 @@ main(argc, argv)
     while (de = readdir(dirp))
     {
       ACCT_080827 old;
-      MAPLECS_HDR old_hdr;
-      MAPLE_PAL old_pal;
+//      MAPLECS_HDR old_hdr;
+//      MAPLE_PAL old_pal;
       int fd;
       char *str;
 

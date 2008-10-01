@@ -91,7 +91,7 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       char fpath[64], fnew[64], fold[64];
       HDR *hdr;
 
-      char Deletelog_folder[64],Deletelog_title[64],copied[64]; /* smiler.1111: 若有啟動editlog_use deletelog_use */
+      char Deletelog_folder[64]/*, Deletelog_title[64]*/, copied[64]; /* smiler.1111: 若有啟動editlog_use deletelog_use */
       HDR  Deletelog_hdr;	/* 則將被砍的資料移至 Deletelog 板備份 */
 
       xmode = head->battr;

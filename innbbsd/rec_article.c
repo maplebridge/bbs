@@ -21,7 +21,7 @@
 #include "inntobbs.h"
 
 static char bbs_dog_str[80];
-static char bbs_dog_title[80];
+//static char bbs_dog_title[80];
 
 /* ----------------------------------------------------- */
 /* board：shm 部份須與 cache.c 相容			 */

@@ -423,9 +423,9 @@ bit_bmw_edit(up, hint, bmw)
   BMW *bmw;
 {
   int recver;
-  screenline slp[3];
-  char *userid, fpath[64];
-  FILE *fp;
+//  screenline slp[3];
+//  char *userid, fpath[64];
+//  FILE *fp;
 
   recver = up ? up->userno : 0;
 

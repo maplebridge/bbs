@@ -79,15 +79,13 @@ main(argc, argv)
 
     sprintf(buf, BBSHOME"/brd");
     chdir(buf);
-    
+
     dirp = opendir(".");
 
     while (de = readdir(dirp))
     {
       MAPLECS_HDR old;
-      int fd;
       char *str;
-
 
       str = de->d_name;
       if (*str <= ' ' ||  *str == '.')

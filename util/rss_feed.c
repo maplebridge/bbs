@@ -135,7 +135,6 @@ main(argc, argv)
   while (de = readdir(dirp))
   {
     RSS old;
-    int fd;
     char *str;
 
     str = de->d_name;

@@ -25,15 +25,14 @@ smiler.080203:
 int code_convert(char *from_charset,char *to_charset,char *inbuf,int inlen,char *outbuf,int outlen)
 {
   iconv_t cd;
-  int rc;
   char **pin = &inbuf;
   char **pout = &outbuf;
 
-  if (!(cd = iconv_open(to_charset,from_charset)))
+  if (!(cd = iconv_open(to_charset, from_charset)))
     return -1;
 
   memset(outbuf,0,outlen);
-  if (iconv(cd,pin,&inlen,pout,&outlen) == -1)
+  if (iconv(cd, pin, &inlen, pout, &outlen) == -1)
     return -1;
   iconv_close(cd);
   return 0;
@@ -52,7 +51,7 @@ main_dictd()
 {
   char word[73];
   char word2[128];
-  char word_big5[256];     //smiler.0202
+//  char word_big5[256];     //smiler.0202
   char word_utf8[256];
   char tmp[256];
   char fname[64];
