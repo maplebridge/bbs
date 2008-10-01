@@ -668,6 +668,7 @@ do_post(xo, title)
 
   film_out(FILM_POST, 0);
 
+  move(19, 0);
   prints("發表文章於【 %s 】看板", currboard);
 
 #ifdef POST_PREFIX
@@ -683,8 +684,8 @@ do_post(xo, title)
     if(!(currbattr & BRD_NOPREFIX))
     {
       FILE *fp;
-      int len = 6, pnum;
-      char prefix[NUM_PREFIX][8];
+      int len = 6, pnum, newline = 0;
+      char prefix[NUM_PREFIX][16];
       char *prefix_default[NUM_PREFIX] =
 	{"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
 
@@ -700,12 +701,19 @@ do_post(xo, title)
 	/* 載入設定檔 */
 	for (mode = 0; mode < NUM_PREFIX; mode++)
 	{
-	  if (!fgets(fpath, 6, fp))
+	  if (!fgets(fpath, 14, fp))
 	    break;
 	  if (strlen(fpath) == 1)	/* '\n' */
 	    break;
 	  fpath[strlen(fpath) - 1] = '\0';
 	  strcpy(prefix[mode], fpath);
+	  if ((len + 3 + strlen(fpath)) >= 70)	/* 換行列印 */
+	  {
+	    move(22, 0);
+	    prints("      ");
+	    len = 6;
+	    newline = 1;
+	  }
 	  prints("%d.%s ", mode + 1, fpath);
 	  len += (3 + strlen(fpath));
 	  pnum = mode + 1;
@@ -722,7 +730,7 @@ do_post(xo, title)
 	}
       }
 
-      mode = vget(21, len, "", fpath, 3, DOECHO) - '1';
+      mode = vget(21 + newline, len, "", fpath, 3, DOECHO) - '1';
       if (mode >= 0 && mode < pnum)	/* 輸入數字選項 */
       {
 	sprintf(fpath, "[%s] ", prefix[mode]);
@@ -730,6 +738,9 @@ do_post(xo, title)
       }
       else				/* 空白跳過 */
 	rcpt = NULL;
+
+      move(20, 0);
+      clrtobot();
     }
     else	/* 看板設定不使用文章類別 */
       rcpt = NULL;

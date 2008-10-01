@@ -308,7 +308,7 @@ post_template_edit()
   {
     for (; i < NUM_PREFIX; i++)
     {
-      if (!fgets(buf, 6, fp))
+      if (!fgets(buf, 14, fp))
 	break;
       if (strlen(buf) == 1)
 	break;
@@ -396,7 +396,7 @@ post_prefix_edit()
   {
     for (; i < NUM_PREFIX; i++)
     {
-      if (!fgets(buf, 6, fp))
+      if (!fgets(buf, 14, fp))
 	break;
       if (strlen(buf) == 1)
 	break;
@@ -432,7 +432,7 @@ post_prefix_edit()
     if (i >= 1 && i <= NUM_PREFIX)
     {
       strcpy(buf, prefix[i - 1] + 2);
-      vget(b_lines, 0, "類別：", buf, 5, GCARRY);	/* 留白就清空 */
+      vget(b_lines, 0, "類別：", buf, 13, GCARRY);	/* 留白就清空 */
         strcpy(prefix[i - 1] + 2, buf);
     }
   } while (i);
@@ -451,7 +451,7 @@ post_prefix_edit()
     if (i >= 1 && i <= NUM_PREFIX)
     {
       strcpy(buf, prefix[i - 1] + 2);
-      vget(b_lines, 0, "類別：", buf, 5, GCARRY);	/* 留白就清空 */
+      vget(b_lines, 0, "類別：", buf, 13, GCARRY);	/* 留白就清空 */
 	strcpy(prefix[i - 1] + 2, buf);
     }
   } while (i);
