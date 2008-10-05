@@ -527,23 +527,23 @@ ulist_paltype(up)		/* 朋友種類 */
   if (is_mybad(userno))
     return FTYPE_MYBAD;
 
-  if (is_super_mygood(userno))     //我設對方為超級好友
+  if (is_super_mygood(userno))	//我設對方為超級好友
   {
-    if (is_super_ogood(up))      //對方設我為超級好友
+    if (is_super_ogood(up))	//對方設我為超級好友
       return FTYPE_SUPER_BOTHGOOD;
     else
       return FTYPE_SUPER_MYGOOD;
   }
-  else if (is_super_ogood(up))     //對方設我為超級好友
+  else if (is_super_ogood(up))	//對方設我為超級好友
     return FTYPE_SUPER_OGOOD;
-  else if (is_mygood(userno))      //我設對方為好友
+  else if (is_mygood(userno))	//我設對方為好友
   {
-    if (is_ogood(up))            //對方設我為好友
+    if (is_ogood(up))		//對方設我為好友
       return FTYPE_BOTHGOOD;
     else
       return FTYPE_MYGOOD;
   }
-  else if (is_ogood(up))          //對方設我為好友
+  else if (is_ogood(up))	//對方設我為好友
     return FTYPE_OGOOD;
   else
     return FTYPE_NORMAL;

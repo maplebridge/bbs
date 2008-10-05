@@ -66,36 +66,42 @@ setuploader()	/* smiler.071110: load 整個站的 .SET 進來 */
   sprintf(file_space, ".SET");
   if (fp = fopen(file_space, "r"))
   {
-    fscanf(fp,"%d",&host_sight_number);
-    fscanf(fp,"%d",&host_sight_select);
-    fscanf(fp,"%d",&model_number);
-    fscanf(fp,"%d",&model_select);
-    fscanf(fp,"%d",&editlog_use);
-    fscanf(fp,"%d",&deletelog_use);
-    fscanf(fp,"%d",&mail_to_newone);
+    fscanf(fp, "%d", &host_sight_number);
+    fscanf(fp, "%d", &host_sight_select);
+    fscanf(fp, "%d", &model_number);
+    fscanf(fp, "%d", &model_select);
+    fscanf(fp, "%d", &editlog_use);
+    fscanf(fp, "%d", &deletelog_use);
+    fscanf(fp, "%d", &mail_to_newone);
     fclose(fp);
   }
 }
 
+
+#if 0
 /* ----------------------------------------------------- */
 /* ip to string 程式					 */
 /* ----------------------------------------------------- */
+
 void ip_to_str(char *tn_addr_buf,int addr)
 {
-	int i;
-	int addr_buf[8];
-	for(i=0;i<8;i++)
-	{
-		addr_buf[i]=addr%16;
-		addr=addr/16;
-	}
-    addr_buf[0]=addr_buf[1]*16+addr_buf[0];
-    addr_buf[1]=addr_buf[3]*16+addr_buf[2];
-    addr_buf[2]=addr_buf[5]*16+addr_buf[4];
-    addr_buf[3]=addr_buf[7]*16+addr_buf[6];
-    sprintf(tn_addr_buf,"%d.%d.%d.%d",addr_buf[0],addr_buf[1],addr_buf[2],addr_buf[3]);
-	printf("%s\n",tn_addr_buf);
+  int i;
+  int addr_buf[8];
+  for (i = 0; i < 8; i++)
+  {
+    addr_buf[i] = addr % 16;
+    addr /= 16;
+  }
+  addr_buf[0] = addr_buf[1]*16 + addr_buf[0];
+  addr_buf[1] = addr_buf[3]*16 + addr_buf[2];
+  addr_buf[2] = addr_buf[5]*16 + addr_buf[4];
+  addr_buf[3] = addr_buf[7]*16 + addr_buf[6];
+  sprintf(tn_addr_buf, "%d.%d.%d.%d", addr_buf[0],addr_buf[1],addr_buf[2],addr_buf[3]);
+  printf("%s\n", tn_addr_buf);
 }
+#endif
+
+
 /* ----------------------------------------------------- */
 /* 離開 BBS 程式					 */
 /* ----------------------------------------------------- */
@@ -560,7 +566,7 @@ utmp_setup(mode)
   if (!cuser.userlevel)		/* guest */
   {
     char nick[7][10] = {"廣藿香娘", "負四小店", "黯然消魂", "海景無敵", "扣你十分", "坑坑疤疤", "跳湖景點"};
-    sprintf(cuser.username, "書桌前的%s", nick[ap_start % 7]);    
+    sprintf(cuser.username, "書桌前的%s", nick[ap_start % 7]);
   }
 #endif	/* GUEST_NICK */
 
@@ -595,13 +601,13 @@ utmp_setup(mode)
       /* 再比對 ip */
       sprintf(name, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
       if (!belong_list(FN_ETC_HOST, name, utmp.from))
-	str_ncpy(utmp.from, fromhost, sizeof(utmp.from)); /* 如果都沒找到對應故鄉，就是用 fromhost */
+	str_ncpy(utmp.from, fromhost, sizeof(utmp.from));	/* 如果都沒找到對應故鄉，就是用 fromhost */
     }
   }
 
 #else
   str_ncpy(utmp.from, fromhost, sizeof(utmp.from));
-#endif	/* HAVE_WHERE */      
+#endif	/* HAVE_WHERE */
 
   /* Thor: 告訴User已經滿了放不下... */
   if (!utmp_new(&utmp))
@@ -611,14 +617,16 @@ utmp_setup(mode)
   pal_cache();
 }
 
+
 char *
 get_my_ip(void)
 {
-    uschar *addr;
-	addr = (uschar *) &tn_addr;
-	static char my_ip[15];
-	sprintf(my_ip, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
-	return my_ip;
+  static char my_ip[15] = {0};
+  uschar *addr;
+  addr = (uschar *) &tn_addr;
+  if (!my_ip[0])
+    sprintf(my_ip, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+  return my_ip;
 }
 
 
@@ -755,7 +763,7 @@ login_user(content)
 	  {
 	    for (;;)
 	    {
-	      if (vget(b_lines - 2, 0, "   [變更帳號] ", uid, IDLEN + 1, DOECHO) && 
+	      if (vget(b_lines - 2, 0, "   [變更帳號] ", uid, IDLEN + 1, DOECHO) &&
 		acct_load(&cuser, uid) >= 0)
 		break;
 	      vmsg(err_uid);
@@ -804,7 +812,7 @@ login_user(content)
 	    if ((kill(pid, SIGTERM) == -1) && (errno == ESRCH))
 	      utmp_free(ui);
 	    else
-	      sleep(3);			/* 被踢的人這時候正在自我了斷 */ 
+	      sleep(3);			/* 被踢的人這時候正在自我了斷 */
 	    blog("MULTI", cuser.userid);
 	  }
 
@@ -1021,10 +1029,10 @@ board_mail_to_user()	/* smiler.071111: 站務寄信給使用者 */
     {
       usr_fpath(fpath_mail, cuser.userid, FN_DIR);
       if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
-      { 
+      {
 	strcpy(hdr.title, "楓橋站務寄給您的情書");
 	strcpy(hdr.owner, STR_SYSOP);
-	hdr.xmode = 0; 
+	hdr.xmode = 0;
 	rec_add(fpath_mail, &hdr, sizeof(HDR));
 	cutmp->status |= STATUS_BIFF;
       }
@@ -1186,19 +1194,19 @@ tn_main()
   clear();
 
 #ifdef HAVE_LOGIN_DENIED
-  char tn_addr_buf[15];           /* smiler.070719: ip address of string form */
-  sprintf(tn_addr_buf,"%s",get_my_ip());
-  if(acl_has(BBS_ACPFILE, "","") != -1) /* BBS_ACLFILE不存在*/
+  char tn_addr_buf[15];		/* smiler.070719: ip address of string form */
+  sprintf(tn_addr_buf, "%s", get_my_ip());
+  if (acl_has(BBS_ACPFILE, "", "") != -1)	/* BBS_ACLFILE不存在*/
   {
     if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf))) /* smiler.070724 */
        login_abort("\n系統維護中,請稍後連入\n");
   }
   else
   {
-    if(acl_has(BBS_DNYFILE, "","") != -1)
+    if (acl_has(BBS_DNYFILE, "", "") != -1)
     {
-      if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", tn_addr_buf))) /* smiler.070724 */
-         login_abort("\n您的機器不被本站台接受\n");
+      if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", tn_addr_buf)))	/* smiler.070724 */
+	login_abort("\n您的機器不被本站台接受\n");
     }
   }
 #endif
@@ -1248,7 +1256,7 @@ tn_main()
 static void
 telnet_init()
 {
-  static char svr[] = 
+  static char svr[] =
   {
     IAC, DO, TELOPT_TTYPE,
     IAC, SB, TELOPT_TTYPE, TELQUAL_SEND, IAC, SE,
@@ -1592,7 +1600,7 @@ main_signals()
   struct sigaction act;
 
   /* act.sa_mask = 0; */ /* Thor.981105: 標準用法 */
-  sigemptyset(&act.sa_mask);      
+  sigemptyset(&act.sa_mask);
   act.sa_flags = 0;
 
   act.sa_handler = reaper;

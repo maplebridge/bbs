@@ -706,62 +706,6 @@ static MENU menu_register[] =
   "註冊選單"
 };
 
-static MENU menu_bpg_color_bar[] =
-{
-  u_brd_bar, PERM_BASIC, M_UFILES,
-  "Brd        【 看板列表 】",
-
-  u_post_bar, PERM_BASIC, M_UFILES,
-  "Post       【 文章列表 】",
-
-  u_gem_bar, PERM_BASIC, M_UFILES,
-  "Gem        【 看板精華 】",
-
-  menu_color_bar, PERM_MENU + 'B', M_UMENU,
-  "光棒設定"
-};
-
-static MENU menu_pl_color_bar[] =
-{
-  u_pal_bar, PERM_BASIC, M_UFILES,
-  "Pal        【 板友好友 】",
-
-  u_usr_bar, PERM_BASIC, M_UFILES,
-  "Usr        【 網友列表 】",
-
-  menu_color_bar, PERM_MENU + 'P', M_UMENU,
-  "光棒設定"
-};
-
-static MENU menu_wma_color_bar[] =
-{
-  u_bmw_bar, PERM_BASIC, M_UFILES,
-  "Bmw        【 回顧水球 】",
-
-  u_mail_bar, PERM_BASIC, M_UFILES,
-  "Mail       【 個人信箱 】",
-
-  u_aloha_bar, PERM_BASIC, M_UFILES,
-  "Aloha      【 上站通知 】",
-
-  menu_color_bar, PERM_MENU + 'B', M_UMENU,
-  "光棒設定"
-};
-
-static MENU menu_vns_color_bar[] =
-{
-  u_vote_bar, PERM_BASIC, M_UFILES,
-  "Vote       【 投票選單 】",
-
-  u_newbrd_bar, PERM_BASIC, M_UFILES,
-  "Newbrd     【 看板連署 】",
-
-  u_song_bar, PERM_BASIC, M_UFILES,
-  "Song       【 點歌選單 】",
-
-  menu_color_bar, PERM_MENU + 'V', M_UMENU,
-  "光棒設定"
-};
 
 static MENU menu_color_bar[] =
 {

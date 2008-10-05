@@ -194,6 +194,22 @@ contWhileOuter:
 /* ----------------------------------------------------- */
 
 
+static int
+vkans(msg)	/* vans | vkey: 簡化使用者按鍵次數 */
+  char *msg;
+{
+  int ch;
+
+  move(b_lines, 0);
+  clrtoeol();
+  outs(msg);
+  ch = vkey();
+  if (ch >= 'A' && ch <= 'Z')	/* 換小寫 */
+    ch |= 0x20;
+  return ch;
+}
+
+
 int
 post_brdtitle()
 {
@@ -203,7 +219,7 @@ post_brdtitle()
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
   /* itoc.註解: 其實呼叫 brd_title(bno) 就可以了，沒差，蠻幹一下好了 :p */
-  if (vans("是否修改中文板名敘述(Y/N)？[N] ") == 'y')
+  if (vkans("是否修改中文板名敘述(Y/N)？[N] ") == 'y')
   {
     vget(b_lines, 0, "看板主題：", newbrd.title, BTLEN + 1, GCARRY);
 
@@ -229,7 +245,7 @@ post_memo_edit()
   int mode;
   char fpath[64];
 
-  mode = vans("進板畫面 (D)刪除 (E)修改 (Q)取消？[E] ");
+  mode = vkans("進板畫面 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (mode != 'q')
   {
@@ -256,7 +272,7 @@ post_spam_edit()
   int mode;
   char fpath[64];
 
-  mode = vans("擋信列表 (D)刪除 (E)修改 (Q)取消？[E] ");
+  mode = vkans("擋信列表 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (mode != 'q')
   {
@@ -338,7 +354,7 @@ post_template_edit()
     return 0;
 
   sprintf(buf, "範本 %d.[%s] D)刪除 E)修改 Q)取消？[Q] ", i + 1, prefix[i]);
-  ans = vans(buf);
+  ans = vkans(buf);
 
   if (ans == 'd')
   {
@@ -379,7 +395,7 @@ post_prefix_edit()
   if (!(bbstate & STAT_BOARD))
     return 0;
 
-  i = vans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
+  i = vkans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
 
   if (i == 'd')
   {
@@ -478,7 +494,7 @@ post_brd_prefix()
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("使用文章類別 (1)使用 (2)不使用 (3)設定類別 (Q)取消？[Q] "))
+  switch (vkans("使用文章類別 (1)使用 (2)不使用 (3)設定類別 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOPREFIX;
@@ -516,7 +532,7 @@ post_battr_noscore()
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放評分 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
+  switch (vkans("開放評分 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOSCORE;
@@ -551,7 +567,7 @@ post_rlock()
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放鎖文 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
+  switch (vkans("開放鎖文 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOL;
@@ -585,7 +601,7 @@ post_vpal()
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("開放觀看板友名單 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
+  switch (vkans("開放觀看板友名單 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_SHOWPAL;
@@ -615,7 +631,7 @@ post_noforward()
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("轉錄文章 (1)允許\ (2)禁止 (Q)取消？[Q] "))
+  switch (vkans("轉錄文章 (1)允許\ (2)禁止 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr &= ~BRD_NOFORWARD;
@@ -645,7 +661,7 @@ post_showturn()
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("轉錄記錄 (1)打開 (2)關閉 (Q)取消？[Q] "))
+  switch (vkans("轉錄記錄 (1)打開 (2)關閉 (Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr |= BRD_SHOWTURN;
@@ -690,7 +706,7 @@ post_changeBM()
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  move(3, 0);
+  move(5, 0);
   clrtobot();
 
   move(8, 0);
@@ -786,7 +802,7 @@ post_brdlevel()
     return 0;
   }
 
-  switch (vans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
+  switch (vkans("1)公開看板 2)秘密看板 3)好友看板？[Q] "))
   {
   case '1':				/* 公開看板 */
     newbrd.readlevel = 0;
@@ -880,7 +896,7 @@ post_bbs_dog()
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vans("加入BBS看門狗計畫 1)是 2)否 Q)取消？[Q] "))
+  switch (vkans("加入BBS看門狗計畫 1)是 2)否 Q)取消？[Q] "))
   {
   case '1':
     newbrd.battr |= BRD_BBS_DOG;
@@ -987,7 +1003,7 @@ post_article_filter()
     }
     fclose(fp);
 
-    switch(vans("選擇 (D)刪除 (E)修改 (Q)離開？[E] "))
+    switch(vkans("選擇 (D)刪除 (E)修改 (Q)離開？[E] "))
     {
     case 'd':
       unlink(fpath);
@@ -995,7 +1011,7 @@ post_article_filter()
       return 0;
     }
 
-    if (!vget(b_lines, 0, "◎ 選則修改 1)~10) (Q)離開 [Q]", input, 3, DOECHO))
+    if (!vget(b_lines, 0, "◎ 規則修改 1~10) (Q)離開 [Q]", input, 3, DOECHO))
       break;
     choose = atoi(input);
 
@@ -1034,7 +1050,7 @@ post_my_level(fname, title)
   sprintf(fpath_w, "%s.tmp", fpath_r);
 
   sprintf(wd, "%s E)編輯 D)刪除 Q)取消 [E] ", title);
-  switch (vans(wd))
+  switch (vkans(wd))
   {
   case 'd':
     if (dashf(fpath_r))
@@ -1179,7 +1195,7 @@ post_my_level(fname, title)
     fclose(fr);
     fclose(fw);
 
-    switch (vans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
+    switch (vkans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
     {
     case 's':
       unlink(fpath_r);
@@ -1207,7 +1223,7 @@ post_view_bbs_dog_log()
   brd_fpath(fpath, currboard, FN_BBSDOG_LOG);
   more(fpath, NULL);
 
-  switch (vans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
+  switch (vkans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
   {
   case 'm':
     sprintf(warn, "%s 板擋文記錄檔", currboard);

@@ -14,7 +14,6 @@ extern UCACHE *ushm;
 extern XZ xz[];
 extern char xo_pool[];
 
-extern BCACHE *bshm;
 
 /* ----------------------------------------------------- */
 /* BMW : bbs message write routines			 */
@@ -129,9 +128,11 @@ can_see(my, up)
     return 1;
 
   /* smiler.080806: 兩者是否看同一看板，且我是板主 */
-  if(my->reading && up->reading)
+  if (my->reading && up->reading)
   {
     BRD *nowbrd;
+    extern BCACHE *bshm;
+
     nowbrd = bshm->bcache + brd_bno(my->reading);
 
     if (is_bm(nowbrd->BM, cuser.userid))
@@ -423,8 +424,9 @@ bit_bmw_edit(up, hint, bmw)
   BMW *bmw;
 {
   int recver;
+  char *userid;
 //  screenline slp[3];
-//  char *userid, fpath[64];
+//  char fpath[64];
 //  FILE *fp;
 
   recver = up ? up->userno : 0;

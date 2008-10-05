@@ -573,6 +573,7 @@ gem_add(xo, gtype)
 
       if (gtype == 'a')
       {
+	curredit = EDIT_GEM;
 	if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
 	{
 	  unlink(fpath);

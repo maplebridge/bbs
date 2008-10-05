@@ -28,6 +28,7 @@ static XO board_xo;
 inline int in_favor(char *brdname);	/* smiler.070724 */
 
 
+#if 0
 //********/* smiler.070602: for xsort 起始處 */********/
 
 #define min(a, b)	(a) < (b) ? a : b
@@ -226,6 +227,8 @@ main()
 #endif
 
 //*******/* smiler.070602: for xsort 結束處 */********/
+#endif
+
 
 /* ----------------------------------------------------- */
 /* 看板閱讀記錄 .BRH (Board Reading History)		 */
@@ -2217,7 +2220,6 @@ class_browse(xo)
   chn = *chp;
   if (chn < 0)		/* 進入分類 */
   {
-
     /*=====================================*/
     /* smiler.070602: for熱門看板 */
     short *chx;
@@ -2225,25 +2227,28 @@ class_browse(xo)
     img = class_img;
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
-    // "HOT/" 名稱可自定，若改名也要順便改後面的長度 4
-    if (!strncmp(str, "HOT/", 4))
+
+    if (!strncmp(str, "HOT/", 4))	// "HOT/" 名稱可自定，若改名也要順便改後面的長度 4
     {
       class_hot = 1;
       chn = CH_END;
     }
+#if 1
     else
       class_hot = 0;
+#endif
     /*=====================================*/
 
     if (!strncmp(str, "IM_CREATE/", 10))
-    {
-      char fpath[64];
-      sprintf(fpath,BBSHOME"/brd/IAS_Announce/note");
-      more(fpath, NULL);
-    }
+      more("brd/IAS_Announce/note", NULL);
 
     if (!XoClass(chn))
       return XO_NONE;
+
+#if 0
+    if (class_hot)
+      class_hot = 0;	/* 離開 HOT Class 再清除 class_hot 標記 */
+#endif
   }
   else			/* 進入看板 */
   {
@@ -2303,7 +2308,6 @@ class_switch(xo)
 /* ----------------------------------------------------- */
 /* MyFavorite [我的最愛]				 */
 /* ----------------------------------------------------- */
-
 
 
 inline int

@@ -799,8 +799,8 @@ talk_speak(fd)
 	case '\n':
 	  /* lkchu.981201: 有換列就把 itswords 印出清掉 */
 	  if (itswords[0] != '\0')
-  	  {
-  	    fprintf(fp, "\033[32m%s：%s\033[m\n", itsuserid, itswords);
+	  {
+	    fprintf(fp, "\033[32m%s：%s\033[m\n", itsuserid, itswords);
 	    itswords[0] = '\0';
 	  }
 	  break;
@@ -813,8 +813,8 @@ talk_speak(fd)
 	  if (isprint2(data[i]))
 	  {
 	    if (strlen(itswords) < sizeof(itswords))
-  	    {
-  	      strncat(itswords, (char *)&data[i], 1);
+	    {
+	      strncat(itswords, (char *)&data[i], 1);
 	    }
 	    else	/* lkchu.981201: itswords 裝滿了 */
 	    {
@@ -899,7 +899,7 @@ talk_speak(fd)
 	  mywords[0] = '\0';
 	}
 	break;
-      
+
       case KEY_BKSP:
 	mywords[strlen(mywords) - 1] = '\0';
 	break;

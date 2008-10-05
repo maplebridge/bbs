@@ -2201,10 +2201,12 @@ vedit(fpath, ve_op)
       {
 	prints(FOOTER_VEDIT,
 #ifdef EVERY_BIFF
-	  mode & VE_BIFF ? "郵差來了" : "編輯文章",
-#else
-	  "編輯文章", 
+	  mode & VE_BIFF ? "郵差來了" :
 #endif
+	  (curredit & EDIT_MAIL) ? "撰寫情書" :
+	  (curredit & EDIT_BOTH) ? "回信回文" :
+	  (curredit & EDIT_GEM) ? "書寫精華" :
+	  (curredit & EDIT_XFILE) ? "編輯檔案" : "編輯文章",
 	  mode & VE_INSERT ? "插入" : "取代",
 	  mode & VE_ANSI ? "ANSI" : "一般",
 	  ve_lno, 1 + (mode & VE_ANSI ? pos : col));

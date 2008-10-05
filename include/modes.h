@@ -197,6 +197,8 @@ static char *ModeTypeTable[] =
 #define EDIT_OUTGO	0x0008		/* 待轉信出去 */
 #define EDIT_ANONYMOUS	0x0010		/* 匿名模式 */
 #define EDIT_RESTRICT	0x0020		/* 加密存檔 */
+#define EDIT_GEM	0x0040		/* 編輯精華區 */
+#define EDIT_XFILE	0x0080		/* 編輯個人/系統檔案 */
 
 
 /* ----------------------------------------------------- */

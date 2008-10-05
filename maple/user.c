@@ -37,6 +37,7 @@ tn_user_show()	/* 使用者上站，初使化與載入使用者文章列表顯示喜好 */
   }
 }
 
+
 /* ----------------------------------------------------- */
 /* 上站時初始化個人光棒					 */
 /* ----------------------------------------------------- */
@@ -45,6 +46,7 @@ static char *DEFCBAR[CBAR_NUM] = {
 		COLORBAR_MENU, COLORBAR_BRD, COLORBAR_POST, COLORBAR_GEM,
 		COLORBAR_PAL, COLORBAR_USR, COLORBAR_BMW, COLORBAR_MAIL,
 		COLORBAR_ALOHA, COLORBAR_VOTE, COLORBAR_NBRD, COLORBAR_SONG, COLORBAR_RSS };
+
 
 #if 1
 static void
@@ -264,71 +266,6 @@ u_menu_bar()
   return u_set_bar(UCBAR_MENU);
 }
 
-int
-u_brd_bar()
-{
-  return u_set_bar(UCBAR_BRD);
-}
-
-int
-u_post_bar()
-{
-  return u_set_bar(UCBAR_POST);
-}
-
-int
-u_gem_bar()
-{
-  return u_set_bar(UCBAR_GEM);
-}
-
-int
-u_pal_bar()
-{
-  return u_set_bar(UCBAR_PAL);
-}
-
-int
-u_usr_bar()
-{
-  return u_set_bar(UCBAR_USR);
-}
-
-int
-u_bmw_bar()
-{
-  return u_set_bar(UCBAR_BMW);
-}
-
-int
-u_mail_bar()
-{
-  return u_set_bar(UCBAR_MAIL);
-}
-
-int
-u_aloha_bar()
-{
-  return u_set_bar(UCBAR_ALOHA);
-}
-
-int
-u_vote_bar()
-{
-  return u_set_bar(UCBAR_VOTE);
-}
-
-int
-u_newbrd_bar()
-{
-  return u_set_bar(UCBAR_NBRD);
-}
-
-int
-u_song_bar()
-{
-  return u_set_bar(UCBAR_SONG);
-}
 
 int
 u_rss_bar()
@@ -336,6 +273,67 @@ u_rss_bar()
   return u_set_bar(UCBAR_RSS);
 }
 
+
+int
+menu_bpg_color_bar()	/* 看板文章精華 */
+{
+  switch(vans("◎光棒設定 1)看板列表 2)文章列表 3)看板精華？[Q] ") - '0')
+  {
+    case 1:
+      return u_set_bar(UCBAR_BRD);
+    case 2:
+      return u_set_bar(UCBAR_POST);
+    case 3:
+      return u_set_bar(UCBAR_GEM);
+  }
+  return 0;
+}
+
+
+int
+menu_pl_color_bar()	/* 板友好友網友 */
+{
+  switch(vans("◎光棒設定 1)板友好友 2)網友列表？[Q] ") - '0')
+  {
+    case 1:
+      return u_set_bar(UCBAR_PAL);
+    case 2:
+      return u_set_bar(UCBAR_USR);
+  }
+  return 0;
+}
+
+
+int
+menu_wma_color_bar()	/* 水球信件上站 */
+{
+  switch(vans("◎光棒設定 1)回顧水球 2)個人信箱 3)上站通知？[Q] ") - '0')
+  {
+    case 1:
+      return u_set_bar(UCBAR_BMW);
+    case 2:
+      return u_set_bar(UCBAR_MAIL);
+    case 3:
+      return u_set_bar(UCBAR_ALOHA);
+  }
+  return 0;
+}
+
+
+int
+menu_vns_color_bar()	/* 投票連署點歌 */
+{
+  switch(vans("◎光棒設定 1)投票選單 2)看板連署 3)點歌選單？[Q] ") - '0')
+  {
+    case 1:
+      return u_set_bar(UCBAR_VOTE);
+    case 2:
+      return u_set_bar(UCBAR_NBRD);
+    case 3:
+      return u_set_bar(UCBAR_SONG);
+  }
+  return 0;
+}
 
 /* ----------------------------------------------------- */
 /* 認證用函式						 */
@@ -950,6 +948,7 @@ u_setup()
   return 0;
 }
 
+
 int
 u_usr_show_set()
 {
@@ -967,6 +966,7 @@ u_usr_show_set()
 
   return 0;
 }
+
 
 int
 u_lock()
@@ -1031,7 +1031,7 @@ x_file(mode, xlist, flist)
 {
   int n, i;
   char *fpath, *desc;
-  char buf[64];
+  char buf[64], ans[4];
 
   //move(MENU_XPOS, 0);
   move(1, 0);
@@ -1068,15 +1068,37 @@ x_file(mode, xlist, flist)
   if (i <= 0 || i > n)
     return;
 
-  n = vget(b_lines, 36, "(D)刪除 (E)編輯 [Q]取消？", buf, 3, LCECHO);
-  if (n != 'd' && n != 'e')
-    return;
-
   fpath = flist[--i];
   if (mode == M_UFILES)
     usr_fpath(buf, cuser.userid, fpath);
   else			/* M_XFILES */
     strcpy(buf, fpath);
+
+#if 1	/* 進入編輯畫面前先預覽 */
+  int fd;
+  char *str;
+  move(13, 0);
+  fd = open(buf, O_RDONLY);
+  if (fd >= 0)
+  {
+    prints("\033[1;30m%s\033[m\n", MSG_SEPERATOR);
+    for (i = 1; i <= 9; i++)
+    {
+      if (!(str = mgets(fd)))
+	break;
+      prints("%s\n", str);
+    }
+    outs("\033[m");
+    close(fd);
+  }
+  else
+    prints("\033[1;30m──────────────── "
+      "\033[37m尚無此檔案存在\033[30m ───────────────\033[m\n\n\n\n\n\n");
+#endif
+
+  n = vget(b_lines, 36, "(D)刪除 (E)編輯 [Q]取消？", ans, 3, LCECHO);
+  if (n != 'd' && n != 'e')
+    return;
 
   if (n == 'd')
   {
@@ -1085,13 +1107,10 @@ x_file(mode, xlist, flist)
   }
   else
   {
-	  if(mode == M_XFILES)
-	  {
-		char fpath_info[64];
-		sprintf(fpath_info, BBSHOME"/gem/@/@mxfile.info");
-		more(fpath_info, NULL);
-	  }
+    if (mode == M_XFILES)
+      more("gem/@/@mxfile.info", NULL);
 
+    curredit = EDIT_XFILE;
     vmsg(vedit(buf, 0) ? "原封不動" : "更新完畢");	/* Thor.981020: 注意被talk的問題  */
   }
 }
