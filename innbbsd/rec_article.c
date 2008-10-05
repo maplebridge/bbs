@@ -227,13 +227,13 @@ copy_post_to_deletelog(hdr, fpath)
 }
 
 
-static int currchrono;
+static int cpchrono;
 
 static int
 reccmpchrono(hdr)
   HDR *hdr;
 {
-  return hdr->chrono == currchrono;
+  return hdr->chrono == cpchrono;
 }
 
 
@@ -297,7 +297,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
     {
       hdr.score = 0;
       hdr.xmode |= POST_SCORE;
-      currchrono = hdr.chrono;
+      cpchrono = hdr.chrono;
       rec_put(folder, &hdr, sizeof(HDR), pos, reccmpchrono);
     }
 #endif

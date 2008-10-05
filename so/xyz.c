@@ -246,74 +246,81 @@ post_sibala(xo)
   HDR hdr;
   struct tm *ptime;
   time_t now;
-  char fname_sibala[32], fpath[64], fpath_tmp[64], buf[64], title[64], folder[64];
+  char fpath[64], buf[64], title[64], folder[64];
   int i, j, k, num_sibala, num_sibala_face;
 
-  sprintf(fname_sibala, "%s.sibala", cuser.userid);
-  brd_fpath(fpath, currboard, fname_sibala);
+  sprintf(fpath, "tmp/%s.sibala", cuser.userid);
 
-  num_sibala = 0;
-  num_sibala_face = 0;
+  for (; j = 0, j != 'y';)
+  {
+    num_sibala = 0;
+    num_sibala_face = 0;
 
-  fp = fopen(fpath, "w");
+    fp = fopen(fpath, "w");
 
-  fprintf(fp, "丟骰人   : %s\n", cuser.userid);
-  fprintf(fp, "來源     : %s\n", fromhost);
-  fprintf(fp, "來源     : %s\n", get_my_ip());
+    fprintf(fp, "丟骰人   : %s\n", cuser.userid);
+    fprintf(fp, "來源     : %s\n", fromhost);
+    fprintf(fp, "來源     : %s\n", get_my_ip());
 
-  time(&now);
-  ptime = localtime(&now);
-  fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
-  ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+    time(&now);
+    ptime = localtime(&now);
+    fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
+    ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
 
-  clear();
-  move(i = 3, 0);
-  if (!vget(i,0, "輸入標題名稱 : ", title, 60, DOECHO))
+    clear();
+    move(i = 3, 0);
+    if (!vget(i, 0, "輸入標題名稱 : ", title, 60, DOECHO))
+      break;
+    fprintf(fp, "標題名稱 : %s\n", title);
+
+    i += 2;
+    if (!vget(i, 0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
+      break;
+    fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+
+    i += 2;
+    if (!vget(i, 0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
+      break;
+    fprintf(fp, "◎丟骰次數 : %d\n", num_sibala);
+
+    j = vans("Y)丟出 E)重來 Q)取消？[Q] ");
+
+    if (j != 'y')
+    {
+      fclose(fp);
+      unlink(fpath);
+    }
+
+    if (!j || j == 'q')
+      return XO_HEAD;
+  }
+
+  if (!j)	/* 處理中斷跳出 */
   {
     fclose(fp);
     unlink(fpath);
     return XO_HEAD;
   }
-  fprintf(fp, "標題名稱 : %s\n", title);
 
-  i += 2;
-  if (!vget(i,0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
+  sprintf(folder, "%s.tmp", fpath);	/* 借用 folder */
+  fp2 = fopen(folder, "w");
+
+  for (i = j = 0, srand(time(0)); i < num_sibala; i++)
   {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
+    k = rand() % num_sibala_face + 1;
+    j += k;
+    fprintf(fp2, "第 %4d 次丟骰結果 : %4d  加總 : %d\n", i + 1, k, j);
   }
-  fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+  fclose(fp2);
 
-  i += 2;
-  if (!vget(i,0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
-  {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
-  }
-  fprintf(fp, "丟骰次數 : %d\n", num_sibala);
-
-  j = 0;
-  sprintf(fpath_tmp, "%s.tmp", fpath);
-  fp2 = fopen(fpath_tmp, "w");
-  srand (time(NULL));
-  for (i=0; i < num_sibala; i++)
-  {
-    k = rand()%num_sibala_face + 1;
-    j = j + k;
-    fprintf(fp2, "第 %4d 次丟骰結果 : %4d  加總 : %d\n", i+1, k, j);
-  }
-
-  sprintf(buf, "丟骰結果 : %d\n", j);
-  fprintf(fp, "%s", buf);
+  sprintf(buf, "丟骰結果 : %d", j);
+  fprintf(fp, "%s\n", buf);
+  fclose(fp);
   vmsg(buf);
 
-  fclose(fp2);
-  fclose(fp);
-
-  sprintf(buf, "/bin/cat %s >> %s",fpath_tmp, fpath);
+  sprintf(buf, "/bin/cat %s >> %s", folder, fpath);
   system(buf);
+  unlink(folder);
 
   if (!(bbstate & STAT_POST))	/* 在 currboard 沒有發表權限，故寄回信箱 */
   {
@@ -333,7 +340,6 @@ post_sibala(xo)
     strcpy(hdr.nick,  "賭神");
     sprintf(hdr.title, "%s : %s", cuser.userid, title);
     rec_bot(xo->dir, &hdr, sizeof(HDR));
-
     btime_update(brd_bno(currboard));
   }
 
@@ -345,10 +351,8 @@ post_sibala(xo)
   strcpy(hdr.nick,  "賭神");
   sprintf(hdr.title, "%s : %s", cuser.userid, title);
   rec_bot(folder, &hdr, sizeof(HDR));
-
   btime_update(brd_bno("log"));
 
-  unlink(fpath_tmp);
   unlink(fpath);
 
   return XO_INIT;

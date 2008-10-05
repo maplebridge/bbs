@@ -2595,9 +2595,10 @@ RefusePal_level(board, hdr)	//smiler 1108
   RefusePal_fpath(fpath, board, 'R', hdr);	//0709
   if (dashf(fpath))	/* 有 POST_RESTRICT 而 pal 檔不存在的就是加密(L)文 */
   {
-    if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)
+    if ((!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size) ||
+      !(hdr->xmode & POST_FRIEND))	/* 有 pal 檔而沒 POST_FRIEND */
     {	/* 有些名單的 size 為 0 */
-      unlink(fpath);
+      RefusePal_kill(currboard, hdr);
       return -1;
     }
 
@@ -2667,25 +2668,20 @@ refusepal_cache(hdr, board)
 
 
 static int
-XoBM_Refuse_pal(xo)
+XoBM_Refuse_pal(xo, hdr)
   XO *xo;
-{
-  XO *xt, *xr;
   HDR *hdr;
+{
+  XO *xt;
   char fpath[64];
   char fpath_friend[64];
   int ans, ans2;
-  int pos, cur;		//smiler 1108
-  pos = xo->pos;	//smiler 1108
-  cur = pos - xo->top;	//smiler 1108
-
-  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
 
 //  if (!(hdr->xmode & POST_RESTRICT))
-//    return XO_NONE;
+//    return 0;
 
   if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
-    return XO_NONE;
+    return 0;
 
   brd_fpath(fpath, currboard, "RefusePal_DIR");
   if (!dashd(fpath))
@@ -2722,11 +2718,11 @@ XoBM_Refuse_pal(xo)
     break;
 
   default:
-    return XO_FOOT;
+    return 0;
   }
 
   if (ans == -1)
-    return XO_FOOT;
+    return 0;
 
   if (!ans2)		/* ans:1-5, ans2 尚未選擇, 引入個人好友群組名單 */
   {
@@ -2745,39 +2741,25 @@ XoBM_Refuse_pal(xo)
     xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
     xt->key = PALTYPE_BPAL;	//smiler 1106
     xover(XZ_PAL);
+    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
     refusepal_cache(hdr, currboard);
     free(xt);
   }
 
   if (ans2 != '9')
   {
-#if 0
-    if (!dashf(fpath_friend))
-    {
-      xz[XZ_PAL - XO_ZONE].xo = xr = xo_new(fpath_friend);
-//      if (ans == '0')	/* 引入個人好友名單 */
-//	xr->key = PALTYPE_PAL;
-      if (!ans2)	/* 引入個人好友群組名單 */
-	xr->key = PALTYPE_LIST;
-      else		/* 引入板友/板友特別名單 */
-	xr->key = PALTYPE_BPAL;
-      xover(XZ_PAL);
-      free(xr);
-    }
-#endif
     vmsg("引入名單！");
     f_cp(fpath_friend, fpath, O_TRUNC);
     xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
     xt->key = PALTYPE_BPAL;	//smiler 1106
     xover(XZ_PAL);
+    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
     refusepal_cache(hdr, currboard);
     free(xt);
   }
 
-//  move(3 + cur, 7);	//smiler 1108
-//  outc('F');		//smiler 1108
-//  return XO_INIT;
-  return 0;
+  vmsg("設定完成！");
+  return 1;
 }
 
 
@@ -2794,7 +2776,7 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   XO *xo;
 {
   HDR *hdr;
-  int pos, cur, ans;
+  int pos, cur, ans, xmode;
 
   if (!cuser.userlevel) /* itoc.020114: guest 不能對其他 guest 的文章加密 */
     return XO_NONE;
@@ -2808,6 +2790,7 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   pos = xo->pos;
   cur = pos - xo->top;
   hdr = (HDR *) xo_pool + cur;
+  xmode = hdr->xmode;
 
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
   {
@@ -2822,16 +2805,16 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
       break;
 
     case 1:	/* 好友(F)文章 */
-      if ((ans =
-  vans("將此篇文章 1)加密/解密(將砍除可見好友名單) 2)修改可見好友名單 Q)取消？[Q] ")) == '1')
+      ans = vans("將此篇文章 1)加密/解密(將砍除可見好友名單) 2)修改可見好友名單 Q)取消？[Q] ");
+      if (ans == '1')
       {
 	ans = vans("將此篇文章 1)加密 2)解密 (加解密都將砍除可見好友名單) Q)取消？[Q] ");
 	if ((ans == '1') || (ans == '2'))
 	{
-	  hdr->xmode &= ~POST_FRIEND;
+	  xmode &= ~POST_FRIEND;
 	  RefusePal_kill(currboard, hdr);
 	  if (ans == '1')		/* 先拿掉, 待會再加回去 */
-	    hdr->xmode ^= POST_RESTRICT;
+	    xmode ^= POST_RESTRICT;
 	  else
 	    ans = '1';
 	}
@@ -2842,26 +2825,27 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
     switch (ans)
     {
     case '1':	/* 執行加解密動作 */
-      hdr->xmode ^= POST_RESTRICT;
+//      xmode &= ~POST_FRIEND;	/* 以防萬一 */
+//      RefusePal_kill(currboard, hdr);
+      xmode ^= POST_RESTRICT;
       break;
 
     case '2':	/* 編輯可見好友名單 */
-      hdr->xmode |= (POST_RESTRICT | POST_FRIEND);
-      XoBM_Refuse_pal(xo);
+      xmode |= (POST_RESTRICT | POST_FRIEND);
+      XoBM_Refuse_pal(xo, hdr);		/* 傳回 0 表示取消動作 */
       break;
 
     default:	/* 取消動作 */
       return XO_FOOT;
     }
 
+    hdr->xmode = xmode;
     currchrono = hdr->chrono;
     rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
-
-    move(3 + cur, 7);
-    outs(post_attr(hdr));
+    return XO_LOAD;
   }
 
-  return (ans == '2') ? XO_INIT : XO_FOOT;
+  return XO_NONE;
 }
 
 

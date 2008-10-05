@@ -1606,9 +1606,9 @@ every_Z(zone)
     z_status++;
 
   cmd = zone;
-  
+
   outz(MSG_ZONE_SWITCH);
-  
+
   tmpbno = vkey();	/* 借用 tmpbno 來換成小寫 */
   if (tmpbno >= 'A' && tmpbno <= 'Z')
     tmpbno |= 0x20;
