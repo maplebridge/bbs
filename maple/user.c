@@ -158,76 +158,102 @@ u_set_bar(bar)
   move(i = 1, 0);
   clrtobot();
   move(2, 0);
-  prints("\033[1;37m亮   : \033[m\033[1;31m31\033[32m32\033[33m33\033[34m34\033[35m35\033[36m36\033[37m37\033[m\n");
-  prints("\033[0;37m暗   : \033[m\033[31m31\033[32m32\033[33m33\033[34m34\033[35m35\033[36m36\033[37m37\033[m\n");
-  prints("\033[0m底色 : \033[m\033[41m41\033[42m42\033[43m43\033[44m44\033[45m45\033[46m46\033[47m47\033[m\n");
   prints("\033[m楓橋設定 : %s測試\033[m\n", imaplecolor);
   prints("\033[m目前設定 : \033[m%s測試\033[m", orgcolor);
 
-  switch (vget(8, 0, "◎ 選擇 E)進入設定 Q)取消 D)刪除個人設定使用預設值 [Q]" , color_write, 3, LCECHO))
+  switch (vget(5, 0, "◎ 選擇 E)進入設定 Q)取消 D)刪除個人設定使用預設值 [Q]" ,
+    color_write, 3, LCECHO))
   {
-    case 'd' :
-      strcpy(UCBAR[bar], DEFCBAR[bar]);
-      goto save;
     case 'e' :
       break;
+    case 'd' :
+      if (vans("確定刪除(Y/N)？ [N]") == 'y')
+      {
+	strcpy(UCBAR[bar], DEFCBAR[bar]);
+	goto save;
+      }
     default :
       return 0;
   }
 
-  i = 10;
-  vget(i, 0, "前景：亮(1)/暗(0)/略過(Enter)", bright, 2, DOECHO);
-  if (bright[0]!='\0' && bright[0] != '0' && bright[0] != '1')
-  {
-    return vmsg("輸入錯誤 !!");
-  }
-
-  sprintf(color_write,"\033[m\033[%s%s",
-	(bright[0] == '\0') ? "" : bright, (bright[0] == '\0') ? "" : ";");
-  color_write[strlen(color_write) - 1] = 'm';
-  prints("\033[m目前設定 : \033[m%s%s測試\033[m", orgcolor, color_write);
-
+  i = 7;
+  move(i, 0);
+  prints("前景 (亮) 1)\033[1;30m＊\033[m 2)\033[1;31m＊\033[m 3)\033[1;32m＊\033[m"
+    " 4)\033[1;33m＊\033[m 5)\033[1;34m＊\033[m 6)\033[1;35m＊\033[m"
+    " 7)\033[1;36m＊\033[m 8)\033[1;37m＊\033[m \n"
+    "     (暗) a)\033[7m＊\033[m b)\033[31m＊\033[m c)\033[32m＊\033[m"
+    " d)\033[33m＊\033[m e)\033[34m＊\033[m f)\033[35m＊\033[m g)\033[36m＊\033[m"
+    " h)\033[37m＊\033[m\n");
   i += 2;
-  vget(i, 0, "前景：閃爍(5)/略過(Enter)", flash, 2, DOECHO);
-  if ((flash[0]!='\0') && (flash[0]!='5'))
+  ans = vget(i, 0, "                                    [Enter]略過？ ",
+    front, 3, LCECHO);
+  if ((ans >= '1') && (ans <= '8'))
   {
-    return vmsg("輸入錯誤 !!");
+    sprintf(bright, "%d", 1);
+    sprintf(front, "%d", ans - '1' + 30);
   }
+  else if ((ans >= 'a') && (ans <= 'h'))
+  {
+    sprintf(bright, "%d", 0);
+    sprintf(front, "%d", ans - 'a' + 30);
+  }
+  else if (!ans)
+    bright[0] = front[0] = '\0';
+  else
+    return vmsg("輸入錯誤 !!");
+
   sprintf(color_write,"\033[m\033[%s%s%s%s",
-	(bright[0]=='\0') ? "" : bright, (bright[0]=='\0') ? "" : ";",
-	(flash[0]=='\0')  ? "" : flash , (flash[0]=='\0')  ? "" : ";");
+    bright, bright[0] ? ";" : "", front , front[0] ? ";" : "");
   color_write[strlen(color_write) - 1] = 'm';
-  prints("\033[m目前設定 : \033[m%s%s測試\033[m", orgcolor, color_write);
-	
   i += 2;
-  vget(i, 0, "前景：色碼(31~37)/略過(Enter)", front, 3, DOECHO);
-  if ((front[0] != '\0') && ((front[0] != '3') && (front[1] < '1' || front[1] > '7')))
-  {
-    return vmsg("輸入錯誤 !!");
-  }
-  sprintf(color_write,"\033[m\033[%s%s%s%s%s%s",
-	(bright[0] == '\0') ? "" : bright, (bright[0] == '\0') ? "" : ";",
-	(flash[0] == '\0')  ? "" : flash , (flash[0] == '\0')  ? "" : ";",
-	(front[0] == '\0')  ? "" : front , (front[0] == '\0')  ? "" : ";");
-  color_write[strlen(color_write) - 1] = 'm';
-  prints("\033[m目前設定 : \033[m%s%s測試\033[m", orgcolor, color_write);
+  move(i++, 0);
+  prints("\033[1;30m------------------ 目前設定 << \033[m"
+    "\033[m%s%s測試\033[m \033[1;30m >> ------------------\033[m\n",
+    orgcolor, (strlen(color_write) > 6) ? color_write : "");
 
-  i += 2;
-  vget(i, 0, "背景：色碼(41~47)/略過(Enter)", back, 3, DOECHO);
-  if ((back[0] != '\0') && ((back[0] != '4') && (back[1] < '1' || back[1] > '7')))
+  vget(i, 0, "前景 是否閃爍？ 1)是 [Enter]略過？ ", flash, 2, DOECHO);
+  if (flash[0] && (flash[0] != '1'))
   {
     return vmsg("輸入錯誤 !!");
   }
+  else if (flash[0])
+    flash[0] = '5';
+
+  sprintf(color_write,"\033[m\033[%s%s%s%s%s%s",
+    bright, bright[0] ? ";" : "",
+    flash, flash[0] ? ";" : "",
+    front, front[0] ? ";" : "");
+  color_write[strlen(color_write) - 1] = 'm';
+  i += 2;
+  move(i++, 0);
+  prints("\033[1;30m------------------ 目前設定 << \033[m"
+    "\033[m%s%s測試\033[m \033[1;30m >> ------------------\033[m",
+    orgcolor, (strlen(color_write) > 6) ? color_write : "");
+
+  ans = vget(i, 0, "背景 1) \033[41m  \033[m 2) \033[42m  \033[m 3) \033[43m  \033[m "
+    "4) \033[44m  \033[m 5) \033[45m  \033[m 6) \033[46m  \033[m 7) \033[47m"
+    "  \033[m [Enter]略過？ ",
+    back, 3, DOECHO);
+  if (ans >= '1' && ans <= '7')
+    sprintf(back, "%d", ans - '0' + 40);
+  else if (!ans)
+    back[0] = '\0';
+  else
+    return vmsg("輸入錯誤 !!");
 
   sprintf(color_write,"\033[m\033[%s%s%s%s%s%s%s%s",
-	(bright[0] == '\0') ? "" : bright, (bright[0] == '\0') ? "" : ";",
-	(flash[0] == '\0')  ? "" : flash , (flash[0] == '\0')  ? "" : ";",
-	(front[0] == '\0')  ? "" : front , (front[0] == '\0')  ? "" : ";",
-	(back[0] == '\0')   ? "" : back  , (back[0] == '\0')   ? "" : ";");
+    bright, bright[0] ? ";" : "",
+    flash, flash[0] ? ";" : "",
+    front, front[0] ? ";" : "",
+    back, back[0] ? ";" : "");
   color_write[strlen(color_write) - 1] = 'm';
-  prints("\033[m目前設定 : \033[m%s%s測試\033[m", orgcolor, color_write);
+  i += 2;
+  move(i++, 0);
+  prints("\033[1;30m------------------ 目前設定 << \033[m"
+    "\033[m%s%s測試\033[m \033[1;30m >> ------------------\033[m",
+    orgcolor, (strlen(color_write) > 6) ? color_write : "");
 
-  if (bright[0] == '\0' && flash[0] == '\0' && front[0] == '\0' && back[0] == '\0')
+  if (!bright[0] && !flash[0] && !front[0] && !back[0])
   {
     return vmsg("取消更動 !!");
   }

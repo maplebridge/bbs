@@ -712,16 +712,16 @@ static MENU menu_color_bar[] =
   u_menu_bar, PERM_BASIC, M_UFILES,
   "Menu   【   選單光棒   】",
 
-  menu_bpg_color_bar, 0, M_UMENU,
+  menu_bpg_color_bar, PERM_BASIC, M_UFILES,
   "Bpg    【 看板文章精華 】",
 
-  menu_pl_color_bar, 0, M_UMENU,
+  menu_pl_color_bar, PERM_BASIC, M_UFILES,
   "Pl     【 板友好友網友 】",
 
-  menu_wma_color_bar, 0, M_UMENU,
+  menu_wma_color_bar, PERM_BASIC, M_UFILES,
   "Wma    【 水球信件上站 】",
 
-  menu_vns_color_bar, 0, M_UMENU,
+  menu_vns_color_bar, PERM_BASIC, M_UFILES,
   "Vns    【 投票連署點歌 】",
 
   u_rss_bar, PERM_BASIC, M_UFILES,

@@ -28,7 +28,7 @@ static XO board_xo;
 inline int in_favor(char *brdname);	/* smiler.070724 */
 
 
-#if 0
+#if 1
 //********/* smiler.070602: for xsort °_©l³B */********/
 
 #define min(a, b)	(a) < (b) ? a : b
