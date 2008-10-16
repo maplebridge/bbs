@@ -33,9 +33,11 @@ typedef struct t_node{
   t_pointer next;
 }	t_node;
 
+
 static t_pointer head=NULL;
 static t_pointer tail=NULL;
 static t_pointer trace=NULL;
+
 
 t_pointer create_t(void)
 {
@@ -45,6 +47,7 @@ t_pointer create_t(void)
   root->next = NULL;
   return root;
 }
+
 
 void add_t(char *name)
 {
@@ -61,6 +64,7 @@ void add_t(char *name)
     strcpy(tail->name,name);
   }
 }
+
 
 void clear_t()	//smiler 1014
 {
@@ -84,6 +88,7 @@ void clear_t()	//smiler 1014
   }
 }
 
+
 int Is_inside(char *name)
 {
   trace=head;
@@ -101,6 +106,7 @@ int Is_inside(char *name)
   }
 }
 
+
 typedef struct{
 #if usekey
   int key;
@@ -110,13 +116,13 @@ typedef struct{
 
 
 element stack[MAX_STACK_SIZE];
-int top=-1;
+int top = -1;
 
 int IsEmpty(int top);
 int IsFull(int top);
 void add(element item);
 void Delete(element *selement);
-char empty[32]="                                ";
+char empty[32] = "                                ";
 
 
 int IsEmpty(int top)

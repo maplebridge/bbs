@@ -69,8 +69,10 @@ mf_urifolder(fpath)
     {
       if (head->mftype & MF_BOARD)
       {
-	if ((bno = brd_bno(head->xname)) >= 0)	/* 只計算看得見(不一定能進入)的看板 */
+	if ((bno = brd_bno(head->xname)) >= 0)
 	{
+	  if (!(brd_bits[bno] & BRD_L_BIT))	/* 只計算看得見(不一定能進入)的看板 */
+	    continue;
 	  brd = bshm->bcache + bno;
 	  btime_refresh(brd);
 #ifdef ENHANCED_VISIT
@@ -121,7 +123,13 @@ mf_item(num, mf)
   else if (mftype & MF_BOARD)
   {
     if ((bno = brd_bno(mf->xname)) >= 0)
-      class_item(num, bno, brdpost, 1, label);
+    {
+      if (!(brd_bits[bno] & BRD_L_BIT))
+	prints("%6d%c  \033[36m%s\033[m\n",
+	  brdpost ? 0 : num, label ? 'T' : ' ', "<本看板為隱板>");
+      else
+	class_item(num, bno, brdpost, 1, label);
+    }
     else
       /* itoc.010821: 不見的看板，讓 user 自己清掉，如此 user 才知道哪些看板被砍了 */
       prints("       %c \033[36m<%s 已改名或被刪除，請將本捷徑刪除>\033[m\n", label ? 'T' : ' ', mf->xname);
@@ -205,12 +213,20 @@ mf_item_bar(xo, mode)
       if (!strcmp(mf->xname, bhead->brdname))
       {
 	pbno = bshm->mantime[chn];
-        if (mode)
-          class_item_bar(bhead, num, chn, brdpost, pbno, 1, label);
-        else
-          class_item(num, chn, brdpost, 1, label);
-        invalid = 0;
-        break;
+	if (!(brd_bits[chn] & BRD_L_BIT))
+	  prints("%s%6d%c  \033[36m%-*.*s\033[m",
+	    mode ? UCBAR[UCBAR_BRD] : "",
+	    brdpost ? 0 : num, label ? 'T' : ' ',
+	    d_cols + 69, d_cols + 68, "<本看板為隱板>");
+	else
+	{
+	  if (mode)
+	    class_item_bar(bhead, num, chn, brdpost, pbno, 1, label);
+	  else
+	    class_item(num, chn, brdpost, 1, label);
+	}
+	invalid = 0;
+	break;
       }
       chn++;
     } while (++bhead < btail);
@@ -1243,8 +1259,9 @@ mf_nextunread(xo)
   {
     bno = brd_bno((++mf)->xname);
 pagewrap:
-    if (bno >= 0 && !(brd_bits[bno] & BRD_Z_BIT))	/* 跳過分類及 zap 掉的看板 */
-    {
+    if ((mf->mftype & MF_FOLDER) && bno >= 0 &&
+      !(brd_bits[bno] & BRD_Z_BIT) && (brd_bits[bno] & BRD_L_BIT))
+    {	/* 跳過分類及 zap 掉、看不見的看板 */
       BRD *brd;
       brd = bshm->bcache + bno;
 
@@ -1282,7 +1299,7 @@ pagewrap:
 	return mf_body(xo);
       }
     }
-    if ((pos == xo->top + XO_TALL) && (pos < max))
+    if ((pos == xo->top + XO_TALL) && (pos < max))	/* 處理翻頁 */
     {
       reload = 1;
       xo->pos = pos;

@@ -1345,7 +1345,7 @@ btime_refresh(brd)
 	maxchrono = 0;
 	while (read(fd, &hdr, sizeof(HDR)) == sizeof(HDR))
 	{
-	  if (!(hdr.xmode & (POST_RESTRICT | POST_BOTTOM)))
+	  if (!(hdr.xmode & (POST_RESTRICT | POST_FRIEND | POST_BOTTOM)))
 	  {
 	    maxchrono = BMAX(maxchrono, hdr.chrono);
 	    maxchrono = BMAX(maxchrono, hdr.stamp);

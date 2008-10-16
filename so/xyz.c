@@ -251,8 +251,9 @@ post_sibala(xo)
 
   sprintf(fpath, "tmp/%s.sibala", cuser.userid);
 
-  for (; j = 0, j != 'y';)
+  for (j = 0; j != 'y';)
   {
+    j = 0;
     num_sibala = 0;
     num_sibala_face = 0;
 

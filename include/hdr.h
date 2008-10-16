@@ -30,9 +30,9 @@ typedef struct
   int xid;			/* reserved */
 
   char xname[28];               /* 檔案名稱 */
-  time_t parent_chrono;         /* 置底文的正本是哪篇 */
+  time4_t parent_chrono;         /* 置底文的正本是哪篇 */
   char owner[76];               /* 作者 (E-mail address) */
-  time_t stamp;                 /* 最近一次更改檔案的時間 */
+  time4_t stamp;                 /* 最近一次更改檔案的時間 */
   char nick[49];		/* 暱稱 */
   char score;			/* 文章評比分數 */
 

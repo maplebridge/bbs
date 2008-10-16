@@ -297,7 +297,5 @@ typedef struct
   char title[73];		/* ¥DÃD (TTLEN + 1) */
 
   int score;
-  
+
 }          LEXEL_GEM;
-
-

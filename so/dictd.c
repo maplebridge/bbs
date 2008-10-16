@@ -149,7 +149,7 @@ main_dictd()
 
     more(fname, NULL);
     sprintf(tmp, "是否把 %s 的查詢結果寄回自己信箱？ (y/N) ", word);
-    if (vans(tmp) == 'y')
+    if (cuser.level && vans(tmp) == 'y')
     {
       sprintf(tmp, "[備 忘 錄] %s 的字典查詢結果", word);
       mail_self(fname, cuser.userid, tmp, 0);

@@ -1683,7 +1683,7 @@ vget_match(prefix, len, op)
 }
 
 
-char lastcmd[MAXLASTCMD][80];
+char lastcmd[MAXLASTCMD + 1][80];
 
 
 /* bbs.h: Flags to getdata input function */
@@ -1798,6 +1798,12 @@ vget(line, col, prompt, data, max, echo)
       prompt = &data[col];
       i = col;
       move(x, y + col);
+
+      if (echo && max < 80)
+      {
+	lastcmd[MAXLASTCMD][col] = ch;
+	str_ncpy(lastcmd[MAXLASTCMD] + col + 1, prompt, len - col);
+      }
 
       for (;;)
       {
@@ -1940,12 +1946,14 @@ vget(line, col, prompt, data, max, echo)
     case KEY_DOWN:
     case Ctrl('N'):
 
-      line += MAXLASTCMD - 2;
+//      line += MAXLASTCMD - 2;
+      line += (MAXLASTCMD + 1) - 2;
 
     case KEY_UP:
     case Ctrl('P'):
 
-      line = (line + 1) % MAXLASTCMD;
+//      line = (line + 1) % MAXLASTCMD;
+      line = (line + 1) % (MAXLASTCMD + 1);
       prompt = lastcmd[line];
       col = 0;
       move(x, y);
@@ -2004,6 +2012,7 @@ vget(line, col, prompt, data, max, echo)
       strcpy(lastcmd[line], lastcmd[line - 1]);
     strcpy(lastcmd[0], data);
   }
+  lastcmd[MAXLASTCMD][0] = '\0';
 
   move(vlen, strlen(data) + hlen);	/* itoc.010312: 固定移到該列列尾再印出'\n' */
   outc('\n');

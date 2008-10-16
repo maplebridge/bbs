@@ -238,4 +238,3 @@ typedef struct
 #define OLDMF_FOLDER	0x00000004/*卷宗*/
 #define OLDMF_GEM	0x00000008/*精華區捷徑*/
 #define OLDMF_DELETED	0x10000000/*被移除的連結*/
-

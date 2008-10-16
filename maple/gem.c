@@ -661,6 +661,8 @@ gem_edit(xo)
 
   level = xo->key;
 
+  curredit = EDIT_GEM;
+
   if (!(level & GEM_W_BIT) || ((hdr->xmode & GEM_RESERVED) && !(level & GEM_X_BIT)))
   {
     vedit(fpath, -1);

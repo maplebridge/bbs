@@ -851,9 +851,9 @@ do_post(xo, title)
       brd_fpath(folder2, "nthu.forsale", FN_DIR);
       //brd_fpath(folder2, "forsale", FN_DIR);	// smiler.080705
       hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);	// smiler.070916
-      strcpy(board_from, currboard);			// smiler.070916
+      strcpy(board_from, currboard);		// smiler.070916
 
-      hdr2.xmode = mode;		// smiler.070916
+      hdr2.xmode = mode;	// smiler.070916
       strcpy(hdr2.owner, rcpt);	// smiler.070916
       strcpy(hdr2.nick, nick);	// smiler.070916
       strcpy(hdr2.title, title);	// smiler.070916
@@ -1115,7 +1115,7 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
 #endif
 
   /* --------------------------------------------------- */
-  /* 印出標題的種類					 */
+  /* 印出標題的種類	 */
   /* --------------------------------------------------- */
 
   /* len: 標題是 type[] 裡面的那一種 */
@@ -2668,8 +2668,7 @@ refusepal_cache(hdr, board)
 
 
 static int
-XoBM_Refuse_pal(xo, hdr)
-  XO *xo;
+XoBM_Refuse_pal(hdr)
   HDR *hdr;
 {
   XO *xt;
@@ -2741,7 +2740,7 @@ XoBM_Refuse_pal(xo, hdr)
     xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
     xt->key = PALTYPE_BPAL;	//smiler 1106
     xover(XZ_PAL);
-    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
+//    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
     refusepal_cache(hdr, currboard);
     free(xt);
   }
@@ -2753,7 +2752,7 @@ XoBM_Refuse_pal(xo, hdr)
     xz[XZ_PAL - XO_ZONE].xo = xt = xo_new(fpath);
     xt->key = PALTYPE_BPAL;	//smiler 1106
     xover(XZ_PAL);
-    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
+//    (xo->key == XZ_XPOST) ? xpost_init(xo) : post_init(xo);
     refusepal_cache(hdr, currboard);
     free(xt);
   }
@@ -2775,7 +2774,7 @@ static int
 post_refuse(xo)	/* itoc.010602: 文章加密 */
   XO *xo;
 {
-  HDR *hdr;
+  HDR *hdr, fhdr;
   int pos, cur, ans, xmode;
 
   if (!cuser.userlevel) /* itoc.020114: guest 不能對其他 guest 的文章加密 */
@@ -2791,6 +2790,9 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   cur = pos - xo->top;
   hdr = (HDR *) xo_pool + cur;
   xmode = hdr->xmode;
+
+  /* XoBM_Refuse_pal() 進 xover(XZ_PAL) 時, 會重寫 xo_pool, 這裡先存起來 */
+  memcpy(&fhdr, hdr, sizeof(HDR));
 
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
   {
@@ -2832,16 +2834,16 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
 
     case '2':	/* 編輯可見好友名單 */
       xmode |= (POST_RESTRICT | POST_FRIEND);
-      XoBM_Refuse_pal(xo, hdr);		/* 傳回 0 表示取消動作 */
+      XoBM_Refuse_pal(&fhdr);		/* 傳回 0 表示取消動作 */
       break;
 
     default:	/* 取消動作 */
       return XO_FOOT;
     }
 
-    hdr->xmode = xmode;
-    currchrono = hdr->chrono;
-    rec_put(xo->dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono);
+    fhdr.xmode = xmode;
+    currchrono = fhdr.chrono;
+    rec_put(xo->dir, &fhdr, sizeof(HDR), xo->key == XZ_XPOST ? fhdr.xid : pos, cmpchrono);
     return XO_LOAD;
   }
 
@@ -3329,6 +3331,8 @@ post_edit(xo)
   /* smiler 1031 */
   hdr_fpath(copied, xo->dir, hdr);
   hdr_fpath(fpath, xo->dir, hdr);
+
+  curredit = 0;
 
   if (HAS_PERM(PERM_ALLBOARD))			/* 站長修改 */
   {
@@ -4434,17 +4438,15 @@ KeyFunc post_cb[] =
   Ctrl('D'), post_prune,
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
-
   Ctrl('S'), post_state,
 
-  Ctrl('F'), post_addMF,
-//  Ctrl('F'), post_oldbm,
   'S', post_oldbm,
   Ctrl('G'), post_oldbm,
   Ctrl('B'), post_oldbm,
+
+  Ctrl('F'), post_addMF,
   'i', post_ishowbm,
   'B', post_ishowbm,
-//  'B' | XO_DL, (void *) "bin/manage.so:post_manage",
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",
   'V' | XO_DL, (void *) "bin/vote.so:XoVote",
   'G' | XO_DL, (void *) "bin/xyz.so:post_sibala",

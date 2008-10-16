@@ -230,7 +230,7 @@ COLOR1 " 轉信設定 " COLOR9 " (↑/↓)"COLOR2"上下 "COLOR9"(PgUp/PgDn)"COLOR2"上下
 COLOR1 "  即時通  "COLOR9" (w)"COLOR2"傳送訊息 " COLOR9 "(^r)"COLOR2"回覆訊息 " COLOR9 "(a/d)"COLOR2"增/刪聯絡人 " COLOR9 "(b/B)"COLOR2"封鎖/解除 "COLOR9"(^k)"COLOR2"斷線  " 
 
 #define FEETER_FAKE_PAL	\
-COLOR1 " 瀏覽名單 " COLOR9 " 本名單僅供瀏覽，板主修改板友名單請退出後按(B)選擇修改              "
+COLOR1 " 瀏覽名單 " COLOR9 " 本名單僅供瀏覽，板主修改板友名單請退出後按 o 選擇修改              "
 
 #define FEETER_RSS	\
 COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"(E)"COLOR2"編輯 "COLOR9"(T)"COLOR2"標簽名稱 "COLOR9"(H)"COLOR2"RSS網址 "COLOR9"(m)"COLOR2"移動 "COLOR9"(h)"COLOR2"說明  "
