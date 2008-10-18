@@ -819,6 +819,12 @@ mf_browse(xo)
       mf_jumpnext = 1;	/* itoc.010910: 只有在離開看板回到看板列表時才需要跳去下一個未讀看板 */
 #endif
 
+    if ((brd_bits[bno] & BRD_Z_BIT) &&
+      vans("本看板被 zap 掉了，將不會儲存閱\讀紀錄，是否要取消 zap？[y/N]") == 'y'))
+    {
+      brd_bits[bno] ^= BRD_Z_BIT;
+    }
+
     return mf_init(xo);
   }
   else if (type & MF_GEM)	/* 精華區捷徑 */
