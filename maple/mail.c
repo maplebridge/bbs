@@ -1369,6 +1369,7 @@ mbox_item_bar(xo, mode)
   else
     hdr_outs(hdr, d_cols + 46);
 
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

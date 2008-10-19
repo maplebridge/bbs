@@ -640,7 +640,7 @@ re_key:
       shift = -1;
     }
 
-    else if (key == KEY_END || key == '$')
+    else if (key == KEY_END || key == '$' || key == 'G')
     {
       shift = END_MASK;
     }

@@ -106,6 +106,7 @@ gem_item_bar(xo, mode)
     prints("%-*.*s%-13s%-8.8s%s", d_cols + 46, d_cols + 45, hdr->title,
       (gtype == 1 ? hdr->xname : hdr->owner), hdr->date, mode ? "\033[m" : "");
 
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

@@ -1653,6 +1653,8 @@ class_bar(xo, mode)
       d_cols + 51, d_cols + 50, str + BNLEN + 1 + BCLEN + 1,
       mode ? "\033[m" : "");
   }
+
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

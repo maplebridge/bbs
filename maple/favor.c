@@ -261,6 +261,8 @@ mf_item_bar(xo, mode)
       mode ? UCBAR[UCBAR_BRD] : "",num, label ? 'T' : ' ', cname, mf->class[3] & 7,
       mf->class, mode ? UCBAR[UCBAR_BRD] : "", d_cols + 51, d_cols + 50, mf->title);
   }
+
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

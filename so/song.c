@@ -237,6 +237,7 @@ song_item_bar(xo, mode)
     (xmode & GEM_RESTRICT) && !(xo->key & GEM_M_BIT) ? MSG_DATA_CLOAK : hdr->title,
     mode ? "\033[m" : "");
 
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

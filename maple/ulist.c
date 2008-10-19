@@ -359,7 +359,9 @@ ulist_item_bar(xo, mode)
 #endif
     up->from : "*", bmode(up, 0), buf,
     mode ? "\033[m" : "");
-  return 0;
+
+  move(xo->pos - xo->top + 3, 0);
+  return XO_NONE;
 }
 #endif
 

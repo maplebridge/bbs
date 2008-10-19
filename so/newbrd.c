@@ -165,6 +165,7 @@ nbrd_item_bar(xo, mode)
     (nbrd->mode & NBRD_NEWBOARD) ? "           " :"                ",
     mode ? "\033[m" : "");
 
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

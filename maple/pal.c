@@ -396,6 +396,7 @@ pal_item_bar(xo, mode)
     d_cols + 54, d_cols + 53, pal->ship,
     mode ? "\033[m" : "");
 
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif

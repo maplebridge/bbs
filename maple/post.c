@@ -4408,8 +4408,8 @@ KeyFunc post_cb[] =
   'g', gem_gather,
 
 #ifdef HAVE_REFUSEMARK
-  'L', post_refuse,
-  'l', post_oldrefuse,
+  'l', post_refuse,
+  'L', post_oldrefuse,
   'O', post_oldrefuse,
 #endif
 
@@ -4498,8 +4498,8 @@ KeyFunc xpost_cb[] =
   'w', post_write,
 
 #ifdef HAVE_REFUSEMARK
-  'L', post_refuse,
-  'l', post_oldrefuse,
+  'l', post_refuse,
+  'L', post_oldrefuse,
   'O', post_oldrefuse,
 #endif
 

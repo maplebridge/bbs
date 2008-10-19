@@ -119,7 +119,8 @@ rss_item_bar(xo, mode)
   prints("%-*.*s", d_cols + 42, d_cols + 41, rss->url);			//42
   prints("%s", ((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
 
-  return 0;
+  move(xo->pos - xo->top + 3, 0);
+  return XO_NONE;
 }
 #endif
 

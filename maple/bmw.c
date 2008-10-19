@@ -904,6 +904,8 @@ bmw_item_bar(xo, mode)
       bmw->userid, d_cols + 53, d_cols + 53, bmw->msg, ptime->tm_hour, ptime->tm_min,
       mode ? "\033[m" : "");
   }
+
+  move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
 }
 #endif
