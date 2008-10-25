@@ -86,7 +86,7 @@
 #define FN_TODO		"todo"		/* 行事曆 */
 #endif
 
-#define FN_MSN      "msn"       /* msn 紀錄 */
+#define FN_MSN		"msn"		/* msn 紀錄 */
 
 #define FN_GOOD_ARTICLE	"log_good_article"	/* 優文記錄 */
 #define FN_POOR_ARTICLE	"log_poor_article"	/* 劣文記錄 */
@@ -258,6 +258,7 @@ UnAnonymous 站務 黑函滿天‧匿名現身 PERM_ALLBOARD PERM_SYSOP
 #define BN_REQUEST	BN_CAMERA	/* 歌本投稿處 */
 #define BN_DELLOG	"Deletelog"	/* 刪文記錄 */
 #define BN_EDITLOG	"Editlog"	/* 修文記錄 */
+#define BN_SYSOPMBOX	"SYSOP_mbox"	/* sysop 的信件 */
 
 #define BN_NULL		"尚未選定"	/* 進站後還沒進入任何看板，所顯示的看板名稱 */
 

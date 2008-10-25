@@ -161,7 +161,7 @@
   /* ------------------------------------------------- */
   /* 組態規劃˙看板信箱                                */
   /* ------------------------------------------------- */
-      
+
 #define	HAVE_ANONYMOUS		/* 提供 anonymous 板 */
 
 #ifdef HAVE_ANONYMOUS
@@ -236,6 +236,8 @@
 #define	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
 
 #define HAVE_MULTI_SIGN		/* 多種站簽供使用者選擇 */
+
+#define SYSOP_MBOX_BRD		/* sysop 信件轉至看板 */
 
 #define	MULTI_MAIL		/* 群組寄信功能 */
 

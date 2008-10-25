@@ -48,6 +48,11 @@ char anonymousid[IDLEN + 1];	/* itoc.010717: 自定匿名 ID */
 #endif
 
 
+#ifdef SYSOP_MBOX_BRD
+extern sysop_reply;
+#endif
+
+
 #define	VE_INSERT	0x01
 #define	VE_ANSI		0x02
 #define	VE_FOOTER	0x04
@@ -1382,7 +1387,11 @@ ve_header(fp)
 
   if (curredit & EDIT_MAIL)
   {
+#ifdef SYSOP_MBOX_BRD
+    fprintf(fp, "%s %s (%s)\n", str_author1, sysop_reply ? "SYSOP" : cuser.userid, sysop_reply ? "(SYSOP)" : cuser.username);
+#else
     fprintf(fp, "%s %s (%s)\n", str_author1, cuser.userid, cuser.username);
+#endif
   }
   else
   {
@@ -1521,6 +1530,9 @@ append_banner1(fp, my_ip)	/* 站簽2 */
 #ifdef HAVE_ANONYMOUS
     (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
 #endif
+#ifdef SYSOP_MBOX_BRD
+    sysop_reply ? "SYSOP" :
+#endif
     cuser.userid,
 #ifdef HAVE_ANONYMOUS
     (curredit & EDIT_ANONYMOUS) ? "納美克星" : 
@@ -1572,6 +1584,9 @@ append_banner2(fp, my_ip)	/* 站簽3 */
   sprintf(buf, "%s\033[37m 從\033[33m %s",
 #ifdef HAVE_ANONYMOUS
     (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
+#endif
+#ifdef SYSOP_MBOX_BRD
+    sysop_reply ? "SYSOP" :
 #endif
     cuser.userid,
 #ifdef HAVE_ANONYMOUS
@@ -1652,6 +1667,9 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
 #endif
+#ifdef SYSOP_MBOX_BRD
+	sysop_reply ? "SYSOP" :
+#endif
 	cuser.userid,
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
@@ -1675,7 +1693,6 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
       fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), my_ip);
   }
 }
-
 
 
 static int

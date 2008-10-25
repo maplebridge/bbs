@@ -958,6 +958,29 @@ chkrestrict(hdr)
 #endif
 
 
+#ifdef SYSOP_MBOX_BRD
+int sysop_reply = 0;
+
+
+static int
+post_sysop_reply(xo, hdr)
+  XO *xo;
+  HDR *hdr;
+{
+  char fpath[64];
+
+  hdr_fpath(fpath, xo->dir, hdr);
+  strcpy(quote_file, fpath);
+  sysop_reply = 1;
+  do_mreply(hdr, 1);
+  sysop_reply = 0;
+  rec_put(xo->dir, hdr, sizeof(HDR), xo->pos, NULL);
+  btime_update(brd_bno(currboard));
+  return XO_HEAD;
+}
+#endif
+
+
 static int
 post_reply(xo)
   XO *xo;
@@ -967,6 +990,11 @@ post_reply(xo)
     HDR *hdr;
 
     hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+#ifdef SYSOP_MBOX_BRD
+    if (!strcmp(currboard, BN_SYSOPMBOX))
+      return post_sysop_reply(xo, hdr);
+#endif
 
 #ifdef HAVE_REFUSEMARK
     //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))  //0709
@@ -1408,6 +1436,49 @@ post_load(xo)
 }
 
 
+#ifdef SYSOP_MBOX_BRD
+static char*
+sysop_mbox_attr(hdr, attr, unread)
+  HDR *hdr;
+  int attr, unread;
+{
+  int mode;
+  char attr_tmp[15] = {0};
+
+  mode = hdr->xmode;
+
+  if (mode & MAIL_REPLIED)
+  {
+    attr = (mode & MAIL_MARKED) ? 'R' : 'r';
+    strcpy(attr_tmp, "\033[1;31m");
+  }
+  else if (mode & MAIL_MARKED)
+  {
+    attr |= 'M';
+    strcpy(attr_tmp, "\033[1;36m");
+  }
+  else if (!attr)
+  {
+    attr = '+';
+    strcpy(attr_tmp, "");
+  }
+
+  if (unread)
+  {
+    if (attr == 'm')
+      attr = '=';
+    else if (!(mode & POST_BOTTOM) &&
+      (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM)))
+      attr = '~';
+  }
+
+  static char color_attr[30];
+  sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);
+  return color_attr;
+}
+#endif
+
+
 static char*
 post_attr(hdr)
   HDR *hdr;
@@ -1431,6 +1502,11 @@ post_attr(hdr)
 #endif
 
   unread = ((USR_SHOW & USR_SHOW_POST_MODIFY_UNREAD) && attr && brh_unread(BMAX(hdr->chrono, hdr->stamp))) ? 1 : 0;
+
+#ifdef SYSOP_MBOX_BRD
+  if (!strcmp(currboard, BN_SYSOPMBOX))
+    return sysop_mbox_attr(hdr, attr, unread);
+#endif
 
 #ifdef HAVE_REFUSEMARK
   if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
@@ -1818,6 +1894,10 @@ re_key:
     case 'r':
       if (bbstate & STAT_POST)
       {
+#ifdef SYSOP_MBOX_BRD
+	if (!strcmp(currboard, BN_SYSOPMBOX))
+	  return post_sysop_reply(xo, hdr);
+#endif
 	if (do_reply(xo, hdr) == XO_INIT)	/* 有成功地 post 出去了 */
 	  return post_init(xo);
       }

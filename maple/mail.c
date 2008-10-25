@@ -16,6 +16,10 @@ extern char xo_pool[];
 
 extern UCACHE *ushm;
 
+#ifdef SYSOP_MBOX_BRD
+extern sysop_reply;
+#endif
+
 
 /* ----------------------------------------------------- */
 /* Link List routines					 */
@@ -826,8 +830,13 @@ mail_send(rcpt)
   {
     usr_fpath(folder, rcpt, fn_dir);
     hdr_stamp(folder, HDR_LINK, &hdr, fpath);
+#ifdef SYSOP_MBOX_BRD
+    strcpy(hdr.owner, sysop_reply ? "SYSOP" : cuser.userid);
+    strcpy(hdr.nick, sysop_reply ? "(SYSOP)" : cuser.username);	/* chuan: 加入 nick */
+#else
     strcpy(hdr.owner, cuser.userid);
     strcpy(hdr.nick, cuser.username);	/* chuan: 加入 nick */
+#endif
     strcpy(hdr.title, ve_title);
     rec_add(folder, &hdr, sizeof(HDR));
 
@@ -895,7 +904,11 @@ mail_reply(hdr)
   if (mail_send(quote_user) >= 0)
     xmode |= MAIL_REPLIED;
 
+#ifdef SYSOP_MBOX_BRD
+  if ((prefix == 'u') || sysop_reply)
+#else
   if (prefix == 'u')  /* user mail 看信時才標 r */
+#endif
     hdr->xmode = xmode;
 }
 
@@ -1029,8 +1042,17 @@ mail_self(fpath, owner, title, xmode)		/* itoc.011115: 寄檔案給自己 */
 {
   HDR hdr;
   char *folder;
+#ifdef SYSOP_MBOX_BRD
+  char buf[64];
 
-  folder = cmbox.dir;
+  if (sysop_reply)
+  {
+    brd_fpath(buf, BN_SYSOPMBOX, FN_DIR);
+    folder = buf;
+  }
+  else
+#endif
+    folder = cmbox.dir;
   hdr_stamp(folder, HDR_COPY, &hdr, fpath);
   strcpy(hdr.owner, owner);
   strcpy(hdr.title, title);
