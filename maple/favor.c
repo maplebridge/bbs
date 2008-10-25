@@ -822,7 +822,7 @@ mf_browse(xo)
 #endif
 
     if ((brd_bits[bno] & BRD_Z_BIT) &&
-      vans("本看板被 zap 掉了，將不會儲存閱\讀紀錄，是否要取消 zap？[y/N]") == 'y'))
+      vans("本看板被 zap 掉了，將不會儲存閱\讀紀錄，是否要取消 zap？[y/N]") == 'y')
     {
       brd_bits[bno] ^= BRD_Z_BIT;
     }
