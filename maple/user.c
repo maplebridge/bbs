@@ -868,6 +868,7 @@ u_info()
 }
 
 
+#ifdef HAVE_MULTI_SIGN
 int
 u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
 {
@@ -949,6 +950,7 @@ u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
   }
 
 }	/* ikulan.080726:(end of function)將改站簽功能獨立出來 */
+#endif
 
 
 int

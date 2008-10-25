@@ -28,6 +28,7 @@
 #define COLOR10		"\033[34;47m"		/* neck 的顏色 */
 #define COLOR11		"\033[35;47m"		/* menu feeter 的顏色 */
 
+
 /* ----------------------------------------------------- */
 /* 使用者名單顏色					 */
 /* ----------------------------------------------------- */
@@ -44,6 +45,24 @@
 #define COLOR_SUPER_MYGOOD	"\033[32m"	/* 我的超級好友 */
 #define COLOR_SUPER_OGOOD	"\033[33m"	/* 與我為超級好友 */
 
+
+/* ----------------------------------------------------- */
+/* 各類光棒顏色						 */
+/* ----------------------------------------------------- */
+
+#define COLORBAR_MENU   "\033[0;30;47m" /* menu.c 選單光棒 */
+#define	COLORBAR_BRD	"\033[1;41m"	/* board.c, favor.c 選單光棒 */
+#define COLORBAR_POST	"\033[1;43m"	/* post.c 選單光棒 */
+#define COLORBAR_GEM	"\033[1;42m"	/* gem.c  選單光棒 */
+#define COLORBAR_PAL	"\033[1;45m"	/* pal.c  選單光棒 */
+#define COLORBAR_USR	"\033[1;45m"	/* ulist.c 選單光棒 */
+#define COLORBAR_BMW	"\033[1;43m"	/* bmw.c 選單光棒 */
+#define COLORBAR_MAIL	"\033[1;42m"	/* mail.c 選單光棒 */
+#define COLORBAR_ALOHA	"\033[1;41m"	/* aloha.c 選單光棒 */
+#define COLORBAR_VOTE	"\033[0;30;43m"	/* vote.c 選單光棒 */
+#define COLORBAR_NBRD	"\033[1;46m"	/* newbrd.c 選單光棒 */
+#define COLORBAR_SONG	"\033[1;42m"	/* song.c 選單光棒 */
+#define COLORBAR_RSS	"\033[1;46m"	/* rss.c 選單光棒 */
 
 /* ----------------------------------------------------- */
 /* 選單位置						 */

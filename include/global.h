@@ -187,7 +187,7 @@
 
 #define FN_ETC_VALID	"etc/valid"		/* 身分認證信函 (Email 認證時，寄去給站外信箱) */
 #define FN_ETC_JUSTIFIED "etc/justified"	/* 認證通過通知 (認證通過時，寄到站內信箱) */
-#define FN_ETC_SYSMAIL  "etc/SYSMAIL"       /* 站務寄給使用者的通知信 */
+#define FN_ETC_SYSMAIL  "etc/SYSMAIL"		/* 站務寄給使用者的通知信 */
 #define FN_ETC_REREG	"etc/re-reg"		/* 重新認證通知 (認證過期時，寄到站內信箱) */
 
 #define FN_ETC_CROSSPOST "etc/cross-post"	/* 跨貼停權通知 (Cross-Post 時，寄到站內信箱) */
@@ -544,20 +544,6 @@ VAR int mail_to_newone;         /* 是否寄信給新申請者? */
 #define	UCBAR_NBRD	10	/* newbrd.c 選單光棒 */
 #define	UCBAR_SONG	11	/* song.c 選單光棒 */
 #define	UCBAR_RSS	12	/* rss.c 選單光棒 */
-
-#define COLORBAR_MENU   "\033[0;30;47m" /* menu.c 選單光棒 */
-#define	COLORBAR_BRD	"\033[1;41m"	/* board.c, favor.c 選單光棒 */
-#define COLORBAR_POST	"\033[1;43m"	/* post.c 選單光棒 */
-#define COLORBAR_GEM	"\033[1;42m"	/* gem.c  選單光棒 */
-#define COLORBAR_PAL	"\033[1;45m"	/* pal.c  選單光棒 */
-#define COLORBAR_USR	"\033[1;45m"	/* ulist.c 選單光棒 */
-#define COLORBAR_BMW	"\033[1;43m"	/* bmw.c 選單光棒 */
-#define COLORBAR_MAIL	"\033[1;42m"	/* mail.c 選單光棒 */
-#define COLORBAR_ALOHA	"\033[1;41m"	/* aloha.c 選單光棒 */
-#define COLORBAR_VOTE	"\033[0;30;43m"	/* vote.c 選單光棒 */
-#define COLORBAR_NBRD	"\033[1;46m"	/* newbrd.c 選單光棒 */
-#define COLORBAR_SONG	"\033[1;42m"	/* song.c 選單光棒 */
-#define COLORBAR_RSS	"\033[1;46m"	/* rss.c 選單光棒 */
 
 VAR char UCBAR[CBAR_NUM][32];
 

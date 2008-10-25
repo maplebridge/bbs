@@ -58,6 +58,7 @@ a_system_setup()
   move(i = 1, 0);
   clrtobot();
 
+#ifdef HAVE_MULTI_SIGN
   /* 站簽個數設定 */  
   sprintf(buf, "%d", host_sight_number);
   vget(++i, 0, "站簽個數設定：", buf, 10, GCARRY);
@@ -127,6 +128,7 @@ a_system_setup()
       model_select_tmp = 1;
     }
   }
+#endif
 
   /* 啟用Editlog功能 */
   sprintf(buf, "%d", editlog_use);

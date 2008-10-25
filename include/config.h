@@ -80,10 +80,11 @@
 #define LOGINASNEW		/* 採用上站申請帳號制度 */
 
 #ifdef LOGINASNEW
-#undef	HAVE_GUARANTOR		/* itoc.000319: 採用保證人制度 */
+#  undef HAVE_GUARANTOR		/* itoc.000319: 採用保證人制度 */
 #endif
 
-#define	HAVE_LOGIN_DENIED	/* itoc.000319: 擋掉某些來源的連結，參照 etc/bbs.acl */ /* smiler.070724 */
+#define	HAVE_LOGIN_DENIED	/* itoc.000319: 擋掉某些來源的連結，參照 etc/bbs.acl */
+				/* smiler.070724 */
 
 #undef	NEWUSER_LIMIT		/* 新手上路的三天限制 */
 
@@ -92,8 +93,8 @@
 #define	EMAIL_JUSTIFY		/* 發出 Internet Email 身分認證信函 */
 
 #ifdef EMAIL_JUSTIFY
-#define	HAVE_POP3_CHECK		/* itoc.000315: POP3 系統認證 */
-#define	HAVE_REGKEY_CHECK	/* itoc.010112: 認證碼驗證 */
+#  define HAVE_POP3_CHECK	/* itoc.000315: POP3 系統認證 */
+#  define HAVE_REGKEY_CHECK	/* itoc.010112: 認證碼驗證 */
 #endif
 
 #define	HAVE_REGISTER_FORM	/* 註冊單認證 */
@@ -102,8 +103,9 @@
   /* 組態規劃˙結交朋友                                */
   /* ------------------------------------------------- */
 
-#define	HAVE_MODERATED_BOARD	/* 提供好友秘密板 */	/* 秘密看板的閱讀權限要是 PERM_SYSOP 才會被當成秘密看板 */
-							/* 好友看板的閱讀權限要是 PERM_BOARD 才會被當成好友看板 */
+#define	HAVE_MODERATED_BOARD	/* 提供好友秘密板 */
+				/* 秘密看板的閱讀權限要是 PERM_SYSOP 才會被當成秘密看板 */
+				/* 好友看板的閱讀權限要是 PERM_BOARD 才會被當成好友看板 */
 #define	CHECK_ONLINE		/* itoc.010306: 文章列表中可以顯示使用者是否在站上 */
 
 #define	HAVE_BADPAL		/* itoc.010302: 提供壞人的功能 */
@@ -121,7 +123,7 @@
 #define	LOG_BMW			/* lkchu.981201: 水球記錄處理 */
 
 #ifdef LOG_BMW
-#define	RETAIN_BMW		/* itoc.021102: 水球存證 */
+#  define RETAIN_BMW		/* itoc.021102: 水球存證 */
 #endif
 
 #define HAVE_BITLBEE		/* bitlbee.c MSN 功能 */
@@ -143,7 +145,7 @@
 #define	HAVE_WHERE		/* itoc.001102: 使用者名單故鄉辨識，參照 etc/host fqdn */
 
 #ifdef HAVE_WHERE
-#define GUEST_WHERE		/* itoc.010208: guest 亂數取故鄉 */
+#  define GUEST_WHERE		/* itoc.010208: guest 亂數取故鄉 */
 #endif
 
 #define	GUEST_NICK		/* itoc.000319: guest 亂數取暱稱 */
@@ -163,7 +165,7 @@
 #define	HAVE_ANONYMOUS		/* 提供 anonymous 板 */
 
 #ifdef HAVE_ANONYMOUS
-#define	HAVE_UNANONYMOUS_BOARD	/* itoc.020602: 反匿名板，必須有開 BN_UNANONYMOUS */
+#  define HAVE_UNANONYMOUS_BOARD	/* itoc.020602: 反匿名板，必須有開 BN_UNANONYMOUS */
 #endif
 
 #define	SHOW_USER_IN_TEXT	/* 在文件中 Ctrl+Q 可顯示 User 的名字 */
@@ -178,18 +180,18 @@
 
 #undef	CURSOR_BAR		/* itoc.010113: 選單光棒，若開啟選單光棒，選單就不能有顏色控制碼 */
 #ifndef CURSOR_BAR
-#define CURSOR_BAR
+#  define CURSOR_BAR
 #endif
 
-#define HAVE_LIGHTBAR         /* xover 整行光棒 */
+#define HAVE_LIGHTBAR		/* xover 整行光棒 */
 
 #define	HAVE_DECLARE		/* 使 title 中有 [] 更明顯，且日期上色 */
 
 #define	HAVE_POPUPMENU		/* 蹦出式選單 */
 
 #ifdef HAVE_POPUPMENU
-#define	POPUP_ANSWER		/* 蹦出式選單 -- 詢問選項 */
-#define	POPUP_MESSAGE		/* 蹦出式選單 -- 訊息視窗 */
+#  define POPUP_ANSWER		/* 蹦出式選單 -- 詢問選項 */
+#  define POPUP_MESSAGE		/* 蹦出式選單 -- 訊息視窗 */
 #endif
 
 #define	AUTHOR_EXTRACTION	/* 尋找同一作者文章 */
@@ -224,7 +226,7 @@
 #define	HAVE_COSIGN		/* itoc.010108: 提供看板連署 */
 
 #ifdef HAVE_COSIGN
-#undef	SYSOP_START_COSIGN	/* itoc.030613: 新板連署要先經站長審核才能開始 */
+#  undef SYSOP_START_COSIGN	/* itoc.030613: 新板連署要先經站長審核才能開始 */
 #endif
 
 #define	HAVE_REFUSEMARK		/* itoc.010602: 提供看板文章加密 */
@@ -232,6 +234,8 @@
 #define	HAVE_LABELMARK		/* itoc.020307: 提供看板文章加待砍標記 */
 
 #define	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
+
+#define HAVE_MULTI_SIGN		/* 多種站簽供使用者選擇 */
 
 #define	MULTI_MAIL		/* 群組寄信功能 */
 
@@ -302,8 +306,8 @@
 /* bbsd.c user.c admutil.c 定期身分認證，記得同步修改 gem/@/@re-reg */
 
 #ifdef JUSTIFY_PERIODICAL
-#define VALID_PERIOD		(86400 * 365)	/* 身分認證有效期(秒) */
-#define INVALID_NOTICE_PERIOD	(86400 * 10)	/* 身分認證失效前多久時間提醒使用者(秒) */
+#  define VALID_PERIOD		(86400 * 365)	/* 身分認證有效期(秒) */
+#  define INVALID_NOTICE_PERIOD	(86400 * 10)	/* 身分認證失效前多久時間提醒使用者(秒) */
 #endif
 
 /* talk.c 朋友名單/水球列表 */
@@ -319,7 +323,7 @@
 /* aloha.c 上站通知 */
 
 #ifdef HAVE_ALOHA
-#define ALOHA_MAX	64		/* 上站通知上限(人) */
+#  define ALOHA_MAX	64		/* 上站通知上限(人) */
 #endif
 
 /* menu.c 留言板 */
@@ -336,30 +340,30 @@
 /* bquota.c mail.c 用來清過期檔案/信件的時間，記得同步修改 etc/justified */
 
 #ifdef OVERDUE_MAILDEL
-#define MARK_DUE        180		/* 標記保存之信件保留時間(天) */
-#define MAIL_DUE        60		/* 一般信件保留時間(天) */
-#define FILE_DUE        30		/* 其他檔案保留時間(天) */
+#  define MARK_DUE        180		/* 標記保存之信件保留時間(天) */
+#  define MAIL_DUE        60		/* 一般信件保留時間(天) */
+#  define FILE_DUE        30		/* 其他檔案保留時間(天) */
 #endif
 
 /* newbrd.c 看板連署 */
 
 #ifdef HAVE_COSIGN
-#define NBRD_NUM_BRD	12		/* 開板需要連署人數 */
-#define NBRD_DAY_BRD	3		/* 開板可連署天數 */
+#  define NBRD_NUM_BRD	12		/* 開板需要連署人數 */
+#  define NBRD_DAY_BRD	3		/* 開板可連署天數 */
 #endif
 
 /* post.c 偵測 cross-post */
 
 #ifdef  HAVE_DETECT_CROSSPOST
-#define	MAX_CROSS_POST		3	/* cross post 最大數量(篇) */
-#define CROSSPOST_DENY_DAY	30	/* cross post 停權時間(天) */
+#  define MAX_CROSS_POST	3	/* cross post 最大數量(篇) */
+#  define CROSSPOST_DENY_DAY	30	/* cross post 停權時間(天) */
 #endif
 
 /* visio.c bguard.c 自動踢人 */
 
 #ifdef TIME_KICKER
-#define IDLE_TIMEOUT	1440	/* visio.c bguard.c 發呆過久自動簽退(分) */
-#define IDLE_WARNOUT	3		/* visio.c 發呆過久提醒(分) -- 自動簽退前三分鐘前 */
+#  define IDLE_TIMEOUT	1440	/* visio.c bguard.c 發呆過久自動簽退(分) */
+#  define IDLE_WARNOUT	3	/* visio.c 發呆過久提醒(分) -- 自動簽退前三分鐘前 */
 #endif
 
 /* more.c edit.c 翻頁 */

@@ -737,8 +737,10 @@ static MENU menu_user_set[] =
   u_setup, 0, M_UFILES,
   "Habit      【 喜好模式 】",
 
+#ifdef HAVE_MULTI_SIGN
   u_sign_set, 0, M_UFILES,
   "Sign       【 站簽設定 】",
+#endif
 
   menu_color_bar, 0, M_UMENU,
   "Colorbar   【 光棒設定 】",

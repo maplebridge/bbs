@@ -213,7 +213,9 @@ int u_deny(void);
 int u_info(void);
 int u_setup(void);
 int u_usr_show_set(void);
+#ifdef HAVE_MULTI_SIGN
 int u_sign_set(void);
+#endif
 int u_lock(void);
 int u_log(void);
 int u_xfile(void);
