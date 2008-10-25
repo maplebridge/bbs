@@ -1334,22 +1334,24 @@ xover(cmd)
 	if ((pos < num) || (pos >= num + XO_TALL))
 	{
 	  xo->top = (pos / XO_TALL) * XO_TALL;
+	  move(3, 0);		/* 解決標題重複時, KEY_PGUP 畫面殘留問題 */
+	  clrtobot();
 	  cmd = XO_LOAD;	/* 載入資料並予以顯示 */
 	}
 	else
 	{
 	  move(3 + cmd - num, 0);
 #ifdef HAVE_LIGHTBAR
-      /* verit.030129 : xover 光棒 */
-      if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
-      {
-        int tmp = xo->pos;
-        clrtoeol();
-        xo->pos = cmd - num + xo->top;
-        (*(xcmd[0].func)) (xo, 0);
-        xo->pos = tmp;
-      }
-      else
+	  /* verit.030129 : xover 光棒 */
+	  if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
+	  {
+	    int tmp = xo->pos;
+	    clrtoeol();
+	    xo->pos = cmd - num + xo->top;
+	    (*(xcmd[0].func)) (xo, 0);
+	    xo->pos = tmp;
+	  }
+	  else
 #endif
 	  outc(' ');
 

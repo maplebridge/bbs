@@ -395,6 +395,7 @@ post_prefix_edit()
   if (!(bbstate & STAT_BOARD))
     return 0;
 
+  brd_fpath(fpath, currboard, "prefix.new");
   i = vkans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
 
   if (i == 'd')
@@ -407,7 +408,6 @@ post_prefix_edit()
     return 0;
 
   i = 0;
-  brd_fpath(fpath, currboard, "prefix.new");
   if (fp = fopen(fpath, "r"))
   {
     for (; i < NUM_PREFIX; i++)

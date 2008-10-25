@@ -734,7 +734,14 @@ do_post(xo, title)
       mode = vget(21 + newline, len, "", fpath, 3, DOECHO) - '1';
       if (mode >= 0 && mode < pnum)	/* 輸入數字選項 */
       {
-	sprintf(fpath, "[%s] ", prefix[mode]);
+	if (prefix[mode][0] == '[' ||
+	    !strncmp(prefix[mode], "【", 2) ||
+	    !strncmp(prefix[mode], "《", 2) ||
+	    !strncmp(prefix[mode], "〈", 2))
+	  sprintf(fpath, "%s ", prefix[mode]);
+	else
+	  sprintf(fpath, "[%s] ", prefix[mode]);
+
 	rcpt = fpath;
       }
       else				/* 空白跳過 */
@@ -2766,7 +2773,7 @@ static int
 post_oldrefuse(xo)
   XO *xo;
 {
-  return vmsg("此功\能已整合至 L 按鍵了哦！");
+  return vmsg("此功\能已整合至 l (小寫 L) 按鍵了哦！");
 }
 
 

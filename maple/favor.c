@@ -822,7 +822,7 @@ mf_browse(xo)
 #endif
 
     if ((brd_bits[bno] & BRD_Z_BIT) &&
-      vans("本看板被 zap 掉了，將不會儲存閱\讀紀錄，是否要取消 zap？[y/N]") == 'y')
+      (vans("本看板被 zap 掉了，將不會儲存閱\讀紀錄，是否要取消 zap？[y/N]") == 'y'))
     {
       brd_bits[bno] ^= BRD_Z_BIT;
     }
@@ -1267,7 +1267,7 @@ mf_nextunread(xo)
   {
     bno = brd_bno((++mf)->xname);
 pagewrap:
-    if ((mf->mftype & MF_FOLDER) && bno >= 0 &&
+    if (bno >= 0 && !(mf->mftype & MF_CLASS) &&
       !(brd_bits[bno] & BRD_Z_BIT) && (brd_bits[bno] & BRD_L_BIT))
     {	/* 跳過分類及 zap 掉、看不見的看板 */
       BRD *brd;
