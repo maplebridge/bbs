@@ -1,0 +1,108 @@
+# ------------------------------------------------------- #
+#  src/Makefile	( NTHU CS MapleBBS Ver 3.10 )	          #
+# ------------------------------------------------------- #
+#  target : Makefile for ALL : Top level		  #
+#  create : 00/02/12                                      #
+#  update : 08/10/24 HBrian                               #
+# ------------------------------------------------------- #
+
+
+# Available OS-types:
+#  solaris sparc64
+#  linux
+#  freebsd
+
+AVAILABLE_TARGETS= \
+	solaris sparc64 \
+	linux \
+	freebsd
+
+# Sub-modules to build:
+#  lib daemon innbbsd maple so game pip util
+#  util/backup util/tran util/uno
+#
+SUBMODULES= \
+	lib daemon innbbsd maple so game pip util util/backup \
+	util/tran util/uno
+
+CC= gcc
+CPUFLAGS=
+CFLAGS+= -Wunused -O2 -fomit-frame-pointer -pipe -I$(PWD)/include $(CPUFLAGS) 
+LD= ld
+LDFLAGS+= -s -L$(PWD)/lib -ldao
+EXTRA_LDFLAGS=
+SYSTYPE=
+RANLIB= ranlib
+CPROTO= cproto -E"gcc -pipe -E" -I$(PWD)/include # -s -v
+INSTALL_DIR= $(HOME)
+
+export AVAILABLE_TARGETS
+export CC
+export LD
+export CFLAGS
+export LDFLAGS
+export RANLIB
+export CPROTO
+export INSTALL_DIR
+
+# We are testing the new Makefiles
+LOCAL_MAKEOPTS= -f Makefile.new
+export LOCAL_MAKEOPTS
+
+build:
+	$(foreach sub_module, $(SUBMODULES), \
+	$(MAKE) $(LOCAL_MAKEOPTS) -C $(PWD)/$(sub_module) $(SYSTYPE) ; )
+
+all:
+	@echo $(CFLAGS)
+	@echo "Please enter 'make <sys-type>', "
+	@echo " make linux   : for Linux"
+	@echo " make solaris : for SunOS 5.x"
+	@echo " make sparc64 : for SunOS SPARCv9"
+	@echo " make freebsd : for BSD 4.4 systems"
+
+
+linux:
+	$(MAKE) $(LOCAL_MAKEOPTS) SYSTYPE=linux \
+	 CFLAGS+="-DLINUX" \
+	 EXTRA_LDFLAGS+="-L/usr/lib -L/usr/local/lib " \
+	 EXTRA_LDFLAGS+="-lcrypt -lresolv -ldl -rdynamic" \
+	 build
+
+solaris:
+	$(MAKE) $(LOCAL_MAKEOPTS) SYSTYPE=solaris \
+	 CFLAGS+="-m32 -DSOLARIS -DSYSV" \
+	 LDFLAGS+="-m32" \
+	 EXTRA_LDFLAGS+="-L/usr/lib -L/usr/local/lib " \
+	 EXTRA_LDFLAGS+="-ltermcap -lsocket -lnsl -lresolv -lelf -ldl" \
+	 build
+
+sparc64:
+	$(MAKE) $(LOCAL_MAKEOPTS) SYSTYPE=sparc64 \
+	 CFLAGS+="-m64 -DSOLARIS -DSYSV" \
+	 LDFLAGS+="-m64" \
+	 EXTRA_LDFLAGS+="-L/usr/lib/sparcv9 -L/usr/local/lib/sparcv9 " \
+	 EXTRA_LDFLAGS+="-ltermcap -lsocket -lnsl -lresolv -lelf -ldl" \
+	 build
+
+freebsd:
+	$(MAKE) $(LOCAL_MAKEOPTS) SYSTYPE=freebsd \
+	 CFLAGS+="-DBSD44" \
+	 EXTRA_LDFLAGS+="-L/usr/lib -L/usr/local/lib " \
+	 EXTRA_LDFLAGS+="-lcrypt -export-dynamic" \
+	 build
+
+install:
+	$(foreach sub_module, $(SUBMODULES), \
+	  $(MAKE) -C $(PWD)/$(sub_module) $(LOCAL_MAKEOPTS) install; )
+
+#update:
+#	@cd daemon; make update
+#	@cd innbbsd; make update
+#	@cd maple; make update
+
+clean:
+	$(foreach sub_module, $(SUBMODULES), \
+	  $(MAKE) -C $(PWD)/$(sub_module) $(LOCAL_MAKEOPTS) clean; )
+
+

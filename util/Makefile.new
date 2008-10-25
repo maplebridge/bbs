@@ -1,0 +1,35 @@
+# ------------------------------------------------------- #
+#  util/Makefile	( NTHU CS MapleBBS Ver 3.10 )	  #
+# ------------------------------------------------------- #
+#  target : Makefile for 寄信、統計、備份、系統維護工具	  #
+#  create : 95/03/29				 	  #
+#  update : 08/10/25 HBrian			 	  #
+# ------------------------------------------------------- #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+EXE =	account acl-sort bbsmail bquota brdmail camera counter expire \
+	usies-sort gem-index hdr-dump mailpost outgo poststat reaper \
+	redir setperm setusr appendbrd mergebrd rss_feed autopost_to_board \
+	showACCT showBRD showDIR showUSR showNUM showACCTlist showPAL \
+	topbrd topgem topsong topusr reload_pal pid2user
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+linux freebsd sparc64 solaris:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+.c:	;  $(CC) -o $@ $@.c $(CFLAGS) $(LDFLAGS)
+
+
+install: $(EXE)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+
+clean:
+	rm -f $(EXE) *.exe *.o *~

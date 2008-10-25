@@ -1,0 +1,42 @@
+# ------------------------------------------------------- #
+#  util/Makefile	( NTHU CS MapleBBS Ver 3.10 )	  #
+# ------------------------------------------------------- #
+#  target : Makefile					  #
+#  create : 95/03/29				 	  #
+#  update : 08/10/24 HBrian			 	  #
+# ------------------------------------------------------- #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+EXE =	bguard bhttpd bmtad bnntpd bpop3d gemd xchatd
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+freebsd linux sparc64 solaris:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+.c:	;  $(CC) -o $@ $@.c $(CFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+
+install: $(EXE)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+
+#update:
+#	-csh -c "kill `tail -1 $(HOME)/run/bguard.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/bhttp.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/bmta.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/bnntp.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/pop3.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/gemd.pid | awk '{print $$1}'`";exit 0
+#	-csh -c "kill `tail -1 $(HOME)/run/chat.pid | awk '{print $$1}'`";exit 0
+
+clean:
+	rm -f $(EXE) *.exe *.o *~
+
+

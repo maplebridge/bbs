@@ -1,0 +1,42 @@
+# ------------------------------------------------------ #
+#  Makefile	( NTHU CS MapleBBS Ver 2.36 )		 #
+# ------------------------------------------------------ #
+#  author : opus.bbs@bbs.cs.nthu.edu.tw		 	 #
+#  target : Makefile for MapleBBS main programs		 #
+#  create : 95/03/29				 	 #
+#  update : 08/10/24 HBrian				 #
+# ------------------------------------------------------ #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+SO =	admutil.so aloha.so bank.so chat.so dictd.so help.so \
+	innbbs.so manage.so newbrd.so \
+	song.so vote.so xyz.so rss.so bitlbee.so \
+	calendar.so classtable.so credit.so todo.so
+
+
+.SUFFIXES:
+.SUFFIXES: .c .o .so
+
+.c.o:	;  $(CC) $(CFLAGS) -I/usr/local/include -c $*.c
+.o.so:	;  $(LD) $(LDFLAGS) -G $*.o -o $*.so -L/usr/local/lib -liconv
+
+
+all: 
+	@echo "Please specify SYSTYPE, see top level Makefile"
+
+
+linux freebsd solaris sparc64:
+	@$(MAKE) $(LOCAL_MAKEOPTS) \
+	 EXTRA_LDFLAGS+="-L/usr/local/lib -liconv" \
+	 $(SO)
+
+install: $(SO)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+	
+clean:
+	rm -f *.so *.o *~

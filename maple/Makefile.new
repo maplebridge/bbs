@@ -1,0 +1,49 @@
+# ------------------------------------------------------ #
+#  maple/Makefile	( NTHU CS MapleBBS Ver 3.10 )    #
+# ------------------------------------------------------ #
+#  author : opus.bbs@bbs.cs.nthu.edu.tw		 	 #
+#  target : Makefile for MapleBBS main programs		 #
+#  create : 95/03/29				 	 #
+#  update : 08/10/24 HBrian				 #
+# ------------------------------------------------------ #
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+SRC =	acct.c bbsd.c bmw.c board.c cache.c edit.c favor.c \
+	gem.c mail.c menu.c more.c pal.c post.c talk.c ulist.c \
+	user.c visio.c window.c xover.c xpost.c vers.c
+
+OBJ =	acct.o bbsd.o bmw.o board.o cache.o edit.o favor.o \
+	gem.o mail.o menu.o more.o pal.o post.o talk.o ulist.o \
+	user.o visio.o window.o xover.o xpost.o vers.o
+
+EXE =	bbsd
+
+
+all:
+	@echo "Please invoke from the top level"
+ 
+linux solaris sparc64:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+freebsd:
+	@sh ./newvers.sh
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+
+bbsd: $(OBJ)
+	$(CC) -o $@ $(OBJ) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+
+install: $(EXE)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+
+#update:
+#	-csh -c "kill `tail -1 $(HOME)/run/bbs.pid | awk '{print $$1}'`";exit 0
+
+clean:
+	rm -f $(EXE) *.exe *.o *~
+

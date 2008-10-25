@@ -1,0 +1,38 @@
+# ------------------------------------------------------ #
+#  Makefile	( NTHU CS MapleBBS Ver 3.10 )		 #
+# ------------------------------------------------------ #
+#  author : itoc.bbs@bbs.tnfsh.tn.edu.tw		 #
+#  target : Makefile for PIP GAME main programs		 #
+#  create : 01/07/24				 	 #
+#  update : 08/10/25 HBrian				 #
+# ------------------------------------------------------ #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+OBJ =	pip_basic.o pip_ending.o pip_fight.o pip_item.o pip_job.o \
+	pip_menu.o pip_pk.o pip_play.o pip_prac.o pip_quest.o pip_race.o \
+	pip_royal.o pip_stuff.o pip_visio.o pip_weapon.o pip.o
+
+
+SO =	pip.so
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+freebsd linux sparc64 solaris:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(SO)
+
+
+pip.so: $(OBJ)
+	$(LD) $(LDFLAGS) -G $(OBJ) -o pip.so
+
+install: $(SO)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+	
+clean:
+	rm -f $(SO) *.o *~

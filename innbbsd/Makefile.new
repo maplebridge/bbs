@@ -1,0 +1,47 @@
+# ------------------------------------------------------ #
+#  innbbsd/Makefile     ( NTHU CS MapleBBS Ver 3.10 )    #
+# ------------------------------------------------------ #
+#  target : Makefile for 轉信程式 innbbsd                #
+#  create : 95/03/29                                     #
+#  update : 08/10/24 HBrian                              #
+#  author : skhuang                                      #
+# ------------------------------------------------------ #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+INNOBJS	= channel.o bbslib.o convcode.o inntobbs.o rec_article.o nocem.o \
+	history.o
+
+LNKOBJS	= bbslink.o bbslib.o convcode.o inntobbs.o rec_article.o nocem.o \
+	history.o
+
+INNBBSD	= innbbsd bbslink
+
+EXE	= $(INNBBSD)
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+linux freebsd solaris sparc64:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+bbslink: $(LNKOBJS)
+	$(CC) -o bbslink $(LNKOBJS) $(OPT) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+innbbsd: $(INNOBJS)
+	$(CC) -o innbbsd $(INNOBJS) $(OPT) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+
+install: $(INNBBSD)
+	install -m 0700 $? $(INSTALL_DIR)/innd
+
+#update:
+#	-csh -c "kill `tail -1 $(HOME)/run/innbbsd.pid | awk '{print $$1}'`";exit 0
+
+clean:
+	rm -f $(EXE) *.exe *.o *~
+

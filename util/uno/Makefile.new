@@ -1,0 +1,41 @@
+# ------------------------------------------------------- #
+#  util/uno/Makefile 	( NTHU CS MapleBBS Ver 3.10 )	  #
+# ------------------------------------------------------- #
+#  target : Makefile for 寄信、統計、備份、系統維護工具	  #
+#  create : 01/03/02				 	  #
+#  update : 08/10/25				 	  #
+# ------------------------------------------------------- #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+EXE =	show_dotUSR collect_uno conflict_uno fix_uno
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+
+linux freebsd:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(EXE)
+
+solaris:
+	@$(MAKE) EXTRA_LDFLAGS+="-L/usr/ucblib -lucb" $(EXE)
+
+sparc64:
+	@$(MAKE) EXTRA_LDFLAGS+="-L/usr/ucblib/sparcv9 -lucb" $(EXE)
+
+
+.c:	;  $(CC) -o $@ $@.c $(CFLAGS) $(LDFLAGS) $(EXTRA_LDFLAGS)
+
+
+install: $(EXE)
+# 不複製到 bin/ 下
+#	install -m 0700 $? $(INSTALL_DIR)/bin
+	@echo "ok!"
+
+clean:
+	rm -f $(EXE) *.exe *.o *~

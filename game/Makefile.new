@@ -1,0 +1,39 @@
+# ------------------------------------------------------ #
+#  Makefile	( NTHU CS MapleBBS Ver 2.36 )		 #
+# ------------------------------------------------------ #
+#  author : opus.bbs@bbs.cs.nthu.edu.tw		 	 #
+#  target : Makefile for MapleBBS main programs		 #
+#  create : 95/03/29				 	 #
+#  update : 08/10/25 HBrian				 #
+# ------------------------------------------------------ #
+
+
+# ------------------------------------------------------ #
+# 下列的 make rules 不需修改				 #
+# ------------------------------------------------------ #
+
+
+SO =	bar.so bingo.so bj.so bwboard.so chessmj.so dice.so dragon.so \
+	fantan.so gp.so gray.so guessnum.so km.so liteon.so marie.so \
+	mine.so nine.so pushbox.so race.so recall.so seven.so tetris.so
+
+
+.SUFFIXES:
+.SUFFIXES: .c .o .so
+
+.c.o:	;  $(CC) $(CFLAGS) -c $*.c
+.o.so:	;  $(LD) $(LDFLAGS) -G $*.o -o $*.so
+
+
+all: 
+	@echo "Please invoke from the top level"
+
+
+linux freebsd solaris sparc64:
+	@$(MAKE) $(LOCAL_MAKEOPTS) $(SO)
+
+install: $(SO)
+	install -m 0700 $? $(INSTALL_DIR)/bin
+	
+clean:
+	rm -f *.so *.o *~
