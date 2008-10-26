@@ -33,8 +33,7 @@ typedef struct
   time4_t parent_chrono;         /* 置底文的正本是哪篇 */
   char owner[76];               /* 作者 (E-mail address) */
   time4_t stamp;                 /* 最近一次更改檔案的時間 */
-  char nick[45];		/* 暱稱 */
-  int value;			/* 文章價值/匿名文章userno */
+  char nick[49];		/* 暱稱 */
   char score;			/* 文章評比分數 */
 
   char date[9];			/* 96/12/31 */
