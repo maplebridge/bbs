@@ -1679,11 +1679,11 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 
 #ifdef HAVE_MULTI_SIGN
     else if (select == 1)		/* 站簽2 */
-      append_banner1(fp, my_ip)
+      append_banner1(fp, my_ip);
     else if (select == 2)		/* 站簽3 */
-      append_banner2(fp, my_ip)
+      append_banner2(fp, my_ip);
     else	/* 站簽4 */
-      append_banner3(fp, my_ip)
+      append_banner3(fp, my_ip);
 #endif	/* HAVE_MULTI_SIGN */
   }
 

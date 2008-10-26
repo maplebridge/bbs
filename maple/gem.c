@@ -84,12 +84,12 @@ gem_item_bar(xo, mode)
   gtype = (char) 0xba;
 
   /* 目錄用實心，不是目錄用空心 */
-  if else if (xmode & (GEM_BOARD | GEM_LINE))	/* 文章:◇ 卷宗:◆ */
+  if (xmode & GEM_FOLDER)		/* 文章:◇ 卷宗:◆ */
     gtype += 1;
 
   if (hdr->xname[0] == '@')		/* 資料:☆ 分類:★ */
     gtype -= 2;
-  else if (xmode & GEM_BOARD)		/*         看板:■ */
+  else if (xmode & (GEM_BOARD | GEM_LINE))	/* 分隔:□ 看板:■ */
     gtype += 2;
 
   prints("%s%6d%c%c\241%c ", mode ? UCBAR[UCBAR_GEM] : "\033[m",
