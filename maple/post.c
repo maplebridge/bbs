@@ -653,7 +653,7 @@ do_post(xo, title)
   /* Thor.981105: 進入前需設好 curredit 及 quote_file */
   HDR hdr;
   char fpath[64], *folder, *nick, *rcpt;
-  int mode;
+  int mode, value;
   time_t spendtime;
 
   if (!(bbstate & STAT_POST))
@@ -787,6 +787,16 @@ do_post(xo, title)
 
   spendtime = time(0) - spendtime;	/* itoc.010712: 總共花的時間(秒數) */
 
+  if (currbattr & BRD_NOCOUNT || wordsnum < 30)
+  {				/* itoc.010408: 以此減少灌水現象 */
+    value = 0;
+  }
+  else
+  {
+    /* itoc.010408: 依文章長度/所費時間來決定要給多少錢；幣制才會有意義 */
+    value = BMIN(wordsnum, spendtime) / 10;	/* 每十字/秒 一元 */
+  }
+
   /* build filename */
 
   folder = xo->dir;
@@ -800,6 +810,7 @@ do_post(xo, title)
   {
     rcpt = anonymousid;	/* itoc.010717: 自定匿名 ID */
     nick = STR_ANONYMOUS;
+    value = cuser.userno;
 
     /* Thor.980727: lkchu patch: log anonymous post */
     /* Thor.980909: gc patch: log anonymous post filename */
@@ -823,6 +834,7 @@ do_post(xo, title)
 #endif
 
   hdr.xmode = mode;
+  hdr.value = value;
   strcpy(hdr.owner, rcpt);
   strcpy(hdr.nick, nick);
   strcpy(hdr.title, title);
@@ -875,16 +887,14 @@ do_post(xo, title)
   clear();
   outs("順利貼出文章，");
 
-  if (currbattr & BRD_NOCOUNT || wordsnum < 30)
+  if ((currbattr & BRD_NOCOUNT) || (curredit & EDIT_ANONYMOUS) || (wordsnum < 30))
   {				/* itoc.010408: 以此減少灌水現象 */
     outs("文章不列入紀錄，敬請包涵。");
   }
   else
   {
-    /* itoc.010408: 依文章長度/所費時間來決定要給多少錢；幣制才會有意義 */
-    mode = BMIN(wordsnum, spendtime) / 10;	/* 每十字/秒 一元 */
-    prints("這是您的第 %d 篇文章，得 %d 銀。", ++cuser.numposts, mode);
-    addmoney(mode);
+    prints("這是您的第 %d 篇文章，得 %d 銀。", ++cuser.numposts, value);
+    addmoney(value);
   }
 
   /* 回應到原作者信箱 */
@@ -4426,6 +4436,39 @@ post_state(xo)
 
 
 static int
+post_info(xo)
+  XO *xo;
+{
+  if (!HAS_PERM(PERM_ALLADMIN))
+    return XO_NONE;
+
+  HDR *hdr;
+  ACCT acct;
+  UTMP *ui;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+
+  move(b_lines - 6, 0);
+  clrtobot();
+
+  prints("========  基本資料 ========\n");
+  prints("檔案名稱 : %s\n", hdr->xname);
+  prints("作者     : %s\n", hdr->owner);
+  prints("文章標題 : %s\n", hdr->title);
+  if (acct_load(&acct, hdr->owner) >= 0)
+    prints("文章價值 : %d 元\n", hdr->value);
+  else if (hdr->value)	/* 找不到使用者但又有文章價值的，就表示為匿名文的 userno */
+  {
+    if (ui = (UTMP *) utmp_find(cuser.userno))
+      prints("匿名編號 : %d \n", hdr->value + ui->pid);
+  }
+  vmsg(NULL);
+
+  return post_body(xo);
+}
+
+
+static int
 post_filename(xo)	/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
   XO *xo;
 {
@@ -4526,6 +4569,7 @@ KeyFunc post_cb[] =
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
   Ctrl('S'), post_state,
+  'p', post_info,
 
   'S', post_oldbm,
   Ctrl('G'), post_oldbm,
