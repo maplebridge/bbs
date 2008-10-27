@@ -1382,6 +1382,11 @@ int bit_sock = 0;	/* originally in bitlbee.c */
 int
 bit_main()
 {
+
+  /* smiler.081025: MSN 後端程式維修中 */
+  vmsg("此服務維修中站不開放 !!");
+  return 0;
+
   void (*p)();
   char account[50], pass[30];
 
