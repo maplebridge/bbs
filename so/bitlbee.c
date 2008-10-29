@@ -157,7 +157,7 @@ bit_set(xo)
     if (bit_sock <= 0)
       return XO_QUIT;
 
-    tmp = strstr(buf, "MSN");
+    tmp = strstr(buf, "msn(");
 
     if (!tmp)
       break;
@@ -537,7 +537,7 @@ bit_start(account, pass)
       fr = fdopen(bit_sock, "r");
       fw = fdopen(bit_sock, "w");
 
-      fprintf(fw, "NICK %d\r\n", cutmp->pid);
+      fprintf(fw, "NICK b%d\r\n", cutmp->pid);
       fflush(fw);
       fprintf(fw, "USER bitlbee ono ccy :bitlbee run\r\n");
       fflush(fw);
