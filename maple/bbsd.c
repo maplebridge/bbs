@@ -1128,7 +1128,18 @@ tn_motd()
 
   if(1)		/* if (!(ufo & UFO_MOTD)) */
   {
-    more("gem/@/@-Announce", NULL);  /* 近期公告 */
+    more("gem/@/@-Announce", (char *) -1);  /* 近期公告 */
+
+    /* ------------------------------------------------- */
+    /* 秀出上次上站資訊					 */
+    /* ------------------------------------------------- */
+
+    move(b_lines - 2, 0);
+    prints("      歡迎您第\033[1;33m %d \033[m度拜訪本站，上次您來自"
+	"\033[1;33m %.23s \033[m，\n     我記得那天是\033[1;33m %s\033[m。",
+	cuser.numlogins, cuser.lasthost, Btime(&cuser.lastlogin));
+    vmsg(NULL);
+
     more("gem/@/@-goodboard", NULL); /* 推薦看板 */
     more("gem/@/@-day", NULL);	/* 今日熱門話題 */
     pad_view();
