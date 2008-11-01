@@ -1422,57 +1422,57 @@ default_key:
     if (cc != cx)	/* 若游標移動位置 */
     {
 //#ifdef CURSOR_BAR
-	if(cuser.ufo & UFO_LIGHTBAR)
-	{
-      if (cx >= 0)
+      if(cuser.ufo & UFO_LIGHTBAR)
       {
-	move(MENU_XPOS + cx, MENU_YPOS);
-	if (cx <= max)
+	if (cx >= 0)
 	{
-	  mptr = table[cx];
-	  str = mptr->desc;
-	  prints("  (\033[1;36m%c\033[m)%s  ", *str, str + 1);
+	  move(MENU_XPOS + cx, MENU_YPOS);
+	  if (cx <= max)
+	  {
+	    mptr = table[cx];
+	    str = mptr->desc;
+	    prints("  (\033[1;36m%c\033[m)%s  ", *str, str + 1);
+	  }
+	  else
+	  {
+	    outs("  ");
+	  }
 	}
-	else
-	{
-	  outs("  ");
-	}
+	move(MENU_XPOS + cc, MENU_YPOS);
+	mptr = table[cc];
+	str = mptr->desc;
+	//prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+	prints("%s[ (%c)%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1);
+	cx = cc;
       }
-      move(MENU_XPOS + cc, MENU_YPOS);
-      mptr = table[cc];
-      str = mptr->desc;
-      //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	  prints("%s[ (\033[1;34m%c\033[m%s)%s ]\033[m", UCBAR[UCBAR_MENU], *str, UCBAR[UCBAR_MENU], str + 1);
-      cx = cc;
-	}
 //#else		/* 沒有 CURSOR_BAR */
-	else
-	{
-      if (cx >= 0)
+      else
       {
-	move(MENU_XPOS + cx, MENU_YPOS);
-	outc(' ');
-      }
-      move(MENU_XPOS + cc, MENU_YPOS);
-      outc('>');
-      cx = cc;
+	if (cx >= 0)
+	{
+	  move(MENU_XPOS + cx, MENU_YPOS);
+	  outc(' ');
 	}
+	move(MENU_XPOS + cc, MENU_YPOS);
+	outc('>');
+	cx = cc;
+      }
 //#endif
     }
     else		/* 若游標的位置沒有變 */
     {
 //#ifdef CURSOR_BAR
-	if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
-	{
-	  move(MENU_XPOS + cc, MENU_YPOS);
-	  mptr = table[cc];
-	  str = mptr->desc;
-      //prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	  prints("%s[ (\033[1;34m%c%s)%s ]\033[m", UCBAR[UCBAR_MENU], *str, UCBAR[UCBAR_MENU], str + 1);
-	}
+      if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
+      {
+	move(MENU_XPOS + cc, MENU_YPOS);
+	mptr = table[cc];
+	str = mptr->desc;
+	//prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
+	prints("%s[ (%c)%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1);
+      }
 //#else
-	else
-      move(MENU_XPOS + cc, MENU_YPOS + 1);
+      else
+	move(MENU_XPOS + cc, MENU_YPOS + 1);
 //#endif
     }
 

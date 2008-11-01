@@ -1160,16 +1160,18 @@ hdr_outs(hdr, cc)		/* print HDR's subject */
 #endif
 
   /* --------------------------------------------------- */
-  /* 印出標題的種類	 */
+  /* 印出標題的種類					 */
   /* --------------------------------------------------- */
 
   /* len: 標題是 type[] 裡面的那一種 */
+#ifdef HAVE_REFUSEMARK
   if (!chkrestrict(hdr))
   {
     title = "<< 文章保密 >>";
     len = 2;
   }
   else
+#endif
   {
     title = str_ttl(mark = hdr->title);
     len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
@@ -1331,12 +1333,14 @@ hdr_outs_bar(hdr, cc)	/* print HDR's subject */
   /* --------------------------------------------------- */
 
   /* len: 標題是 type[] 裡面的那一種 */
-  if(!chkrestrict(hdr))
+#ifdef HAVE_REFUSEMARK
+  if (!chkrestrict(hdr))
   {
     title = "<< 文章保密 >>";
     len = 2;
   }
   else
+#endif
   {
     title = str_ttl(mark = hdr->title);
     len = (title == mark) ? 2 : (*mark == 'R') ? 0 : 1;
@@ -1656,7 +1660,7 @@ post_item_bar(xo, mode)
     {
       prints("%s%s%s%c%s%s",
 	mode ? UCBAR[UCBAR_POST] : "",
-	"  \033[1;33m重要\033[m",mode ? UCBAR[UCBAR_POST] : "",
+	"  \033[1;33m重要\033[m", mode ? UCBAR[UCBAR_POST] : "",
 	tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
     }
     else
@@ -1668,13 +1672,12 @@ post_item_bar(xo, mode)
 
     if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
     {
-      //num = hdr->score;
       num = hdr->score;
       if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
 	outs("  ");
       else if (num <= 99 && num >= -99)
 	prints("%s\033[1;3%cm%s%2d\033[m%s",
-	  mode ? UCBAR[UCBAR_POST] : "", num > 0 ? '1' : num < 0 ? '2' : '7' ,
+	  mode ? UCBAR[UCBAR_POST] : "", num > 0 ? '1' : num < 0 ? '2' : mode ? '7' : '0',
 	  mode ? UCBAR[UCBAR_POST] : "", abs(num), mode ? UCBAR[UCBAR_POST] : "");
       else
 	prints("%s\033[1;3%s\033[m%s", mode ? UCBAR[UCBAR_POST] : "", num >= 0 ? "1m爆" : "2m噓",
@@ -4543,10 +4546,7 @@ post_info(xo)
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
   value = atoi(hdr->value);
 
-  move(b_lines - 4, 0);
-  clrtobot();
-
-  prints("==============================================================================\n");
+  move(0, 0);
   prints("檔案名稱：#%s @ %-*s", hdr->xname, BNLEN + 1, currboard);
   prints("作者：%-19.18s\n", hdr->owner);
 #ifdef HAVE_REFUSEMARK
@@ -4572,8 +4572,10 @@ post_info(xo)
       prints("，文章禁止推文");
   }
 
-  vmsg(NULL);
-  return post_body(xo);
+  clrtoeol();
+  move(xo->pos - xo->top + 3, 0);
+  vkey();
+  return post_head(xo);
 }
 
 
