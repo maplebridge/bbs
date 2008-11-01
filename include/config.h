@@ -178,12 +178,11 @@
 
 #undef	COLOR_HEADER		/* lkchu.981201: 變換彩色標頭 */
 
-#undef	CURSOR_BAR		/* itoc.010113: 選單光棒，若開啟選單光棒，選單就不能有顏色控制碼 */
-#ifndef CURSOR_BAR
-#  define CURSOR_BAR
-#endif
-
 #define HAVE_LIGHTBAR		/* xover 整行光棒 */
+
+#ifdef HAVE_LIGHTBAR
+#  define CURSOR_BAR		/* itoc.010113: 選單光棒，若開啟選單光棒，選單就不能有顏色控制碼 */
+#endif
 
 #define	HAVE_DECLARE		/* 使 title 中有 [] 更明顯，且日期上色 */
 
@@ -234,6 +233,8 @@
 #define	HAVE_LABELMARK		/* itoc.020307: 提供看板文章加待砍標記 */
 
 #define	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
+
+#define HAVE_RSS		/* 提供看板接收 RSS 功能 */
 
 #define HAVE_MULTI_SIGN		/* 多種站簽供使用者選擇 */
 

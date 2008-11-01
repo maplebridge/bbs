@@ -12,6 +12,8 @@
 #include "bbs.h"
 #include <netinet/in.h>
 
+#ifdef HAVE_RSS
+
 #define FN_RSS_BAK		"./.RSS.bak"	
 #define FN_RSS_TMP		"./.RSS.tmp"
 
@@ -232,3 +234,4 @@ main(argc, argv)
 
   return 0;
 }
+#endif	/* HAVE_RSS */

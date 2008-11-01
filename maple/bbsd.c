@@ -1054,10 +1054,11 @@ tn_login()
   /* --------------------------------------------------- */
 
   /* Thor.990415: 記錄ip, 怕正查不到 */
-  sprintf(buf, "%s ip:%08x (%d)", fromhost, tn_addr, currpid);
+  sprintf(buf, "%s ip:%08x", fromhost, tn_addr);
 
   multi = login_user(buf);
 
+  sprintf(buf, "%s ip:%08x (%d)", fromhost, tn_addr, currpid);
   blog("ENTER", buf);
 
   /* --------------------------------------------------- */

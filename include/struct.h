@@ -743,9 +743,16 @@ typedef struct
 #endif
 
 
+#ifdef HAVE_RSS
 /* ----------------------------------------------------- */
 /* RSS							 */
 /* ----------------------------------------------------- */
+
+#define RSS_START	0x0001	/* RSS為啟用狀態 */
+#define	RSS_UTF8	0x0002	/* RSS採用UTF8編碼，或其餘編碼 */
+#define RSS_TXT		0x0004	/* RSS需轉譯為txt格式，反之為html格式 */
+#define RSS_RESTRICT	0x0008	/* 隱藏此 RSS 內容 */
+#define RSS_RESTART	0x0010	/* 重送此 RSS 內容 */
 
 typedef struct
 {
@@ -760,11 +767,6 @@ typedef struct
   char modified[64];		/* feed->modified，即rss/atom最後更新時間 */
   char code_type[64];		/* 採用編碼名稱 */
 }   RSS;
-
-#define RSS_START	0x0001	/* RSS為啟用狀態 */
-#define	RSS_UTF8	0x0002	/* RSS採用UTF8編碼，或其餘編碼 */
-#define RSS_TXT		0x0004	/* RSS需轉譯為txt格式，反之為html格式 */
-#define RSS_RESTRICT	0x0008	/* 隱藏此 RSS 內容 */
-#define RSS_RESTART	0x0010	/* 重送此 RSS 內容 */
+#endif
 
 #endif				/* _STRUCT_H_ */

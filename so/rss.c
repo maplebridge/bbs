@@ -9,6 +9,9 @@
 
 #include "bbs.h"
 
+
+#ifdef HAVE_RSS
+
 extern XZ xz[];
 extern char xo_pool[];
 
@@ -22,6 +25,7 @@ static int rss_body();
 static int rss_head();
 static int rss_add();
 static rss_currchrono;
+
 
 static int IS_URL(url)
   char *url;
@@ -77,7 +81,7 @@ rss_item(num, rss)
   prints("\033[1;3%dm%s\033[m ", cal_day(rss->date) + 1, rss->date + 3);//6
   prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
   prints("%-12.12s ",rss->bookmark);					//13
-  prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",		//3*3=9
+  prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",	//3*3=9
 			(rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
 			(rss->xmode & RSS_START) ? "◆"    : "◇");
   prints("%-42.40s",rss->url);						//42
@@ -105,19 +109,21 @@ rss_item_bar(xo, mode)
   prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
   if ((rss->xmode & RSS_RESTRICT) && (!(bbstate & STAT_BOARD))  &&  (strcmp(rss->owner,cuser.userid)) )
   {
-    prints("%-70.70s","<<資料保密>>");
+    prints("%-*.*s", d_cols + 70, d_cols + 70, "<<資料保密>>");
     prints("%s",((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
-    return 0;
   }
-  prints("\033[1;3%dm%s\033[m", cal_day(rss->date) + 1, rss->date + 3);	//5
-  prints("%s ",mode ? UCBAR[UCBAR_RSS] : "");				//1
-  prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
-  prints("%-12.12s ",rss->bookmark);					//13
-  prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",		//3*3=9
+  else
+  {
+    prints("\033[1;3%dm%s\033[m", cal_day(rss->date) + 1, rss->date + 3);	//5
+    prints("%s ",mode ? UCBAR[UCBAR_RSS] : "");				//1
+    prints("%s",(rss->xmode & RSS_RESTART) ? "\033[1;33m" : "");
+    prints("%-12.12s ",rss->bookmark);					//13
+    prints("%s %s %s ", (rss->xmode & RSS_UTF8)  ? "Ｕ"    : "※",		//3*3=9
 			    (rss->xmode & RSS_TXT)   ? "Ｔ"    : "Ｈ",
 			    (rss->xmode & RSS_START) ? "◆"    : "◇");
-  prints("%-*.*s", d_cols + 42, d_cols + 41, rss->url);			//42
-  prints("%s", ((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
+    prints("%-*.*s", d_cols + 42, d_cols + 41, rss->url);			//42
+    prints("%s", ((rss->xmode & RSS_RESTART) || mode) ? "\033[m" : "");
+  }
 
   move(xo->pos - xo->top + 3, 0);
   return XO_NONE;
@@ -797,3 +803,4 @@ int rss_main()
   free(xo);
   return 0;
 }
+#endif	/* HAVE_RSS */

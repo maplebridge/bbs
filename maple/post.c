@@ -653,7 +653,7 @@ do_post(xo, title)
   /* Thor.981105: 進入前需設好 curredit 及 quote_file */
   HDR hdr;
   char fpath[64], *folder, *nick, *rcpt;
-  int mode;
+  int mode, value;
   time_t spendtime;
 
   if (!(bbstate & STAT_POST))
@@ -787,6 +787,16 @@ do_post(xo, title)
 
   spendtime = time(0) - spendtime;	/* itoc.010712: 總共花的時間(秒數) */
 
+  if (currbattr & BRD_NOCOUNT || wordsnum < 30)
+  {				/* itoc.010408: 以此減少灌水現象 */
+    value = 0;
+  }
+  else
+  {
+    /* itoc.010408: 依文章長度/所費時間來決定要給多少錢；幣制才會有意義 */
+    value = BMIN(wordsnum, spendtime) / 10;	/* 每十字/秒 一元 */
+  }
+
   /* build filename */
 
   folder = xo->dir;
@@ -800,6 +810,7 @@ do_post(xo, title)
   {
     rcpt = anonymousid;	/* itoc.010717: 自定匿名 ID */
     nick = STR_ANONYMOUS;
+    value = cuser.userno;
 
     /* Thor.980727: lkchu patch: log anonymous post */
     /* Thor.980909: gc patch: log anonymous post filename */
@@ -823,6 +834,7 @@ do_post(xo, title)
 #endif
 
   hdr.xmode = mode;
+  sprintf(hdr.value, "%d", value);
   strcpy(hdr.owner, rcpt);
   strcpy(hdr.nick, nick);
   strcpy(hdr.title, title);
@@ -875,16 +887,14 @@ do_post(xo, title)
   clear();
   outs("順利貼出文章，");
 
-  if (currbattr & BRD_NOCOUNT || wordsnum < 30)
+  if ((currbattr & BRD_NOCOUNT) || (curredit & EDIT_ANONYMOUS) || (wordsnum < 30))
   {				/* itoc.010408: 以此減少灌水現象 */
     outs("文章不列入紀錄，敬請包涵。");
   }
   else
   {
-    /* itoc.010408: 依文章長度/所費時間來決定要給多少錢；幣制才會有意義 */
-    mode = BMIN(wordsnum, spendtime) / 10;	/* 每十字/秒 一元 */
-    prints("這是您的第 %d 篇文章，得 %d 銀。", ++cuser.numposts, mode);
-    addmoney(mode);
+    prints("這是您的第 %d 篇文章，得 %d 銀。", ++cuser.numposts, value);
+    addmoney(value);
   }
 
   /* 回應到原作者信箱 */
@@ -1593,11 +1603,11 @@ post_item(num, hdr)
     if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
     {
       num = hdr->score;
-      if ((num==0) && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
+      if (!num && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
 	outs("  ");
       else if (num <= 99 && num >= -99)
-	prints("\033[%c;3%cm%2d\033[m",
-	  num == 0 ? '0' : '1', num > 0 ? '1' : num < 0 ? '2' : '7' , abs(num));
+	prints("\033[1;3%cm%2d\033[m",
+	  num > 0 ? '1' : num < 0 ? '2' : '0', abs(num));
       else
 	prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
    }
@@ -1660,7 +1670,7 @@ post_item_bar(xo, mode)
     {
       //num = hdr->score;
       num = hdr->score;
-      if ((num == 0) && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
+      if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
 	outs("  ");
       else if (num <= 99 && num >= -99)
 	prints("%s\033[1;3%cm%s%2d\033[m%s",
@@ -1704,7 +1714,7 @@ post_item_bar(xo, mode)
     }
   }
   else
-    prints("%s%10s",mode ? UCBAR[UCBAR_POST] : "",hdr->xname);
+    prints("%s%10s", mode ? UCBAR[UCBAR_POST] : "", hdr->xname);
 
   if (mode)
     hdr_outs_bar(hdr, d_cols + 47);
@@ -4063,14 +4073,6 @@ post_addMF(xo)
 
 
 static int
-post_oldbm(xo)
-  XO *xo;
-{
-  return vmsg("此功\能已整合至 i / B 了哦！");
-}
-
-
-static int
 post_viewpal()
 {
   XO *xt;
@@ -4164,7 +4166,10 @@ post_show_dog(fname)
 }
 
 
+#ifdef HAVE_RSS
 static int post_rss();
+#endif
+
 
 static int
 post_ishowbm(xo)
@@ -4247,9 +4252,17 @@ post_ishowbm(xo)
 
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %sk%s - 板友特別名單\n"
-	" %sp%s - 文章類別     %ss%s - 擋信列表     %sg%s - BBS 看門狗     %sr%s - RSS 設定\n",
+	" %sp%s - 文章類別     %ss%s - 擋信列表     %sg%s - BBS 看門狗"
+#ifdef HAVE_RSS
+	"     %sr%s - RSS 設定"
+#endif
+	"\n",
 	mark, "\033[m", mark, "\033[m", mark, "\033[m",
-	mark, "\033[m", mark, "\033[m", mark, "\033[m", mark, "\033[m");
+	mark, "\033[m", mark, "\033[m", mark, "\033[m"
+#ifdef HAVE_RSS
+	, mark, "\033[m"
+#endif
+	);
     }
 
     move(b_lines - 5, 0);
@@ -4257,11 +4270,13 @@ post_ishowbm(xo)
       "\033[;37;44m[觀看看板設定]\033[;1;30m ===============================\033[m\n\n");
     prints(" %s1%s - 發文限制  %s2%s - 讀取限制  %s3%s - 顯示限制  ",
       "\033[1;36m", "\033[m", "\033[1;36m", "\033[m", "\033[1;36m", "\033[m");
-    if (isbm)
-      prints("%s4%s - 板友名單 ", "\033[1;36m", "\033[m");
-    else
+#ifdef HAVE_RSS
+    if (!isbm)
       prints("%s4%s - RSS 設定  %s", "\033[1;36m", "\033[m",
 	!(currbattr & BRD_SHOWPAL) ? "\033[1;36m5\033[m - 板友名單" : "");
+    else
+#endif
+      prints("%s4%s - 板友名單 ", "\033[1;36m", "\033[m");
 
     move(b_lines, 0);
     prints(COLOR1 " ◆ %-*s " COLOR2 " [或按其餘任意鍵離開] \033[m", 51 + d_cols, "請輸入上方各提示操作按鍵");
@@ -4295,10 +4310,12 @@ post_ishowbm(xo)
     case '3':
       post_show_dog(FN_NO_LIST);
       break;
+#ifdef HAVE_RSS
     case '4':
     case 'r':
       reload = post_rss(xo);
       break;
+#endif
     case '5':
       reload = post_viewpal() ? 1 : reload;
       break;
@@ -4426,6 +4443,141 @@ post_state(xo)
 
 
 static int
+post_jxname(xo)	/* jump to xname */
+  XO *xo;
+{
+  HDR *head;
+  char xname[32], *px, *pb, *ptr;
+  char folder[64], *fimage;
+  int i, fsize, max;
+  int bno = -1;
+  static int j_status = 0;
+
+  if (j_status)
+    return XO_NONE;
+
+  if (!vget(b_lines, 0, "檔案名稱：", px = xname, 12 + BNLEN + 1, DOECHO))
+    return XO_FOOT;
+
+  if (xname[0] == '#')
+    px++;
+
+  if (pb = strchr(px + 8, '@'))
+  {
+    *pb++ = '\0';
+    while (*pb == ' ')
+      pb++;
+    if (!*pb)	/* 防止只輸入 @ */
+      pb = NULL;
+    else if (ptr = strchr(pb, ' '))
+      *ptr = '\0';
+  }
+
+  if (pb && strcmp(pb, currboard))
+  {
+    if (((bno = brd_bno(pb)) >= 0) && (brd_bits[bno] & BRD_R_BIT))
+      brd_fpath(folder, pb, FN_DIR);
+    else	/* 沒有權限進入 或 錯誤的看板名稱 */
+      return XO_FOOT;
+  }
+  else	/* 直接找現在所處的看板 */
+    brd_fpath(folder, currboard, FN_DIR);
+
+  if (ptr = strchr(px, ' '))
+    *ptr = '\0';
+
+  fimage = f_map(folder, &fsize);
+  max = fsize / sizeof(HDR);
+  if (fimage == (char *) -1)
+  {
+    vmsg("目前無法開啟索引檔");
+    return XO_BODY;
+  }
+
+  head = (HDR *) fimage;
+  for (i = 0; i < max; i++, head++)
+  {
+    if (!strcmp(head->xname, px))
+    {
+      munmap(fimage, fsize);
+      if (bno >= 0)
+      {
+	int tmpbno = currbno;
+	int tmppos = xo->pos;
+	XoPost(bno);
+	xz[XZ_POST - XO_ZONE].xo->pos = i;
+	j_status++;
+	xover(XZ_POST);
+	j_status--;
+	XoPost(tmpbno);
+	xo = xz[XZ_POST - XO_ZONE].xo;
+	xo->pos = tmppos;
+	return XO_INIT;
+      }
+      else
+      {
+	xo->pos = i;
+	return XO_LOAD;
+      }
+    }
+  }
+  munmap(fimage, fsize);
+
+  vmsg("無此檔案");
+  return XO_FOOT;
+}
+
+
+static int
+post_info(xo)
+  XO *xo;
+{
+  if (!HAS_PERM(PERM_ATOM))
+    return XO_NONE;
+
+  HDR *hdr;
+  ACCT acct;
+  UTMP *ui;
+  int value;
+
+  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
+  value = atoi(hdr->value);
+
+  move(b_lines - 4, 0);
+  clrtobot();
+
+  prints("==============================================================================\n");
+  prints("檔案名稱：#%s @ %-*s", hdr->xname, BNLEN + 1, currboard);
+  prints("作者：%-19.18s\n", hdr->owner);
+#ifdef HAVE_REFUSEMARK
+  if (!chkrestrict(hdr))
+    prints("          %s\n", "<< 文章保密 >>");
+  else
+#endif
+  {
+    prints("文章標題：%s\n", hdr->title);
+    if (acct_load(&acct, hdr->owner) >= 0)
+      prints("文章價值：%d 銀", value);
+    else if (value)	/* 找不到使用者但又有文章價值的，就表示為匿名文的 userno */
+    {
+      if (ui = (UTMP *) utmp_find(cuser.userno))
+	prints("匿名管理編號：%d", value + ui->pid);
+    }
+    else
+      prints("本篇為舊格式文章");
+
+    if (hdr->xmode & POST_NOFORWARD)
+      prints("，文章禁止轉錄");
+    if (hdr->xmode & POST_NOSCORE)
+      prints("，文章禁止推文");
+  }
+
+  vmsg(NULL);
+  return post_body(xo);
+}
+
+
+static int
 post_filename(xo)	/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
   XO *xo;
 {
@@ -4435,12 +4587,30 @@ post_filename(xo)	/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
 }
 
 
+#ifdef HAVE_RSS
 static int
 post_rss()
 {
   more("gem/@/@rss.info", NULL);
   DL_func("bin/rss.so:rss_main");
   return 1;
+}
+#endif
+
+
+static int
+post_oldbm(xo)
+  XO *xo;
+{
+  return vmsg("此功\能已整合至 i / B 了哦！");
+}
+
+
+static int
+post_oldsibala(xo)
+  XO *xo;
+{
+  return vmsg("此功\能已整合至 Ctrl + G 了哦！");
 }
 
 
@@ -4526,9 +4696,9 @@ KeyFunc post_cb[] =
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
   Ctrl('S'), post_state,
+  'p', post_info,
 
   'S', post_oldbm,
-  Ctrl('G'), post_oldbm,
   Ctrl('B'), post_oldbm,
 
   Ctrl('F'), post_addMF,
@@ -4536,7 +4706,8 @@ KeyFunc post_cb[] =
   'B', post_ishowbm,
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",
   'V' | XO_DL, (void *) "bin/vote.so:XoVote",
-  'G' | XO_DL, (void *) "bin/xyz.so:post_sibala",
+  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala",
+  'G', post_oldsibala,
 
 #ifdef HAVE_TERMINATOR
   Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
@@ -4612,6 +4783,8 @@ KeyFunc xpost_cb[] =
   Ctrl('D'), post_prune,
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
+  Ctrl('S'), post_state,
+  'p', post_info,
 
   'h', post_help		/* itoc.030511: 共用即可 */
 };
