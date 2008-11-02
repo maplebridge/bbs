@@ -287,6 +287,8 @@ COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"
 #define TOKEN_FRIEND_BRD	'.'			/* 好友板 */
 #define TOKEN_SECRET_BRD	')'			/* 秘密板 */
 
+#define GOODBYE_MSG		"G)隨風而逝 M)報告站長 N)留言板 Q)取消？[Q] "
+
 #ifdef SITE_LEXEL
 #include "lexel.h"
 #endif

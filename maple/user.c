@@ -978,6 +978,26 @@ u_setup()
 
 
 int
+u_setup2()
+{
+  usint ulevel;
+  int len;
+
+  /* itoc.000320: 增減項目要更改 len 大小, 也別忘了改 ufo.h 的旗標 STR_UFO */
+
+  ulevel = cuser.userlevel;
+  if (!ulevel)
+    len = NUMUFOS2_GUEST;
+  else
+    len = NUMUFOS2_USER;
+
+  cuser.ufo2 = cutmp->ufo2 = bitset(cuser.ufo2, len, len, MSG_USERUFO, ufo_tbl2);
+
+  return 0;
+}
+
+
+int
 u_usr_show_set()
 {
   FILE *fp;

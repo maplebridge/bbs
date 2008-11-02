@@ -212,6 +212,7 @@ int u_verify(void);
 int u_deny(void);
 int u_info(void);
 int u_setup(void);
+int u_setup2(void);
 int u_usr_show_set(void);
 #ifdef HAVE_MULTI_SIGN
 int u_sign_set(void);

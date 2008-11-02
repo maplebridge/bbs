@@ -400,6 +400,7 @@ acct_apply()
 
   cuser.userlevel = PERM_DEFAULT;
   cuser.ufo = UFO_DEFAULT_NEW;
+  cuser.ufo2 = UFO2_DEFAULT_NEW;
   cuser.numlogins = 1;
   cuser.tvalid = ap_start;		/* itoc.030724: 拿上站時間當第一次認證碼的 seed */
   sprintf(cuser.email, "%s.bbs@%s", cuser.userid, str_host);	/* itoc.010902: 預設 email */
@@ -555,6 +556,7 @@ utmp_setup(mode)
   utmp.in_addr = (addr[0] << 24) + (addr[1] << 16) + (addr[2] << 8) + addr[3];
   utmp.userlevel = cuser.userlevel;	/* itoc.010309: 把 userlevel 也放入 cache */
   utmp.ufo = cuser.ufo;
+  utmp.ufo2 = cuser.ufo2;
   utmp.status = 0;
 
   strcpy(utmp.userid, cuser.userid);
@@ -833,6 +835,7 @@ login_user(content)
       logattempt(' ', content);
       cuser.userlevel = 0;	/* Thor.981207: 怕人亂玩, 強制寫回cuser.userlevel */
       cuser.ufo = UFO_DEFAULT_GUEST;
+      cuser.ufo2= UFO2_DEFAULT_GUEST;
       break;	/* Thor.980917: 註解: cuser ok! */
     }
   }

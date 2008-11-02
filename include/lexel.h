@@ -39,6 +39,7 @@
 #undef ICON_VOTED_BRD
 #undef ICON_NOTRAN_BRD
 #undef ICON_TRAN_BRD
+#undef GOODBYE_MSG
 
 
 /* ----------------------------------------------------- */
@@ -135,5 +136,7 @@
 #define ICON_VOTED_BRD		"！"	/* 舉行投票中的看板 */
 #define ICON_NOTRAN_BRD		"☆"			/* 不轉信板 */
 #define ICON_TRAN_BRD		"★"			/* 轉信板 */
+#define GOODBYE_MSG		"確定不上來客所了嗎 >///< ？[N] "
+
 
 #endif	/* SITE_LEXEL */

@@ -175,7 +175,7 @@ goodbye()
   clear();
   film_out(FILM_GOODBYE, 0);
 
-  switch (vans("G)隨風而逝 M)報告站長 N)留言板 Q)取消？[Q] "))
+  switch (vans(GOODBYE_MSG))
   {
   /* lkchu.990428: 內定改為不離站 */
   case 'g':
@@ -211,22 +211,12 @@ goodbye()
       cuser.userid, cuser.username, str_site);
     acct_show(&cuser, 0);
     vmsg(NULL);
-	/* smiler.080201: 離站倒數 */
-//    int i=3;
-//    char buf[100];
-//    while(i)
-//    {
-//        sprintf(buf,"資料將於 %d 秒後自動銷毀..",i);
-//        delay_msg(buf,5);
-//        i--;
-//    }
-    clear();
-//    delay_msg("Bye Bye!!",9);
   }
 
   u_exit("EXIT ");
-  clear();    //
-  refresh(); //080515
+  move (0, 0);
+  clrtobot();
+  refresh();
   exit(0);
 }
 

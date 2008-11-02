@@ -4256,12 +4256,18 @@ post_ishowbm(xo)
 
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %sk%s - 板友特別名單\n"
-	" %sp%s - 文章類別     %ss%s - 擋信列表     %sg%s - BBS 看門狗"
+#ifdef POST_PREFIX
+	" %sp%s - 文章類別     "
+#endif
+	"%ss%s - 擋信列表     %sg%s - BBS 看門狗"
 #ifdef HAVE_RSS
 	"     %sr%s - RSS 設定"
 #endif
 	"\n",
-	mark, "\033[m", mark, "\033[m", mark, "\033[m",
+#ifdef POST_PREFIX
+	mark, "\033[m", 
+#endif
+	mark, "\033[m", mark, "\033[m",
 	mark, "\033[m", mark, "\033[m", mark, "\033[m"
 #ifdef HAVE_RSS
 	, mark, "\033[m"
@@ -4368,9 +4374,11 @@ post_ishowbm(xo)
     case 'k':
       reload = XoBM_add_pal() ? 1 : reload;
       break;
+#ifdef POST_PREFIX
     case 'p':
       DL_func("bin/manage.so:post_brd_prefix");
       break;
+#endif
     case 's':
       DL_func("bin/manage.so:post_spam_edit");
       break;
@@ -4541,8 +4549,8 @@ post_info(xo)
 
   HDR *hdr;
   ACCT acct;
-  UTMP *ui;
   int value;
+  static int upid = -1;
 
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
   value = atoi(hdr->value);
@@ -4561,8 +4569,14 @@ post_info(xo)
       prints("文章價值：%d 銀", value);
     else if (value)	/* 找不到使用者但又有文章價值的，就表示為匿名文的 userno */
     {
-      if (ui = (UTMP *) utmp_find(cuser.userno))
-	prints("匿名管理編號：%d", value + ui->pid);
+      if (upid <= 0)
+      {
+	UTMP *ui;
+	if (ui = (UTMP *) utmp_find(cuser.userno))
+	  upid = ui->pid;
+      }
+      else
+	prints("匿名管理編號：%d", value + upid);
     }
     else
       prints("本篇為舊格式文章");
@@ -4700,6 +4714,7 @@ KeyFunc post_cb[] =
   Ctrl('O'), xo_usetup,
   Ctrl('S'), post_state,
   'p', post_info,
+  '#', post_jxname,
 
   'S', post_oldbm,
   Ctrl('B'), post_oldbm,

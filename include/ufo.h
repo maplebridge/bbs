@@ -62,10 +62,19 @@
 #define UFO_NOUSE30	BFLAG(30)
 #define UFO_NOUSE31	BFLAG(31)
 
+/* --------------------------------------------------------------------------- */
+
+#define UFO2_LOGOUTY	BFLAG(0)	/* bossliaw.081019: LEXEL-預設離線 */
+#define UFO2_CMODE	BFLAG(1)	/* bossliaw.081019: LEXEL-自訂/隱藏動態 */
+#define UFO2_CFROM	BFLAG(2)	/* bossliaw.081019: LEXEL-自訂/隱藏故鄉 */11
+
 /* 新註冊帳號、guest 的預設 ufo */
 
 #define UFO_DEFAULT_NEW		(UFO_BRDNOTE | UFO_MOVIE | UFO_LIGHTBAR)
 #define UFO_DEFAULT_GUEST	(UFO_MOVIE | UFO_BRDNOTE | UFO_QUIET | UFO_NOALOHA | UFO_NOSIGN | UFO_LIGHTBAR)
+
+#define UFO2_DEFAULT_NEW	0
+#define UFO2_DEFAULT_GUEST	0
 
 
 /* ----------------------------------------------------- */
@@ -107,6 +116,7 @@
 
 #define NUM_USR_SHOW	12
 
+
 /* ----------------------------------------------------- */
 /* 各種習慣的中文意義					 */
 /* ----------------------------------------------------- */
@@ -118,7 +128,13 @@
 #define NUMUFOS_GUEST	5	/* guest 可以用前 5 個 ufo */
 #define NUMUFOS_USER	22	/* 一般使用者 可以用前 22 個 ufo */
 
-#define STR_UFO		"-mpsnefPBQFAN---SHZJ-L--CHA"		/* itoc: 新增習慣的時候別忘了改這裡啊 */
+#define STR_UFO		"-mpsnefPBQFAN---SHZJ-L--CHA-----"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
+
+#define NUMUFOS2	3
+#define NUMUFOS2_GUEST	1	/* guest 可以用前 1 個 ufo */
+#define NUMUFOS2_USER	3	/* 一般使用者 可以用前 3 個 ufo */
+
+#define STR_UFO2	"YMF-----------------------------"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -201,6 +217,14 @@ char *ufo_tbl[NUMUFOS] =
   "站長上站來源    (限制/任意)"	/* UFO_ACL */
 };
 
+
+char *ufo_tbl2[NUMUFOS2] =
+{
+  "離站預設[Y]",			/* UFO2_LOGOUTY */
+
+  "自訂/隱藏動態",			/* UFO2_CMODE */
+  "自訂/隱藏故鄉"			/* UFO2_CFROM */
+};
 
 
 /* ----------------------------------------------------- */

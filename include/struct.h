@@ -96,8 +96,8 @@ typedef struct
   int good_article;		/* 優文 */
   int poor_article;		/* 劣文 */
   int violation;		/* 違規記錄 */
+  usint ufo2;
   int reserved_1;
-  int reserved_2;
   char cmode[11];		/* 自訂動態 */
   char reserved[245];		/* 保留 */
 }      ACCT;
@@ -316,6 +316,7 @@ struct UTMP
   int mode;			/* bbsmode */
   usint userlevel;		/* the save as ACCT.userlevel */
   usint ufo;			/* the same as ACCT.ufo */
+  usint ufo2;			/* the same as ACCT.ufo2 */
   usint status;			/* status */
 
   time4_t idle_time;		/* active time for last event */

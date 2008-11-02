@@ -266,7 +266,7 @@ adm_log(old, new)
     alog("異動錢幣", buf);
   }
 
-  if ((old->ufo != new->ufo))
+  if ((old->ufo != new->ufo) || (old->ufo2 != new->ufo2))
   {
     alog("異動習慣", userid);
   }
@@ -364,6 +364,7 @@ acct_show(u, adm)
     prints("  \033[32m上站地點：\033[37m%-35s\033[32m發信次數：\033[37m%d\n", u->lasthost, u->numemails);
     bitmsg("  \033[32m權限等級：\033[37m", STR_PERM, ulevel);
     bitmsg("  \033[32m習慣旗標：\033[37m", STR_UFO, u->ufo);
+    bitmsg("  \033[32m進階旗標：\033[37m", STR_UFO, u->ufo2);
   }
   else
   {
@@ -653,6 +654,9 @@ acct_setup(u, adm)
 
     if (vans("設定習慣(Y/N)？[N] ") == 'y')
       x.ufo = bitset(x.ufo, NUMUFOS, NUMUFOS, MSG_USERUFO, ufo_tbl);
+
+    if (vans("設定進階習慣(Y/N)？[N] ") == 'y')
+      x.ufo = bitset(x.ufo2, NUMUFOS2, NUMUFOS2, MSG_USERUFO, ufo_tbl2);
 
     if (vans("設定權限(Y/N)？[N] ") == 'y')
     {
