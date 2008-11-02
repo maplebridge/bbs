@@ -29,6 +29,7 @@
 #define SCHOOLNAME	"清大資工"		/* 組織名稱 */
 #define BBSNAME		"楓橋驛站"		/* 中文站名 */
 #define BBSNAME2	"MapleBBS"		/* 英文站名 */
+#define BBSNAME3	"楓橋"			/* 短站名 */
 #define SYSOPNICK	"大家的好幫手"		/* sysop 的暱稱 */
 #define TAG_VALID	"["BBSNAME2"]To"	/* 身分認證函 token */
 
@@ -47,6 +48,9 @@
 
 #define BBSUID		10000
 #define BBSGID		100			/* Linux 請設為 999 */
+
+
+#undef SITE_LEXEL
 
 
 /* ----------------------------------------------------- */
@@ -247,6 +251,8 @@
 #undef	OVERDUE_MAILDEL		/* itoc.020217: 清除過期信件 */
 
 #define	LOG_BRD_USIES		/* 統計每日熱門看板 */
+
+#undef MENU_FEAST		/* 選單狀態列額外顯示節日 */
 
   /* ------------------------------------------------- */
   /* 組態規劃˙外掛程式                                */

@@ -1249,6 +1249,7 @@ int
 post_guard_dog()
 {
   char fpath[64];
+#ifdef POPUP_ANSWER
   char *menu[] =
   {
     "BQ",
@@ -1260,12 +1261,19 @@ post_guard_dog()
     "Vlog    擋文log記錄",
     NULL
   };
+#else
+  char *menu = "◎ (B)看門狗計畫  限制(P)文章內容 (W)發文 (R)閱\讀 (L)列出 (V)擋文記錄？[Q] ";
+#endif
 
   sprintf(fpath, BBSHOME"/gem/@/@BBS_DOG_WARN");
   more(fpath, NULL);
 
   clear();
+#ifdef POPUP_ANSWER
   switch (pans(3, 20, "BBS 看門狗", menu))
+#else
+  switch (vans(menu))
+#endif
   {
   case 'b':
     return post_bbs_dog();

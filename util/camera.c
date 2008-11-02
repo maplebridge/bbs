@@ -301,7 +301,11 @@ do_today()
   lunar_calendar(key3, &now, ptime);
 
   today = image.today;
+#ifdef MENU_FEAST
+  sprintf(today, "%s 週%.2s", key1, "日一二三四五六" + (ptime->tm_wday << 1));
+#else
   sprintf(today, "%s %.2s", key1, "日一二三四五六" + (ptime->tm_wday << 1));
+#endif
 
   if (fp = fopen(FN_ETC_FEAST, "r"))
   {
@@ -314,7 +318,11 @@ do_today()
       {
 	if (!strcmp(ptr1, key1) || !strcmp(ptr1, key2) || !strcmp(ptr1, key3))
 	{
+#ifdef MENU_FEAST
+	  str_ncpy(image.feast, ptr2, sizeof(image.feast));
+#else
 	  str_ncpy(today, ptr2, sizeof(image.today));
+#endif
 
 	  if (ptr3 = strtok(NULL, " \t\n"))
 	    sprintf(feast, "gem/@/@%s", ptr3);  //smiler.070925
@@ -323,6 +331,10 @@ do_today()
 
 	  break;
 	}
+#ifdef MENU_FEAST
+	else
+	  str_ncpy(image.feast, "本日無節日", sizeof(image.feast));
+#endif
       }
     }
     fclose(fp);

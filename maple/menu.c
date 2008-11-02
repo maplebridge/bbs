@@ -128,7 +128,7 @@ pad_draw()
     str[cc++] = ' ';
 
   sprintf(str + cc,
-    "\033[1;44m %s \033[m╮\n"
+    COLOR_SITE " %s \033[m╮\n"
     "│  \033[1;%dm%-70s\033[m  │\n"
     "│  \033[1;%dm%-70s\033[m  │\n"
     "╰  \033[1;%dm%-70s\033[m  ╯\n",
@@ -243,7 +243,7 @@ vs_head(title, mid)
   char buf[40], ttl[60];
   int spc, len;
 
-  int broken=0;
+  int broken = 0;
 
   if (mid)	/* xxxx_head() 都是用 vs_head(title, str_site); */
   {
@@ -271,7 +271,7 @@ vs_head(title, mid)
       memcpy(ttl, mid, spc);
       mid = ttl;
       mid[spc] = '\0';
-      broken=1;
+      broken = 1;
     }
   }
 
@@ -287,12 +287,12 @@ vs_head(title, mid)
 #else
   if(!broken)
   {
-  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m%s看板《%s》\033[m\n",
-    title, buf, mid, buf + len+4, currboard);
+    prints(COLOR_SITE "【%s】%s\033[33m%s" COLOR_SITE "%s看板《%s》\033[m\n",
+      title, buf, mid, buf + len+4, currboard);
   }
   else
   {
-  prints("\033[1;37;44m【%s】%s\033[33m%s\033[1;37;44m看板《%s》\033[m\n",
+    prints(COLOR_SITE "【%s】%s\033[33m%s" COLOR_SITE "看板《%s》\033[m\n",
     title, buf, mid, currboard);
   }
 
@@ -337,14 +337,14 @@ status_foot()
   if (orig_flag != ufo)
   {
     orig_flag = ufo;
+#ifndef MENU_FEAST
     sprintf(flagmsg,
       "%s%s%s%s",
       (ufo & UFO_PAGER) ? "\033[m\033[30;41m7\033[m" : COLOR2" ",     //7
       (ufo & UFO_QUIET) ? "\033[m\033[30;42m9\033[m" : COLOR2" ",     //9
       (ufo & UFO_ALOHA) ? "\033[m\033[30;43mB\033[m" : COLOR2" ",     //B
       (ufo & UFO_CLOAK) ? "\033[m\033[30;45mO\033[m" : COLOR2" ");    //O
-#if 0
-    orig_flag = ufo;
+#else
     sprintf(flagmsg,
       "%s%s%s%s",
       (ufo & UFO_PAGER) ? "關" : "開",     //7
@@ -358,15 +358,15 @@ status_foot()
   if (orig_flag != ufo)
   {
     orig_flag = ufo;
+#ifndef MENU_FEAST
     sprintf(flagmsg,
       "%s%s%s  ",
       (ufo & UFO_PAGER) ? "\033[m\033[30;41m7" : COLOR2" ",     //7
       (ufo & UFO_QUIET) ? "\033[m\033[30;43mB" : COLOR2" ",     //B
       (ufo & UFO_CLOAK) ? "\033[m\033[30;45mO" : COLOR2" ");    //O
-#if 0
-    orig_flag = ufo;
+#else
     sprintf(flagmsg,
-      "%s%s%s  ",
+      "%s%s%s",
       (ufo & UFO_PAGER) ? "關" : "開",   //7
       (ufo & UFO_QUIET) ? "靜" : "  ",   //B
       (ufo & UFO_CLOAK) ? "隱" : "  ");  //O
@@ -391,17 +391,18 @@ status_foot()
   if (cuser.money != orig_money)
   {
     orig_money = cuser.money;
-    sprintf(coinmsg, "銀%4d%c",
-       (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
+    /* ryanlei.081018: 把銀幣也配COLOR11控制碼，故修改coinmsg的index */
+    sprintf(coinmsg, "銀" COLOR11 "%4d%c",
+      (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
       (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
-    coinmsg[7] = ' ';
+    coinmsg[7 + strlen(COLOR11)] = ' ';
   }
 
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg + 8, "金"COLOR11"%4d%c "COLOR2,
+    sprintf(coinmsg + 8 + strlen(COLOR11), COLOR2 "金" COLOR11 "%4d%c " COLOR2,
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
       (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
@@ -413,10 +414,17 @@ status_foot()
   ufo = (now - (uptime - 86400)) / 60;	/* 借用 ufo 來做時間(分) */
 
   /* itoc.010717: 改一下 feeter 使長度和 FEETER_XXX 一致 */
-//  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2 " 人數 %-4d 我是 %-12s %s [呼叫]%-9s  ",
-//    fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
-  sprintf(feeter, COLOR1 " %8.8s %02d:%02d " COLOR2 " 人數 "COLOR11"%-4d"COLOR2" 我是"COLOR11"%-12s"COLOR2" %s[呼叫]%-4s\033[m" COLOR2 " " COLOR8 "(h)說明",
+#ifndef MENU_FEAST
+  sprintf(feeter, COLOR1 " %8.8s %02d:%02d "
+    COLOR2 " 人數 " COLOR11 "%-4d" COLOR2 " 我是" COLOR11 "%-12s"
+    COLOR2 "%s[呼叫]%-4s\033[m" COLOR2 " " COLOR8 "(h)說明",
     fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
+#else
+  sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
+    COLOR2 " [訪 客] " COLOR11 "%d" COLOR2 " 人 [到此一遊] " COLOR11 "%-12s"
+    COLOR2 "[呼叫]" COLOR11 "%6.6s\033[m" COLOR2 " ",
+    fshm->today, ufo / 60, ufo % 60, fshm->feast, total_user, cuser.userid, flagmsg);
+#endif
   outf(feeter);
 }
 
@@ -1117,7 +1125,7 @@ static MENU menu_main[] =
 #endif
 
   goodbye, 0, M_XMODE,
-  "Goodbye   再別楓橋，輕輕的我走了",
+  "Goodbye   再別" BBSNAME3 "，輕輕的我走了",
 
   NULL, PERM_MENU + 'B', M_0MENU,
   "主功\能表"
@@ -1298,46 +1306,46 @@ menu()
 
 #endif
 
-	case Ctrl('B'):           //看板列表
-	  utmp_mode(M_BOARD);
-	  Boards();
-	  goto every_key;
+    case Ctrl('B'):		/* 看板列表 */
+      utmp_mode(M_BOARD);
+      Boards();
+      goto every_key;
 
-	case Ctrl('C'):           //聊天室
-	  if(cuser.userlevel)
-	  {
-	    utmp_mode(- M_CHAT);
-	    DL_func("bin/chat.so:t_chat");
-	  }
-	  goto every_key;
+    case Ctrl('C'):		/* 聊天室 */
+      if (cuser.userlevel)
+      {
+	utmp_mode(- M_CHAT);
+	DL_func("bin/chat.so:t_chat");
+      }
+      goto every_key;
 
 #ifdef MY_FAVORITE
     /* itoc.010911: Favorite everywhere，不再限制是在 M_0MENU */
     case Ctrl('F'):
       if (cuser.userlevel)	/* itoc.010407: 要檢查權限 */
       {
-	    utmp_mode(M_MF);
-	    MyFavorite();
+	utmp_mode(M_MF);
+	MyFavorite();
       }
       goto every_key;
 #endif
 
-	case Ctrl('I'):           //閱讀信件
-	  if(cuser.userlevel)
-	  {
-	    utmp_mode(M_RMAIL);
-	    XoMbox();
-	  }
-	  goto every_key;
+    case Ctrl('I'):		/* 閱讀信件 */
+      if (cuser.userlevel)
+      {
+	utmp_mode(M_RMAIL);
+	XoMbox();
+      }
+      goto every_key;
 
 #ifdef HAVE_BITLBEE
-	case Ctrl('N'):           //MSN
-	  if(cuser.userlevel)
-	  {
-	    utmp_mode(M_LUSERS);
-	    bit_main();
-	  }
-	  goto every_key;
+    case Ctrl('N'):		/* MSN */
+      if (cuser.userlevel)
+      {
+	utmp_mode(M_LUSERS);
+	bit_main();
+      }
+      goto every_key;
 #endif
 
     /* itoc.010911: Select everywhere，不再限制是在 M_0MENU */
@@ -1355,13 +1363,13 @@ menu()
       }
       goto default_key;	/* 若在 M_UMENU / M_XMENU 中按 s 的話，要視為一般按鍵 */
 
-    case Ctrl('T'):           //喜好模式
-	  utmp_mode(M_UFILES);
-	  u_setup();
-	  goto every_key;
+    case Ctrl('T'):		/*喜好模式 */
+      utmp_mode(M_UFILES);
+      u_setup();
+      goto every_key;
 
-	case 'h':                 /* smiler.080222: menu 的 help 選單 */
-	  xo_help("menu");
+    case 'h':			/* smiler.080222: menu 的 help 選單 */
+      xo_help("menu");
       goto every_key;
 
     /* itoc.020301: Read currboard in M_0MENU */

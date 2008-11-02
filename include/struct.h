@@ -93,12 +93,13 @@ typedef struct
 
   char lasthost[30];		/* 上次登入來源 */
   char email[56];		 /* 目前登記的電子信箱 */
-  int good_article;     /* 優文 */
-  int poor_article;     /* 劣文 */
-  int violation;        /* 違規記錄 */
+  int good_article;		/* 優文 */
+  int poor_article;		/* 劣文 */
+  int violation;		/* 違規記錄 */
   int reserved_1;
   int reserved_2;
-  char reserved[256];
+  char cmode[11];		/* 自訂動態 */
+  char reserved[245];		/* 保留 */
 }      ACCT;
 
 
@@ -328,6 +329,7 @@ struct UTMP
   char mateid[IDLEN + 1];	/* partner's ID */
   char username[UNLEN + 1];	/* user's nickname */
   char from[34];		/* remote host */
+  char cmode[11];
 #ifdef HAVE_BRDMATE
   char reading[BNLEN + 1];	/* reading board */
 #endif
@@ -482,6 +484,7 @@ typedef struct
   int shot[MOVIE_MAX];	/* Thor.980805: 合理範圍為 0..MOVIE_MAX - 1 */
   char film[MOVIE_SIZE];
   char today[16];
+  char feast[16];
 } FCACHE;
 
 

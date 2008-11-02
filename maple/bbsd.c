@@ -1030,7 +1030,7 @@ board_mail_to_user()	/* smiler.071111: 站務寄信給使用者 */
       usr_fpath(fpath_mail, cuser.userid, FN_DIR);
       if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
       {
-	strcpy(hdr.title, "楓橋站務寄給您的情書");
+	strcpy(hdr.title, BBSNAME3 "站務寄給您的情書");
 	strcpy(hdr.owner, STR_SYSOP);
 	hdr.xmode = 0;
 	rec_add(fpath_mail, &hdr, sizeof(HDR));

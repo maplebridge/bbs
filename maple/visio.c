@@ -1106,7 +1106,7 @@ vs_bar(title)
   char *title;
 {
   clear();
-  prints("\033[1;33;44m¡i %s ¡j\033[m\n", title);
+  prints("%s¡i %s ¡j\033[m\n", COLOR_SITE, title);
 }
 
 

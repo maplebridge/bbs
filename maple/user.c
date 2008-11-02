@@ -158,7 +158,7 @@ u_set_bar(bar)
   move(i = 1, 0);
   clrtobot();
   move(2, 0);
-  prints("\033[m楓橋設定 : %s測試\033[m\n", imaplecolor);
+  prints("\033[m" BBSNAME3 "設定 : %s測試\033[m\n", imaplecolor);
   prints("\033[m目前設定 : \033[m%s測試\033[m", orgcolor);
 
   switch (vget(5, 0, "◎ 選擇 E)進入設定 Q)取消 D)刪除個人設定使用預設值 [Q]" ,

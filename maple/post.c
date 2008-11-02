@@ -2944,6 +2944,7 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
     fhdr.xmode = xmode;
     currchrono = fhdr.chrono;
     rec_put(xo->dir, &fhdr, sizeof(HDR), xo->key == XZ_XPOST ? fhdr.xid : pos, cmpchrono);
+    btime_update(brd_bno(currboard));	/* 解決因無法閱讀鎖文而一直亮燈的狀況 */
     return XO_LOAD;
   }
 
@@ -3439,7 +3440,7 @@ post_edit(xo)
 #ifdef HAVE_REFUSEMARK
     //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
     if (!chkrestrict(hdr))
-      return XO_NONE;
+      return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
 
     /* smiler 1031 */
@@ -3558,7 +3559,7 @@ post_edit(xo)
     vedit(fpath, -1);
   }
 #else
-    return XO_NONE;
+    return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
 
   /* return post_head(xo); */

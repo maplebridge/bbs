@@ -27,6 +27,7 @@
 #define COLOR9		"\033[m\033[31;47m"	/* feeter 加強標註(紅/白) */
 #define COLOR10		"\033[34;47m"		/* neck 的顏色 */
 #define COLOR11		"\033[35;47m"		/* menu feeter 的顏色 */
+#define COLOR_SITE	"\033[1;37;44m"		/* ryanlei.081017: 站台主色 */
 
 
 /* ----------------------------------------------------- */
@@ -272,7 +273,7 @@ COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"
 /* 其他訊息字串						 */
 /* ----------------------------------------------------- */
 
-#define VMSG_NULL	"                           \033[1;33;46m ● 請按任意鍵繼續 ● \033[m"
+#define VMSG_NULL	"                           " COLOR1 " ● 請按任意鍵繼續 ● \033[m"
 
 #define ICON_UNREAD_BRD		"\033[1;33m˙\033[m"	/* 未讀看板 */
 #define ICON_READ_BRD		"  "			/* 已讀看板 */
@@ -285,5 +286,9 @@ COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"
 #define TOKEN_ZAP_BRD		'-'			/* zap 板 */
 #define TOKEN_FRIEND_BRD	'.'			/* 好友板 */
 #define TOKEN_SECRET_BRD	')'			/* 秘密板 */
+
+#ifdef SITE_LEXEL
+#include "lexel.h"
+#endif
 
 #endif				/* _THEME_H_ */
