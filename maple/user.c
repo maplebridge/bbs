@@ -11,6 +11,7 @@
 
 
 extern char *ufo_tbl[];
+extern char *ufo_tbl2[];
 extern char *usr_show_tbl[];
 
 

@@ -118,8 +118,8 @@ trans_acct(old, new)
   new->good_article = 0;
   new->poor_article = 0;
   new->violation = 0;
+  new->ufo2 = 0;
   new->reserved_1 = 0;
-  new->reserved_2 = 0;
 
   new->reserved[0] = '\0';
 }

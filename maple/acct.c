@@ -364,7 +364,7 @@ acct_show(u, adm)
     prints("  \033[32m上站地點：\033[37m%-35s\033[32m發信次數：\033[37m%d\n", u->lasthost, u->numemails);
     bitmsg("  \033[32m權限等級：\033[37m", STR_PERM, ulevel);
     bitmsg("  \033[32m習慣旗標：\033[37m", STR_UFO, u->ufo);
-    bitmsg("  \033[32m進階旗標：\033[37m", STR_UFO, u->ufo2);
+    bitmsg("  \033[32m進階旗標：\033[37m", STR_UFO2, u->ufo2);
   }
   else
   {
