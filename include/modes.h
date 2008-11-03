@@ -58,8 +58,9 @@
 #define M_QUERY		30
 #define M_IDLE		31	/* ← M_TALK(含) 與 M_IDLE(含) 間接 mateid */
 #define M_RSS		32
+#define M_MSN		33
 
-#define M_XMODE		33
+#define M_XMODE		34
 #define M_MAX           M_XMODE
 
 
@@ -107,6 +108,7 @@ static char *ModeTypeTable[] =
   "查詢",			/* M_QUERY */
   "發呆",			/* M_IDLE */
   "RSS 設定",			/* M_RSS */
+  "MSN 交談",			/* M_MSN */
 
   "其他"				/* M_XMODE */
 };

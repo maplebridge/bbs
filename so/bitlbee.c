@@ -5,7 +5,7 @@
 /* modify : smiler.bbs@bbs.cs.nthu.edu.tw		 */
 /* target : MSN on MapleBBS				 */
 /* create : 05/06/08					 */
-/* update : 08/02/18					 */
+/* update : 08/11/03					 */
 /*-------------------------------------------------------*/
 
 #include "bbs.h"
@@ -33,7 +33,7 @@ bit_fgets()
   char *tmp;
 
   fgets(buf, sizeof (buf), fr);
-  tmp = strstr(buf, "Logged out");
+  tmp = strstr(buf, "Error: Someone else logged in with your account");
 
   if (tmp)
   {
@@ -553,28 +553,36 @@ bit_start(account, pass)
 
       sleep (10);
 
-      /* 前面 login 有 9 行 configure, 略過 */
-      while (i < 13)
-      {
-	bit_fgets();
-	if (bit_sock <= 0)
-	  return 0;
-	i++;
-      }
 
-      /* root 再設定 mode, 略過 */
-      while (bit_fgets())
+      i = 0;
+
+      while(1)
       {
+      
+        bit_fgets();
+
 	if (bit_sock <= 0)
 	  return XO_QUIT;
 
-	tmp = strstr(buf, "Error");
-
-	if (tmp)
+	if (strstr(buf, "Error"))
 	{
-	  bit_sock = 0;
-	  return vmsg("帳號或密碼輸入錯誤喔 :p");
+	  vmsg("帳號或密碼輸入錯誤喔 :p");
+	  bit_abort();
+	  sleep(1);
+	  return 0;
 	}
+        else if(i >= 100)
+        {
+          return vmsg("MSN系統產生異常狀態，請至sysop板回報");
+          bit_abort();
+          sleep(1);
+          return 0;
+        }
+        else if (strstr(buf, "Logging in: Logged in"))
+          break;
+	
+	i++;
+	
       }
     }
   }
