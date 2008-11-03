@@ -4565,7 +4565,10 @@ post_info(xo)
 #endif
   {
     prints("文章標題：%s\n", hdr->title);
-    if (acct_load(&acct, hdr->owner) >= 0)
+
+    if (hdr->xmode & POST_INCOME)
+      prints("本篇為站外信，無文章價值");
+    else if (acct_load(&acct, hdr->owner) >= 0)
       prints("文章價值：%d 銀", value);
     else if (value)	/* 找不到使用者但又有文章價值的，就表示為匿名文的 userno */
     {
@@ -4575,16 +4578,26 @@ post_info(xo)
 	if (ui = (UTMP *) utmp_find(cuser.userno))
 	  upid = ui->pid;
       }
-      else
-	prints("匿名管理編號：%d", value + upid);
+
+      prints("匿名管理編號：%d", (upid > 0) ? value + upid : 0);
     }
     else
       prints("本篇為舊格式文章");
 
+    if (hdr->xmode & POST_GOOD)
+      prints(" | \033[1;33m優文標記\033[m");
+    else if (hdr->xmode & POST_MARKED)
+      prints(" | \033[1;36mmark標記\033[m");
+    if ((bbstate & STAT_BOARD) && (hdr->xmode & POST_GEM))
+      prints(" | \033[1;35m已收錄\033[m");
+    if (hdr->xmode & POST_DELETE)
+      prints(" | \033[1;32m待砍\033[m");
+    if (hdr->parent_chrono == 1)
+      prints(" | \033\[30;46m置底\033[m");
     if (hdr->xmode & POST_NOFORWARD)
-      prints("，文章禁止轉錄");
+      prints(" | \033[30;41m禁止轉錄\033[m");
     if (hdr->xmode & POST_NOSCORE)
-      prints("，文章禁止推文");
+      prints(" | \033[30;44m禁止推文\033[m");
   }
 
   clrtoeol();
