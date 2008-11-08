@@ -1061,6 +1061,42 @@ ulist_fromchange(xo)
 #endif
 
 
+#ifdef HAVE_CHANGE_MODE
+static int
+ulist_modechange(xo)
+  XO *xo;
+{
+  char *str, buf[16];
+
+  if (!cuser.userlevel)
+    return XO_NONE;
+
+  if (cuser.ufo2 & UFO2_CMODE)
+  {
+    strcpy(buf, str = cutmp->cmode);
+    if (vget(b_lines, 0, "請輸入新的動態：", buf, sizeof(cuser.cmode), GCARRY))
+    {
+      if (strcmp(buf, str))
+      {
+	strcpy(str, buf);
+	strcpy(cuser.cmode, buf);	/* 一併更換 cuser. */
+      }
+    }
+    else
+    {
+      strcpy(buf, "不告訴你");
+      strcpy(str, buf);
+      strcpy(cuser.cmode, buf);	/* 一併更換 cuser. */
+    }
+
+    return ulist_body(xo);
+  }
+
+  return XO_FOOT;
+}
+#endif
+
+
 #ifdef HAVE_CHANGE_ID
 static int
 ulist_idchange(xo)
@@ -1202,6 +1238,9 @@ static KeyFunc ulist_cb[] =
 #endif
 #ifdef HAVE_CHANGE_FROM
   Ctrl('F'), ulist_fromchange,
+#endif
+#ifdef HAVE_CHANGE_MODE
+  Ctrl('M'), ulist_modechange,
 #endif
 #ifdef HAVE_CHANGE_ID
   Ctrl('D'), ulist_idchange,

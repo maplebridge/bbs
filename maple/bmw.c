@@ -20,8 +20,8 @@ extern char xo_pool[];
 /* ----------------------------------------------------- */
 
 
-#define BMW_FORMAT	"\033[1;33;46m」%s \033[37;45m %s \033[m"	/* Μ瞴 */
-#define BMW_FORMAT2	"\033[1;33;41m「%s \033[34;47m %s \033[m"	/* 癳瞴 */
+#define BMW_FORMAT	COLOR1 "」 %s " COLOR3 " %s \033[m"	/* Μ瞴 */
+#define BMW_FORMAT2	"To %s: %s "				/* 癳瞴 */
 
 #ifdef HAVE_BITLBEE
 #define MSN_FORMAT	"\033[1;33;42m(MSN)%s \033[37;45m %s \033[m"	/* ΜMSN瞴 */
@@ -247,7 +247,7 @@ bmw_display(max)	/* itoc.010313: display 玡瞴 */
     move(i, 0);
     clrtoeol();
 #ifdef HAVE_BITLBEE
-    if(bmw->nick[0] != '\0')
+    if (bmw->nick[0] != '\0')
       prints("  " MSN_FORMAT, bmw->nick, bmw->msg);
     else
 #endif
@@ -320,15 +320,15 @@ bmw_edit(up, hint, bmw)
     {
       up = bmw_up;
       recver = up->userno;
-	  if(strcmp(cuser.userid,up->userid))
-        sprintf(hint, "」[%s]", up->userid);
-	  else
-        sprintf(hint, "」[%s]", bmw->nick);
+      if (strcmp(cuser.userid,up->userid))
+	sprintf(hint, "」[%s]", up->userid);
+      else
+	sprintf(hint, "」[%s]", bmw->nick);
     }
   }
 
 #ifdef HAVE_BITLBEE
-  if(bmw->nick[0] != '\0')	/* smiler.080319: Τnick, ボbmw肚癳msn */
+  if (bmw->nick[0] != '\0')	/* smiler.080319: Τnick, ボbmw肚癳msn */
   {
     void (*p)() = DL_get("bin/bitlbee.so:bit_reply");
     sprintf(fpath, "絋﹚璶癳MSN倒 %s 盾(Y/N)[Y] ", bmw->nick );
@@ -383,14 +383,8 @@ bmw_edit(up, hint, bmw)
       usr_fpath(fpath, userid, fn_amw);
       if (fp = fopen(fpath, "a"))
       {
-//#ifdef HAVE_BITLBEE
-#if 0
-	if (bmw->nick[0] != '\0')
-	  fprintf(fp, MSN_FORMAT2 " %s\n", bmw->nick, bmw->msg, Btime(&bmw->btime));
-	else
-#endif
-	  fprintf(fp, BMW_FORMAT2 " %s\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
-        fclose(fp);
+	fprintf(fp, BMW_FORMAT2 "(%s)\n", bmw->userid, bmw->msg, Btime(&bmw->btime));
+	fclose(fp);
       }
 
       /* itoc.030621: 玂痙癳瞴 */
@@ -402,8 +396,8 @@ bmw_edit(up, hint, bmw)
       }
       else
       {
-        i = bmw_locat;
-        bmw_locat++;
+	i = bmw_locat;
+	bmw_locat++;
       }
       bmw_lword[i].recver = recver;
       strcpy(bmw_lword[i].msg, bmw->msg);
@@ -634,7 +628,7 @@ bmw_reply_CtrlRT(key)
 
 #ifdef BMW_DISPLAY
   //if (cuser.ufo & UFO_BMWDISPLAY)
-  if(1)
+  if (1)
   {
     move(2 + max - pos, 0);
     outc(' ');
@@ -879,24 +873,24 @@ bmw_item(num, bmw)
 static int
 bmw_item_bar(xo, mode)
   XO *xo;
-  int mode;     /* 1:次  0:次 */
+  int mode;	/* 1:次  0:次 */
 {
   BMW *bmw;
   struct tm *ptime;
 
-  //bmw->nick[0] = '\0';    /* smiler.080319: for msn^bmw detect */
+//  bmw->nick[0] = '\0';	/* smiler.080319: for msn^bmw detect */
 
   bmw = (BMW *) xo_pool + (xo->pos - xo->top);
   ptime = localtime4(&bmw->btime);
 
-  if (bmw->sender == cuser.userno)  /* 癳瞴 */
+  if (bmw->sender == cuser.userno)	/* 癳瞴 */
   {
     prints("%s%6d%c\033[33m%-13s\033[36m%-*.*s\033[33m%02d:%02d\033[m",
       mode ? UCBAR[UCBAR_BMW] : "",
       xo->pos + 1, tag_char(bmw->btime),
       bmw->userid, d_cols + 53, d_cols + 53, bmw->msg, ptime->tm_hour, ptime->tm_min);
   }
-  else                              /* Μ瞴 */
+  else				/* Μ瞴 */
   {
     prints("%s%6d%c%-13s\033[32m%-*.*s\033[37m%02d:%02d%s",
       mode ? UCBAR[UCBAR_BMW] : "",
@@ -1104,10 +1098,10 @@ bmw_store(fpath)
     {
 #ifdef HAVE_BITLBEE
       if (bmw.nick[0] != '\0')
-	fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+	fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n", bmw.nick, bmw.msg, Btime(&bmw.btime));
       else
 #endif
-	fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
+	fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 "(%s)\n" : BMW_FORMAT " %s\n", bmw.userid, bmw.msg, Btime(&bmw.btime));
     }
     fclose(fp);
   }
@@ -1168,13 +1162,12 @@ bmw_save_user(xo)
 	{
 	  if (bmw.sender == acct.userno || bmw.recver == acct.userno)
 	  {
-	    //fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
 #ifdef HAVE_BITLBEE
-	    if (bmw.nick[0] !='\0')
-	      fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n",bmw.nick, bmw.msg, Btime(&bmw.btime));
+	    if (bmw.nick[0] != '\0')
+	      fprintf(fp, bmw.recver == cuser.userno ? MSN_FORMAT " %s\n" : MSN_FORMAT2 " %s\n", bmw.nick, bmw.msg, Btime(&bmw.btime));
 	    else
 #endif
-	      fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 " %s\n" : BMW_FORMAT " %s\n",bmw.userid, bmw.msg, Btime(&bmw.btime));
+	      fprintf(fp, bmw.sender == cuser.userno ? BMW_FORMAT2 "(%s)\n" : BMW_FORMAT " %s\n", bmw.userid, bmw.msg, Btime(&bmw.btime));
 	  }
 	}
 	fclose(fp);

@@ -175,7 +175,18 @@ goodbye()
   clear();
   film_out(FILM_GOODBYE, 0);
 
-  switch (vans(GOODBYE_MSG))
+  int ch;
+#ifdef HAVE_LOGOUTY
+  if (cuser.ufo2 & UFO2_LOGOUTY)
+  {
+    if ((ch = vans(GOODBYE_NMSG)) == 'n')
+      return 0;
+  }
+  else
+#endif
+    ch = vans(GOODBYE_MSG);
+
+  switch (ch)
   {
   /* lkchu.990428: 內定改為不離站 */
   case 'g':

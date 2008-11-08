@@ -573,6 +573,7 @@ utmp_setup(mode)
 #endif	/* GUEST_NICK */
 
   strcpy(utmp.username, cuser.username);
+  strcpy(utmp.cmode, cuser.cmode);
 
 #ifdef HAVE_WHERE
 
@@ -835,7 +836,7 @@ login_user(content)
       logattempt(' ', content);
       cuser.userlevel = 0;	/* Thor.981207: 怕人亂玩, 強制寫回cuser.userlevel */
       cuser.ufo = UFO_DEFAULT_GUEST;
-      cuser.ufo2= UFO2_DEFAULT_GUEST;
+      cuser.ufo2 = UFO2_DEFAULT_GUEST;
       break;	/* Thor.980917: 註解: cuser ok! */
     }
   }

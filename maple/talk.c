@@ -43,7 +43,11 @@ bmode(up, simple)
   int mode;
   char *word, *mateid;
 
-  word = ModeTypeTable[mode = up->mode];
+  word =
+#ifdef HAVE_CHANGE_MODE
+	(up->ufo2 & UFO2_CMODE) ? up->cmode :
+#endif
+	ModeTypeTable[mode = up->mode];
 
   if (simple)
     return word;

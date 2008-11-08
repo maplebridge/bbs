@@ -16,9 +16,9 @@
 /* ----------------------------------------------------- */
 
 //#define COLOR1		"\033[34;46m"	/* footer/feeter 的前段顏色 */
-#define COLOR1		"\033[m\033[1;33;44m"	/* footer/feeter 的前段顏色 */
+#define COLOR1		"\033[1;33;44m"		/* footer/feeter 的前段顏色 */
 #define COLOR2		"\033[m\033[30;47m"	/* footer/feeter 的後段顏色 */
-#define COLOR3		"\033[30;47m"	
+#define COLOR3		"\033[;30;47m"	
 #define COLOR4		"\033[1;44m"		/* 光棒 的顏色 */
 #define COLOR5		"\033[34;47m"		/* more 檔頭的標題顏色 */
 #define COLOR6		"\033[37;44m"		/* more 檔頭的內容顏色 */

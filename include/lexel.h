@@ -66,6 +66,10 @@
   /* 組態規劃˙註冊認證                                */
   /* ------------------------------------------------- */
 
+#define HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+
+#define HAVE_LOGOUTY	/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
+
 #undef POST_PREFIX	/* itoc.020113: 發表文章時標題可選擇種類 */
 
 
@@ -97,9 +101,9 @@
 /* 基本顏色定義，以利介面修改				 */
 /* ----------------------------------------------------- */
 
-#define COLOR1		"\033[m\033[1;33;42m"	/* footer 的前段顏色 */
+#define COLOR1		"\033[1;33;42m"		/* footer 的前段顏色 */
 #define COLOR2		"\033[m\033[30;47m"	/* footer 的後段顏色 */
-#define COLOR3		"\033[30;47m"		/* unused */
+#define COLOR3		"\033[;30;47m"
 #define COLOR4		"\033[1;42m"		/* 光棒 的顏色 */
 #define COLOR5		"\033[1;37;42m"		/* more 檔頭的標題顏色 */
 #define COLOR6		"\033[0;34;47m"		/* more 檔頭的內容顏色 */
@@ -136,7 +140,7 @@
 #define ICON_VOTED_BRD		"！"	/* 舉行投票中的看板 */
 #define ICON_NOTRAN_BRD		"☆"			/* 不轉信板 */
 #define ICON_TRAN_BRD		"★"			/* 轉信板 */
-#define GOODBYE_MSG		"確定不上來客所了嗎 >///< ？[N] "
-
+#define GOODBYE_MSG		"確定不上來客所了嗎 >///< ？[Q] "
+#define GOODBYE_NMSG		"確定不上來客所了嗎 >///< ？[Y] "
 
 #endif	/* SITE_LEXEL */
