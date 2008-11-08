@@ -628,7 +628,7 @@ do_post(xo, title)
   /* Thor.981105: 進入前需設好 curredit 及 quote_file */
   HDR hdr;
   char fpath[64], *folder, *nick, *rcpt;
-  int mode, value;
+  int mode = -1, value;
   time_t spendtime;
 
   if (!(bbstate & STAT_POST))
@@ -4211,21 +4211,25 @@ post_ishowbm(xo)
 //      "\033[;32m按鍵 \033[1;30m修改類別  屬性\033[m\n"
 
       prints(
-	" %sw%s - 進板畫面     %so%s - 板友名單     %sk%s - 板友特別名單"
+	" %sw%s - 進板畫面     %so%s - 板友名單     %s%sk%s - 板友特別名單"
 #ifdef HAVE_TEMPLATE
 	"   %st%s - 文章範本\n"
 #else
 	"\n"
 #endif
 #ifdef POST_PREFIX
-	" %sp%s - 文章類別     "
+	" %sp%s - 文章類別    "
 #endif
-	"%ss%s - 擋信列表     %sg%s - BBS 看門狗"
+	" %ss%s - 擋信列表     %sg%s - BBS 看門狗"
 #ifdef HAVE_RSS
 	"     %sr%s - RSS 設定"
 #endif
 	"\n",
-	mark, "\033[m", mark, "\033[m", mark, "\033[m",
+	mark, "\033[m", mark, "\033[m",
+#ifndef POST_PREFIX
+	"  ",
+#endif
+	mark, "\033[m",
 #ifdef HAVE_TEMPLATE
 	mark, "\033[m",
 #endif

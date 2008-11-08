@@ -71,7 +71,7 @@
 #define HAVE_LOGOUTY	/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
 
 #undef POST_PREFIX	/* itoc.020113: 發表文章時標題可選擇種類 */
-
+#undef HAVE_TEMPLATE
 
   /* ------------------------------------------------- */
   /* 組態規劃˙看板信箱                                */

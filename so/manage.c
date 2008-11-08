@@ -382,7 +382,7 @@ post_template_edit()
 #endif	/* HAVE_TEMPLATE */
 
 
-int
+static int
 post_prefix_edit()
 {
   FILE *fp;
