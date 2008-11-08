@@ -91,7 +91,8 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       char fpath[64], fnew[64], fold[64];
       HDR *hdr;
 
-      char Deletelog_folder[64]/*, Deletelog_title[64]*/, copied[64]; /* smiler.1111: 若有啟動editlog_use deletelog_use */
+      /* smiler.1111: 若有啟動editlog_use deletelog_use */
+      char Deletelog_folder[64]/*, Deletelog_title[64]*/, copied[64];
       HDR  Deletelog_hdr;	/* 則將被砍的資料移至 Deletelog 板備份 */
 
       xmode = head->battr;
@@ -173,8 +174,10 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
       if (fsize)
 	rename(fnew, fpath);
       else
+      {
 contWhileOuter:
 	unlink(fnew);
+      }
 
       btime_update(brd_bno(currboard));
     } while (++head < tail);
@@ -298,17 +301,16 @@ post_spam_edit()
 /* 板主功能 : 修改發文類別				 */
 /* ----------------------------------------------------- */
 
-#define NUM_PREFIX	8
 
-static int
+#ifdef HAVE_TEMPLATE
+int
 post_template_edit()
 {
   FILE *fp;
   int i, ans, pnum;
   char buf[64], fpath[64];
   char prefix[NUM_PREFIX][16];
-  char *prefix_def[NUM_PREFIX] =	/* 預設的類別 */
-  {"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
+  char *prefix_def[NUM_PREFIX] = DEFAULT_PREFIX;
 
   if (!(bbstate & STAT_BOARD))
     return 0;
@@ -370,7 +372,6 @@ post_template_edit()
     mkdir(fpath, 0700);
 
   sprintf(buf, "prefix/template_%d", i + 1);
-
   brd_fpath(fpath, currboard, buf);
 
   if (vedit(fpath, 0))	/* Thor.981020: 注意被talk的問題 */
@@ -378,19 +379,16 @@ post_template_edit()
 
   return 0;
 }
+#endif	/* HAVE_TEMPLATE */
 
 
-static int
+int
 post_prefix_edit()
 {
   FILE *fp;
   int i;
   char fpath[64], buf[20], prefix[NUM_PREFIX][16], *menu[NUM_PREFIX + 3];
-  char *prefix_def[NUM_PREFIX] =	/* 預設的類別 */
-  {
-    "閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"
-   // "公告", "測試", "閒聊", "灌水", "無聊", "打混"
-  };
+  char *prefix_def[NUM_PREFIX] = DEFAULT_PREFIX;
 
   if (!(bbstate & STAT_BOARD))
     return 0;

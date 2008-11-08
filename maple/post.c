@@ -39,31 +39,6 @@ cmpchrono(hdr)
 
 
 static int
-cmpparent(hdr)
-  HDR *hdr;
-{
-  /* 可以不用檢查 POST_BOTTOM，因為一般文章的 parent_chrono = 0 */
-  return /* (hdr->xmode & POST_BOTTOM) && */
-    (hdr->parent_chrono == currchrono);
-}
-
-
-static void
-change_stamp(folder, hdr)
-  char *folder;
-  HDR *hdr;
-{
-  HDR buf;
-
-  /* 為了確定新造出來的 stamp 也是 unique (不和既有的 chrono 重覆)，
-     就產生一個新的檔案，該檔案隨便 link 即可。
-     這個多產生出來的垃圾會在 expire 被 sync 掉 (因為不在 .DIR 中) */
-  hdr_stamp(folder, HDR_LINK | 'A', &buf, "etc/stamp");
-  hdr->stamp = buf.chrono;
-}
-
-
-static int
 IS_BIGGER_AGE(age)
   int age;
 {
@@ -681,14 +656,12 @@ do_post(xo, title)
   }
   else		/* itoc.020113: 新文章選擇標題分類 */
   {
-#define NUM_PREFIX	8
     if (!(currbattr & BRD_NOPREFIX))
     {
       FILE *fp;
       int len = 6, pnum, newline = 0;
       char prefix[NUM_PREFIX][16];
-      char *prefix_default[NUM_PREFIX] =
-	{"閒聊", "公告", "問題", "建議", "討論", "心得", "請益", "情報"};
+      char *prefix_default[NUM_PREFIX] = DEFAULT_PREFIX;
 
       for (mode = 0; mode < NUM_PREFIX; mode++)
 	strcpy(prefix[mode], prefix_default[mode]);
@@ -767,7 +740,18 @@ do_post(xo, title)
     curredit &= ~EDIT_OUTGO;
 
   utmp_mode(M_POST);
+#ifdef HAVE_TEMPLATE
+ if (mode >= 0 && mode < NUM_PREFIX)
+ {
+   char buf1[32], buf2[64];
+   sprintf(buf1, "prefix/template_%d", mode + 1);
+   brd_fpath(buf2, currboard, buf1);
+   sprintf(fpath, "tmp/%s.%d", cuser.userid, time(0));
+   f_cp(buf2, fpath, O_TRUNC);
+ }
+#else
   fpath[0] = '\0';
+#endif
   time(&spendtime);
   if (vedit(fpath, 1) < 0)
   {
@@ -3704,6 +3688,31 @@ post_write(xo)			/* itoc.010328: 丟線上作者水球 */
 static int curraddscore;
 
 
+static int
+cmpparent(hdr)
+  HDR *hdr;
+{
+  /* 可以不用檢查 POST_BOTTOM，因為一般文章的 parent_chrono = 0 */
+  return /* (hdr->xmode & POST_BOTTOM) && */
+    (hdr->parent_chrono == currchrono);
+}
+
+
+static void
+change_stamp(folder, hdr)
+  char *folder;
+  HDR *hdr;
+{
+  HDR buf;
+
+  /* 為了確定新造出來的 stamp 也是 unique (不和既有的 chrono 重覆)，
+     就產生一個新的檔案，該檔案隨便 link 即可。
+     這個多產生出來的垃圾會在 expire 被 sync 掉 (因為不在 .DIR 中) */
+  hdr_stamp(folder, HDR_LINK | 'A', &buf, "etc/stamp");
+  hdr->stamp = buf.chrono;
+}
+
+
 static void
 addscore(hdd, ram)
   HDR *hdd, *ram;
@@ -3730,11 +3739,8 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   HDR *hdr;
 {
   int pos, cur, ans, vtlen, maxlen;
-  char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  char *dir, *userid, *verb, fpath[64], reason[80];
   FILE *fp;
-//#ifdef HAVE_ANONYMOUS
-//  char uid[IDLEN + 1];
-//#endif
 
   pos = xo->pos;
   cur = pos - xo->top;
@@ -3747,61 +3753,11 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     return XO_NONE;
 #endif
 
-//  switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
-//  {
-//  case '1':
-//    verb = "1m△";
-//    vtlen = 2;
-//    break;
-//
-//  case '2':
-//    verb = "2m▽";
-//    vtlen = 2;
-//    break;
-//
-//  case '3':
-//    verb = "7m─";
-//    vtlen = 2;
-//    break;
-//    /* songsongboy.070124:lexel version*/
-//    /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
-//      return XO_FOOT;
-//    vtlen = strlen(fpath);
-//    sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
-//    break;*/
+  ans = '3';
+  verb = "0m==";
+  vtlen = 2;
 
-//  default:
-    ans='3';
-    verb = "0m==";
-    vtlen = 2;
-//  }
-
-#if 0
-#ifdef HAVE_ANONYMOUS
-  if (currbattr & BRD_ANONYMOUS)
-    maxlen = 63 - IDLEN - vtlen - 6;
-  else
-#endif
-#endif
-    maxlen = 63 - strlen(cuser.userid) - vtlen - 6;
-
-//  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
-//    return XO_FOOT;
-
-//#ifdef HAVE_ANONYMOUS
-//  if (currbattr & BRD_ANONYMOUS)
-//  {
-//    userid = uid;
-//    if (!vget(b_lines, 0, "請輸入您想用的ID，也可直接按[Enter]，或是按[r]用真名：", userid, IDLEN, DOECHO))
-//      userid = STR_ANONYMOUS;
-//    else if (userid[0] == 'r' && userid[1] == '\0')
-//      userid = cuser.userid;
-//    else
-//      strcat(userid, ".");		/* 自定的話，最後加 '.' */
-//    maxlen = 64 - strlen(userid) - vtlen;
-//  }
-//  else
-//#endif
+  maxlen = 63 - strlen(cuser.userid) - vtlen - 6;
 
   userid = cuser.userid;
   str_ncpy(reason, log, maxlen);
@@ -3827,7 +3783,7 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     curraddscore = 0;
 
     currchrono = hdr->chrono;
-    change_stamp(dir, hdr);
+//    change_stamp(dir, hdr);
     rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
     if (hdr->xmode & POST_BOTTOM)	/* 若是評分置底文章，去找正本來連動分數 */
     {
@@ -3836,12 +3792,11 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     }
     else				/* 若是評分一般文章，去找謄本來連動分數 */
     {
-      /* currchrono = hdr->chrono; */ /* 前面有了 */
       rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
     }
-    post_history(xo, hdr);
+//    post_history(xo, hdr);
 
-    btime_update(currbno);
+//    btime_update(currbno);
     return XO_LOAD;
 }
 
@@ -3867,15 +3822,17 @@ post_append_score(xo, choose)
   hdr = (HDR *) xo_pool + cur;
 
   if (hdr->xmode & POST_NOSCORE)
-    return XO_NONE;
+  {
+    vmsg("這篇文章被設定為不能推文哦！");
+    return XO_FOOT;
+  }
 
 #ifdef HAVE_REFUSEMARK
   if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
     return XO_NONE;
 #endif
 
-  ans = choose;
-  if (!ans)
+  if (!(ans = choose))
   {
     switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
     {
@@ -3901,14 +3858,14 @@ post_append_score(xo, choose)
      break;*/
 
     default:
-      ans='3';
+      ans = '3';
       verb = "7m─";
       vtlen = 2;
     }
   }
   else
   {
-    ans='3';
+    ans = '3';
     verb = "7m─";
     vtlen = 2;
   }
@@ -3967,7 +3924,6 @@ post_append_score(xo, choose)
   }
   else				/* 若是評分一般文章，去找謄本來連動分數 */
   {
-    /* currchrono = hdr->chrono; */ /* 前面有了 */
     rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
   }
   post_history(xo, hdr);
@@ -4086,10 +4042,10 @@ post_viewpal()
   if (!cuser.userlevel)
     return 0;
 
-  if((currbattr & BRD_SHOWPAL) && !(bbstate & STAT_BM))
+  if ((currbattr & BRD_SHOWPAL) && !(bbstate & STAT_BM))
     return 0;
 
-  brd_fpath(fpath, currboard, "friend");
+  brd_fpath(fpath, currboard, FN_PAL);
   if (!stat(fpath, &st) && S_ISREG(st.st_mode) && !st.st_size)	/* 有些名單的 size 為 0 */
     unlink(fpath);
 
@@ -4255,7 +4211,12 @@ post_ishowbm(xo)
 //      "\033[;32m按鍵 \033[1;30m修改類別  屬性\033[m\n"
 
       prints(
-	" %sw%s - 進板畫面     %so%s - 板友名單     %sk%s - 板友特別名單\n"
+	" %sw%s - 進板畫面     %so%s - 板友名單     %sk%s - 板友特別名單"
+#ifdef HAVE_TEMPLATE
+	"   %st%s - 文章範本\n"
+#else
+	"\n"
+#endif
 #ifdef POST_PREFIX
 	" %sp%s - 文章類別     "
 #endif
@@ -4264,13 +4225,16 @@ post_ishowbm(xo)
 	"     %sr%s - RSS 設定"
 #endif
 	"\n",
+	mark, "\033[m", mark, "\033[m", mark, "\033[m",
+#ifdef HAVE_TEMPLATE
+	mark, "\033[m",
+#endif
 #ifdef POST_PREFIX
-	mark, "\033[m", 
+	mark, "\033[m",
 #endif
 	mark, "\033[m", mark, "\033[m",
-	mark, "\033[m", mark, "\033[m", mark, "\033[m"
 #ifdef HAVE_RSS
-	, mark, "\033[m"
+	mark, "\033[m"
 #endif
 	);
     }
@@ -4374,6 +4338,11 @@ post_ishowbm(xo)
     case 'k':
       reload = XoBM_add_pal() ? 1 : reload;
       break;
+#ifdef HAVE_TEMPLATE
+    case 't':
+      DL_func("bin/manage.so:post_template_edit");
+      break;
+#endif
 #ifdef POST_PREFIX
     case 'p':
       DL_func("bin/manage.so:post_brd_prefix");
@@ -4556,7 +4525,7 @@ post_info(xo)
   value = atoi(hdr->value);
 
   move(0, 0);
-  prints("檔案名稱：#%s @ %-*s", hdr->xname, BNLEN + 1, currboard);
+  prints("檔案名稱：#%s @ %-*s", hdr->xname, BNLEN + 2, currboard);
   prints("作者：%-19.18s\n", hdr->owner);
 #ifdef HAVE_REFUSEMARK
   if (!chkrestrict(hdr))
@@ -4598,6 +4567,31 @@ post_info(xo)
       prints(" | \033[30;41m禁止轉錄\033[m");
     if (hdr->xmode & POST_NOSCORE)
       prints(" | \033[30;44m禁止推文\033[m");
+  }
+
+  if (HAS_PERM(PERM_ALLBOARD))
+  {
+    char fpath[64];
+    struct stat st;
+
+    hdr_fpath(fpath, xo->dir, hdr);
+
+    if (!stat(fpath, &st))
+    {
+      time4_t temp = st.st_mtime;
+      prints("\n時間戳記：%s  檔案大小：%d\n", Btime(&temp), st.st_size);
+    }
+
+    prints("發文日期：%s", hdr->date);
+    prints("%-17s暱稱    ：%s\n", "", hdr->nick);
+    prints("檔案位置：%s\n", fpath);
+
+    prints("好友限定：%s", (hdr->xmode & POST_FRIEND) ? "是" : "否");
+
+    prints("%-23s作者限定：%s\n", "", (hdr->xmode & POST_RESTRICT) ? "是" : "否");
+
+    prints("可轉站外：%s", (hdr->xmode & POST_OUTGO) ? "是" : "否");
+    prints("%-23s已被評分：%s",  "", (hdr->xmode & POST_SCORE) ? "是" : "否");
   }
 
   clrtoeol();

@@ -238,6 +238,15 @@
 
 #define	POST_PREFIX		/* itoc.020113: 發表文章時標題可選擇種類 */
 
+#ifdef POST_PREFIX
+#  define NUM_PREFIX	8	/* 改此數字要注意版面配置 */
+				/* 預設的類別 */
+#  define DEFAULT_PREFIX	{"閒聊", "公告", "問題", "建議", \
+				"討論", "心得", "請益", "情報"}
+		// "公告", "測試", "閒聊", "灌水", "無聊", "打混"
+#  define HAVE_TEMPLATE		/* kewang.060601: 自訂文章範本 */
+#endif
+
 #define HAVE_RSS		/* 提供看板接收 RSS 功能 */
 
 #define HAVE_MULTI_SIGN		/* 多種站簽供使用者選擇 */
