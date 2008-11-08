@@ -290,8 +290,8 @@ post_filter(fpath)
 
   while (fgets(filter, sizeof(filter), fp))
   {
-    if (strstr(filter,"paperdo@gmail.com") || strstr(filter,"http://paperdo.googlepages.com/index.htm")
-	|| strstr(filter,"論文代寫") || strstr(filter,"代寫論文"))
+    if (strstr(filter, "paperdo@gmail.com") || strstr(filter, "http://paperdo.googlepages.com/index.htm")
+	|| strstr(filter, "論文代寫") || strstr(filter, "代寫論文"))
       return 1;
   }
 #endif
@@ -740,17 +740,19 @@ do_post(xo, title)
     curredit &= ~EDIT_OUTGO;
 
   utmp_mode(M_POST);
-#ifdef HAVE_TEMPLATE
- if (mode >= 0 && mode < NUM_PREFIX)
- {
-   char buf1[32], buf2[64];
-   sprintf(buf1, "prefix/template_%d", mode + 1);
-   brd_fpath(buf2, currboard, buf1);
-   sprintf(fpath, "tmp/%s.%d", cuser.userid, time(0));
-   f_cp(buf2, fpath, O_TRUNC);
- }
-#else
   fpath[0] = '\0';
+#ifdef HAVE_TEMPLATE
+  if (mode >= 0 && mode < NUM_PREFIX)
+  {
+    char buf1[32], buf2[64];
+    sprintf(buf1, "prefix/template_%d", mode + 1);
+    if (dashf(buf1))
+    {
+      brd_fpath(buf2, currboard, buf1);
+      sprintf(fpath, "tmp/%s.%d", cuser.userid, time(0));
+      f_cp(buf2, fpath, O_TRUNC);
+    }
+  }
 #endif
   time(&spendtime);
   if (vedit(fpath, 1) < 0)
@@ -762,7 +764,7 @@ do_post(xo, title)
 
 #ifdef DO_POST_FILTER
   strcpy(bbs_dog_title, ve_title);
-  if( post_filter(fpath) )	/* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+  if (post_filter(fpath))	/* smiler.080830: 針對文章標題內容偵測有無不當之處 */
   {
     unlink(fpath);
     return XO_HEAD;
@@ -1382,7 +1384,7 @@ hdr_outs_bar(hdr, cc)	/* print HDR's subject */
   if (ch && (title == mark - 3))	/* 還沒印完 */
   {
 
-    if(strlen(title) < 4)
+    if (strlen(title) < 4)
     {
       outc(ch);
       while (ch = *title++)
@@ -1512,7 +1514,7 @@ post_attr(hdr)
     attr |= 'F',
     strcpy(attr_tmp, "\033[1;33m");
   }
-  else if((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+  else if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
     attr |= 'L';
     strcpy(attr_tmp, "\033[1;34m");
@@ -1524,7 +1526,7 @@ post_attr(hdr)
     attr |= 'B';	/* 若有 mark+gem，顯示 B */
     strcpy(attr_tmp, "\033[1;31m");
   }
-  else if((bbstate & STAT_BOARD) && (mode & POST_GEM) && (!(mode & POST_MARKED)) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM))
+  else if ((bbstate & STAT_BOARD) && (mode & POST_GEM) && (!(mode & POST_MARKED)) && (USR_SHOW & USR_SHOW_POST_ATTR_GEM))
   {
     attr |= 'G';
     strcpy(attr_tmp, "\033[1;35m");
@@ -1609,13 +1611,13 @@ post_item(num, hdr)
 
   hdr_outs(hdr, d_cols + 45);	/* 少一格來放分數 */
 #else
- if(!(cuser.ufo & UFO_FILENAME))
+ if (!(cuser.ufo & UFO_FILENAME))
  {
    /*ckm.070325: 置底文沒有編號*/
-   if(hdr->xmode & POST_BOTTOM)
-    prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
+   if (hdr->xmode & POST_BOTTOM)
+     prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
    else
-    prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+     prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
  }
  else
    prints("%10s", hdr->xname);
@@ -1760,7 +1762,7 @@ post_head(xo)
   XO *xo;
 {
   vs_head(currBM, xo->xyz);
-  if(!(cuser.ufo & UFO_FILENAME))
+  if (!(cuser.ufo & UFO_FILENAME))
     prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
   else
     prints(NECKER_POST_FILE, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
@@ -2110,7 +2112,7 @@ post_cross(xo)
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
 
-  int can_showturn=0;
+  int can_showturn = 0;
   if (xo->dir[0] == 'b')
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
@@ -2130,8 +2132,8 @@ post_cross(xo)
   //if(RefusePal_level(currboard, hdr_org)!=0)	//若為L文及F文,僅板主及作者可轉錄
   if (hdr_org->xmode & POST_RESTRICT)
   {
-  if (strcmp(hdr_org->owner, cuser.userid) && !(bbstate & STAT_BM))
-    return XO_NONE;
+    if (strcmp(hdr_org->owner, cuser.userid) && !(bbstate & STAT_BM))
+      return XO_NONE;
   }
 #endif
 
@@ -2329,9 +2331,9 @@ post_cross(xo)
 
 
     char str_tag_score[50];
-    sprintf(str_tag_score," 轉錄至 %s 看板 ",xboard);
+    sprintf(str_tag_score, " 轉錄至 %s 看板 ", xboard);
 
-    if(can_showturn)	/* 只有看板才有可能有 can_showturn */
+    if (can_showturn)	/* 只有看板才有可能有 can_showturn */
       post_t_score(xo,str_tag_score,hdr);
 
   } while (++locus < tag);
@@ -2407,7 +2409,7 @@ post_forward(xo)
     *quote_file = '\0';
 
     char str_tag_score[50];
-    sprintf(str_tag_score," 轉寄至 %s 的bbs信箱 ", muser.userid);
+    sprintf(str_tag_score, " 轉寄至 %s 的bbs信箱 ", muser.userid);
     if (xo->dir[0] == 'b')
     {
       if (currbattr & BRD_SHOWTURN)
@@ -2594,7 +2596,7 @@ post_bottom(xo)
     post.xmode = POST_BOTTOM;
 #endif
     /*ryancid: copy the score*/
-    if(hdr->xmode & POST_SCORE)
+    if (hdr->xmode & POST_SCORE)
     {
       post.xmode |= POST_SCORE;
       post.score = hdr->score;
@@ -3133,7 +3135,7 @@ post_delete(xo)	/* 單一刪文 */
 	}
 
 	hdr_fpath(fpath, xo->dir, hdr);
-	sprintf(title,"[文章刪除] 理由: %s", reason);
+	sprintf(title, "[文章刪除] 理由: %s", reason);
 	mail_him(fpath, acct.userid, title, 0);
 	break;
 
@@ -3167,7 +3169,7 @@ post_delete(xo)	/* 單一刪文 */
 	  f_cat(fpath, buf);
 
 	  hdr_fpath(fpath, xo->dir, hdr);
-	  sprintf(title,"[劣退] 理由: %s", reason);
+	  sprintf(title, "[劣退] 理由: %s", reason);
 	  mail_him(fpath, acct.userid, title, 0);
         }
 	break;
@@ -4205,15 +4207,15 @@ post_ishowbm(xo)
 
     if (isbm)
     {
-    prints("\033[1;30m============================== "
-      "\033[;37;44m[編輯畫面名單]\033[;1;30m ===============================\033[m\n\n");
-//      "\033[32m按鍵 \033[1;30m修改類別  屬性                         "
-//      "\033[;32m按鍵 \033[1;30m修改類別  屬性\033[m\n"
+      prints("\033[1;30m============================== "
+	"\033[;37;44m[編輯畫面名單]\033[;1;30m ===============================\033[m\n\n");
+//	"\033[32m按鍵 \033[1;30m修改類別  屬性                         "
+//	"\033[;32m按鍵 \033[1;30m修改類別  屬性\033[m\n"
 
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %s%sk%s - 板友特別名單"
 #ifdef HAVE_TEMPLATE
-	"   %st%s - 文章範本\n"
+	"%s"
 #else
 	"\n"
 #endif
@@ -4231,7 +4233,7 @@ post_ishowbm(xo)
 #endif
 	mark, "\033[m",
 #ifdef HAVE_TEMPLATE
-	mark, "\033[m",
+	(currbattr & BRD_ATOM) ? "   \033[1;33mt\033[m - 文章範本\n" : "",
 #endif
 #ifdef POST_PREFIX
 	mark, "\033[m",
@@ -4266,6 +4268,9 @@ post_ishowbm(xo)
       return reload ? XO_INIT : XO_HEAD;
 
     if (!(currbattr & BRD_PUBLIC) && ch == 'u')	/* 公眾板才看說明 */
+      return reload ? XO_INIT : XO_HEAD;
+
+    if (!(currbattr & BRD_ATOM) && ch == 't')	/* ATOM看板才能使用文章範本 */
       return reload ? XO_INIT : XO_HEAD;
 
     if ((currbattr & BRD_PUBLIC) &&

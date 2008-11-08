@@ -978,6 +978,7 @@ u_setup()
 }
 
 
+#ifdef HAVE_UFO2
 int
 u_setup2()
 {
@@ -996,6 +997,7 @@ u_setup2()
 
   return 0;
 }
+#endif
 
 
 int

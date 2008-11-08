@@ -58,8 +58,8 @@
 #include "battr.h"		/* board attribution */
 #include "modes.h"		/* The list of valid user modes */
 #include "struct.h"		/* data structure */
-#include "global.h"		/* global variable & definition */
 #include "theme.h"		/* custom theme */
+#include "global.h"		/* global variable & definition */
 #include "proto.h"		/* prototype of functions */
 
 #endif				/* _BBS_H_ */

@@ -746,6 +746,11 @@ static MENU menu_user_set[] =
   u_setup, 0, M_UFILES,
   "Habit      【 喜好模式 】",
 
+#ifdef HAVE_UFO2
+  u_setup2, PERM_VALID, M_UFILES,
+  "Advance    【 進階設定 】",
+#endif
+
 #ifdef HAVE_MULTI_SIGN
   u_sign_set, 0, M_UFILES,
   "Sign       【 站簽設定 】",

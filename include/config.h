@@ -140,6 +140,12 @@
 
 #define	BMW_DISPLAY		/* itoc.010313: 顯示之前的水球 */
 
+#undef HAVE_UFO2
+#ifdef HAVE_UFO2
+#  undef HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  undef HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
+#endif
+
 #define	HAVE_CHANGE_NICK	/* 使用者名單 ^N 永久更改暱稱 */
 
 #define	HAVE_CHANGE_FROM	/* 使用者名單 ^F 暫時更改故鄉 */

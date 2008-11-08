@@ -66,9 +66,11 @@
   /* 組態規劃˙註冊認證                                */
   /* ------------------------------------------------- */
 
-#define HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
-
-#define HAVE_LOGOUTY	/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
+#define HAVE_UFO2
+#ifdef HAVE_UFO2
+#  define HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  define HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
+#endif
 
 #undef POST_PREFIX	/* itoc.020113: 發表文章時標題可選擇種類 */
 #undef HAVE_TEMPLATE
