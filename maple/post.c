@@ -746,9 +746,9 @@ do_post(xo, title)
   {
     char buf1[32], buf2[64];
     sprintf(buf1, "prefix/template_%d", mode + 1);
-    if (dashf(buf1))
+    brd_fpath(buf2, currboard, buf1);
+    if (dashf(buf2))
     {
-      brd_fpath(buf2, currboard, buf1);
       sprintf(fpath, "tmp/%s.%d", cuser.userid, time(0));
       f_cp(buf2, fpath, O_TRUNC);
     }
@@ -4215,7 +4215,7 @@ post_ishowbm(xo)
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %s%sk%s - 板友特別名單"
 #ifdef HAVE_TEMPLATE
-	"%s"
+	"%s\n"
 #else
 	"\n"
 #endif
@@ -4230,10 +4230,12 @@ post_ishowbm(xo)
 	mark, "\033[m", mark, "\033[m",
 #ifndef POST_PREFIX
 	"  ",
+#else
+	"",
 #endif
 	mark, "\033[m",
 #ifdef HAVE_TEMPLATE
-	(currbattr & BRD_ATOM) ? "   \033[1;33mt\033[m - 文章範本\n" : "",
+	(currbattr & BRD_ATOM) ? "   \033[1;33mt\033[m - 文章範本" : "",
 #endif
 #ifdef POST_PREFIX
 	mark, "\033[m",

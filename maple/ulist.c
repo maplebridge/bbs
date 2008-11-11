@@ -1240,7 +1240,7 @@ static KeyFunc ulist_cb[] =
   Ctrl('F'), ulist_fromchange,
 #endif
 #ifdef HAVE_CHANGE_MODE
-  Ctrl('M'), ulist_modechange,
+  'M', ulist_modechange,
 #endif
 #ifdef HAVE_CHANGE_ID
   Ctrl('D'), ulist_idchange,

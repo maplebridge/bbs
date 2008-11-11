@@ -248,7 +248,7 @@ post_memo_edit()
   int mode;
   char fpath[64];
 
-  mode = vkans("進板畫面 (D)刪除 (E)修改 (Q)取消？[E] ");
+  mode = vans("進板畫面 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (mode != 'q')
   {
@@ -275,7 +275,7 @@ post_spam_edit()
   int mode;
   char fpath[64];
 
-  mode = vkans("擋信列表 (D)刪除 (E)修改 (Q)取消？[E] ");
+  mode = vans("擋信列表 (D)刪除 (E)修改 (Q)取消？[E] ");
 
   if (mode != 'q')
   {
@@ -356,7 +356,7 @@ post_template_edit()
     return 0;
 
   sprintf(buf, "範本 %d.[%s] D)刪除 E)修改 Q)取消？[Q] ", i + 1, prefix[i]);
-  ans = vkans(buf);
+  ans = vans(buf);
 
   if (ans == 'd')
   {
@@ -394,7 +394,7 @@ post_prefix_edit()
     return 0;
 
   brd_fpath(fpath, currboard, "prefix.new");
-  i = vkans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
+  i = vans("類別 (D)刪除 (E)修改 (Q)取消？[Q] ");
 
   if (i == 'd')
   {
@@ -1001,7 +1001,7 @@ post_article_filter()
     }
     fclose(fp);
 
-    switch(vkans("選擇 (D)刪除 (E)修改 (Q)離開？[E] "))
+    switch(vans("選擇 (D)刪除 (E)修改 (Q)離開？[E] "))
     {
     case 'd':
       unlink(fpath);
@@ -1048,7 +1048,7 @@ post_my_level(fname, title)
   sprintf(fpath_w, "%s.tmp", fpath_r);
 
   sprintf(wd, "%s E)編輯 D)刪除 Q)取消 [E] ", title);
-  switch (vkans(wd))
+  switch (vans(wd))
   {
   case 'd':
     if (dashf(fpath_r))
@@ -1221,7 +1221,7 @@ post_view_bbs_dog_log()
   brd_fpath(fpath, currboard, FN_BBSDOG_LOG);
   more(fpath, NULL);
 
-  switch (vkans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
+  switch (vans("擋文記錄 M)寄回自己信箱 D)刪除 Q)離開？[Q] "))
   {
   case 'm':
     sprintf(warn, "%s 板擋文記錄檔", currboard);

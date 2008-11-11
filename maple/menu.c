@@ -180,7 +180,9 @@ goodbye()
   if (cuser.ufo2 & UFO2_LOGOUTY)
   {
     if ((ch = vans(GOODBYE_NMSG)) == 'n')
-      return 0;
+      ch = 'q';
+    else if (ch != 'm' && ch != 'p' && ch != 'q')
+      ch = 'y';
   }
   else
 #endif
@@ -198,6 +200,7 @@ goodbye()
     break;
 
   case 'n':
+  case 'p':
     /* if (cuser.userlevel) */
     if (HAS_PERM(PERM_POST)) /* Thor.990118: 要能post才能留言, 提高門檻 */
       pad_draw();
