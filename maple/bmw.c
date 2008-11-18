@@ -1441,6 +1441,6 @@ bit_display()
     }
   }
 
-  return XO_BODY;
+  return 0;
 }
 #endif

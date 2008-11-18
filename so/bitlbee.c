@@ -425,6 +425,15 @@ bit_close()
 }
 
 
+static int
+bit_show(xo)
+  XO *xo;
+{
+  bit_display();
+  return bit_head(xo);
+}
+
+
 #if 0
 static int
 bit_test()
@@ -450,7 +459,7 @@ static KeyFunc bit_cb[] = {
   'B', bit_block,	/* 封鎖連絡人 */
   'a', bit_addpal,	/* 新增連絡人 */
   'd', bit_delpal,	/* 刪除連絡人 */
-  'l', bit_display,	/* 回顧 FN_MSN 訊息 */
+  'l', bit_show,	/* 回顧 FN_MSN 訊息 */
 //  's', bit_save,
 //  'n', bit_onick,
   'c', bit_mynick,	/* 更改自己的暱稱 */
@@ -558,7 +567,6 @@ bit_start(account, pass)
 
       while(1)
       {
-      
         bit_fgets();
 
 	if (bit_sock <= 0)

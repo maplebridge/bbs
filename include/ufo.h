@@ -66,7 +66,7 @@
 
 #define UFO2_LOGOUTY	BFLAG(0)	/* bossliaw.081019: LEXEL-預設離線 */
 #define UFO2_CMODE	BFLAG(1)	/* bossliaw.081019: LEXEL-自訂/隱藏動態 */
-#define UFO2_CFROM	BFLAG(2)	/* bossliaw.081019: LEXEL-自訂/隱藏故鄉 */11
+#define UFO2_CFROM	BFLAG(2)	/* bossliaw.081019: LEXEL-自訂/隱藏故鄉 */
 
 /* 新註冊帳號、guest 的預設 ufo */
 
