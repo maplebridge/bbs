@@ -728,9 +728,10 @@ u_register()
   memset(&rform, 0, sizeof(RFORM));
   for (;;)
   {
-    getfield(5, 50, rform.career, "服務單位：", "學校系級或單位職稱");
-    getfield(8, 60, rform.address, "目前住址：", "包括寢室或門牌號碼");
-    getfield(11, 20, rform.phone, "連絡電話：", "包括長途撥號區域碼");
+    getfield(5, 20, rform.realname, "真實姓名", "請用中文");
+    getfield(8, 50, rform.career, "服務單位：", "學校系級或單位職稱");
+    getfield(11, 60, rform.address, "目前住址：", "包括寢室或門牌號碼");
+    getfield(14, 20, rform.phone, "連絡電話：", "包括長途撥號區域碼");
     ans = vans("以上資料是否正確(Y/N/Q)？[N] ");
     if (ans == 'q')
       return 0;

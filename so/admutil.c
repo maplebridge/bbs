@@ -601,6 +601,7 @@ scan_register_form(fd)
     userid = rform.userid;
     move(2, 0);
     prints("申請代號: %s (申請時間：%s)\n", userid, Btime(&rform.rtime));
+    prints("真實姓名: %s\n", rform.realname);
     prints("服務單位: %s\n", rform.career);
     prints("目前住址: %s\n", rform.address);
     prints("連絡電話: %s\n%s\n", rform.phone, msg_seperator);
@@ -643,10 +644,12 @@ scan_register_form(fd)
       /* 提升權限 */
       sprintf(buf, "REG: %s:%s:%s:by %s", rform.phone, rform.career, rform.address, agent);
       justify_log(acct.userid, buf);
+      strcpy(acct.realname, rform.realname);
       time4(&acct.tvalid);
       /* itoc.041025: 這個 acct_setperm() 並沒有緊跟在 acct_load() 後面，中間隔了一個 vans()，
          這可能造成拿舊 acct 去覆蓋新 .ACCT 的問題。不過因為是站長才有的權限，所以就不改了 */
       acct_setperm(&acct, PERM_VALID, 0);
+      utmp_admset(acct.userno, STATUS_DATALOCK);	/* 鎖定資料，以防止線上使用者認證後下線，姓名又被寫回 */
 
       /* 寄信通知使用者 */
       usr_fpath(folder, userid, fn_dir);

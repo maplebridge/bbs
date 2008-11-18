@@ -683,7 +683,7 @@ mf_label(xo)
   rec_put(xo->dir, mf, sizeof(MF), pos, NULL);
 
   move(3 + cur, 0);
-  mf_item(pos, mf);
+  mf_item(pos + 1, mf);
 
   return (pos + 1 == xo->max ? 0 : pos + 1) + XO_MOVE;   /* 跳至下一項 */
 }

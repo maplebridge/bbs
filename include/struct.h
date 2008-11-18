@@ -98,8 +98,9 @@ typedef struct
   int violation;		/* 違規記錄 */
   usint ufo2;
   int reserved_1;
-  char cmode[11];		/* 自訂動態 */
-  char reserved[245];		/* 保留 */
+  char cmode[20];		/* 自訂動態 */
+  char cfrom[34];		/* 自訂來源 */
+  char reserved[202];		/* 保留 */
 }      ACCT;
 
 
@@ -113,7 +114,7 @@ typedef struct			/* 16 bytes */
 #ifdef HAVE_REGISTER_FORM
 
 /* itoc.041025: RFROM 不應出現和 ACCT 一樣但值可能不同的欄位
-   RFORM 和 ACCT 唯二相同的欄位是 userno、userid */
+   RFORM 和 ACCT 唯三相同的欄位是 userno、userid、realname */
 
 typedef struct	/* 註冊表單 (Register From) 256 bytes */
 {
@@ -121,7 +122,7 @@ typedef struct	/* 註冊表單 (Register From) 256 bytes */
   time4_t rtime;
   char userid[IDLEN + 1];
   char agent[IDLEN + 1];
-  char nouse[20];
+  char realname[RNLEN + 1];
   char career[50];
   char address[60];
   char phone[20];
