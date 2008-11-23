@@ -71,26 +71,13 @@ brd_get(bname)
 /* ----------------------------------------------------- */
 
 static void
-send_rss(old, new, brdname)
-  RSS *old;
-  RSS *new;
+send_rss(rss, brdname)
+  RSS *rss;
   char *brdname;
 {
   FILE *fp;
   char file_path[64];
   char cmd[256];
-
-  memset(new, 0, sizeof(RSS));
-  strcpy(new->bookmark, old->bookmark);
-  new->chrono = old->chrono;
-  new->xmode = old->xmode;
-  new->xid = old->xid;
-  strcpy(new->owner, old->owner);
-  strcpy(new->date, old->date);
-  strcpy(new->url, old->url);
-  strcpy(new->info, old->info);
-  strcpy(new->code_type, old->code_type);
-  strcpy(new->modified, old->modified);
 
   /* smiler.080823: 重送前，先將之前暫存的 BBS<->RSS message 清掉 */
   sprintf(file_path, "%s/" FN_BBS_TO_RSS, brdname);
@@ -98,46 +85,41 @@ send_rss(old, new, brdname)
   sprintf(file_path, "%s/" FN_RSS_TO_BBS, brdname);
   unlink(file_path);
 
-  if (new->xmode & RSS_RESTART)
-    strcpy(new->modified, "start");	/* smiler.080823: 設定重送時，將modified清為"start" */
+  if (rss->xmode & RSS_RESTART)
+    strcpy(rss->modified, "start");	/* smiler.080823: 設定重送時，將 modified 清為 "start" */
 
-  if (new->xmode & RSS_START)
+  if (rss->xmode & RSS_START)
   {
     /* smiler.080823: 送出 BBS_TO_RSS message  */
     sprintf(file_path, "%s/" FN_BBS_TO_RSS, brdname);
     fp = fopen(file_path, "w");
 
-    fprintf(fp,"%s\n", new->owner);
-
-    fprintf(fp, "%s\n", (new->bookmark[0] != '\0') ? new->bookmark : "RSS");
-
-    fprintf(fp, "%s\n", new->url);
-
-    fprintf(fp, "%s\n", new->modified);
-
-    fprintf(fp, "%c\n", (new->xmode & RSS_TXT) ? 'y' : 'n');
-
-    fprintf(fp, "%c\n", (new->xmode & RSS_RESTART) ? 'r' : 'n');
+    fprintf(fp, "%s\n", rss->owner);
+    fprintf(fp, "%s\n", (rss->bookmark[0] != '\0') ? rss->bookmark : "RSS");
+    fprintf(fp, "%s\n", rss->url);
+    fprintf(fp, "%s\n", rss->modified);
+    fprintf(fp, "%c\n", (rss->xmode & RSS_TXT) ? 'y' : 'n');
+    fprintf(fp, "%c\n", (rss->xmode & RSS_RESTART) ? 'r' : 'n');
 
     fclose(fp);
 
     /* smiler.080823: 送出 command */
-    sprintf(cmd, BBSHOME "/bin/rss_b003 %s %s;", BBSHOME, brdname);
+    sprintf(cmd, BBSHOME "/bin/rss_b004 %s %s;", BBSHOME, brdname);
     system(cmd);
 
     /* smiler.080823: 取回 RSS_TO_BBS message */
     sprintf(file_path, "%s/" FN_RSS_TO_BBS, brdname);
     if (fp = fopen(file_path, "r"))
     {
-      fgets(new->modified , 64 , fp);
+      fgets(rss->modified , 64, fp);
       fclose(fp);
     }
     else
-      strcpy(new->modified, "start");	/* 若 feed->modified 未回傳，則modified重設為start */
+      strcpy(rss->modified, "start");	/* 若 feed->modified 未回傳，則 modified 重設為 "start" */
   }
 
-  if (new->xmode & RSS_RESTART)
-     new->xmode &= (~RSS_RESTART);	/* 最後將 RSS_RESTART 歸 0 */
+  if (rss->xmode & RSS_RESTART)
+     rss->xmode ^= RSS_RESTART;		/* 最後將 RSS_RESTART 歸 0 */
 }
 
 
@@ -147,7 +129,6 @@ main(argc, argv)
   char *argv[];
 {
   FILE *fp;
-  RSS rss;
 
 #if 0
   if (argc > 2)
@@ -164,8 +145,7 @@ main(argc, argv)
   struct dirent *de;
   DIR *dirp;
 
-  sprintf(buf, BBSHOME "/brd");
-  chdir(buf);
+  chdir(BBSHOME "/brd");
 
   init_bshm();
 
@@ -173,7 +153,7 @@ main(argc, argv)
 
   while (de = readdir(dirp))
   {
-    RSS old;
+    RSS rss;
     char *str;
 
     str = de->d_name;
@@ -190,43 +170,37 @@ main(argc, argv)
     if (dashf(buf))
     {
       char cmd[64];
+      char file_path[64];
+
+      /* smiler.080823: 若 .RSS.ENTRY_NUM 不存在，就先開檔，並寫入0 */
+      sprintf(file_path, "%s/" FN_RSS_ENTRY_NUM, str);
+      if (!dashf(file_path))
+      {
+	sprintf(cmd, "echo '0' > %s", file_path);
+	system(cmd);
+      }
+
       sprintf(cmd, "cp %s %s", buf, buf3);
       system(cmd);
 
       fp = fopen(buf3, "r");
-
-      /* smiler.080823: 若 .RSS.ENTRY_NUM 不存在，就先開檔，並寫入0 */
-      FILE *fp_entry_num;
-      char file_path[64];
-
-      sprintf(file_path, "%s/" FN_RSS_ENTRY_NUM, str);
-      if (!dashf(file_path))
+      while (fread(&rss, sizeof(RSS), 1, fp) == 1)
       {
-	fp_entry_num = fopen (file_path, "w");
-	fputc('0', fp_entry_num);
-        fclose(fp_entry_num);
-      }
-
-      while (fread(&old, sizeof(old), 1, fp) == 1)
-      {
-	send_rss(&old, &rss, str);
+	send_rss(&rss, str);
 	rec_add(buf2, &rss, sizeof(RSS));
-
-	/* 更新看板 btime */
-	BRD *brd;
-	brd = brd_get(str);
-	brd->btime = -1;
       }
 
       fclose(fp);
 
-      /* 刪除舊的，把新的更名 */
-      unlink(buf3);
-      rename(buf2, buf3);
-
-      /* 將備份檔寫回 .RSS */
+      /* 刪除舊的，將備份檔寫回 .RSS */
       unlink(buf);
-      rename(buf3, buf);
+      unlink(buf3);
+      rename(buf2, buf);
+
+      /* 更新看板 btime */
+      BRD *brd;
+      brd = brd_get(str);
+      brd->btime = -1;
     }
   }
 
