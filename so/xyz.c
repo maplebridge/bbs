@@ -236,125 +236,191 @@ x_password()
 /* ----------------------------------------------------- */
 /* 擲骰子程式						 */
 /* ----------------------------------------------------- */
-
-
+/* ryanlei.081123: 改寫，顯示方式可為：
+   1)出現次數 2)逐次顯示 3)兩者皆要，
+   並列出相關總和，平均，及其期望值作為參考。
+   另更動排版使其縮排一致
+*/
 int
 post_sibala(xo)
-  XO *xo;
+	XO *xo;
 {
-  FILE *fp, *fp2;
-  HDR hdr;
-  struct tm *ptime;
-  time_t now;
-  char fpath[64], buf[64], title[64], folder[64];
-  int i, j, k, num_sibala, num_sibala_face;
+	FILE *fp, *fp2, *fp3;
+	HDR hdr;
+	struct tm *ptime;
+	time_t now;
+	char fpath[64], buf[64], title[64], folder[64], FP3[64];
+	char line[40] = "──────────────────\n";
+	unsigned short i, j, k, num_sibala_face, num_sibala;
+	unsigned short *count, mode;  // ryanlei.081123: 次數統計、顯示模式
+	unsigned total = 0;  // 點數總和
+	float mean, Ex;  // ryanlei.081123: 平均數、期望值
 
-  sprintf(fpath, "tmp/%s.sibala", cuser.userid);
+	sprintf(fpath, "tmp/%s.sibala", cuser.userid);
 
-  for (j = 0; j != 'y';)
-  {
-    j = 0;
-    num_sibala = 0;
-    num_sibala_face = 0;
+	for (j = 0; j != 'y';)
+	{
+    	j = 0;
+    	num_sibala = 0;
+    	num_sibala_face = 0;
 
-    fp = fopen(fpath, "w");
+    	fp = fopen(fpath, "w");
+		fprintf(fp, "丟骰人   : %s\n", cuser.userid);
+		fprintf(fp, "來源     : %s\n", fromhost);
+		fprintf(fp, "IP位址   : %s\n", get_my_ip());
 
-    fprintf(fp, "丟骰人   : %s\n", cuser.userid);
-    fprintf(fp, "來源     : %s\n", fromhost);
-    fprintf(fp, "來源     : %s\n", get_my_ip());
+		time(&now);
+		ptime = localtime(&now);
+		fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
+    		ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
 
-    time(&now);
-    ptime = localtime(&now);
-    fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
-    ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+    	clear();
+    	move(i = 3, 0);
+    	if (!vget(i, 0, "輸入標題名稱 : ", title, 60, DOECHO))
+			break;
+		fprintf(fp, "標題名稱 : %s\n", title);
 
-    clear();
-    move(i = 3, 0);
-    if (!vget(i, 0, "輸入標題名稱 : ", title, 60, DOECHO))
-      break;
-    fprintf(fp, "標題名稱 : %s\n", title);
+    	i += 2;
+		// ryanlei.081123: 為了防止malloc負荷過重，只允許兩位數骰子面數
+    	if (!vget(i, 0, "輸入骰子面數 : ", buf, 3, DOECHO) || !(num_sibala_face = atoi(buf)))
+      		break;
+		fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+		// ryanlei.081123: 統計各點數出現的次數
+		count = malloc( sizeof(unsigned short) * num_sibala_face );
 
-    i += 2;
-    if (!vget(i, 0, "輸入骰子面數 : ", buf, 5, DOECHO) || !(num_sibala_face = atoi(buf)))
-      break;
-    fprintf(fp, "丟骰面數 : %d\n", num_sibala_face);
+    	i += 2;
+    	if (!vget(i, 0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
+      		break;
+    	fprintf(fp, "丟骰次數 : %d\n", num_sibala);
 
-    i += 2;
-    if (!vget(i, 0, "輸入丟骰次數 : ", buf, 5, DOECHO) || !(num_sibala = atoi(buf)))
-      break;
-    fprintf(fp, "◎丟骰次數 : %d\n", num_sibala);
+		// ryanlei.081123: 
+		// 顯示方式 : 1)出現次數 2)逐次結果 3)兩者皆要
+		i += 2;
+    	vget(i, 0, "顯示方式 : 1)出現次數 2)逐次結果 3)兩者皆要 [1] ", buf, 2, DOECHO);
+		mode = atoi( buf );
+		if ( mode != 2 && mode != 3 )
+			mode = 1;  // default: 1
+		fprintf( fp, "顯示方式 : %s\n", 
+			mode == 2 ? "逐次結果" :
+			mode == 3 ? "兩者皆要" :
+			"出現次數" );
+		fprintf( fp, "\n丟骰結果 : \n%s", line );
+		fclose( fp );
 
-    j = vans("Y)丟出 E)重來 Q)取消？[Q] ");
+	    j = vans("Y)丟出 E)重來 Q)取消？[Q] ");
 
-    if (j != 'y')
-    {
-      fclose(fp);
-      unlink(fpath);
-    }
+	    if (j != 'y')
+    	{
+	    	fclose(fp);
+    	  	unlink(fpath);
+    	}
 
-    if (!j || j == 'q')
-      return XO_HEAD;
-  }
+		if (!j || j == 'q')
+      		return XO_HEAD;
+	}
 
-  if (!j)	/* 處理中斷跳出 */
-  {
-    fclose(fp);
-    unlink(fpath);
-    return XO_HEAD;
-  }
+	if (!j)	/* 處理中斷跳出 */
+  	{
+    	fclose(fp);
+    	unlink(fpath);
+    	return XO_HEAD;
+	}
 
-  sprintf(folder, "%s.tmp", fpath);	/* 借用 folder */
-  fp2 = fopen(folder, "w");
+  	sprintf(folder, "%s.tmp1", fpath);	/* 借用 folder */
+  	fp2 = fopen( folder, "w" );
+  	sprintf( FP3, "%s.tmp2", fpath );
+  	fp3 = fopen( FP3, "w" );
 
-  for (i = j = 0, srand(time(0)); i < num_sibala; i++)
-  {
-    k = rand() % num_sibala_face + 1;
-    j += k;
-    fprintf(fp2, "第 %4d 次丟骰結果 : %4d  加總 : %d\n", i + 1, k, j);
-  }
-  fclose(fp2);
+  	if ( mode == 3 )  /* 兩者皆要=>加分隔線 */
+	  fprintf( fp3, "%s", line );
 
-  sprintf(buf, "丟骰結果 : %d", j);
-  fprintf(fp, "%s\n", buf);
-  fclose(fp);
-  vmsg(buf);
+	for ( i = 0; i <= num_sibala_face; i++ ) count[ i ] = 0;  // 初始化
+	/* 丟骰子開始 */
+	for ( i = 0, srand(time(0)); i < num_sibala; i++ )
+  	{
+		k = rand() % num_sibala_face + 1;
+		count[ k-1 ]++;
+		total += k;
+		if ( mode != 1 )
+    		fprintf(fp3, "第 %4d 次丟骰結果 : %4d\n", i + 1, k );
+  	}
+  	fclose( fp3 );
 
-  sprintf(buf, "/bin/cat %s >> %s", folder, fpath);
-  system(buf);
-  unlink(folder);
+  	if ( mode != 2 )
+	{
+		fprintf( fp2, "    點數      出現次數      比例\n" );
+		for ( i = 0; i < num_sibala_face; i++ )
+  		{	
+			if ( count[ i ] != 0 )  // 出現1次以上才顯示
+			{
+	  			fprintf( fp2, "    %4d      %4d       %6.3f%%\n",
+	  			i+1, count[ i ], (float)count[ i ]/(float)num_sibala*100.f ); 
+	  		}
+		}
+		fprintf( fp2, "%s平均期望次數: %7.2f    %6.3f%%\n", line,
+			(float)num_sibala / (float)num_sibala_face, 
+			100.f / (float)num_sibala_face );
+  	}
+	/* 計算平均和期望值 */
+  	mean = (float)total / (float)num_sibala;
+  	Ex = (float)( num_sibala_face + 1 ) / 2.f;
+  	
+	fclose(fp2);
+  	sprintf(buf, "丟骰完成！\n");
+  	vmsg(buf);
 
-  if (!(bbstate & STAT_POST))	/* 在 currboard 沒有發表權限，故寄回信箱 */
-  {
-    usr_fpath(folder, cuser.userid, fn_dir);
-    hdr_stamp(folder, HDR_COPY, &hdr, fpath);
-    strcpy(hdr.owner, "丟骰結果");
-    strcpy(hdr.nick,  "賭神");
-    hdr.xmode = MAIL_READ | MAIL_NOREPLY;
-    sprintf(hdr.title, "%s : %s", cuser.userid, title);
-    rec_add(folder, &hdr, sizeof(HDR));
-    vmsg("您沒有在此發表文章的權限，丟骰結果已寄回您的信箱");
-  }
-  else		/* 貼回原看板上 */
-  {
-    hdr_stamp(xo->dir, HDR_COPY | 'A', &hdr, fpath);
-    strcpy(hdr.owner, "丟骰結果");
-    strcpy(hdr.nick,  "賭神");
-    sprintf(hdr.title, "%s : %s", cuser.userid, title);
-    rec_bot(xo->dir, &hdr, sizeof(HDR));
-    btime_update(brd_bno(currboard));
-  }
+	if ( mode != 2 ) 
+	{
+		sprintf( buf, "/bin/cat %s >> %s", folder, fpath );
+		system(buf);
+  	}
+  	if ( mode != 1 )
+	{
+		sprintf( buf, "/bin/cat %s >> %s", FP3, fpath );
+		system(buf);
+  	}
+  
+  	/* 總計 */
+  	fp = fopen( fpath, "a" );  // 再開一次檔
+  	fprintf( fp, "\n點數總和 : %6d     期望值 : %9.2f\n", total, Ex * num_sibala );
+  	fprintf( fp, "點數平均 : %6.2f     期望值 : %9.2f\n", mean, Ex );
+	fclose( fp );
 
-  /* 貼至 log 板做記錄 */
-  brd_fpath(folder, "log", ".DIR");
+  	unlink(folder);
 
-  hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
-  strcpy(hdr.owner, "丟骰結果");
-  strcpy(hdr.nick,  "賭神");
-  sprintf(hdr.title, "%s : %s", cuser.userid, title);
-  rec_bot(folder, &hdr, sizeof(HDR));
-  btime_update(brd_bno("log"));
+	if (!(bbstate & STAT_POST))	/* 在 currboard 沒有發表權限，故寄回信箱 */
+  	{
+    	usr_fpath(folder, cuser.userid, fn_dir);
+    	hdr_stamp(folder, HDR_COPY, &hdr, fpath);
+    	strcpy(hdr.owner, "丟骰結果");
+    	strcpy(hdr.nick,  "賭神");
+    	hdr.xmode = MAIL_READ | MAIL_NOREPLY;
+    	sprintf(hdr.title, "%s : %s", cuser.userid, title);
+    	rec_add(folder, &hdr, sizeof(HDR));
+    	vmsg("您沒有在此發表文章的權限，丟骰結果已寄回您的信箱");
+  	}
+  	else		/* 貼回原看板上 */
+  	{
+    	hdr_stamp(xo->dir, HDR_COPY | 'A', &hdr, fpath);
+    	strcpy(hdr.owner, "丟骰結果");
+    	strcpy(hdr.nick,  "賭神");
+    	sprintf(hdr.title, "%s : %s", cuser.userid, title);
+    	rec_bot(xo->dir, &hdr, sizeof(HDR));
+    	btime_update(brd_bno(currboard));
+  	}
 
-  unlink(fpath);
+  	/* 貼至 log 板做記錄 */
+  	brd_fpath(folder, "log", ".DIR");
 
-  return XO_INIT;
+  	hdr_stamp(folder, HDR_COPY | 'A', &hdr, fpath);
+  	strcpy(hdr.owner, "丟骰結果");
+  	strcpy(hdr.nick,  "賭神");
+  	sprintf(hdr.title, "%s : %s", cuser.userid, title);
+  	rec_bot(folder, &hdr, sizeof(HDR));
+  	btime_update(brd_bno("log"));
+
+  	free( count );
+  	unlink(fpath);
+
+  	return XO_INIT;
 }
