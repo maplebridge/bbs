@@ -974,6 +974,18 @@ post_sysop_reply(xo, hdr)
   btime_update(brd_bno(currboard));
   return XO_HEAD;
 }
+
+
+static int
+post_sysop_send(xo)
+  XO *xo;
+{
+  sysop_reply = 1;
+  m_send();
+  sysop_reply = 0;
+  btime_update(brd_bno(currboard));
+  return XO_HEAD;
+}
 #endif
 
 
@@ -1009,6 +1021,11 @@ static int
 post_add(xo)
   XO *xo;
 {
+#ifdef SYSOP_MBOX_BRD
+  if (!strcmp(currboard, BN_SYSOPMBOX))
+    return post_sysop_send(xo);
+#endif
+
   curredit = EDIT_OUTGO;
   *quote_file = '\0';
   return do_post(xo, NULL);
@@ -1016,7 +1033,7 @@ post_add(xo)
 
 
 /* ----------------------------------------------------- */
-/* 印出 hdr 標題						 */
+/* 印出 hdr 標題					 */
 /* ----------------------------------------------------- */
 
 
