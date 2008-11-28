@@ -1655,7 +1655,12 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 #endif
 
   char my_ip[15];
-  sprintf(my_ip, "%s", get_my_ip());
+#ifdef HAVE_HIDE_FROM
+  if (cuser.ufo2 & UFO2_CFROM)
+    str_ncpy(my_ip, cuser.cfrom, sizeof(my_ip));
+  else
+#endif
+    sprintf(my_ip, "%s", get_my_ip());
 
   if (!modify)
   {

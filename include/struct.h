@@ -332,6 +332,7 @@ struct UTMP
   char username[UNLEN + 1];	/* user's nickname */
   char from[34];		/* remote host */
   char cmode[11];
+  char cfrom[34];		/* user's custom from */
 #ifdef HAVE_BRDMATE
   char reading[BNLEN + 1];	/* reading board */
 #endif

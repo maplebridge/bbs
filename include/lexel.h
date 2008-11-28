@@ -46,20 +46,21 @@
 /* 定義 BBS 站名位址					 */
 /* ------------------------------------------------------*/
 
-#define BBSNAME		"來客所Beta2"		/* 中文站名 */
-#define BBSNAME2	"LexelBBS-bsd1"		/* 英文站名 */
+#define BBSNAME		"來客所"		/* 中文站名 */
+#define BBSNAME2	"LexelBBS"		/* 英文站名 */
 #define BBSNAME3	"來客所"		/* 短站名 */
 #define SYSOPNICK	"sysop"			/* sysop 的暱稱 */
 
 #define MYIPADDR	"140.114.87.41"		/* IP address */
-#define MYHOSTNAME	"bsd1.cs.nthu.edu.tw"	/* 網路地址 FQDN */
-#define HOST_ALIASES	{MYHOSTNAME, MYIPADDR}
+#define MYHOSTNAME	"maplebbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
+#define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, \
+			"lexel.twbbs.org", NULL}
 
-#define BBSHOME		"/home/bbs"		/* BBS 的家 */
-#define BAKPATH		"/home/bbs/bak"		/* 備份檔的路徑 */
+#define BBSHOME		"/home/lexel"		/* BBS 的家 */
+#define BAKPATH		"/home/lexel/bak"	/* 備份檔的路徑 */
 
-#define BBSUID		1004
-#define BBSGID		1004			/* Linux 請設為 999 */
+#define BBSUID		1002
+#define BBSGID		1002			/* Linux 請設為 999 */
 
 
   /* ------------------------------------------------- */
@@ -69,6 +70,8 @@
 #define HAVE_UFO2
 #ifdef HAVE_UFO2
 #  define HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  define HAVE_HIDE_FROM	/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+				/* 要先 define HAVE_CHANGE_FROM */
 #  define HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
 #endif
 

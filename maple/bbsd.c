@@ -574,6 +574,7 @@ utmp_setup(mode)
 
   strcpy(utmp.username, cuser.username);
   strcpy(utmp.cmode, cuser.cmode);
+  strcpy(utmp.cfrom, cuser.cfrom);
 
 #ifdef HAVE_WHERE
 

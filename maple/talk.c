@@ -170,8 +170,13 @@ do_query(acct)
     fortune[rich],
     (m_query(userid) & STATUS_BIFF) ? "有新信件" : "都看過了");
 
-  prints("[來源] (%s) %s\n",
-    Btime(&acct->lastlogin), acct->lasthost);
+#ifdef HAVE_HIDE_FROM
+  if (up->ufo2 & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+    prints("[來源] %s\n", acct->cfrom);
+  else
+#endif
+    prints("[來源] (%s) %s\n",
+      Btime(&acct->lastlogin), acct->lasthost);
 
   showplans(userid);
   vmsg(NULL);
@@ -1384,7 +1389,12 @@ talk_rqst()
 #endif
 
   bell();
-  prints("您想跟 %s 聊天嗎？(來自 %s)", page_requestor, up->from);
+  prints("您想跟 %s 聊天嗎？(來自 %s)", page_requestor,
+#ifdef HAVE_HIDE_FROM
+  (up->ufo2 & UFO2_CFROM) ? up->cfrom :
+#endif
+  up->from);
+
   for (;;)	/* 讓使用者可以先查詢要求聊天的對方 */
   {
     ans = vget(1, 0, "==> Q)查詢 Y)聊天 N)取消？[Y] ", buf, 3, LCECHO);

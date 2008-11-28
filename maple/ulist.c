@@ -248,6 +248,9 @@ ulist_item(num, up, slot, now, sysop)
 #else
     (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?			/* 對方設我為好友可看見對方來源 */
 #endif
+#ifdef HAVE_HIDE_FROM
+    (up->ufo2 & UFO2_CFROM) ? up->cfrom :
+#endif
     up->from : "*", bmode(up, 0), buf);
 }
 
@@ -356,6 +359,9 @@ ulist_item_bar(xo, mode)
 #else
     (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
       ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?
+#endif
+#ifdef HAVE_HIDE_FROM
+    (up->ufo2 & UFO2_CFROM) ? up->cfrom :
 #endif
     up->from : "*", bmode(up, 0), buf,
     mode ? "\033[m" : "");
@@ -1052,9 +1058,27 @@ ulist_fromchange(xo)
     if (strcmp(buf, str))
     {
       strcpy(str, buf);
-      return ulist_body(xo);
+#ifdef HAVE_HIDE_FROM
+      if (!(cuser.ufo2 & UFO2_CFROM))
+#endif
+	return ulist_body(xo);
     }
   }
+#ifdef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+  else if (cuser.ufo2 & UFO2_CFROM)
+  {
+    strcpy(buf, "不告訴你");
+    strcpy(str, buf);
+
+    return ulist_body(xo);
+  }
+
+  if (cuser.ufo2 & UFO2_CFROM)
+  {
+    strcpy(cuser.cfrom, buf);	/* 一併更換 cuser. */
+    return ulist_body(xo);
+  }
+#endif
 
   return XO_FOOT;
 }

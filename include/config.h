@@ -36,9 +36,9 @@
 #define MYIPADDR	"140.114.87.5"		/* IP address */
 #define MYHOSTNAME	"bbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 
-#define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, "nthucs.twbbs.org",\
-                         "bbs.iMaple.tw", "iMaple.tw", \
-                         NULL}
+#define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, "nthucs.twbbs.org", \
+			"bbs.iMaple.tw", "iMaple.tw", \
+			NULL}
 
 #define MYCHARSET	"big5"			/* BBS 所使用的字集 */
 
@@ -143,6 +143,7 @@
 #undef HAVE_UFO2
 #ifdef HAVE_UFO2
 #  undef HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  undef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
 #  undef HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
 #endif
 
