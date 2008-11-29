@@ -1,8 +1,8 @@
 /*-------------------------------------------------------*/
-/* theme.h	( NTHU CS MapleBBS Ver 3.10 )		 */
+/* lexel.h	( NTHU CS MapleBBS Ver 3.10 )		 */
 /*-------------------------------------------------------*/
-/* target : custom theme				 */
-/* create : 02/08/17				 	 */
+/* target : lexel custom config				 */
+/* create : 08/11/02				 	 */
 /* update :   /  /  				 	 */
 /*-------------------------------------------------------*/
 
@@ -51,7 +51,7 @@
 #define BBSNAME3	"來客所"		/* 短站名 */
 #define SYSOPNICK	"sysop"			/* sysop 的暱稱 */
 
-#define MYIPADDR	"140.114.87.41"		/* IP address */
+#define MYIPADDR	"140.114.87.7"		/* IP address */
 #define MYHOSTNAME	"maplebbs.cs.nthu.edu.tw"	/* 網路地址 FQDN */
 #define HOST_ALIASES	{MYHOSTNAME, MYIPADDR, \
 			"lexel.twbbs.org", NULL}

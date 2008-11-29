@@ -1052,7 +1052,12 @@ ulist_fromchange(xo)
   if (!cuser.userlevel)
     return XO_NONE;
 
-  strcpy(buf, str = cutmp->from);
+#ifdef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+  if (cuser.ufo2 & UFO2_CFROM)
+    strcpy(buf, str = cutmp->cfrom);
+  else
+#endif
+    strcpy(buf, str = cutmp->from);
   if (vget(b_lines, 0, "請輸入新的故鄉：", buf, sizeof(cutmp->from), GCARRY))
   {
     if (strcmp(buf, str))
@@ -1064,7 +1069,7 @@ ulist_fromchange(xo)
 	return ulist_body(xo);
     }
   }
-#ifdef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#ifdef HAVE_HIDE_FROM
   else if (cuser.ufo2 & UFO2_CFROM)
   {
     strcpy(buf, "不告訴你");

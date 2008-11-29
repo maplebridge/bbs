@@ -172,7 +172,7 @@ do_query(acct)
 
 #ifdef HAVE_HIDE_FROM
   if (up->ufo2 & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 璹/留旅 ㄓ方 */
-    prints("[ㄓ方] %s\n", acct->cfrom);
+    prints("[ㄓ方] %s\n", up->cfrom);
   else
 #endif
     prints("[ㄓ方] (%s) %s\n",

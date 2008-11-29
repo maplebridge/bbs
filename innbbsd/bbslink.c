@@ -247,6 +247,7 @@ inetclient(server, port)
 {
   struct hostent *host;		/* host information entry */
   struct sockaddr_in sin;	/* Internet endpoint address */
+  struct sockaddr_in addr_svr;	/* sending out address */
   int fd;
 
   if (!*server || !port)
@@ -266,6 +267,17 @@ inetclient(server, port)
   fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (fd < 0)
     return -1;
+
+  memset(&addr_svr, 0, sizeof(addr_svr));
+  addr_svr.sin_addr.s_addr= inet_addr(MYIPADDR);
+  addr_svr.sin_family= AF_INET;
+  addr_svr.sin_port= htons(0);
+
+  if (bind(fd, (struct sockaddr *) &addr_svr,sizeof(addr_svr)) == -1)
+  {
+    printf("bind error!\n");
+    exit(1);
+  }
 
   /* Connect the socket to the server */
   if (connect(fd, (struct sockaddr *) & sin, sizeof(sin)) < 0)
