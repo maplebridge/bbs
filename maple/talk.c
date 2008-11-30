@@ -171,8 +171,8 @@ do_query(acct)
     (m_query(userid) & STATUS_BIFF) ? "Τ穝獺ン" : "常筁");
 
 #ifdef HAVE_HIDE_FROM
-  if (up->ufo2 & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 璹/留旅 ㄓ方 */
-    prints("[ㄓ方] %s\n", up->cfrom);
+  if ((up ? up->ufo2 : acct->ufo2) & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 璹/留旅 ㄓ方 */
+    prints("[ㄓ方] %s\n", up ? up->cfrom : acct->cfrom);
   else
 #endif
     prints("[ㄓ方] (%s) %s\n",
