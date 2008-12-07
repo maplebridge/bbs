@@ -2368,16 +2368,22 @@ ve_key:
 
       case Ctrl('O'):		/* delete to end of file */
 
-	/* vln->len = ve_col = cc = 0; */
-	tmp = vln->next;
-	vln->next = NULL;
-	while (tmp)
+	cc = vans("請問你要 1)刪除此行之後至檔案結束 2)切換 Insert/Overwrite ？[Q] ");
+	if (cc == '1')
 	{
-	  vln = tmp->next;
-	  free(tmp);
-	  tmp = vln;
+	  /* vln->len = ve_col = cc = 0; */
+	  tmp = vln->next;
+	  vln->next = NULL;
+	  while (tmp)
+	  {
+	    vln = tmp->next;
+	    free(tmp);
+	    tmp = vln;
+	  }
+	  ve_mode = mode | VE_REDRAW;
 	}
-	ve_mode = mode | VE_REDRAW;
+	else if (cc == '2')
+	  ve_mode = mode ^ VE_INSERT;
 	continue;
 
       case Ctrl('Y'):		/* delete current line */

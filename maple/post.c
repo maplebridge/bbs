@@ -943,7 +943,7 @@ do_reply(xo, hdr)
 
 
 #ifdef HAVE_REFUSEMARK
-static int
+int
 chkrestrict(hdr)
   HDR *hdr;
 {
@@ -1005,8 +1005,6 @@ post_reply(xo)
 #endif
 
 #ifdef HAVE_REFUSEMARK
-    //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))  //0709
-    //  return XO_NONE;
     if (!chkrestrict(hdr))
       return XO_NONE;
 #endif
@@ -1886,7 +1884,6 @@ post_browse(xo)
     xmode = hdr->xmode;
 
 #ifdef HAVE_REFUSEMARK
-    //if ((xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
     if (!chkrestrict(hdr))
       return XO_NONE;
 #endif
@@ -2393,7 +2390,7 @@ post_forward(xo)
     return XO_NONE;
 
 #ifdef HAVE_REFUSEMARK
-//  if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+//  if (!chkrestrict(hdr))
 //    return XO_NONE;
   //if(RefusePal_level(currboard, hdr)!=0)  //若為L文及F文,僅板主及作者可轉錄
   if (hdr->xmode & POST_RESTRICT)
@@ -3441,7 +3438,6 @@ post_edit(xo)
   if (HAS_PERM(PERM_ALLBOARD))			/* 站長修改 */
   {
 #ifdef HAVE_REFUSEMARK
-    //if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
     if (!chkrestrict(hdr))
       return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
@@ -3768,7 +3764,7 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     return XO_NONE;
 
 #ifdef HAVE_REFUSEMARK
-  if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+  if (!chkrestrict(hdr))
     return XO_NONE;
 #endif
 
@@ -3847,7 +3843,7 @@ post_append_score(xo, choose)
   }
 
 #ifdef HAVE_REFUSEMARK
-  if ((hdr->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, hdr))
+  if (!chkrestrict(hdr))
     return XO_NONE;
 #endif
 

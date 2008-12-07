@@ -133,7 +133,7 @@ XoXpost(xo, hdr, on, off, fchk)		/* Thor: eXtended post : call from post_cb */
     head = (HDR *) fimage + locus;
 
 #ifdef HAVE_REFUSEMARK
-    if ((head->xmode & POST_RESTRICT) && !RefusePal_belong(currboard, head))
+    if (!chkrestrict(head))
       continue;
 #endif
 
@@ -995,8 +995,7 @@ xpost_browse(xo)
 
 #if 0	/* itoc.010822: 不需要，在 XoXpost() 中已被剔除 */
 #ifdef HAVE_REFUSEMARK
-    xmode = hdr->xmode;
-    if ((xmode & POST_RESTRICT) && 
+    if (chkrestrict(hdr) && 
       strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
       continue;
 #endif
@@ -1370,7 +1369,7 @@ XoNews(xo)			/* itoc: News reader : call from post_cb */
     head = (HDR *) fimage + i;
 
 #ifdef HAVE_REFUSEMARK
-    if ((head->xmode & POST_RESTRICT) && 
+    if (chkrestrict(head) && 
       strcmp(head->owner, cuser.userid) && !(bbstate & STAT_BM))
       continue;
 #endif

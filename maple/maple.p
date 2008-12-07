@@ -165,6 +165,7 @@ int IS_WELCOME(char *board, char *f_mode);
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
 int do_reply(XO *xo, HDR *hdr);
+int chkrestrict(HDR *hdr);
 int tag_char(int chrono);
 void hdr_outs(HDR *hdr, int cc);
 int post_edit(XO *xo);

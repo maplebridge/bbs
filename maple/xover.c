@@ -518,7 +518,7 @@ xo_prune(xo, size, fvfy, fdel)		/* itoc.031003: ¼ÐÅÒ§R°£ */
   free(data);
 
   TagNum = 0;
-  
+
   return XO_LOAD;
 }
 
@@ -1021,7 +1021,7 @@ xo_thread(xo, op)
     }
 
 #ifdef HAVE_REFUSEMARK
-    if ((hdr->xmode & POST_RESTRICT) && strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
+    if (chkrestrict(hdr) && strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
       continue;
 #endif
 
