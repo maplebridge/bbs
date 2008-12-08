@@ -1202,7 +1202,7 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 static int IamBM;
 
 static int
-chkrestrict(hdr)
+gem_chkrestrict(hdr)
   HDR *hdr;
 {
   if (hdr->xmode & GEM_BOARD)		/* 看板不能被複製/貼上 */
@@ -1234,7 +1234,7 @@ gem_copy(xo)
   if (!(level & GEM_W_BIT))
     return XO_NONE;
 
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict ,1);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), gem_chkrestrict ,1);
 
   zmsg("拷貝完成。[注意] 貼上後才能刪除原文！");
   /* return XO_FOOT; */
@@ -1395,8 +1395,8 @@ gem_do_paste(srcDir, dstDir, hdr, pos)		/* itoc.010725: for gem_paste() */
       tail = data + (fsize / sizeof(HDR));
       do
       {
-	/* 只有 gem_copy() 才可能有 GEM_FOLDER，所以用精華區的 chkrestrict */
-	if (chkrestrict(head))
+	/* 只有 gem_copy() 才可能有 GEM_FOLDER，所以用精華區的 gem_chkrestrict */
+	if (gem_chkrestrict(head))
 	  gem_do_paste(folder, fpath, head, -1);
       } while (++head < tail);
 
