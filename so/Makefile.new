@@ -23,7 +23,7 @@ SO =	admutil.so aloha.so bank.so chat.so dictd.so help.so \
 .SUFFIXES: .c .o .so
 
 .c.o:	;  $(CC) $(CFLAGS) -I/usr/local/include -c $*.c
-.o.so:	;  $(LD) $(LDFLAGS) -G $*.o -o $*.so -L/usr/local/lib -liconv
+.o.so:	;  $(LD) -G $*.o -o $*.so $(LDFLAGS) $(EXTRA_LDFLAGS) 
 
 
 all: 
