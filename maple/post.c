@@ -3427,6 +3427,9 @@ post_edit(xo)
   if (!strcmp(currboard, BN_DELLOG) || !strcmp(currboard, BN_EDITLOG))
     return XO_NONE;
 
+  if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BOARD))
+    return XO_NONE;
+
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
 
   /* smiler 1031 */
@@ -3489,8 +3492,14 @@ post_edit(xo)
     /* smiler 1031 */
     backup_post_log(copied, BN_EDITLOG, hdr, 0);
   }
-  else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BOARD))	/* 板主/原作者修改 */
+  else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* 板主/原作者修改 */
   {
+    if (currbattr & BRD_NOEDIT)
+    {
+      vedit(fpath, -1);
+      return XO_HEAD;
+    }
+
     /* smiler 1031 */
     backup_post_log(copied, BN_EDITLOG, hdr, 0);
 
@@ -3515,41 +3524,41 @@ post_edit(xo)
     }
 
 #ifdef DO_POST_FILTER
-  strcpy(bbs_dog_title, hdr->title);
-  if (post_filter(tmpfile))	/* smiler.080830: 針對文章標題內容偵測有無不當之處 */
-    unlink(tmpfile);
-  else
-  {
-    char xpath[64];
-
-    unlink(fpath);
-    f_ln(tmpfile, fpath);
-    unlink(tmpfile);
-
-    if (hdr->xmode & POST_BOTTOM)	/* 修改置底文，去找原文一起改 */
+    strcpy(bbs_dog_title, hdr->title);
+    if (post_filter(tmpfile))	/* smiler.080830: 針對文章標題內容偵測有無不當之處 */
+      unlink(tmpfile);
+    else
     {
-      if (find_xname_by_chrono(hdr->parent_chrono, xpath, 1))
+      char xpath[64];
+
+      unlink(fpath);
+      f_ln(tmpfile, fpath);
+      unlink(tmpfile);
+
+      if (hdr->xmode & POST_BOTTOM)	/* 修改置底文，去找原文一起改 */
       {
-	unlink(xpath);
-	f_ln(fpath, xpath);
+	if (find_xname_by_chrono(hdr->parent_chrono, xpath, 1))
+	{
+	  unlink(xpath);
+	  f_ln(fpath, xpath);
+	}
+      }
+      else if (hdr->parent_chrono)	/* 此篇文章有置底副本，一併更改之 */
+      {
+	if (find_xname_by_chrono(hdr->chrono, xpath, 0))
+	{
+	  unlink(xpath);
+	  f_ln(fpath, xpath);
+	}
       }
     }
-    else if (hdr->parent_chrono)	/* 此篇文章有置底副本，一併更改之 */
-    {
-      if (find_xname_by_chrono(hdr->chrono, xpath, 0))
-      {
-	unlink(xpath);
-	f_ln(fpath, xpath);
-      }
-    }
-  }
 #endif
 
     /* smiler 1031 */
     backup_post_log(copied, BN_EDITLOG, hdr, 0);
   }
   else		/* itoc.010301: 提供使用者修改(但不能儲存)其他人發表的文章 */
-#if 0
+#if 1
   {
 #ifdef HAVE_REFUSEMARK
     if (hdr->xmode & POST_RESTRICT)

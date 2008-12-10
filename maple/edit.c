@@ -2094,7 +2094,7 @@ vedit(fpath, ve_op)
       }
       else
       {
-	prints(FOOTER_VEDIT,
+	prints((ve_op < 0) ? FOOTER_VEDIT_RONLY : FOOTER_VEDIT,
 #ifdef EVERY_BIFF
 	  mode & VE_BIFF ? "¶l®t¨Ó¤F" :
 #endif

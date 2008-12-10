@@ -187,6 +187,8 @@ COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 " COLOR9 "(@)"COLOR2"動畫播
 #define FOOTER_VEDIT	\
 COLOR1 " %s " COLOR9 " (^Z)"COLOR2"說明 "COLOR9"(^W)"COLOR2"符號 "COLOR9"(^L)"COLOR2"重繪 "COLOR9"(^X)"COLOR2"檔案處理 ║"COLOR9"%s"COLOR2"│"COLOR9"%s"COLOR2"║"COLOR9"%5d:%3d"COLOR2"    \033[m"
 
+#define FOOTER_VEDIT_RONLY	\
+"%.0s\033[1;5m             唯讀模式                 \033[m"COLOR9"(^X)"COLOR2"檔案處理 ║"COLOR9"%s"COLOR2"│"COLOR9"%s"COLOR2"║"COLOR9"%5d:%3d"COLOR2"    \033[m"
 
 /* ----------------------------------------------------- */
 /* 訊息字串：xo_foot() 時的 feeter 都抓出來定義在這      */
