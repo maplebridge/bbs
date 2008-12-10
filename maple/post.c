@@ -3816,6 +3816,21 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
 }
 
 
+#ifdef HAVE_ANONYMOUS
+static void
+log_anonyscore(fname, say)
+  char *fname, *say;
+{
+  char buf[512];
+
+  /* Thor.990113: 加上 fromhost 比較詳盡 */
+  sprintf(buf, "%s %-13s(%s)\n%-13s %s 理由:%s\n",
+	Now(), cuser.userid, fromhost, currboard, fname, say);
+  f_cat(FN_RUN_ANONYMOUS, buf);
+}
+#endif
+
+
 static int
 post_append_score(xo, choose)
   XO *xo;
@@ -3824,6 +3839,7 @@ post_append_score(xo, choose)
   HDR *hdr;
   int pos, cur, ans, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
@@ -3892,7 +3908,7 @@ post_append_score(xo, choose)
 #endif
     maxlen = 63 - strlen(cuser.userid) - vtlen;
 
-  if (!vget(b_lines, 0, "請輸入理由：", reason, maxlen, DOECHO))
+  if (!vget(b_lines, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
     return XO_FOOT;
 
 #ifdef HAVE_ANONYMOUS
@@ -3927,6 +3943,11 @@ post_append_score(xo, choose)
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     fclose(fp);
   }
+
+#ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
+  if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
+    log_anonyscore(hdr->xname, reason);
+#endif
 
   curraddscore = ans == '1' ? 1 : ans == '2' ? -1 : 0;
   currchrono = hdr->chrono;

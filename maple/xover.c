@@ -1021,7 +1021,7 @@ xo_thread(xo, op)
     }
 
 #ifdef HAVE_REFUSEMARK
-    if (chkrestrict(hdr) && strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
+    if (!chkrestrict(hdr))
       continue;
 #endif
 
