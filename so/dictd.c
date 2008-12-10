@@ -4,7 +4,7 @@
 /* author : statue.bbs@bbs.yzu.edu.tw                    */
 /* target : 字典                                         */
 /* create : 01/11/18                                     */
-/* update : 01/11/18                                     */
+/* update : 08/12/11                                     */
 /*-------------------------------------------------------*/
 
 #include "bbs.h"
@@ -58,6 +58,9 @@ main_dictd()
   char fname_tmp[64];          //smiler.0202
   uschar *str, *ptr, *pend;
 
+  int is_ch=0;
+  int is_eng=0;
+
   while(1)
   {
     clear();
@@ -90,9 +93,6 @@ main_dictd()
     if (!vget(b_lines, 0, "word: ", word, sizeof(word) - 1, DOECHO))
       return 0;
 
-    if (strchr(word, ';') || strchr(word, '"') || strchr(word, '|') || strchr(word, '&'))	/* security reason */
-      return 0;
-
     str = word;
     ptr = word2;
     pend = str + strlen(word);
@@ -102,6 +102,9 @@ main_dictd()
       if (*str >= 0x81 && *str < 0xFE && *(str + 1) >= 0x40
 	&& *(str + 1) <= 0xFE && *(str + 1) != 0x7F)    /* 中文字 BIG5+ */
       {
+      
+        is_ch=1;
+      
 	if (*(str + 1) == 0x5C)
 	{
 	  *ptr = *str;
@@ -119,11 +122,26 @@ main_dictd()
       }
       else
       {
-	*ptr = *str;
-	/* security reason */
-	if (*ptr == ';' || *ptr == '"' || *ptr == '|' || *ptr == '&')
-	  return 0;
+        /* smiler.081211: security reason， 僅接受中文，英文，空格符號輸入 !! */
+	if((*str >= 'a' && *str <= 'z') || (*str >= 'A' && *str <= 'Z') || (*str == ' '))
+	{
+	  *ptr = *str;
+	  if(*ptr != ' ')
+	    is_eng=1;
+	}
+	else
+	{
+	  vmsg("字典僅接受中文，英文，以及空格符號三種輸入 !!");
+	    return 0;
+	}
       }
+
+      if(is_ch == is_eng)
+      {
+        vmsg("不可同時輸入中英文 !!");
+          return 0;
+      }
+      
       str++;
       ptr++;
     }
