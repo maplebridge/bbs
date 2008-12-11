@@ -425,8 +425,8 @@ status_foot()
     fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
 #else
   sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
-    COLOR2 " [訪 客] " COLOR11 "%d" COLOR2 " 人 [到此一遊] " COLOR11 "%-12s"
-    COLOR2 "[呼叫]" COLOR11 "%6.6s\033[m" COLOR2 " ",
+    COLOR2 " [訪 客]" COLOR11 "%d" COLOR2 "人 [到此一遊]" COLOR11 "%-12s"
+    COLOR2 "[呼叫]" COLOR11 "%6.6s\033[m" COLOR2 ,
     fshm->today, ufo / 60, ufo % 60, fshm->feast, total_user, cuser.userid, flagmsg);
 #endif
   outf(feeter);
