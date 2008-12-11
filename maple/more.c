@@ -441,7 +441,7 @@ more(fpath, footer)
   more_width = b_cols + 1;		/* itoc.070517.註解: 若用這個，每列最大字數與螢幕同寬 */
 
   /* 找檔頭結束的地方 */
-  for (i = 0; i < LINE_HEADER; i++)
+  for (i = 0; i < LINE_HEADER + 1; i++)
   {
     if (!more_line(buf))
       break;
