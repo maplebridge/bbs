@@ -602,10 +602,10 @@ post_vpal()
   switch (vkans("開放觀看板友名單 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
   {
   case '1':
-    newbrd.battr &= ~BRD_SHOWPAL;
+    newbrd.battr &= ~BRD_HIDEPAL;
     break;
   case '2':
-    newbrd.battr |= BRD_SHOWPAL;
+    newbrd.battr |= BRD_HIDEPAL;
     break;
   default:
     return 0;

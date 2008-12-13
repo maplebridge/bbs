@@ -1009,6 +1009,40 @@ private_key(ymd)
 
 
 /* ----------------------------------------------------- */
+/* 重整 NewBoard 分類看板				 */
+/* ----------------------------------------------------- */
+
+
+static void
+class_newboard_sync()
+{
+  HDR hdr;
+  int num, pos;
+  time_t now;
+  char fpath[64];
+
+  sprintf(fpath, "gem/@/@%s", "NewBoard");
+
+  num = rec_num(fpath, sizeof(HDR));
+  pos = 0;
+  time(&now);
+
+  while (pos < num)
+  {
+    rec_get(fpath, &hdr, sizeof(HDR), pos);
+
+    if (now - hdr.chrono > (86400 * 30))	/* 一個月內開的新看板才留在 NewBoard 內 */
+    {
+      rec_del(fpath, sizeof(HDR), pos, NULL);
+      pos--;
+      num--;
+    }
+    pos++;
+  }
+}
+
+
+/* ----------------------------------------------------- */
 /* 主程式						 */
 /* ----------------------------------------------------- */
 
@@ -1135,6 +1169,8 @@ main(argc, argv)
 //    sprintf(title, "%s熱門看板", date);
 //    keeplog("gem/@/@-topbrd", NULL, title, 2);
 #endif
+
+    class_newboard_sync();	/* 每日凌晨重整 NewBoard 分類看板  */
 
     /* ------------------------------------------------- */
     /* 每週一凌晨零時做的事				 */

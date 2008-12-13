@@ -3427,9 +3427,6 @@ post_edit(xo)
   if (!strcmp(currboard, BN_DELLOG) || !strcmp(currboard, BN_EDITLOG))
     return XO_NONE;
 
-  if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BOARD))
-    return XO_NONE;
-
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
 
   /* smiler 1031 */
@@ -3445,8 +3442,7 @@ post_edit(xo)
       return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
 
-    /* smiler 1031 */
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);
+    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
 
 #ifdef DO_POST_FILTER
     strcpy(tmpfile, "tmp/");
@@ -3489,8 +3485,7 @@ post_edit(xo)
     }
 #endif
 
-    /* smiler 1031 */
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);
+    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
   }
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* 板主/原作者修改 */
   {
@@ -3500,8 +3495,7 @@ post_edit(xo)
       return XO_HEAD;
     }
 
-    /* smiler 1031 */
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);
+    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
 
 #ifdef DO_POST_FILTER
     strcpy(tmpfile, "tmp/");
@@ -3554,12 +3548,13 @@ post_edit(xo)
     }
 #endif
 
-    /* smiler 1031 */
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);
+    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
   }
   else		/* itoc.010301: 提供使用者修改(但不能儲存)其他人發表的文章 */
 #if 1
   {
+    if (currbattr & BRD_NOFORWARD)
+      return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #ifdef HAVE_REFUSEMARK
     if (hdr->xmode & POST_RESTRICT)
       return XO_NONE;
@@ -4087,7 +4082,7 @@ post_viewpal()
   if (!cuser.userlevel)
     return 0;
 
-  if ((currbattr & BRD_SHOWPAL) && !(bbstate & STAT_BM))
+  if ((currbattr & BRD_HIDEPAL) && !(bbstate & STAT_BM))
     return 0;
 
   brd_fpath(fpath, currboard, FN_PAL);
@@ -4212,7 +4207,7 @@ post_ishowbm(xo)
       (brd->readlevel == PERM_BOARD) ? "好友" : "公開");
     prints("                          %s%s - 板友名單: %s\n", mark,
       (currbattr & BRD_PUBLIC) ? " \033[m" : "v\033[m",
-      (currbattr & BRD_SHOWPAL) ? "板主隱藏板友名單" : "板友可看板友名單");
+      (currbattr & BRD_HIDEPAL) ? "板主隱藏板友名單" : "板友可看板友名單");
 
     prints(" %s%s - 鎖文限制: %s", mark,
       (currbattr & BRD_PUBLIC) ? " \033[m" : "x\033[m",
@@ -4298,7 +4293,7 @@ post_ishowbm(xo)
 #ifdef HAVE_RSS
     if (!isbm)
       prints("%s4%s - RSS 設定  %s", "\033[1;36m", "\033[m",
-	!(currbattr & BRD_SHOWPAL) ? "\033[1;36m5\033[m - 板友名單" : "");
+	!(currbattr & BRD_HIDEPAL) ? "\033[1;36m5\033[m - 板友名單" : "");
     else
 #endif
       prints("%s4%s - 板友名單 ", "\033[1;36m", "\033[m");

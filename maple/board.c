@@ -1192,11 +1192,11 @@ static int class_flag = 0;
 static int class_jumpnext = 0;	/* itoc.010910: 是否跳去下一個未讀板 1:要 0:不要 */
 #endif
 
-/* smiler.070602: for熱門看板 */
+
 static int class_hot = 0;
-/* smiler.070602: 看板人氣排序 */
+
 static int
-mantime_cmp(a, b)
+mantime_cmp(a, b)	/* smiler.070602: 看板人氣排序 */
 short *a;
 short *b;
 {
@@ -1255,7 +1255,8 @@ class_load(xo)
       val = bits[chn];
       if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
 	continue;
-      if (class_hot && bshm->mantime[chn] < 0) continue; /* smiler.070602: for熱門看板 */
+      if (class_hot && bshm->mantime[chn] <= 0)	/* smiler.070602: for熱門看板 */
+	continue;
     }
     else		/* 分類群組 */
     {
@@ -1268,8 +1269,7 @@ class_load(xo)
      if (chn >= 0) bnum++; /* smiler.070602: for熱門看板 */
   } while (chead < ctail);
 
-  /* smiler.070602: for熱門看板 */
-  if (class_hot && bnum > 0)
+  if (class_hot && bnum > 0)	/* smiler.070602: for熱門看板 */
   {
     cbase -= bnum;
     xsort(cbase, bnum, sizeof(short), mantime_cmp);
@@ -2140,22 +2140,20 @@ hdr_cmp(a, b)
 
 
 static void
-add_class(brd,class_name)
+add_class(brd, class_name)
   BRD *brd;
   char *class_name;
 {
   HDR hdr;
   char fpath[64];
 
-  sprintf(fpath,"gem/@/@%s",class_name);
+  sprintf(fpath, "gem/@/@%s", class_name);
 
   /* 加入適當的分類 */
 
   brd2gem(brd, &hdr);
   rec_add(fpath, &hdr, sizeof(HDR));
   rec_sync(fpath, sizeof(HDR), hdr_cmp, NULL);
-
-//  vmsg("新板成立，程式自動加入 Class 群組成功\");
 }
 
 
@@ -2193,10 +2191,7 @@ class_newbrd(xo)
       *str = '\0';
 
     /* 加入分類群組 */
-    sprintf(fpath, "gem/@/@%s", xname);
-    brd2gem(&newboard, &hdr);
-    rec_add(fpath, &hdr, sizeof(HDR));
-    rec_sync(fpath, sizeof(HDR), hdr_cmp, NULL);
+    add_class(&newboard, xname);
 
     vmsg("新板成立");
   }
@@ -2205,7 +2200,7 @@ class_newbrd(xo)
     vmsg("新板成立，記著加入分類群組");
   }
 
-  add_class(&newboard,"NewBoard"); /* smiler.080516: 新開看板加入NewBoard群組內 */
+  add_class(&newboard, "NewBoard");	/* smiler.080516: 新開看板加入NewBoard群組內 */
 
   return class_init(xo);
 }

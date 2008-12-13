@@ -25,7 +25,7 @@
 #define BRD_NOSCORE	0x40	/* 不評分看板 */
 #define BRD_PUBLIC	0x80	/* 公眾板 */
 #define BRD_NOL		0x00000100	/* 不可鎖文 */
-#define	BRD_SHOWPAL	0x00000200	/* 顯示板友名單 */
+#define	BRD_HIDEPAL	0x00000200	/* 隱藏板友名單 */
 #define BRD_NOPREFIX	0x00000400	/* 關閉看板 POST_PREFIX 功能 */
 #define BRD_NOFORWARD	0x00000800	/* 看板禁止轉錄 */
 #define BRD_SHOWTURN	0x00001000	/* 文章註記轉錄記錄看板 */
@@ -56,7 +56,7 @@ static char *battr_tbl[NUMBATTRS] =
   "不評分看板",		/* BRD_NOSCORE */
   "公眾板",		/* BRD_PUBLIC */
   "不可鎖文",		/* BRD_NOL */
-  "顯示板友名單",	/* BRD_SHOWPAL */
+  "隱藏(不顯示)板友名單",/* BRD_HIDEPAL */
   "停止使用文章類別", 	/* BRD_NOPREFIX */
   "看板禁止轉錄",	/* BRD_NOFORWARD */
   "轉錄記錄",		/* BRD_SHOWTURN */
