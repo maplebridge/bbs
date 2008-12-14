@@ -1045,6 +1045,80 @@ board_mail_to_user()	/* smiler.071111: 站務寄信給使用者 */
   }
 }
 
+/* ----------------------------------------------------- */
+/* SYSOP sudoer						 */
+/* ----------------------------------------------------- */
+
+static void
+sysop_sudoer()
+{
+   ACCT usr_sysop;
+   char usr_sysop_id[IDLEN + 1];
+   char usr_sysop_pw[PSWDLEN + 1];
+   char usr_sysop_welcome[64];
+   char usr_sysop_ip[16];
+   char msg[512];
+
+   sprintf(usr_sysop_ip, "%s", get_my_ip());
+
+   /* 記錄登入 ip 來源 */
+   sprintf(msg, "登入來源: %s", usr_sysop_ip);
+   alog("SYSOP_SUDOER", msg);
+
+   clear();
+
+   move(4, 0);
+   prints("請輸入您的帳號密碼以取得 SYSOP 管理權限，\n");
+   prints("或於帳號欄輸入 exit 離開\n");
+
+   while(!vget(8, 0, "[您的帳號] ", usr_sysop_id, IDLEN + 1, DOECHO));
+
+   if(!strcmp(usr_sysop_id, "exit"))
+   {
+      sprintf(msg, "輸入exit以離開SYSOP_SUDOER  登入來源: %s", usr_sysop_ip);
+      alog("SYSOP_SUDOER", msg);
+      login_abort("\n您輸入exit離開本系統，再見 ...");
+   }
+
+   if(acct_load(&usr_sysop, usr_sysop_id) < 0)
+   {
+      sprintf(msg, "輸入錯誤帳號 %s 而離開SYSOP_SUDOER  登入來源: %s", usr_sysop_id, usr_sysop_ip);
+      alog("SYSOP_SUDOER", msg);
+      login_abort("\n無此帳號，再見 ...");
+   }
+
+   if(!strcmp(usr_sysop.userid, "sysop"))
+   {
+      sprintf(msg, "輸入錯誤帳號 sysop 而離開SYSOP_SUDOER  登入來源: %s", usr_sysop_id, usr_sysop_ip);
+      alog("SYSOP_SUDOER", msg);
+      login_abort("\nSYSOP非您的原始帳號，再見 ...");
+   }
+
+   while(!vget(10, 0, "[您的密碼] ", usr_sysop_pw, PSWDLEN + 1, NOECHO));
+
+
+   if(chkpasswd(usr_sysop.passwd, usr_sysop_pw))
+   {
+      sprintf(msg, "帳號 %s 輸入錯誤密碼而離開SYSOP_SUDOER  登入來源: %s", usr_sysop_id, usr_sysop_ip);
+      alog("SYSOP_SUDOER", msg);
+      login_abort("\n密碼輸入錯誤，再見 ...");
+   }
+
+
+   if(!(usr_sysop.userlevel & PERM_ATOM))
+   {
+      sprintf(msg, "帳號 %s 不具 ATOM權限而離開SYSOP_SUDOER  登入來源: %s", usr_sysop_id, usr_sysop_ip);
+      alog("SYSOP_SUDOER", msg);
+      login_abort("\n您不具ATOM成員身分，再見 ...");
+   }
+
+   sprintf(msg, "帳號 %s 正常SYSOP_SUDOER  登入來源: %s", usr_sysop_id, usr_sysop_ip);
+   alog("SYSOP_SUDOER", msg);
+
+   sprintf(usr_sysop_welcome, "%s，歡迎使用本系統，請小心使用 SYSOP 管理權限 !!", usr_sysop_id);
+   vmsg(usr_sysop_welcome);
+
+}
 
 static void
 tn_login()
@@ -1062,6 +1136,12 @@ tn_login()
   sprintf(buf, "%s ip:%08x", fromhost, tn_addr);
 
   multi = login_user(buf);
+
+  /* smiler.081215: 使用sysop登入時，對相關使用權限進行控管及記錄 */
+#ifdef HAVE_SYSOP_SUDOER
+  if(!strcmp(cuser.userid, "sysop"))
+     sysop_sudoer();
+#endif
 
   sprintf(buf, "%s ip:%08x (%d)", fromhost, tn_addr, currpid);
   blog("ENTER", buf);
