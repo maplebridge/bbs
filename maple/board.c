@@ -1540,7 +1540,7 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
     str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
 
   /* 處理 人氣 */
-  bno = bshm->mantime[bno];
+  bno = bshm->mantime[chn];
   if (bno > 99)
     str3 = "\033[1;31m爆\033[m";
   else if (bno > 0)
