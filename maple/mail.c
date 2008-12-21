@@ -1317,6 +1317,8 @@ do_mreply(hdr, noreply)
 #endif
     mail_reply(hdr);
 
+  pcurrhdr = NULL;
+
   return XO_HEAD;
 }
 

@@ -465,6 +465,7 @@ VAR char hunt[32];		/* hunt keyword */
 
 VAR int curredit;		/* current edit mode */
 VAR time4_t currchrono;		/* current file timestamp */
+VAR HDR *pcurrhdr;		/* current file hdr pointer */
 VAR char currtitle[80];		/* currently selected article title */
 
 VAR int currbno;		/* currently selected board bno */

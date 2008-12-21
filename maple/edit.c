@@ -1800,7 +1800,10 @@ ve_filer(fpath, ve_op)
     return VE_FOOTER;
 
   case 'w':
-    tbf_write();
+    if (pcurrhdr && !chkrescofo(pcurrhdr))
+      vmsg("此篇文章原文不能轉錄，所以無法寫入暫存檔");
+    else
+      tbf_write();
     return VE_FOOTER;
 
   case 'd':

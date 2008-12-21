@@ -639,6 +639,7 @@ do_post(xo, title)
     else
 #endif
       vmsg("對不起，您沒有在此發表文章的權限");
+    pcurrhdr = NULL;
     return XO_FOOT;
   }
 
@@ -731,7 +732,10 @@ do_post(xo, title)
 #else
   if (!ve_subject(21, title, NULL))
 #endif
-      return XO_HEAD;
+  {
+    pcurrhdr = NULL;
+    return XO_HEAD;
+  }
 
   /* 未具備 Internet 權限者，只能在站內發表文章 */
   /* Thor.990111: 沒轉信出去的看板, 也只能在站內發表文章 */
@@ -759,6 +763,7 @@ do_post(xo, title)
   {
     unlink(fpath);
     vmsg(msg_cancel);
+    pcurrhdr = NULL;
     return XO_HEAD;
   }
 
@@ -767,6 +772,7 @@ do_post(xo, title)
   if (post_filter(fpath))	/* smiler.080830: 針對文章標題內容偵測有無不當之處 */
   {
     unlink(fpath);
+    pcurrhdr = NULL;
     return XO_HEAD;
   }
 #endif
@@ -902,6 +908,7 @@ do_post(xo, title)
     copy_post_IAS(&hdr, fpath);
 
   unlink(fpath);
+  pcurrhdr = NULL;
 
   vmsg(NULL);
 
@@ -916,6 +923,7 @@ do_reply(xo, hdr)
 {
   curredit = 0;
 
+  pcurrhdr = hdr;
   switch (vans("▲ 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (Q)取消？[F] "))
   {
   case 'm':
@@ -1881,11 +1889,13 @@ post_browse(xo)
 #endif
 
     hdr_fpath(fpath, dir, hdr);
+    pcurrhdr = hdr;
 
     /* Thor.990204: 為考慮more 傳回值 */
     if ((key = more(fpath, FOOTER_POST)) < 0)
       break;
 
+    pcurrhdr = NULL;
     post_history(xo, hdr);
     strcpy(currtitle, str_ttl(hdr->title));
 
@@ -1940,6 +1950,7 @@ re_key:
       return post_edit(xo);
 
     case 'C':	/* itoc.000515: post_browse 時可存入暫存檔 */
+      if (chkrescofo(hdr))
       {
 	FILE *fp;
 	if (fp = tbf_open())
