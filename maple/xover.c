@@ -570,6 +570,9 @@ xo_tbf(xo)
     if (xmode & (GEM_RESTRICT | GEM_RESERVED))
       continue;
 
+    if ((*dir == 'b') && chkrescofo(hdr))
+      continue;
+
     if (!(xmode & GEM_FOLDER))		/* ¬d hdr ¬O§_ plain text */
     {
       hdr_fpath(fpath, dir, hdr);

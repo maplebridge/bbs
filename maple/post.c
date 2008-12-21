@@ -965,7 +965,7 @@ chkrescofo(hdr)	/* restrict / copy / forward */
 #ifdef HAVE_REFUSEMARK
     chkrestrict(hdr) &&
 #endif
-    !(hdr.xmode & POST_NOFORWARD) && (!(currbattr & BRD_NOFORWARD) || (bbstate & STAT_BM));
+    !(hdr->xmode & POST_NOFORWARD) && (!(currbattr & BRD_NOFORWARD) || (bbstate & STAT_BM));
 }
 
 
@@ -3304,7 +3304,7 @@ post_copy(xo)	   /* itoc.010924: ¨ú¥N gem_gather */
 #ifdef HAVE_REFUSEMARK
   gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrescofo, 1);
 #else
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL, 1);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrescofo, 1);
 #endif
 
   if (bbstate & STAT_BOARD)
