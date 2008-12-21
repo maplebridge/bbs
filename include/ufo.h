@@ -26,7 +26,7 @@
 #define UFO_BRDNOTE	BFLAG(4)	/* 顯示進板畫面 */
 #define UFO_VEDIT	BFLAG(5)	/* 簡化編輯器 */
 //#define UFO_MOTD	BFLAG(6)	/* 簡化進/離站畫面 */
-#define UFO_FILENAME	BFLAG(6)
+#define UFO_NOUSE6	BFLAG(6)
 
 #define UFO_PAGER	BFLAG(7)	/* 關閉呼叫器 */
 #define UFO_RCVER	BFLAG(8)	/* itoc.010716: 拒收廣播 */
@@ -149,7 +149,7 @@ char *ufo_tbl[NUMUFOS] =
   "進板畫面        (顯示/跳過)",	/* UFO_BRDNOTE */
   "文章編輯器      (簡化/完整)",	/* UFO_VEDIT */
 //  "進/離站畫面     (簡化/完整)",	/* UFO_MOTD */
-  "文章列表顯示    (檔名/編號)",	/* UFO_FILENAME */  /* smiler.080201: 文章列表顯示檔名/編號 */
+  "保留",
 
   "呼叫器          (好友/所有)",	/* UFO_PAGER */
 #ifdef HAVE_NOBROAD

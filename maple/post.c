@@ -257,10 +257,10 @@ post_filter(fpath)
       Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    vmsg("您所post文章不為本站接受，請洽本站站務群 !!");
-    sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!");
+    vmsg("您所post文章不為本站接受，請洽本站站務群");
+    sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群");
     mail_self(fpath, cuser.userid, warn, 0);
-    sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群 !!\n");
+    sprintf(warn, "[警告] 本篇文章不為本站接受，有問題請洽站務群\n");
     f_cat(fpath, warn);
     unlink(fpath);
     return 1;
@@ -277,10 +277,10 @@ post_filter(fpath)
       Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    vmsg("您所post文章不為本看板接受，請洽本看板板主 !!");
-    sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!", currboard);
+    vmsg("您所post文章不為本看板接受，請洽本看板板主");
+    sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主", currboard);
     mail_self(fpath, cuser.userid, warn, 0);
-    sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主 !!\n", currboard);
+    sprintf(warn, "[警告] 本篇文章不為 %s 板接受，有問題請洽看板板主\n", currboard);
     f_cat(fpath, warn);
     unlink(fpath);
     return 1;
@@ -608,7 +608,7 @@ copy_post_IAS(hdr, fpath)
 
   while (brdp < bend)
   {
-    if (brdp->battr & BRD_IAS)	// 分類
+    if (brdp->battr & BRD_IAS)
     {
       brd_fpath(folder, brdp->brdname, fn_dir);
       hdr_stamp(folder, HDR_COPY | 'A', &post, fpath);
@@ -897,7 +897,8 @@ do_post(xo, title)
     outs(mode >= 0 ? "\n\n成功\回應至作者信箱" : "\n\n作者無法收信");
   }
 
-  if (HAS_PERM(PERM_ALLADMIN) && !strcmp(currboard, "IAS_Announce"))	/* smiler.080705:自動貼文至各藝文館 */
+  /* smiler.080705:自動貼文至各藝文館 */
+  if (!strcmp(currboard, "IAS_Announce") && HAS_PERM(PERM_ALLADMIN))
     copy_post_IAS(&hdr, fpath);
 
   unlink(fpath);
@@ -947,11 +948,25 @@ int
 chkrestrict(hdr)
   HDR *hdr;
 {
-  //return !(hdr->xmode & POST_RESTRICT) ||
-  //  !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
+#if 0
+  return !(hdr->xmode & POST_RESTRICT) ||
+    !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
+#endif
   return !(hdr->xmode & POST_RESTRICT) || RefusePal_belong(currboard, hdr);
 }
 #endif
+
+
+int
+chkrescofo(hdr)	/* restrict / copy / forward */
+  HDR *hdr;
+{
+  return
+#ifdef HAVE_REFUSEMARK
+    chkrestrict(hdr) &&
+#endif
+    !(hdr.xmode & POST_NOFORWARD) && (!(currbattr & BRD_NOFORWARD) || (bbstate & STAT_BM));
+}
 
 
 #ifdef SYSOP_MBOX_BRD
@@ -1599,43 +1614,32 @@ post_item(num, hdr)
   HDR *hdr;
 {
 #ifdef HAVE_SCORE
-  if (!(cuser.ufo & UFO_FILENAME))
-  {
-    if (hdr->xmode & POST_BOTTOM)
-      prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
-    else
-      prints("%6d%c%s", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-    if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
-    {
-      num = hdr->score;
-      if (!num && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
-	outs("  ");
-      else if (num <= 99 && num >= -99)
-	prints("\033[1;3%cm%2d\033[m",
-	  num > 0 ? '1' : num < 0 ? '2' : '0', abs(num));
-      else
-	prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
-   }
-   else
-   {
-     outs("  ");
-   }
-  }
+  if (hdr->xmode & POST_BOTTOM)
+    prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
   else
-   prints("%10s",hdr->xname);
+    prints("%6d%c%s", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+  if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
+  {
+    num = hdr->score;
+    if (!num && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
+      outs("  ");
+    else if (num <= 99 && num >= -99)
+      prints("\033[1;3%cm%2d\033[m",
+	num > 0 ? '1' : num < 0 ? '2' : '0', abs(num));
+    else
+      prints("\033[1;3%s\033[m", num >= 0 ? "1m爆" : "2m噓");
+ }
+ else
+ {
+   outs("  ");
+ }
 
   hdr_outs(hdr, d_cols + 45);	/* 少一格來放分數 */
 #else
- if (!(cuser.ufo & UFO_FILENAME))
- {
-   /*ckm.070325: 置底文沒有編號*/
-   if (hdr->xmode & POST_BOTTOM)
-     prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
-   else
-     prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
- }
+ if (hdr->xmode & POST_BOTTOM)
+   prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
  else
-   prints("%10s", hdr->xname);
+   prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
 
  hdr_outs(hdr, d_cols + 47);
 #endif
@@ -1655,42 +1659,37 @@ post_item_bar(xo, mode)
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
 
-  if (!(cuser.ufo & UFO_FILENAME))
+  if (hdr->xmode & POST_BOTTOM)
   {
-    if (hdr->xmode & POST_BOTTOM)
-    {
-      prints("%s%s%s%c%s%s",
-	mode ? UCBAR[UCBAR_POST] : "",
-	"  \033[1;33m重要\033[m", mode ? UCBAR[UCBAR_POST] : "",
-	tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-    }
-    else
-    {
-      prints("%s%6d%c%s%s",
-	mode ? UCBAR[UCBAR_POST] : "",
-	num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-    }
-
-    if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
-    {
-      num = hdr->score;
-      if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
-	outs("  ");
-      else if (num <= 99 && num >= -99)
-	prints("%s\033[1;3%cm%s%2d\033[m%s",
-	  mode ? UCBAR[UCBAR_POST] : "", num > 0 ? '1' : num < 0 ? '2' : mode ? '7' : '0',
-	  mode ? UCBAR[UCBAR_POST] : "", abs(num), mode ? UCBAR[UCBAR_POST] : "");
-      else
-	prints("%s\033[1;3%s\033[m%s", mode ? UCBAR[UCBAR_POST] : "", num >= 0 ? "1m爆" : "2m噓",
-	  mode ? UCBAR[UCBAR_POST] : "");
-    }
-    else
-    {
-      outs("  ");
-    }
+    prints("%s%s%s%c%s%s",
+      mode ? UCBAR[UCBAR_POST] : "",
+      "  \033[1;33m重要\033[m", mode ? UCBAR[UCBAR_POST] : "",
+      tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
   }
   else
-    prints("%s%10s",mode ? UCBAR[UCBAR_POST] : "", hdr->xname);
+  {
+    prints("%s%6d%c%s%s",
+      mode ? UCBAR[UCBAR_POST] : "",
+      num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
+  }
+
+  if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
+  {
+    num = hdr->score;
+    if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
+      outs("  ");
+    else if (num <= 99 && num >= -99)
+      prints("%s\033[1;3%cm%s%2d\033[m%s",
+	mode ? UCBAR[UCBAR_POST] : "", num > 0 ? '1' : num < 0 ? '2' : mode ? '7' : '0',
+	mode ? UCBAR[UCBAR_POST] : "", abs(num), mode ? UCBAR[UCBAR_POST] : "");
+    else
+      prints("%s\033[1;3%s\033[m%s", mode ? UCBAR[UCBAR_POST] : "", num >= 0 ? "1m爆" : "2m噓",
+	mode ? UCBAR[UCBAR_POST] : "");
+  }
+  else
+  {
+    outs("  ");
+  }
 
   if (mode)
     hdr_outs_bar(hdr, d_cols + 45);	/* 少一格來放分數 */
@@ -1700,25 +1699,20 @@ post_item_bar(xo, mode)
 #else
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
-  if (!(cuser.ufo & UFO_FILENAME))
+  if (hdr->xmode & POST_BOTTOM)
   {
-    if (hdr->xmode & POST_BOTTOM)
-    {
-      prints("%s%s%s%c%s%s ",
-	mode ? UCBAR[UCBAR_POST] : "",
-	"  \033[1;33m重要\033[m",mode ? UCBAR[UCBAR_POST] : "",
-	tag_char(hdr->chrono), post_attr(hdr),
-	mode ? UCBAR[UCBAR_POST] : "");
-    }
-    else
-    {
-      prints("%s%6d%c%s%s ",
-	mode ? UCBAR[UCBAR_POST] : "",
-	num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-    }
+    prints("%s%s%s%c%s%s ",
+      mode ? UCBAR[UCBAR_POST] : "",
+      "  \033[1;33m重要\033[m",mode ? UCBAR[UCBAR_POST] : "",
+      tag_char(hdr->chrono), post_attr(hdr),
+      mode ? UCBAR[UCBAR_POST] : "");
   }
   else
-    prints("%s%10s", mode ? UCBAR[UCBAR_POST] : "", hdr->xname);
+  {
+    prints("%s%6d%c%s%s ",
+      mode ? UCBAR[UCBAR_POST] : "",
+      num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
+  }
 
   if (mode)
     hdr_outs_bar(hdr, d_cols + 47);
@@ -1777,10 +1771,8 @@ post_head(xo)
   XO *xo;
 {
   vs_head(currBM, xo->xyz);
-  if (!(cuser.ufo & UFO_FILENAME))
-    prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
-  else
-    prints(NECKER_POST_FILE, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
+  prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
+
   return post_body(xo);
 }
 
@@ -2131,7 +2123,7 @@ post_cross(xo)
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
     {
-      vmsg("本看板禁止轉錄 !!");
+      vmsg("本看板禁止轉錄");
       return XO_NONE;
     }
 
@@ -2143,8 +2135,7 @@ post_cross(xo)
   pos = xo->pos;	//smiler 1108
   cur = pos - xo->top;	//smiler 1108
   hdr_org = (HDR *) xo_pool + (xo->pos - xo->top);
-  //if(RefusePal_level(currboard, hdr_org)!=0)	//若為L文及F文,僅板主及作者可轉錄
-  if (hdr_org->xmode & POST_RESTRICT)
+  if (hdr_org->xmode & POST_RESTRICT)	/* 若為L文及F文,僅板主及作者可轉錄 */
   {
     if (strcmp(hdr_org->owner, cuser.userid) && !(bbstate & STAT_BM))
       return XO_NONE;
@@ -2165,7 +2156,7 @@ post_cross(xo)
 
   /* 原作者轉錄自己文章時，可以選擇「原文轉載」 */
   method = (HAS_PERM(PERM_ALLBOARD) || (!tag && !strcmp(hdr->owner, cuser.userid))) &&
-    (vget(2, 0, "(1)原文轉載 (2)轉錄文章？[2] ", buf, 3, DOECHO) == '1') ? 0 : 1; /* smiler.070602: 改預設為2 */
+    (vget(2, 0, "(1)原文轉載 (2)轉錄文章？[2] ", buf, 3, DOECHO) == '1') ? 0 : 1;
 
   if (!tag)	/* lkchu.981201: 整批轉錄就不要一一詢問 */
   {
@@ -2254,7 +2245,7 @@ post_cross(xo)
 	xboard, bbs_dog_title, bbs_dog_str);
       f_cat(fpath_log, content_log);
 
-      vmsg("您所轉錄文章不為本站接受，請洽本站站務群 !!");
+      vmsg("您所轉錄文章不為本站接受，請洽本站站務群");
       is_bite = 1;
       continue;
     }
@@ -2269,7 +2260,7 @@ post_cross(xo)
       sprintf(content_log, "%s 文章內容限制: 轉錄失敗\n作者: %s\n來源: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "個人信箱", xboard, bbs_dog_title, bbs_dog_str);
       f_cat(fpath_log, content_log);
 
-      vmsg("您所轉錄文章不為對方看板接受，請洽看板板主 !!");
+      vmsg("您所轉錄文章不為對方看板接受，請洽看板板主");
       is_bite = 1;
       continue;
     }
@@ -2390,10 +2381,7 @@ post_forward(xo)
     return XO_NONE;
 
 #ifdef HAVE_REFUSEMARK
-//  if (!chkrestrict(hdr))
-//    return XO_NONE;
-  //if(RefusePal_level(currboard, hdr)!=0)  //若為L文及F文,僅板主及作者可轉錄
-  if (hdr->xmode & POST_RESTRICT)
+  if (hdr->xmode & POST_RESTRICT)	/* 若為L文及F文,僅板主及作者可轉錄 */
   {
     if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
       return XO_NONE;
@@ -2404,9 +2392,11 @@ post_forward(xo)
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
     {
-      vmsg("本看板禁止轉錄 !!");
+      vmsg("本看板禁止轉錄");
       return XO_NONE;
     }
+    if (hdr->xmode & POST_NOFORWARD)		/* 此篇文章禁轉 */
+      return XO_NONE;
   }
 
   if (acct_get("轉達信件給：", &muser) > 0)
@@ -2460,7 +2450,7 @@ post_mark(xo)
 
     if (xmode & POST_GOOD)
     {
-      vmsg("此篇為優文，請按 M 鍵取消本篇優文 !!");
+      vmsg("此篇為優文，請按 M 鍵取消本篇優文");
       return XO_FOOT;
     }
 
@@ -2497,13 +2487,13 @@ post_mark_good(xo)
 
     if (!strncmp(currboard, "P_", 2) || !strncmp(currboard, "R_", 2))
     {
-      vmsg("個人看板，寢板不開放優文設定 !!");
+      vmsg("個人看板，寢板不開放優文設定");
       return XO_FOOT;
     }
 
     if (!strcmp(hdr->owner, cuser.userid))
     {
-      vmsg("自己不可加自己優文 !!");
+      vmsg("自己不可加自己優文");
       return XO_BODY;
     }
 
@@ -2514,7 +2504,7 @@ post_mark_good(xo)
 
     if ((xmode & POST_MARKED) && (!(xmode & POST_GOOD)))
     {
-      vmsg("請先按 m 取消本篇文章標記，再按 M 重設本篇文章為優文 !!");
+      vmsg("請先按 m 取消本篇文章標記，再按 M 重設本篇文章為優文");
       return XO_BODY;
     }
 
@@ -2533,22 +2523,15 @@ post_mark_good(xo)
 	  hdr->xmode |= POST_GOOD;
 	  x.good_article++;
 	  sprintf(buf, "%s %-13s 優文增 %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title);
-      }
-      else
-      {
-	hdr->xmode &= (~POST_GOOD);
-	x.good_article--;
-	sprintf(buf, "%s %-13s 優文減 %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title);
-      }
+	}
+	else
+	{
+	  hdr->xmode &= (~POST_GOOD);
+	  x.good_article--;
+	  sprintf(buf, "%s %-13s 優文減 %s %s %s\n", Now(), cuser.userid, currboard, hdr->xname, hdr->title);
+	}
 
-      /* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式
-	-------------------------------------------------------------------------------
-	 itoc.010811: 動態設定線上使用者
-	 被站長改過資料的線上使用者(包括站長自己)，其 cutmp->status 會被加上 STATUS_DATALOCK
-	 這個旗標，就無法 acct_save()，於是站長便可以修改線上使用者資料
-	 在站長修改過才上線的 ID 因為其 cutmp->status 沒有 STATUS_DATALOCK 的旗標，
-	 所以將可以繼續存取，所以線上如果同時有修改前、修改後的同一隻 ID multi-login，也是無妨。
-	-------------------------------------------------------------------------------*/
+	/* smiler.080827: 模仿 acct_setup() 內站長更改使用者資料模式 */
 	utmp_admset(x.userno, STATUS_DATALOCK | STATUS_COINLOCK);
 	memcpy(&acct, &x, sizeof(ACCT));
 	acct_save(&acct);
@@ -2564,18 +2547,16 @@ post_mark_good(xo)
 }
 
 
-/*ryancid: reset parent_chrono*/
 static void
-reset_parent_chrono(hdd, ram)
+reset_parent_chrono(hdd, ram)	/*ryancid: reset parent_chrono*/
   HDR *hdd, *ram;
 {
   hdd->parent_chrono = 0;
 }
 
 
-/*ryancid: set parent_chrono*/
 static void
-set_parent_chrono(hdd, ram)
+set_parent_chrono(hdd, ram)	/*ryancid: set parent_chrono*/
   HDR *hdd, *ram;
 {
   hdd->parent_chrono = 1;
@@ -2730,7 +2711,6 @@ RefusePal_belong(board, hdr)
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
     return 1;
 
-  //RefusePal_fpath(fpath, board, 'C', hdr);	//smiler 1109
   RefusePal_fpath(fpath, board, 'R', hdr);	//smiler 1109
   if (fimage = (int *) f_img(fpath, &fsize))
   {
@@ -2775,9 +2755,6 @@ XoBM_Refuse_pal(hdr)
   char fpath[64];
   char fpath_friend[64];
   int ans, ans2;
-
-//  if (!(hdr->xmode & POST_RESTRICT))
-//    return 0;
 
   if (strcmp(hdr->owner, cuser.userid) && !(bbstate & STAT_BM))
     return 0;
@@ -2859,14 +2836,6 @@ XoBM_Refuse_pal(hdr)
 
   vmsg("設定完成！");
   return 1;
-}
-
-
-static int
-post_oldrefuse(xo)
-  XO *xo;
-{
-  return vmsg("此功\能已整合至 l (小寫 L) 按鍵了哦！");
 }
 
 
@@ -3144,7 +3113,7 @@ post_delete(xo)	/* 單一刪文 */
       case '1':
 	if (!vget(b_lines, 0, "請輸入理由：", reason, 55, DOECHO))
 	{
-	  vmsg("取消 !!");
+	  vmsg("取消");
 	  return XO_BODY;
 	}
 
@@ -3158,7 +3127,7 @@ post_delete(xo)	/* 單一刪文 */
 	{
 	  if (!vget(b_lines, 0, "請輸入理由：", reason, 55, DOECHO))
 	  {
-	    vmsg("取消 !!");
+	    vmsg("取消");
 	    return XO_BODY;
 	  }
 
@@ -3260,10 +3229,6 @@ delpost(xo, hdr)
   char fpath[64];
   char copied[64];
 
-//  /* smiler.1111: 保護Deletelog 以及 Editlog 的 記錄不被移除 */
-//  if (!strcmp(currboard, BN_DELLOG) || !strcmp(currboard, BN_EDITLOG))
-//    return XO_NONE;
-
   if (deletelog_use)
   {
     hdr_fpath(copied, xo->dir, hdr);
@@ -3337,9 +3302,9 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
     return XO_NONE;
 
 #ifdef HAVE_REFUSEMARK
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrestrict,1);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkrescofo, 1);
 #else
-  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL,1);
+  gem_buffer(xo->dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), NULL, 1);
 #endif
 
   if (bbstate & STAT_BOARD)
@@ -3553,12 +3518,9 @@ post_edit(xo)
   else		/* itoc.010301: 提供使用者修改(但不能儲存)其他人發表的文章 */
 #if 1
   {
-    if (currbattr & BRD_NOFORWARD)
+    if (!chkrescofo(hdr))
       return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
-#ifdef HAVE_REFUSEMARK
-    if (hdr->xmode & POST_RESTRICT)
-      return XO_NONE;
-#endif
+
     vedit(fpath, -1);
   }
 #else
@@ -3767,11 +3729,6 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   if (hdr->xmode & POST_NOSCORE)
     return XO_NONE;
 
-#ifdef HAVE_REFUSEMARK
-  if (!chkrestrict(hdr))
-    return XO_NONE;
-#endif
-
   ans = '3';
   verb = "0m==";
   vtlen = 2;
@@ -3802,7 +3759,6 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     curraddscore = 0;
 
     currchrono = hdr->chrono;
-//    change_stamp(dir, hdr);
     rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
     if (hdr->xmode & POST_BOTTOM)	/* 若是評分置底文章，去找正本來連動分數 */
     {
@@ -3813,9 +3769,7 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     {
       rec_ref(dir, hdr, sizeof(HDR), 0, cmpparent, addscore);
     }
-//    post_history(xo, hdr);
 
-//    btime_update(currbno);
     return XO_LOAD;
 }
 
@@ -4098,7 +4052,7 @@ post_viewpal()
     return 1;
   }
 
-  vmsg("本板尚未設定板友名單 !!");
+  vmsg("本板尚未設定板友名單");
   return 0;
 }
 
@@ -4240,16 +4194,11 @@ post_ishowbm(xo)
     prints("   - 文章篇數: %s記錄", (currbattr & BRD_NOCOUNT) ? "不" : "有");
     prints("                          - 熱門話題: %s統計\n\n",
       (currbattr & BRD_NOSTAT) ? "不" : "參與");
-//  prints("   - 投票結果公佈: %s公佈投票結果於 [record] 板\n",
-//    (currbattr & BRD_NOVOTE) ? "不" : "");
 
     if (isbm)
     {
       prints("\033[1;30m============================== "
 	"\033[;37;44m[編輯畫面名單]\033[;1;30m ===============================\033[m\n\n");
-//	"\033[32m按鍵 \033[1;30m修改類別  屬性                         "
-//	"\033[;32m按鍵 \033[1;30m修改類別  屬性\033[m\n"
-
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %s%sk%s - 板友特別名單"
 #ifdef HAVE_TEMPLATE
@@ -4413,66 +4362,6 @@ post_ishowbm(xo)
 
 
 static int
-post_state(xo)
-  XO *xo;
-{
-  HDR *hdr;
-  char fpath[64], *dir;
-  time4_t temp;
-  struct stat st;
-
-  if (!HAS_PERM(PERM_ALLBOARD))
-    return XO_NONE;
-
-  hdr = (HDR *) xo_pool + (xo->pos - xo->top);
-  dir = xo->dir;
-  hdr_fpath(fpath, dir, hdr);
-
-  move(3, 0);
-  clrtobot();
-
-  prints("========  基本資料 ========\n");
-  if (!stat(fpath, &st))
-  {
-    temp = st.st_mtime;
-    prints("\n時間戳記 : %s\n檔案大小 : %d\n", Btime(&temp), st.st_size);
-  }
-
-  prints("DIR 位置 : %s\n", dir);
-  prints("檔案名稱 : %s\n", hdr->xname);
-  prints("檔案位置 : %s\n", fpath);
-  prints("作者     : %s\n", hdr->owner);
-  prints("暱稱     : %s\n", hdr->nick);
-  prints("發文日期 : %s\n", hdr->date);
-  prints("文章標題 : %s\n", hdr->title);
-  prints("========  文章屬性 ========\n");
-
-  prints("文章標記 : %s", (hdr->xmode & POST_MARKED) ? "有" : "無");
-  prints("    可否轉寄 : %s\n", (hdr->xmode & POST_NOFORWARD) ? "否" : "可");
-
-  prints("可否評分 : %s", (hdr->xmode & POST_NOSCORE) ? "否" : "可");
-  prints("    置底文 ? : %s\n", (hdr->xmode & POST_BOTTOM) ? "是" : "否");
-
-  prints("標記待砍 : %s", (hdr->xmode & POST_DELETE) ? "是" : "否");
-  prints("    轉信進來 : %s\n", (hdr->xmode & POST_INCOME) ? "是" : "否");
-
-  prints("初級限制 : %s", (hdr->xmode & POST_FRIEND) ? "是" : "否");
-  prints("    可轉站外 : %s\n", (hdr->xmode & POST_OUTGO) ? "是" : "否");
-
-  prints("中級限制 : %s", (hdr->xmode & POST_RESTRICT) ? "是" : "否");
-  prints("    最高限制 : %s\n", (hdr->xmode & POST_RESERVED) ? "是" : "否");
-
-  prints("已被評分 : %s\n", (hdr->xmode & POST_SCORE) ? "是" : "否");
-
-  prints("    收錄精華 : %s", (hdr->xmode & POST_GEM) ? "是" : "否");
-
-  vmsg(NULL);
-
-  return post_body(xo);
-}
-
-
-static int
 post_jxname(xo)	/* jump to xname */
   XO *xo;
 {
@@ -4562,13 +4451,15 @@ static int
 post_info(xo)
   XO *xo;
 {
-  if (!HAS_PERM(PERM_ATOM))
-    return XO_NONE;
-
   HDR *hdr;
   ACCT acct;
   int value;
   static int upid = -1;
+
+#if 1
+  if (cuser.ufo & BFLAG(6))
+    cuser.ufo &= ~(BFLAG(6));
+#endif
 
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
   value = atoi(hdr->value);
@@ -4596,8 +4487,10 @@ post_info(xo)
 	if (ui = (UTMP *) utmp_find(cuser.userno))
 	  upid = ui->pid;
       }
-
-      prints("匿名管理編號：%d", (upid > 0) ? value + upid : 0);
+      if (HAS_PERM(PERM_ALLBOARD))
+	prints("匿名管理編號：%d", (upid > 0) ? value + upid : 0);
+      else
+	prints("本篇為匿名文章，無文章價值");
     }
     else
       prints("本篇為舊格式文章");
@@ -4650,16 +4543,6 @@ post_info(xo)
 }
 
 
-static int
-post_filename(xo)	/* smiler.080201: 畫面顯示 檔名<-> 篇數 */
-  XO *xo;
-{
-  cuser.ufo ^= UFO_FILENAME;
-  cutmp->ufo = cuser.ufo;
-  return XO_HEAD;
-}
-
-
 #ifdef HAVE_RSS
 static int
 post_rss()
@@ -4669,22 +4552,6 @@ post_rss()
   return 1;
 }
 #endif
-
-
-static int
-post_oldbm(xo)
-  XO *xo;
-{
-  return vmsg("此功\能已整合至 i / B 了哦！");
-}
-
-
-static int
-post_oldsibala(xo)
-  XO *xo;
-{
-  return vmsg("此功\能已整合至 Ctrl + G 了哦！");
-}
 
 
 static int
@@ -4711,7 +4578,6 @@ KeyFunc post_cb[] =
   's', post_switch,
   KEY_TAB, post_gem,
   'z', post_gem,
-  'f', post_filename,
   'y', post_reply,
   'd', post_delete,
   'v', post_visit,
@@ -4739,8 +4605,6 @@ KeyFunc post_cb[] =
 
 #ifdef HAVE_REFUSEMARK
   'l', post_refuse,
-  'L', post_oldrefuse,
-  'O', post_oldrefuse,
 #endif
 
 #ifdef HAVE_LABELMARK
@@ -4768,12 +4632,8 @@ KeyFunc post_cb[] =
   Ctrl('D'), post_prune,
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
-  Ctrl('S'), post_state,
-  'p', post_info,
+  'f', post_info,
   '#', post_jxname,
-
-  'S', post_oldbm,
-  Ctrl('B'), post_oldbm,
 
   Ctrl('F'), post_addMF,
   'i', post_ishowbm,
@@ -4781,7 +4641,6 @@ KeyFunc post_cb[] =
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",
   'V' | XO_DL, (void *) "bin/vote.so:XoVote",
   Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala",
-  'G', post_oldsibala,
 
 #ifdef HAVE_TERMINATOR
   Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
@@ -4812,7 +4671,6 @@ KeyFunc xpost_cb[] =
   'X', post_forward,
   KEY_TAB, post_gem,
   'z', post_gem,
-  'f', post_filename,
   'o', post_noforward,
   'c', post_copy,
   'g', gem_gather,
@@ -4831,8 +4689,6 @@ KeyFunc xpost_cb[] =
 
 #ifdef HAVE_REFUSEMARK
   'l', post_refuse,
-  'L', post_oldrefuse,
-  'O', post_oldrefuse,
 #endif
 
 #ifdef HAVE_LABELMARK
@@ -4857,8 +4713,7 @@ KeyFunc xpost_cb[] =
   Ctrl('D'), post_prune,
   Ctrl('Q'), xo_uquery,
   Ctrl('O'), xo_usetup,
-  Ctrl('S'), post_state,
-  'p', post_info,
+  'f', post_info,
 
   'h', post_help		/* itoc.030511: 共用即可 */
 };

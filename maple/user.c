@@ -21,14 +21,13 @@ tn_user_show()	/* 使用者上站，初使化與載入使用者文章列表顯示喜好 */
   FILE *fp;
   char fpath[64];
 
-  /* 讀出使用者個人設定的 USR_SHOW */
   usr_fpath(fpath, cuser.userid, "MY_USR_SHOW");
-  if (fp = fopen(fpath, "r"))	//若檔案存在則讀出來
+  if (fp = fopen(fpath, "r"))
   {
     fscanf(fp, "%ud", &USR_SHOW);
     fclose(fp);
   }
-  else					//反之則將我們 initial 的 USR_SHOW 寫回去
+  else		/* 沒有設定檔就新建一個 */
   {
     /* initialization USR_SHOW */
     USR_SHOW = -1 & ~(-1 << NUM_USR_SHOW);
@@ -201,7 +200,7 @@ u_set_bar(bar)
   else if (!ans)
     bright[0] = front[0] = '\0';
   else
-    return vmsg("輸入錯誤 !!");
+    return vmsg("輸入錯誤");
 
   sprintf(color_write,"\033[m\033[%s%s%s%s",
     bright, bright[0] ? ";" : "", front , front[0] ? ";" : "");
@@ -215,7 +214,7 @@ u_set_bar(bar)
   vget(i, 0, "前景 是否閃爍？ 1)是 [Enter]略過？ ", flash, 2, DOECHO);
   if (flash[0] && (flash[0] != '1'))
   {
-    return vmsg("輸入錯誤 !!");
+    return vmsg("輸入錯誤");
   }
   else if (flash[0])
     flash[0] = '5';
@@ -240,7 +239,7 @@ u_set_bar(bar)
   else if (!ans)
     back[0] = '\0';
   else
-    return vmsg("輸入錯誤 !!");
+    return vmsg("輸入錯誤");
 
   sprintf(color_write,"\033[m\033[%s%s%s%s%s%s%s%s",
     bright, bright[0] ? ";" : "",
@@ -256,7 +255,7 @@ u_set_bar(bar)
 
   if (!bright[0] && !flash[0] && !front[0] && !back[0])
   {
-    return vmsg("取消更動 !!");
+    return vmsg("取消更動");
   }
 
   switch (ans = vans("◎ 選擇 Y)確定 Q)取消 D)預設 [Q] "))

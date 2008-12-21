@@ -166,12 +166,14 @@ ulist_item(num, up, slot, now, sysop)
     return;
   }
 
+#if 0
   /* itoc.011022: 若生日當天上站，借用 idle 欄位來放壽星 */
   if (up->status & STATUS_BIRTHDAY)
   {
     strcpy(buf, "\033[1;31m 壽星 \033[m");
   }
   else
+#endif
   {
 #ifdef DETAIL_IDLETIME
     if ((diff = now - up->idle_time) >= 60)	/* 超過 60 秒才算閒置 */
@@ -274,12 +276,14 @@ ulist_item_bar(xo, mode)
     return;
   }
 
+#if 0
   /* itoc.011022: 若生日當天上站，借用 idle 欄位來放壽星 */
   if (up->status & STATUS_BIRTHDAY)
   {
     strcpy(buf, "\033[1;31m 壽星 \033[m");
   }
   else
+#endif
   {
 #ifdef DETAIL_IDLETIME
     if ((diff = time4(NULL) - up->idle_time) >= 60)   /* 超過 60 秒才算閒置 */
@@ -535,23 +539,23 @@ ulist_paltype(up)		/* 朋友種類 */
   if (is_mybad(userno))
     return FTYPE_MYBAD;
 
-  if (is_super_mygood(userno))	//我設對方為超級好友
+  if (is_super_mygood(userno))	/* 我設對方為超級好友 */
   {
-    if (is_super_ogood(up))	//對方設我為超級好友
+    if (is_super_ogood(up))	/* 對方設我為超級好友 */
       return FTYPE_SUPER_BOTHGOOD;
     else
       return FTYPE_SUPER_MYGOOD;
   }
-  else if (is_super_ogood(up))	//對方設我為超級好友
+  else if (is_super_ogood(up))	/* 對方設我為超級好友 */
     return FTYPE_SUPER_OGOOD;
-  else if (is_mygood(userno))	//我設對方為好友
+  else if (is_mygood(userno))	/* 我設對方為好友 */
   {
-    if (is_ogood(up))		//對方設我為好友
+    if (is_ogood(up))		/* 對方設我為好友 */
       return FTYPE_BOTHGOOD;
     else
       return FTYPE_MYGOOD;
   }
-  else if (is_ogood(up))	//對方設我為好友
+  else if (is_ogood(up))	/* 對方設我為好友 */
     return FTYPE_OGOOD;
   else
     return FTYPE_NORMAL;

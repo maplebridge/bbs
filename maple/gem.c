@@ -1074,19 +1074,14 @@ gbuf_malloc(num)
 
 
 void
-gem_buffer(dir, hdr, fchk ,gem_mode)
+gem_buffer(dir, hdr, fchk, gem_mode)
   char *dir;
   HDR *hdr;		/* NULL 代表放入 TagList, 否則將傳入的放入 */
   int (*fchk)();	/* 允許放入 gbuf 的條件 */
-  int gem_mode;     /* 0:其他 1:from 看板 */
+  int gem_mode;		/* 0:其他 1:from 看板 */
 {
   int max, locus, num;
   HDR *gbuf, buf;
-
-  /* smiler.080614 : 收錄精華記錄，但因對folder無效，目前取消掉 */
-//  int can_show = 1;
-//  char fpath[64];
-//  FILE *fp;
 
   if (hdr)
   {
@@ -1108,6 +1103,7 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
     {
       memcpy(gbuf, hdr, sizeof(HDR));
       num++;
+#if 1
       if (gem_mode)
       {
 	if (dir[0] == 'b')
@@ -1116,32 +1112,8 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	  currchrono = hdr->chrono;
 	  rec_put(dir, hdr, sizeof(HDR), 0, cmpchrono);
 	}
-
-#if 0
-	if (strstr(dir,"gem/brd/"))
-	  if ((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
-	    can_show=0;
-
-	if (can_show)
-	{
-	  hdr_fpath(fpath, dir, hdr);
-	  if (fp = fopen(fpath, "a"))
-	  {
-	    time_t now;
-	    struct tm *ptime;
-
-	    time(&now);
-	    ptime = localtime(&now);
-
-	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n",
-	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華",
-	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
-	    fclose(fp);
-	  }
-	}
-#endif
-
       }
+#endif
     }
   }
   else
@@ -1156,7 +1128,7 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	memcpy(gbuf + num, &buf, sizeof(HDR));
 	num++;
       }
-
+#if 1
       if (gem_mode)
       {
 	if (dir[0] == 'b')
@@ -1165,32 +1137,8 @@ gem_buffer(dir, hdr, fchk ,gem_mode)
 	  currchrono = buf.chrono;
 	  rec_put(dir, &buf, sizeof(HDR), 0, cmpchrono);
 	}
-
-#if 0
-	if (strstr(dir,"gem/brd/"))
-	  if ((hdr->xmode & GEM_FOLDER) || (hdr->xmode & GEM_BOARD))
-	    can_show=0;
-
-	if (can_show)
-	{
-	  hdr_fpath(fpath, dir, &buf);
-	  vmsg(fpath);
-	  if (fp = fopen(fpath, "a"))
-	  {
-	    time_t now;
-	    struct tm *ptime;
-
-	    time(&now);
-	    ptime = localtime(&now);
-
-	    fprintf(fp, "\033[m\033[36m%s\033[m \033[36m%s ：\033[36m%-*s\033[36m%02d/%02d/%02d\n",
-	      "==", cuser.userid, 64 - strlen(cuser.userid) - 2 , "收錄精華",
-	      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday);
-	    fclose(fp);
-	  }
-	}
-#endif
       }
+#endif
     } while (++locus < max);
   }
 
@@ -1576,7 +1524,8 @@ gem_gather(xo)
 
   /* gather 視同 copy，可準備作 paste */
   dir = xo->dir;
-  gem_buffer(dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top), chkgather, 1);
+  gem_buffer(dir, tag ? NULL : (HDR *) xo_pool + (xo->pos - xo->top),
+    (*dir == 'b') ? chkrescofo : chkgather, 1);
 
   if (!GemBufferNum)
   {

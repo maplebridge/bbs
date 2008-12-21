@@ -1214,7 +1214,7 @@ class_load(xo)
   short *cbase, *chead, *ctail;
   int chn;			/* ClassHeader number */
   int pos, max, val, zap;
-  int bnum=0;       /* smiler.070602: for熱門看板 */
+  int bnum = 0;			/* smiler.070602: for熱門看板 */
   BRD *brd;
   char *bits;
 
@@ -1255,7 +1255,7 @@ class_load(xo)
       val = bits[chn];
       if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
 	continue;
-      if (class_hot && bshm->mantime[chn] <= 0)	/* smiler.070602: for熱門看板 */
+      if (class_hot && bshm->mantime[chn] <= 0)
 	continue;
     }
     else		/* 分類群組 */
@@ -1266,10 +1266,12 @@ class_load(xo)
 
     max++;
     *cbase++ = chn;
-     if (chn >= 0) bnum++; /* smiler.070602: for熱門看板 */
+
+    if (chn >= 0)	/* smiler.070602: for熱門看板 */
+      bnum++;
   } while (chead < ctail);
 
-  if (class_hot && bnum > 0)	/* smiler.070602: for熱門看板 */
+  if (class_hot && bnum > 0)
   {
     cbase -= bnum;
     xsort(cbase, bnum, sizeof(short), mantime_cmp);
@@ -1492,9 +1494,9 @@ void
 #else
 static void
 #endif
-class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
+class_item_bar(brd, bno, chn, brdpost, infav, label)
   BRD *brd;
-  int bno, chn, brdpost, pbno, infav, label;
+  int bno, chn, brdpost, infav, label;
 {
   int num;
   char *str1, *str2, *str3, token, buf[16];
@@ -1539,7 +1541,6 @@ class_item_bar(brd, bno, chn, brdpost ,pbno, infav, label)
 
   /* 處理 人氣 */
   bno = bshm->mantime[bno];
-  bno = pbno;
   if (bno > 99)
     str3 = "\033[1;31m爆\033[m";
   else if (bno > 0)
@@ -1621,7 +1622,6 @@ class_bar(xo, mode)
   short *chp;
   BRD *brd;
   int chn, cnt, brdpost;
-  int pbno;  //smiler 1107
 
   cnt = xo->pos + 1;
   chp = (short *) xo->xyz + xo->pos;
@@ -1631,9 +1631,8 @@ class_bar(xo, mode)
 
   if (chn >= 0)		/* 一般看板 */
   {
-    pbno = bshm->mantime[chn];	//smiler 1107
     if (mode)
-      class_item_bar(brd, cnt, chn, brdpost ,pbno, in_favor(brd->brdname), 0);	//smiler 1107
+      class_item_bar(brd, cnt, chn, brdpost, in_favor(brd->brdname), 0);
     else
       class_item(cnt, chn, brdpost, in_favor(brd->brdname), 0);
   }
@@ -2179,8 +2178,7 @@ class_newbrd(xo)
   {
     short *chx;
     char *img, *str;
-    char xname[BNLEN + 1], fpath[64];
-    HDR hdr;
+    char xname[BNLEN + 1];
 
     img = class_img;
     chx = (short *) img + (CH_END - xo->key);
@@ -2217,7 +2215,7 @@ class_browse(xo)
   chn = *chp;
   if (chn < 0)		/* 進入分類 */
   {
-    /*=====================================*/
+#if 1
     /* smiler.070602: for熱門看板 */
     short *chx;
     char *img, *str;
@@ -2225,16 +2223,12 @@ class_browse(xo)
     chx = (short *) img + (CH_END - chn);
     str = img + *chx;
 
-    if (!strncmp(str, "HOT/", 4))	// "HOT/" 名稱可自定，若改名也要順便改後面的長度 4
+    if (!strncmp(str, "HOT/", 4))	/* "HOT/" 名稱可自定，若改名也要順便改後面的長度 4 */
     {
       class_hot = 1;
       chn = CH_END;
     }
-#if 1
-    else
-      class_hot = 0;
 #endif
-    /*=====================================*/
 
     if (!strncmp(str, "IM_CREATE/", 10))
       more("brd/IAS_Announce/note", NULL);
@@ -2242,10 +2236,8 @@ class_browse(xo)
     if (!XoClass(chn))
       return XO_NONE;
 
-#if 0
     if (class_hot)
       class_hot = 0;	/* 離開 HOT Class 再清除 class_hot 標記 */
-#endif
   }
   else			/* 進入看板 */
   {
@@ -2301,7 +2293,6 @@ class_switch(xo)
 
 
 #ifdef MY_FAVORITE
-
 /* ----------------------------------------------------- */
 /* MyFavorite [我的最愛]				 */
 /* ----------------------------------------------------- */
@@ -2432,7 +2423,7 @@ MFclass_browse(name)
   }
   return 0;
 }
-#endif  /* MY_FAVORITE */
+#endif	/* MY_FAVORITE */
 
 
 #ifdef AUTHOR_EXTRACTION
@@ -2647,9 +2638,9 @@ board_main()
 int
 Boards()
 {
-   class_hot = 0;  /* smiler.070602: for熱門看板 */
   /* class_xo = &board_xo; *//* Thor: 已有 default, 不需作此 */
 
+  class_hot = 0;
 #ifdef AUTO_JUMPBRD
   if (cuser.ufo & UFO_JUMPBRD)
     class_jumpnext = 1;	/* itoc.010910: 主動跳去下一個未讀看板 */

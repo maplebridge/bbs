@@ -68,9 +68,9 @@ can_override(up)
     return 0;
 
   /* smiler.080806: 隱身時傳送水球，須先雙方互加特殊好友才可傳送水球 */
-  if ((cuser.ufo & UFO_CLOAK) || (up->ufo & UFO_CLOAK))
+  if (up->ufo & UFO_CLOAK)
   {
-    vmsg("雙方互加特殊好友，才可於隱身模式互丟水球 !!");
+    vmsg("雙方互加特殊好友，才可於隱身模式互丟水球");
     return 0;
   }
 

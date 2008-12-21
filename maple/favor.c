@@ -201,7 +201,6 @@ mf_item_bar(xo, mode)
   {
     BRD *bhead, *btail;
     int chn;
-    int pbno;
 
     chn = 0;
     invalid = 1;
@@ -212,7 +211,6 @@ mf_item_bar(xo, mode)
     {
       if (!strcmp(mf->xname, bhead->brdname))
       {
-	pbno = bshm->mantime[chn];
 	if (!(brd_bits[chn] & BRD_L_BIT))
 	  prints("%s%6d%c  \033[36m%-*.*s\033[m",
 	    mode ? UCBAR[UCBAR_BRD] : "",
@@ -221,7 +219,7 @@ mf_item_bar(xo, mode)
 	else
 	{
 	  if (mode)
-	    class_item_bar(bhead, num, chn, brdpost, pbno, 1, label);
+	    class_item_bar(bhead, num, chn, brdpost, 1, label);
 	  else
 	    class_item(num, chn, brdpost, 1, label);
 	}
@@ -798,14 +796,16 @@ mf_browse(xo)
     /* itoc.010726: 若是看板已經被砍或權限沒有了，則要移除捷徑 */
     if ((bno = brd_bno(xname)) < 0)
     {
-      //rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
-      //vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
-      vmsg("本看板已被刪除 !!");
+#if 0
+      rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
+      vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
+#endif
+      vmsg("本看板已被刪除");
       return mf_load(xo);
     }
     else if (!(brd_bits[bno] & BRD_R_BIT))
     {
-      vmsg("您沒有權限閱\讀本看板 !!");
+      vmsg("您沒有權限閱\讀本看板");
       return mf_load(xo);
     }
 
@@ -834,9 +834,11 @@ mf_browse(xo)
     /* itoc.010726: 若是看板已經被砍或權限沒有了，則要移除捷徑 */
     if ((type = gem_link(xname)) < 0)
     {
-      //rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
-      //vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
-	  vmsg("本看板已被刪除或您沒有權限閱\讀本看板 !!");
+#if 0
+      rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
+      vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
+#endif
+      vmsg("本看板已被刪除或您沒有權限閱\讀本看板");
       return mf_load(xo);
     }
 

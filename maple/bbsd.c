@@ -798,7 +798,7 @@ login_user(content)
 	/* check for multi-session */
 
 	/* if (!HAS_PERM(PERM_ALLADMIN)) */
-	if(str_cmp(cuser.userid, str_sysop))
+	if (str_cmp(cuser.userid, str_sysop))
 	{
 	  UTMP *ui;
 	  pid_t pid;
@@ -1026,19 +1026,18 @@ static void
 board_mail_to_user()	/* smiler.071111: 站務寄信給使用者 */
 {
   HDR hdr;
-  char fpath_mail[80];
+  char folder[80];
 
-  if(mail_to_newone)
+  if (mail_to_newone)
   {
-    if (cuser.numlogins == 15)	//在此設定權限
+    if (cuser.numlogins == 15)	/* 在此設定權限 */
     {
-      usr_fpath(fpath_mail, cuser.userid, FN_DIR);
-      if (!hdr_stamp(fpath_mail, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
+      usr_fpath(folder, cuser.userid, FN_DIR);
+      if (!hdr_stamp(folder, HDR_LINK, &hdr, FN_ETC_SYSMAIL))
       {
 	strcpy(hdr.title, BBSNAME3 "站務寄給您的情書");
 	strcpy(hdr.owner, STR_SYSOP);
-	hdr.xmode = 0;
-	rec_add(fpath_mail, &hdr, sizeof(HDR));
+	rec_add(folder, &hdr, sizeof(HDR));
 	cutmp->status |= STATUS_BIFF;
       }
     }
@@ -1159,7 +1158,7 @@ tn_login()
 
 #ifdef HAVE_SYSOP_SUDOER
   /* smiler.081215: 使用sysop登入時，對相關使用權限進行控管及記錄 */
-  if(!str_cmp(cuser.userid, str_sysop))
+  if (!str_cmp(cuser.userid, str_sysop))
      sysop_sudoer();
 #endif
 
@@ -1243,10 +1242,10 @@ tn_motd()
 
   ufo = cuser.ufo;
 
-  if(1)		/* if (!(ufo & UFO_MOTD)) */
+  if (1)	/* if (!(ufo & UFO_MOTD)) */
   {
-    more("gem/@/@-goodboard", NULL); /* 推薦看板 */
-    more("gem/@/@-day", NULL);	/* 今日熱門話題 */
+    more("gem/@/@-goodboard", NULL);	/* 推薦看板 */
+    more("gem/@/@-day", NULL);		/* 今日熱門話題 */
     pad_view();
   }
 
@@ -1793,7 +1792,7 @@ main(argc, argv)
 
     //if(argc<=1)
     //if(argc>0)
-    if(1)
+    if (1)
     {
       setuploader();	/* 載入整個站的設定檔 */
     }
@@ -1801,7 +1800,7 @@ main(argc, argv)
     /* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
     if (ChangeLoging)
     {
-      sprintf(currtitle, "程式修改中，請稍後再來\n");     /* 公佈修改進度及相關資訊 */
+      sprintf(currtitle, "程式修改中，請稍後再來\n");	/* 公佈修改進度及相關資訊 */
       send(csock, currtitle, strlen(currtitle), 0);
       close(csock);
       continue;

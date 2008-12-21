@@ -1293,13 +1293,13 @@ quote_check()
 
   if ((quot_line >> 2) <= post_line)   /* 文章行數要多於引言行數四分之一 */
     return 0;
-  else
+  else	/* if (HAS_PERM(PERM_ALLADMIN)) */
     return (vans("引言過多 (E)繼續編輯 (W)強制寫入？[E] ") != 'w');
-  //if (HAS_PERM(PERM_ALLADMIN))
-  //  return (vans("引言過多 (E)繼續編輯 (W)強制寫入？[E] ") != 'w');
 
-  //vmsg("引言太多，請按 Ctrl+Y 來刪除不必要之引言");
-  //return 1;
+#if 0
+  vmsg("引言太多，請按 Ctrl+Y 來刪除不必要之引言");
+  return 1;
+#endif
 }
 
 
@@ -1484,7 +1484,6 @@ get_sign_select()
     }
   }
 
- //select_devide = 4;
   select = time(0) % (select_devide);	/* smiler.071030: select witch 站簽 */
 
   usr_fpath(host_personal_path, cuser.userid, "host");

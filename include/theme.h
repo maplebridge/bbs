@@ -127,9 +127,6 @@
 #define NECKER_POST	"[←]離開 [→]閱\讀 [^P]發表 [b]進板畫面 [d]刪除 [V]投票 [TAB]精華區 [h]說明\n" \
 			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                 評:%s  人氣:%-4d \033[m"
 
-#define NECKER_POST_FILE	"[←]離開 [→]閱\讀 [^P]發表 [b]進板畫面 [d]刪除 [V]投票 [TAB]精華區 [h]說明\n" \
-			COLOR10 "  檔名(f)  日 期 作  者       文  章  標  題%*s                 評:%s  人氣:%-4d \033[m"
-
 #define NECKER_GEM	"[←]離開 [→]瀏覽 [B]模式 [C]暫存 [F]轉寄 [d]刪除 [h]說明  %s\n" \
 			COLOR10 "  編號     主              題%*s                            [編      選] [日  期]\033[m"
 
