@@ -573,11 +573,12 @@ film_out(tag, row)
   if (d_cols)	/* waynesan.040831: ¨Ì¼e¿Ã¹õ¸m¤¤ */
   {
     char *ptr;
+    len = (row < 0) ? 0 : row;
     for (film = buf; *film;)
     {
       if (ptr = strchr(film, '\n'))
 	*ptr = '\0';
-      move(row++, (d_cols >> 1));
+      move(len++, (d_cols >> 1));
       outx(film);
       prints("\033[m");
       if (ptr)
