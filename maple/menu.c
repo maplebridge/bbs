@@ -1071,6 +1071,9 @@ static MENU menu_tool[] =
   menu_other, 0, M_XMENU,
   "Other      【 雜七雜八 】",
 
+  "bin/nthuctable.so:main_ctable", 0, - M_XMODE,
+  "ClassTable 【 清華課表 】",
+
   "bin/xyz.so:x_sysinfo", 0, - M_XMODE,
   "SysInfo    【 系統資訊 】",
 
