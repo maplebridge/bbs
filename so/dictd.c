@@ -57,9 +57,7 @@ main_dictd()
   char fname[64];
   char fname_tmp[64];          //smiler.0202
   uschar *str, *ptr, *pend;
-
-  int is_ch=0;
-  int is_eng=0;
+  int is_ch, is_eng;
 
   while(1)
   {
@@ -89,6 +87,7 @@ main_dictd()
     outs("cdict5     Chinese to English and English to Chinese Dictionary\n");
     memset(word, 0, sizeof(word));
     memset(word2, 0, sizeof(word2));
+    is_ch =  is_eng = 0;
 
     if (!vget(b_lines, 0, "word: ", word, sizeof(word) - 1, DOECHO))
       return 0;
@@ -99,12 +98,10 @@ main_dictd()
 
     while (str < pend)
     {
-      if (*str >= 0x81 && *str < 0xFE && *(str + 1) >= 0x40
-	&& *(str + 1) <= 0xFE && *(str + 1) != 0x7F)    /* 中文字 BIG5+ */
+      if (IS_ZHC_HI(*str) && is_zhc_low(str, 1))
       {
-      
-        is_ch=1;
-      
+        is_ch = 1;
+
 	if (*(str + 1) == 0x5C)
 	{
 	  *ptr = *str;
@@ -127,21 +124,21 @@ main_dictd()
 	{
 	  *ptr = *str;
 	  if(*ptr != ' ')
-	    is_eng=1;
+	    is_eng = 1;
 	}
 	else
 	{
-	  vmsg("字典僅接受中文，英文，以及空格符號三種輸入 !!");
-	    return 0;
+	  vmsg("字典僅接受中文/英文/或是空格符號三種輸入 !!");
+	  return 0;
 	}
       }
 
-      if(is_ch == is_eng)
+      if(is_ch && is_eng)
       {
-        vmsg("不可同時輸入中英文 !!");
-          return 0;
+	vmsg("不可同時輸入中英文 !!");
+	return 0;
       }
-      
+
       str++;
       ptr++;
     }

@@ -1078,8 +1078,6 @@ ulist_fromchange(xo)
   {
     strcpy(buf, "¤£§i¶D§A");
     strcpy(str, buf);
-
-    return ulist_body(xo);
   }
 
   if (cuser.ufo2 & UFO2_CFROM)

@@ -1255,7 +1255,7 @@ class_load(xo)
       val = bits[chn];
       if (!(val & BRD_L_BIT) || (val & zap) || !(brd[chn].brdname[0]))
 	continue;
-      if (class_hot && bshm->mantime[chn] <= 0)
+      if (class_hot && bshm->mantime[chn] <= 2)
 	continue;
     }
     else		/* ¤ÀÃþ¸s²Õ */

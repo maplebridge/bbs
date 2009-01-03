@@ -71,7 +71,7 @@ mf_urifolder(fpath)
       {
 	if ((bno = brd_bno(head->xname)) >= 0)
 	{
-	  if (!(brd_bits[bno] & BRD_L_BIT))	/* 只計算看得見(不一定能進入)的看板 */
+	  if (!(brd_bits[bno] & BRD_R_BIT))	/* 只計算進得去的看板 */
 	    continue;
 	  brd = bshm->bcache + bno;
 	  btime_refresh(brd);
