@@ -956,12 +956,16 @@ login_status(multi)
 
   /* itoc.010924: 檢查個人精華區是否過多 */
 #ifndef LINUX	/* 在 Linux 下這檢查怪怪的 */
+#if 0		
+/* smiler.080106: 以下的code不可用於計算folder之大小，
+   需使用 du -h folder 或是採用累計file大小 */
   {
     struct stat st;
     usr_fpath(fpath, cuser.userid, "gem");
     if (!stat(fpath, &st) && (st.st_size >= 512 * 7))
       status |= STATUS_MGEMOVER;
   }
+#endif
 #endif
 
   cutmp->status |= status;
@@ -1009,11 +1013,13 @@ login_other()
     film_out(FILM_MQUOTA, -1);		/* 過期信件即將清除警告 */
 #endif
 
-  if (status & STATUS_MAILOVER)
+  if ((status & STATUS_MAILOVER) && !(cuser.userlevel & PERM_MBOX))	/* smiler.080106: 精華區無上限者不警告 */
     film_out(FILM_MAILOVER, -1);	/* 信件過多或寄信過多 */
 
+#if 0	/* smiler.080106: 取消精華區過大警告 */
   if (status & STATUS_MGEMOVER)
     film_out(FILM_MGEMOVER, -1);	/* itoc.010924: 個人精華區過多警告 */
+#endif
 
   if (status & STATUS_BIRTHDAY)
     film_out(FILM_BIRTHDAY, -1);	/* itoc.010415: 生日當天上站有 special 歡迎畫面 */
