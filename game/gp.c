@@ -514,7 +514,7 @@ main_gp()
 
     if (!cont)		/* 第一次壓注 */
     {
-      vget(b_lines - 3, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BET ") ", buf, 6, DOECHO);
+      vget(b_lines - 3, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BETS ") ", buf, 6, DOECHO);
       money = atoi(buf);
       if (money < 1 || money > MAX_GAME_BET || money > cuser.money)
         break;		/* 離開賭場 */

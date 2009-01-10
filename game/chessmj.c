@@ -600,7 +600,7 @@ main_chessmj()
 
     out_song(0);
 
-    vget(2, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BET ") ", ans, 6, DOECHO);
+    vget(2, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BETS ") ", ans, 6, DOECHO);
     money = atoi(ans);
     if (money < 1 || money > MAX_GAME_BET || money > cuser.money)
       break;			/* 離開賭場 */
