@@ -108,9 +108,9 @@ main_dice()
 
   while (1)
   {
-    vget(2, 0, "請問要下注多少呢？(1 ~ 50000) ", buf, 6, DOECHO);
+    vget(2, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BET ") ", buf, 6, DOECHO);
     money = atoi(buf);
-    if (money < 1 || money > 50000 || money > cuser.money)
+    if (money < 1 || money > MAX_GAME_BET || money > cuser.money)
       break;				/* 離開賭場 */
 
     vget(12, 0, "要押哪一項呢？(請輸入號碼) ", buf, 3, DOECHO);

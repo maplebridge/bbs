@@ -13,8 +13,6 @@
 
 #ifdef HAVE_GAME
 
-#define MAX_MARIEBET	50000	/* 最多押到 50000 元 */
-
 
 static inline int
 get_item()		/* 亂數選取要中的項目 */
@@ -107,7 +105,7 @@ main_marie()
 
     case 'a':			/* 全壓 */
       i = 9 * flag;
-      if ((xtotal + i <= MAX_MARIEBET) && (cuser.money >= i))
+      if ((xtotal + i <= MAX_GAME_BET) && (cuser.money >= i))
       {
         cuser.money -= i;
         xtotal += i;
@@ -125,7 +123,7 @@ main_marie()
     case '7':
     case '8':
     case '9':
-      if ((xtotal + flag <= MAX_MARIEBET) && (cuser.money >= flag))
+      if ((xtotal + flag <= MAX_GAME_BET) && (cuser.money >= flag))
       {
         cuser.money -= flag;
         xtotal += flag;

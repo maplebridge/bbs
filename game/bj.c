@@ -156,9 +156,9 @@ main_bj()
     vs_bar("黑傑克大戰");
     out_song();
 
-    vget(2, 0, "請問要下注多少呢？(1 ~ 50000) ", buf, 6, DOECHO);
+    vget(2, 0, "請問要下注多少呢？(1 ~ " MAX_GAME_BET ") ", buf, 6, DOECHO);
     money = atoi(buf);
-    if (money < 1 || money > 50000 || money > cuser.money)
+    if (money < 1 || money > MAX_GAME_BET || money > cuser.money)
       break;			/* 離開賭場 */
 
     cuser.money -= money;

@@ -3813,6 +3813,8 @@ post_append_score(xo, choose)
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
 #endif
+  time_t start;
+  static time_t last = 0;
 
   if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
     return XO_NONE;
@@ -3831,6 +3833,20 @@ post_append_score(xo, choose)
   if (!chkrestrict(hdr))
     return XO_NONE;
 #endif
+
+  time(&start);
+  if ((start - last) < 5)
+  {
+    srand(start);
+    vtlen = rand() % 10000;
+    sprintf(fpath, "◎ 離上次推文時間過短，請輸入隨機數字 %4d: ",vtlen);
+    vget(b_lines, 0, fpath, reason, 5, DOECHO);
+    if (atoi(reason) != vtlen)
+    {
+      vmsg("輸入錯誤");
+      return XO_FOOT;
+    }
+  }
 
   if (!(ans = choose))
   {
@@ -3933,6 +3949,7 @@ post_append_score(xo, choose)
   }
   post_history(xo, hdr);
   btime_update(currbno);
+  last = start;
 
   return XO_LOAD;
 }

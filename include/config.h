@@ -292,6 +292,7 @@
 #  define HAVE_CREDIT		/* itoc.020125: 提供記帳本 */
 #  define HAVE_LOVELETTER	/* itoc.020602: 提供情書產生器 */
 #  define HAVE_CALENDAR		/* itoc.020831: 提供萬年曆 */
+#  define MAX_GAME_BET		10	/* 賭金每次最多 10 元 */
 #endif
 
 #ifdef HAVE_SONG
