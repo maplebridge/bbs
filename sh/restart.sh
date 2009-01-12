@@ -13,12 +13,15 @@ killall -u maple bbsd
 sleep 5
 killall -u maple bbsd
 sleep 5
+ipcs -a
 # remove SHM
 /usr/home/maple/src/sh/killbbs.sh
+ipcs -a
 sleep 5
 # rebuild maple
 cd /usr/home/maple/src/
 su maple -c /usr/home/maple/src/sh/rebuild.sh
+ipcs -a
 sleep 75
 # clean BRDSHM
 ipcrm -M 2997
