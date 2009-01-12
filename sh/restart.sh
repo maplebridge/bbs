@@ -20,6 +20,18 @@ sleep 5
 cd /usr/home/maple/src/
 su maple -c /usr/home/maple/src/sh/rebuild.sh
 sleep 75
+# clean BRDSHM
+ipcrm -M 2997
+sleep 2
+# clean UTMPSHM
+ipcrm -M 1998
+sleep 2
+# clean FILMSHM
+ipcrm -M 2999
+sleep 2
+# clean PIPSHM
+ipcrm -M 4998
+sleep 2
 # setup environment
 su maple -c /usr/home/maple/bin/camera
 sleep 5
