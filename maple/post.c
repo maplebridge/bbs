@@ -2316,6 +2316,7 @@ post_cross(xo)
       if (!finish)
 	f_suck(fpw, fpath);
 
+      ve_banner(fpw, 0);
       fclose(fpw);
 
       strcpy(xpost.owner, cuser.userid);
