@@ -135,6 +135,7 @@ void menu(void);
 char *mgets(int fd);
 void *mread(int fd, int len);
 int more(char *fpath, char *footer);
+int more_hunt(char *fpath, char *footer);
 
 /* pal.c */
 int is_super_mygood(int userno);

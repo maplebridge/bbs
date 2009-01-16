@@ -4581,6 +4581,32 @@ post_rss()
 }
 #endif
 
+static int
+post_whereami(xo)
+  XO *xo;
+{
+    char fpath[64], cmd[32];
+    FILE *fp;
+
+    sprintf(fpath, "gem/@/@Class.index");
+    
+    if(!(fp = fopen(fpath, "r")))
+    {
+      vmsg("分類索引尚未建立，請至 sysop 板反應此問題 !!");
+      return XO_NONE;
+    }
+    fclose(fp);
+
+    sprintf(cmd , "*%s ", currboard);
+
+    if((currboard[0] == 'P') && (currboard[1] == '_'))
+      vmsg("個人看板位於 (C)lass -> People 內，以下將搜尋其餘可能結果 !!");
+
+    more_hunt(fpath, cmd);
+
+    return XO_INIT;
+
+}
 
 static int
 post_help(xo)
@@ -4602,6 +4628,7 @@ KeyFunc post_cb[] =
   XO_HEAD, post_head,
   XO_BODY, post_body,
 
+  'W', post_whereami,
   'r', post_browse,
   's', post_switch,
   KEY_TAB, post_gem,
