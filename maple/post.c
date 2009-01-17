@@ -4587,8 +4587,10 @@ static int
 post_whereami(xo)
   XO *xo;
 {
+  FILE *fp;
   static char *index = "gem/@/@Class.index";
-  char cmd[32];
+  char cmd[32], buf[256], *ptr;
+  int end = 0, line = 6;
 
   if (!dashf(index))
   {
@@ -4600,7 +4602,44 @@ post_whereami(xo)
     vmsg("個人看板位於 (C)lass -> People 內，以下將搜尋其餘可能結果 !!");
 
   sprintf(cmd , "*%s ", currboard);
-  more_hunt(index, cmd);
+
+  move(1, 0);
+  clrtobot();
+  outs("我在哪裡？\n\n");
+  if (fp = fopen(index, "r"))
+  {
+    while (fgets(buf, sizeof(buf), fp))
+    {
+      if (!strncmp(buf, cmd, strlen(cmd)))
+      {
+	if (line >= 20 && end == 0)
+	{
+	  line = 6;
+	  move(b_lines - 1, 0);
+	  outs("\033[1;44m 尚未顯示完畢，按任意鍵顯示下頁....\033[m");
+	  vmsg(NULL);
+	  move(3, 0);
+	  clrtobot();
+	}
+
+	if (ptr = strstr(buf, "C:"))
+	{
+	  prints("%-*s", end * 2, "");
+	  if (!strncmp(ptr + 2, currboard, strlen(currboard)) && *(ptr + 2 + strlen(currboard)) == ' ')
+	  {
+	    end = -1;
+	    prints("%s\n", ptr + 2);
+	  }
+	  else
+	    prints(ptr + 2);
+	  end++;
+	  line++;
+	}
+      }
+    }
+    fclose(fp);
+    vmsg(NULL);
+  }
 
   return XO_HEAD;
 }

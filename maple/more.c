@@ -9,9 +9,6 @@
 
 #include "bbs.h"
 
-#define HUNT_NO_SECRET
-
-static int hunt_no_secret = 0;
 
 /* ----------------------------------------------------- */
 /* buffered file read					 */
@@ -215,10 +212,6 @@ outs_line(str)			/* 印出一般內容 */
 {
   int ch1, ch2, ansi;
 
-#ifdef HUNT_NO_SECRET
-  int hunt_no_secret_fund = 0;
-#endif
-
   /* ※處理引用者 & 引言 */
 
   ch1 = str[0];
@@ -259,27 +252,17 @@ outs_line(str)			/* 印出一般內容 */
 	str_ncpy(ptr2, str, buf + ANSILINELEN - ptr2 - 1);
 	break;
       }
-#ifdef HUNT_NO_SECRET
-      hunt_no_secret_fund = 1;
-#endif
 
       if (buf + ANSILINELEN - 1 <= ptr2 + (ptr1 - str) + (len + 7))	/* buf 空間不夠 */
 	break;
 
       str_ncpy(ptr2, str, ptr1 - str + 1);
       ptr2 += ptr1 - str;
-#ifdef HUNT_NO_SECRET
-      sprintf(ptr2, "\033[%dm%.*s\033[m", (hunt_no_secret ? 8 : 7), len, ptr1);
-#else
       sprintf(ptr2, "\033[7m%.*s\033[m", len, ptr1);
-#endif
       ptr2 += len + 7;
       str = ptr1 + len;
     }
-#ifdef HUNT_NO_SECRET
-    if (hunt_no_secret_fund || (!hunt_no_secret))
-#endif
-       outx(buf);
+    outx(buf);
   }
 
   if (ansi)
@@ -349,20 +332,6 @@ outs_footer(buf, lino, fsize)
 {
   int i;
   
-#ifdef HUNT_NO_SECRET  
-  if (hunt_no_secret)
-  {
-    move(0, 0);
-    clrtoeol();
-    prints("\033[m   我在哪裡?        [可按 n 鍵向下移動畫面繼續查詢(若有的話)，或按 ← 鍵離開]\033[m");
-    move(1, 0);
-    clrtoeol();
-    prints("\033[m==============================================================================\033[m");
-    move(23, 0);
-
-  }
-#endif  
-
   /* P.1 有 (PAGE_SCROLL + 1) 列，其他 Page 都是 PAGE_SCROLL 列 */
 
   /* prints(FOOTER_MORE, (lino - 2) / PAGE_SCROLL + 1, ((foff - fimage) * 100) / fsize); */
@@ -370,10 +339,7 @@ outs_footer(buf, lino, fsize)
   /* itoc.010821: 為了和 FOOTER 對齊 */
   sprintf(buf, FOOTER_MORE, (lino - 2) / PAGE_SCROLL + 1, ((foff - fimage) * 100) / fsize);
 
-#ifdef HUNT_NO_SECRET  
-  if (!hunt_no_secret)
-#endif
-     outs(buf);
+  outs(buf);
 
 
   for (i = b_cols + sizeof(COLOR1) + sizeof(COLOR9) * 6 + sizeof(COLOR2) * 6 - strlen(buf); i > 3; i--)
@@ -397,11 +363,7 @@ more_slideshow()
   {
     ch = vkey();
 
-#ifdef HUNT_NO_SECRET
-    if ((!hunt_no_secret) && (ch == '@'))
-#else
-    if(ch == '@')
-#endif
+    if (ch == '@')
     {
       slideshow = vans("請選擇放映的速度 1(最慢)～9(最快)？播放中按任意鍵可停止播放：") - '0';
       if (slideshow < 1 || slideshow > 9)
@@ -647,29 +609,17 @@ re_key:
     key = vkey();
 #endif
 
-#ifdef HUNT_NO_SECRET
-    if ((!hunt_no_secret) && (key == ' ' || key == KEY_PGDN || key == KEY_RIGHT || key == Ctrl('F')))
-#else
     if (key == ' ' || key == KEY_PGDN || key == KEY_RIGHT || key == Ctrl('F'))
-#endif
     {
       shift = PAGE_SCROLL;
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == KEY_DOWN || key == '\n'))
-#else
     else if (key == KEY_DOWN || key == KEY_DOWN || key == '\n')
-#endif
     {
       shift = 1;
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == KEY_PGUP || key == Ctrl('B') || key == KEY_DEL))
-#else
     else if (key == KEY_PGUP || key == Ctrl('B') || key == KEY_DEL)
-#endif
     {
       /* itoc.010324: 到了最開始再上捲表示離開，並回傳 'k' (keymap[] 定義上一篇) */
       if (lino <= b_lines)
@@ -682,11 +632,7 @@ re_key:
       shift = BMAX(-PAGE_SCROLL, i);
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == KEY_UP))
-#else
     else if (key == KEY_UP)
-#endif
     {
       /* itoc.010324: 到了最開始再上捲表示離開，並回傳 'k' (keymap[] 定義上一篇) */
       if (lino <= b_lines)
@@ -697,20 +643,12 @@ re_key:
       shift = -1;
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == KEY_END || key == '$' || key == 'G'))
-#else
     else if (key == KEY_END || key == '$' || key == 'G')
-#endif
     {
       shift = END_MASK;
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == KEY_HOME || key == '0'))
-#else
     else if (key == KEY_HOME || key == KEY_HOME || key == '0')
-#endif
     {
       if (lino <= b_lines)	/* 已經在最開始了 */
 	shift = 0;
@@ -724,11 +662,7 @@ re_key:
       {
 	shift = HUNT_MASK | HUNT_NEXT;
       }
-#ifdef HUNT_NO_SECRET
-      else if ((!hunt_no_secret) && vget(b_lines, 0, "搜尋：", hunt, sizeof(hunt), DOECHO))
-#else
       else if (vget(b_lines, 0, "搜尋：", hunt, sizeof(hunt), DOECHO))
-#endif
       {
 	str_lowest(hunt, hunt);
 	shift = HUNT_MASK | HUNT_START;
@@ -739,11 +673,7 @@ re_key:
       }
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && key == 'C')	/* Thor.980405: more 時可存入暫存檔 */
-#else
     else if (key == 'C')
-#endif
     {
       FILE *fp;
       if (fp = tbf_open())
@@ -754,11 +684,7 @@ re_key:
       shift = 0;		/* 重繪 footer */
     }
 
-#ifdef HUNT_NO_SECRET
-    else if ((!hunt_no_secret) && (key == 'h'))
-#else
     else if (key == 'h')
-#endif
     {
       screenline slt[T_LINES];
       uschar *tmp_fimage;
@@ -916,18 +842,6 @@ re_key:
     }
     else		/* 沒有 footer 要 vmsg() */
     {
-#ifdef HUNT_NO_SECRET    
-      if(hunt_no_secret)
-      {
-	move(0, 0);
-	clrtoeol();
-	prints("\033[m   我在哪裡?        [可按 n 鍵向下移動畫面繼續查詢(若有的話)，或按 ← 鍵離開]\033[m");
-	move(1, 0);
-	clrtoeol();
-	prints("\033[m==============================================================================\033[m");
-	move(23, 0);
-      }
-#endif
       /* lkchu.981201: 先清一次以免重疊顯示 */
       move(b_lines, 0);
       clrtoeol();
@@ -954,25 +868,5 @@ re_key:
 
   /* Thor.990204: 讓key可回傳至more外 */
   return cmd;
-}
-
-
-void
-more_hunt(fpath, footer)
-  char *fpath;
-  char *footer;
-{
-  hunt_no_secret = 1;
-
-#ifdef HUNT_NO_SECRET
-  strcpy(hunt, footer);
-  str_lowest(hunt, hunt);
-  shift = HUNT_MASK | HUNT_START;
-  more(fpath, NULL);
-#else
-  vmsg("請回報 SYSOP 此段 code 需先define HUNT_NO_SECRET !!");
-#endif  
-
-  hunt_no_secret = 0;
 }
 
