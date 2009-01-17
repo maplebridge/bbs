@@ -916,17 +916,16 @@ re_key:
     }
     else		/* 沒有 footer 要 vmsg() */
     {
-
 #ifdef HUNT_NO_SECRET    
       if(hunt_no_secret)
       {
-        move(0, 0);
-        clrtoeol();
-        prints("\033[m   我在哪裡?        [可按 n 鍵向下移動畫面繼續查詢(若有的話)，或按 ← 鍵離開]\033[m");
-        move(1, 0);
-        clrtoeol();
-        prints("\033[m==============================================================================\033[m");
-        move(23, 0);
+	move(0, 0);
+	clrtoeol();
+	prints("\033[m   我在哪裡?        [可按 n 鍵向下移動畫面繼續查詢(若有的話)，或按 ← 鍵離開]\033[m");
+	move(1, 0);
+	clrtoeol();
+	prints("\033[m==============================================================================\033[m");
+	move(23, 0);
       }
 #endif
       /* lkchu.981201: 先清一次以免重疊顯示 */
@@ -957,7 +956,8 @@ re_key:
   return cmd;
 }
 
-int
+
+void
 more_hunt(fpath, footer)
   char *fpath;
   char *footer;
@@ -975,3 +975,4 @@ more_hunt(fpath, footer)
 
   hunt_no_secret = 0;
 }
+

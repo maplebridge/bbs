@@ -3986,7 +3986,7 @@ post_noscore(xo)
   cur = pos - xo->top;
   hdr = (HDR *) xo_pool + cur;
 
-  if (HAS_PERM(PERM_ALLBOARD) || !strcmp(hdr->owner, cuser.userid))
+  if ((bbstate & STAT_BOARD) || !strcmp(hdr->owner, cuser.userid))
   {
     hdr->xmode ^= POST_NOSCORE;
     currchrono = hdr->chrono;
@@ -4582,32 +4582,31 @@ post_rss()
 }
 #endif
 
+
 static int
 post_whereami(xo)
   XO *xo;
 {
-    char fpath[64], cmd[32];
-    FILE *fp;
+  static char *index = "gem/@/@Class.index";
+  char fpath[64], cmd[32];
+  FILE *fp;
 
-    sprintf(fpath, "gem/@/@Class.index");
-    
-    if(!(fp = fopen(fpath, "r")))
-    {
-      vmsg("分類索引尚未建立，請至 sysop 板反應此問題 !!");
-      return XO_NONE;
-    }
-    fclose(fp);
+  if (!dashf(index))
+  {
+    vmsg("分類索引尚未建立，請至 sysop 板反應此問題 !!");
+    return XO_NONE;
+  }
 
-    sprintf(cmd , "*%s ", currboard);
+  sprintf(cmd , "*%s ", currboard);
 
-    if((currboard[0] == 'P') && (currboard[1] == '_'))
-      vmsg("個人看板位於 (C)lass -> People 內，以下將搜尋其餘可能結果 !!");
+  if ((currboard[0] == 'P') && (currboard[1] == '_'))
+    vmsg("個人看板位於 (C)lass -> People 內，以下將搜尋其餘可能結果 !!");
 
-    more_hunt(fpath, cmd);
+  more_hunt(index, cmd);
 
-    return XO_INIT;
-
+  return XO_HEAD;
 }
+
 
 static int
 post_help(xo)
@@ -4672,15 +4671,13 @@ KeyFunc post_cb[] =
   '!', XoRXsearch,
   '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
   'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
+  'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
+  'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
 
 #if 0
   '~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
-  '~', XoXselect,		/* itoc.001220: 搜尋作者/標題 */
-  'S', XoXsearch,		/* itoc.001220: 搜尋相同標題文章 */
-  'a', XoXauthor,		/* itoc.001220: 搜尋作者 */
   '/', XoXtitle,		/* itoc.001220: 搜尋標題 */
   'f', XoXfull,			/* itoc.030608: 全文搜尋 */
-  'G', XoXmark,			/* itoc.010325: 搜尋 mark 文章 */
   'K', XoXlocal,		/* itoc.010822: 搜尋本地文章 */
 #endif
 
@@ -4755,13 +4752,12 @@ KeyFunc xpost_cb[] =
   '!', XoRXsearch,
   '~', XoXselect,
   'a', XoXauthor,
-#if 0
-  '~', XoXselect,
   'S', XoXsearch,
-  'a', XoXauthor,
+  'G', XoXmark,
+
+#if 0
   '/', XoXtitle,
   'f', XoXfull,
-  'G', XoXmark,
   'K', XoXlocal,
 #endif
 
