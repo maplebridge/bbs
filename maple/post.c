@@ -4588,8 +4588,7 @@ post_whereami(xo)
   XO *xo;
 {
   static char *index = "gem/@/@Class.index";
-  char fpath[64], cmd[32];
-  FILE *fp;
+  char cmd[32];
 
   if (!dashf(index))
   {
@@ -4597,11 +4596,10 @@ post_whereami(xo)
     return XO_NONE;
   }
 
-  sprintf(cmd , "*%s ", currboard);
-
   if ((currboard[0] == 'P') && (currboard[1] == '_'))
     vmsg("個人看板位於 (C)lass -> People 內，以下將搜尋其餘可能結果 !!");
 
+  sprintf(cmd , "*%s ", currboard);
   more_hunt(index, cmd);
 
   return XO_HEAD;
