@@ -169,9 +169,9 @@ x_password()
   {
     time(&now);
 
-    if (acct.lastlogin > now - 86400 * 10)
+    if (acct.lastlogin > now - 86400 * 3)
     {
-      vmsg("該使用者必須十天以上未上站方可重送密碼");
+      vmsg("該使用者必須三天以上未上站方可重送密碼");
       return 0;
     }
 
