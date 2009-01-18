@@ -36,10 +36,14 @@ sleep 2
 /usr/bin/ipcrm -M 4998
 sleep 2
 # setup environment
-su maple -c /usr/home/maple/bin/camera
-sleep 5
+/usr/bin/ipcs -a
+sleep 2
 su maple -c /usr/home/maple/bin/account
 sleep 120
+su maple -c /usr/home/maple/bin/camera
+sleep 5
+/usr/bin/ipcs -a
+sleep 2
 # start inetd
 /etc/rc.d/inetd start
 #/usr/sbin/inetd -wW -C 60
