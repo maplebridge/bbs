@@ -619,6 +619,23 @@ copy_post_IAS(hdr, fpath)
   }
 }
 
+void
+do_ias_post_log(hdr)
+  HDR hdr;
+{
+  char fpath[64];
+  char buf[512];
+  
+  if( ( (currbattr & BRD_NOPREFIX) || (strstr(currboard, "IS_")) || 
+        (strstr(currboard, "IA_")) || (strstr(currboard, "IAS_")) ) && 
+        (bbstate & STAT_BM) )
+  {
+    sprintf(buf, "時間:%s\n作者:%s 看板:%s\n標題:%s\n檔名:%s\n--\n\n", Now(), cuser.userid, currboard, hdr.title, hdr.xname);
+    f_cat("run/IAS_POLOG", buf);
+    sprintf(fpath, "gem/brd/IAS_Meeting/@/@IAS_POLOG");
+    f_cat(fpath, buf);
+  }
+}
 
 static int
 do_post(xo, title)
@@ -878,6 +895,9 @@ do_post(xo, title)
 
   clear();
   outs("順利貼出文章，");
+  
+  /* smiler.090120: 藝文館板主po文記錄 */
+  do_ias_post_log(hdr);
 
   if ((currbattr & BRD_NOCOUNT) || (curredit & EDIT_ANONYMOUS) || (wordsnum < 30))
   {				/* itoc.010408: 以此減少灌水現象 */
