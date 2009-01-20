@@ -15,7 +15,7 @@ killall -u maple bbsd
 sleep 5
 /usr/bin/ipcs -a
 # remove SHM
-/usr/home/maple/src/sh/killbbs.sh
+su maple -c /usr/home/maple/src/sh/killbbs.sh
 /usr/bin/ipcs -a
 sleep 5
 # rebuild maple
