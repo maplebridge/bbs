@@ -501,9 +501,6 @@ gem_check_if_data_class(xo, fpath, key)
   if (strstr(xo->dir, "gem/.DIR") || strstr(xo->dir, "gem/@/"))
   {
     sprintf(check_fpath, "gem/@/@%s", fpath);
-    char buf[32];
-    sprintf(buf, "%d", is_struct(check_fpath, sizeof(HDR)));
-    vmsg(buf);
     if ((key == 'C' && is_struct(check_fpath, sizeof(HDR)) == (-1)) || 
         (key == 'D' && is_struct(check_fpath, sizeof(HDR)) == 1))
       return 0;
