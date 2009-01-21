@@ -626,7 +626,7 @@ do_ias_post_log(hdr)
   char fpath[64];
   char buf[512];
   
-  if( ( (currbattr & BRD_NOPREFIX) || (strstr(currboard, "IS_")) || 
+  if( ( (currbattr & BRD_IAS) || (strstr(currboard, "IS_")) || 
         (strstr(currboard, "IA_")) || (strstr(currboard, "IAS_")) ) && 
         (bbstate & STAT_BM) )
   {
