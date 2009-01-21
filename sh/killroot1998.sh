@@ -4,7 +4,7 @@
 # for freebsd only
 for i in `ipcs | grep root | awk '{print $3}'`
 do
-  if [ $OSTYPE = "FreeBSD" ]; then
+  if [ $i = 1998 ]; then
          reboot
   fi
 done
