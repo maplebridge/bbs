@@ -44,6 +44,8 @@ su maple -c /usr/home/maple/bin/camera
 sleep 5
 /usr/bin/ipcs -a
 sleep 2
+/usr/home/maple/src/sh/killroot1998.sh
+sleep 2
 # start inetd
 /etc/rc.d/inetd start
 #/usr/sbin/inetd -wW -C 60
