@@ -2,11 +2,18 @@
 
 # killbbs first
 su maple -c /usr/home/maple/src/sh/killbbs.sh
+sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # stop inetd, so no one gets in
 /etc/rc.d/inetd stop
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # killbbs again
 su maple -c /usr/home/maple/src/sh/killbbs.sh
 sleep 5
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # flush buffers
 sync
 sleep 5
@@ -18,15 +25,24 @@ sleep 5
 killall -u maple bbsd
 sleep 5
 /usr/bin/ipcs -a
+sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # remove SHM
 su maple -c /usr/home/maple/src/sh/killbbs.sh
+sleep 2
 /usr/bin/ipcs -a
-sleep 5
+sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # rebuild maple
 cd /usr/home/maple/src/
 su maple -c /usr/home/maple/src/sh/rebuild.sh
-/usr/bin/ipcs -a
 sleep 75
+/usr/bin/ipcs -a
+sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 # clean BRDSHM
 /usr/bin/ipcrm -M 2997
 sleep 2
@@ -42,11 +58,15 @@ sleep 2
 # setup environment
 /usr/bin/ipcs -a
 sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
+sleep 2
 su maple -c /usr/home/maple/bin/account
 sleep 120
 su maple -c /usr/home/maple/bin/camera
 sleep 5
 /usr/bin/ipcs -a
+sleep 2
+su maple -c /usr/home/maple/src/sh/ipcs.sh
 sleep 2
 # start inetd
 /etc/rc.d/inetd start
