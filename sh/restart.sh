@@ -1,7 +1,11 @@
 #!/bin/sh
 
+# killbbs first
+su maple -c /usr/home/maple/src/sh/killbbs.sh
 # stop inetd, so no one gets in
 /etc/rc.d/inetd stop
+# killbbs again
+su maple -c /usr/home/maple/src/sh/killbbs.sh
 sleep 5
 # flush buffers
 sync
@@ -44,8 +48,8 @@ su maple -c /usr/home/maple/bin/camera
 sleep 5
 /usr/bin/ipcs -a
 sleep 2
-/usr/home/maple/src/sh/killroot1998.sh
-sleep 2
 # start inetd
 /etc/rc.d/inetd start
 #/usr/sbin/inetd -wW -C 60
+# if root has 1998, reboot
+/usr/home/maple/src/sh/killroot1998.sh
