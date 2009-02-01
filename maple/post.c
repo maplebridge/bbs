@@ -3925,7 +3925,7 @@ post_append_score(xo, choose)
     return XO_INIT;
     
   move(b_lines, 46);
-  prints("(連推: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
+  prints("(行數: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
@@ -3978,7 +3978,7 @@ post_append_score(xo, choose)
        ans2 = vans("◎ Y)完成推文 N)重新輸入 E)繼續推文 [N] ");
        
        move(b_lines, 46);
-       prints("(連推: %d/%d)\n", (ans2 == 'E' || ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
+       prints("(行數: %d/%d)\n", (ans2 == 'E' || ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
                                  (ans2 == 'E' || ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
        
        if(ans2 != 'Y' && ans2 != 'y' && ans2 != 'E' && ans2 != 'e')
