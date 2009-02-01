@@ -3820,6 +3820,7 @@ log_anonyscore(fname, say)
 }
 #endif
 
+#define	MAX_REASON_RECORD	20
 
 static int
 post_append_score(xo, choose)
@@ -3827,9 +3828,10 @@ post_append_score(xo, choose)
   int choose;	/* 0: 尚未選擇  >0: 已選擇的選項 */
 {
   HDR *hdr;
-  int pos, cur, ans, vtlen, maxlen;
+  int pos, cur, ans, ans2, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
   char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
+  int  num_reason_record = 0;
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
@@ -3914,8 +3916,16 @@ post_append_score(xo, choose)
 #endif
     maxlen = 63 - strlen(cuser.userid) - vtlen;
 
-  if (!vget(b_lines, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
-    return XO_FOOT;
+  if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
+    return XO_INIT;
+
+  ans2 = vans("◎ Y)確定 N)取消 E)繼續 [N] ");
+
+  if(ans2 != 'Y' && ans2 != 'y' && ans2 != 'E' && ans2 != 'e')
+    return XO_INIT;
+    
+  move(b_lines, 46);
+  prints("(連推: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
@@ -3947,13 +3957,53 @@ post_append_score(xo, choose)
     fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
-    fclose(fp);
-  }
+      
+#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
+  if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
+    log_anonyscore(hdr->xname, reason);
+#endif      
 
-#ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
+
+    num_reason_record ++;
+    
+    while((ans2 == 'E' || ans2 == 'e' ) && (num_reason_record < MAX_REASON_RECORD))
+    {
+
+       time(&now);
+       ptime = localtime(&now);
+
+       if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
+          break;
+          
+       ans2 = vans("◎ Y)完成推文 N)重新輸入 E)繼續推文 [N] ");
+       
+       move(b_lines, 46);
+       prints("(連推: %d/%d)\n", (ans2 == 'E' || ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
+                                 (ans2 == 'E' || ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
+       
+       if(ans2 != 'Y' && ans2 != 'y' && ans2 != 'E' && ans2 != 'e')
+       {
+         ans2 = 'E';
+         continue;
+       }
+       
+       fprintf(fp, "\033[1;3%s \033[36m%-*s\033[m  \033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
+         "0m  ", strlen(userid), " ",maxlen, reason,
+         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
+
+#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
     log_anonyscore(hdr->xname, reason);
 #endif
+       num_reason_record ++;
+         
+       if(ans2 == 'Y' || ans2 =='y')
+         break;
+
+    }
+
+    fclose(fp);
+  }
 
   curraddscore = ans == '1' ? 1 : ans == '2' ? -1 : 0;
   currchrono = hdr->chrono;
