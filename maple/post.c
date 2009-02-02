@@ -3919,9 +3919,9 @@ post_append_score(xo, choose)
   if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
     return XO_INIT;
 
-  ans2 = vans("◎ Y)確定 N)取消 E)繼續 [N] ");
+  ans2 = vans("◎ Y)確定 N)取消 E)繼續 [Y] ");
 
-  if(ans2 != 'Y' && ans2 != 'y' && ans2 != 'E' && ans2 != 'e')
+  if(ans2 == 'N' || ans2 == 'n')
     return XO_INIT;
     
   move(b_lines, 46);
@@ -3975,13 +3975,13 @@ post_append_score(xo, choose)
        if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
           break;
           
-       ans2 = vans("◎ Y)完成推文 N)重新輸入 E)繼續推文 [N] ");
+       ans2 = vans("◎ Y)完成推文 N)重新輸入 E)繼續推文 [E] ");
        
        move(b_lines, 46);
        prints("(行數: %d/%d)\n", (ans2 == 'E' || ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
                                  (ans2 == 'E' || ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
        
-       if(ans2 != 'Y' && ans2 != 'y' && ans2 != 'E' && ans2 != 'e')
+       if(ans2 == 'N' || ans2 == 'n')
        {
          ans2 = 'E';
          continue;
@@ -3997,8 +3997,9 @@ post_append_score(xo, choose)
 #endif
        num_reason_record ++;
          
-       if(ans2 == 'Y' || ans2 =='y')
-         break;
+
+      if(ans2 != 'Y' && ans2 != 'y')
+         ans2 = 'E';
 
     }
 
