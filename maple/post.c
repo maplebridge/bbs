@@ -4023,7 +4023,7 @@ post_append_score(xo, choose)
   btime_update(currbno);
   last = start;
 
-  return XO_LOAD;
+  return XO_INIT;
 }
 
 
