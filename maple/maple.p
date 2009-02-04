@@ -16,6 +16,7 @@ void brd_title(int bno);
 void x_file(int mode, char *xlist[], char *flist[]);
 int m_trace(void);
 char *get_my_ip(void);
+char *get_my_ansi_ip(void);
 
 /* bbsd.c */
 void alog(char *mode, char *msg);

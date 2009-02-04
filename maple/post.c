@@ -3831,6 +3831,7 @@ post_append_score(xo, choose)
   int pos, cur, ans, ans2, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
   char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
+  char my_ansi_ip[96];
   int  num_reason_record = 0;
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
@@ -3911,10 +3912,10 @@ post_append_score(xo, choose)
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 63 - IDLEN - vtlen;
+    maxlen = 63 - IDLEN - vtlen - 5;
   else
 #endif
-    maxlen = 63 - strlen(cuser.userid) - vtlen;
+    maxlen = 63 - strlen(cuser.userid) - vtlen - 5;
 
   if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
     return XO_INIT;
@@ -3937,11 +3938,19 @@ post_append_score(xo, choose)
       userid = cuser.userid;
     else
       strcat(userid, ".");		/* 自定的話，最後加 '.' */
-    maxlen = 63 - strlen(userid) - vtlen;
+    maxlen = 63 - strlen(userid) - vtlen - 5;
   }
   else
 #endif
     userid = cuser.userid;
+
+  /* smiler.090204: 推文記錄ip，若匿名板則不記錄 */
+#ifdef HAVE_ANONYMOUS
+  if(currbattr & BRD_ANONYMOUS)
+    strcpy(my_ansi_ip, "xxxx");
+  else
+#endif
+    strcpy(my_ansi_ip, get_my_ansi_ip());
 
   dir = xo->dir;
   hdr_fpath(fpath, dir, hdr);
@@ -3954,9 +3963,9 @@ post_append_score(xo, choose)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
+    fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
       verb, userid, maxlen, reason,
-      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ansi_ip);
       
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -3987,9 +3996,9 @@ post_append_score(xo, choose)
          continue;
        }
        
-       fprintf(fp, "\033[1;3%s \033[36m%-*s\033[m  \033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m\n",
+       fprintf(fp, "\033[1;3%s \033[36m%-*s\033[m  \033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
          "0m  ", strlen(userid), " ",maxlen, reason,
-         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
+         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ansi_ip);
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))

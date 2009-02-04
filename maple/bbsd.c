@@ -633,6 +633,50 @@ get_my_ip(void)
   return my_ip;
 }
 
+char *
+get_my_ansi_ip(void)
+{
+  static ansi_ip[96] = {0};
+  uschar *addr;
+  addr = (uschar *) &tn_addr;
+  int ip1, ip2, ip3, ip4;
+  
+  if(!ansi_ip[0])
+  {
+    ip1 = (int) addr[0] ;
+    ip2 = (int) addr[1] ;
+    ip3 = (int) addr[2] ;
+    ip4 = (int) addr[3] ;
+
+
+    sprintf(ansi_ip,
+       "\033[1;3%d%s%c\033[m"
+       "\033[1;3%d%s%c\033[m"
+       "\033[1;3%d%s%c\033[m"
+       "\033[1;3%d%s%c\033[m",
+                     
+    ( ip1 % 10 ) % 8,
+    ( ( ip1 % 10 ) / 8) ? ";4m" : "m",
+    (int) 'a' + ip1 / 10,
+                     
+    ( ip2 % 10 ) % 8,
+    ( ( ip2 % 10 ) / 8) ? ";4m" : "m",
+    (int) 'a' + ip2 / 10,
+    
+    ( ip3 % 10 ) % 8,
+    ( ( ip3 % 10 ) / 8) ? ";4m" : "m",
+    (int) 'a' + ip3 / 10,
+                     
+    ( ip4 % 10 ) % 8,
+    ( ( ip4 % 10 ) / 8) ? ";4m" : "m",
+    (int) 'a' + ip4 / 10
+                     
+    );
+  }
+
+  return ansi_ip;
+}
+
 
 /* ----------------------------------------------------- */
 /* user login						 */
