@@ -1958,6 +1958,9 @@ re_key:
       return post_init(xo);
 #endif
 
+    case '!':
+      return post_trans_ip(xo);
+
     case '/':
       if (vget(b_lines, 0, "搜尋：", hunt, sizeof(hunt), DOECHO))
       {
@@ -4724,6 +4727,162 @@ post_whereami(xo)
   return XO_HEAD;
 }
 
+static int
+post_ip_to_char(xo)
+{
+  int i, ip1, ip2, ip3, ip4;
+  char buf[4];
+  
+  move(0, 0);
+  clrtobot();
+  
+  move(3, 0);
+  
+  prints("ip 以 ip1.ip2.ip3.ip4 表示 : \n");
+  
+  i=5;
+  
+  if(!vget(i, 0, "請輸入ip1: ", buf, 4, DOECHO))
+    return XO_INIT;
+    
+  ip1 = atoi(buf);
+  if(ip1 > 255  || ip1 < 1)
+  {
+    vmsg("輸入不正確:  0 < ip1 < 256 ");
+    return XO_INIT;
+  }
+  
+  i=i+2;
+  
+  if(!vget(i, 0, "請輸入ip2: ", buf, 4, DOECHO))
+    return XO_INIT;
+  
+  ip2 = atoi(buf);
+  if(ip2 > 255  || ip2 < 1)
+  {
+    vmsg("輸入不正確:  0 < ip2 < 256 ");
+    return XO_INIT;
+  }
+   
+  i=i+2;
+  
+  if(!vget(i, 0, "請輸入ip3: ", buf, 4, DOECHO))
+    return XO_INIT;
+    
+  ip3 = atoi(buf);
+  if(ip3 > 255  || ip3 < 1)
+  {
+    vmsg("輸入不正確:  0 < ip3 < 256 ");
+    return XO_INIT;
+  }
+  
+  i=i+2;
+  
+  if(!vget(i, 0, "請輸入ip4: ", buf, 4, DOECHO))
+    return XO_INIT;
+    
+  ip4 = atoi(buf);
+  if(ip4 > 255  || ip4 < 1)
+  {
+    vmsg("輸入不正確:  0 < ip4 < 256 ");
+    return XO_INIT;
+  }
+   
+  prints("\n\n ip代碼=> %s \n", get_my_ansi_ip_char(ip1, ip2, ip3, ip4) );
+  
+  vmsg(NULL);
+  
+  return XO_INIT;
+}
+
+
+static int
+post_char_to_ip(xo)
+  XO *xo;
+{
+  int ip1=0;
+  int ip2=0;
+  int ip3=0;
+  int ip4=0;
+
+  move(8, 0);
+  clrtoeol();
+  move(9, 0);
+  clrtoeol();
+
+  move(4, 0);
+  clrtoeol();  
+  prints("\033[1;33m 請依序輸入ip代碼以解出 \033[5m? \033[m");
+  
+  move(5, 0);
+  clrtoeol();
+  
+  prints("\033[1;33;5m?\033[m.x.x.x");
+  
+  ip1 = get_my_ansi_char_ip(6);
+  if(!ip1 || ip1>255 || ip1<1)
+  {
+    vmsg("輸入有誤 !!");
+    return XO_INIT;
+  }
+
+  move(5, 0);
+  clrtoeol();
+  prints("\033[1;33m%d.\033[1;33;5m?\033[m.x.x", ip1);
+
+  ip2 = get_my_ansi_char_ip(6);
+  if(!ip2 || ip2>255 || ip2<1)
+  {
+    vmsg("輸入有誤 !!");
+    return XO_INIT;
+  }
+  
+  move(5, 0);
+  clrtoeol();
+  prints("\033[1;33m%d.%d.\033[1;33;5m?\033[m.x", ip1, ip2);
+
+  ip3 = get_my_ansi_char_ip(6);
+  if(!ip3 || ip3>255 || ip3<1)
+  {
+    vmsg("輸入有誤 !!");
+    return XO_INIT;
+  }
+
+  move(5, 0);
+  clrtoeol();
+  prints("\033[1;33m%d.%d.%d.\033[1;33;5m?\033[m", ip1, ip2, ip3);
+
+  ip4 = get_my_ansi_char_ip(6);
+  if(!ip4 || ip4>255 || ip4<1)
+  {
+    vmsg("輸入有誤 !!");
+    return XO_INIT;
+  }
+
+  move(5, 0);
+  clrtoeol();
+  prints("\033[1;33m%d.%d.%d.%d <===== 查詢結果\033[m", ip1, ip2, ip3, ip4);
+  vmsg(NULL);
+    
+  return XO_INIT;
+}
+
+int
+post_trans_ip(xo)
+  XO *xo;
+{
+  switch(vans("1)ip碼查詢ip  2)ip查詢ip碼 [Q]"))
+  {
+  case '1':
+    post_char_to_ip(xo);
+    return XO_INIT;
+  case '2':
+    post_ip_to_char(xo);
+    return XO_INIT;
+  default:
+    return XO_INIT;
+  }
+}
 
 static int
 post_help(xo)
@@ -4763,6 +4922,7 @@ KeyFunc post_cb[] =
   '_', post_bottom,
   'D', post_rangedel,
   'o', post_noforward,
+  '!', post_trans_ip,
 #ifdef HAVE_SCORE
   '%', post_score,
   'e', post_e_score,

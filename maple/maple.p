@@ -17,6 +17,8 @@ void x_file(int mode, char *xlist[], char *flist[]);
 int m_trace(void);
 char *get_my_ip(void);
 char *get_my_ansi_ip(void);
+char *get_my_ansi_ip_char(int ip1, int ip2, int ip3, int ip4);
+int get_my_ansi_char_ip(int i);
 
 /* bbsd.c */
 void alog(char *mode, char *msg);
@@ -180,6 +182,7 @@ int post_e_score(XO *xo);
 int post_score(XO *xo);
 void hdr_outs_bar(HDR *hdr, int cc);
 void post_history(XO *xo, HDR *hdr);
+int post_trans_ip(XO *xo);
 
 /* talk.c */
 char *bmode(UTMP *up, int simple);
