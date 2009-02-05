@@ -725,6 +725,9 @@ get_my_ansi_char_ip(i)
   }
   else if(buf[0] >= 'A' && buf[0] <= 'Z')
   {
+    if(i1 > 1)
+      return 0;
+
     return ((int) buf[0] - (int) 'A') * 10 + i1 + 8;
   }
   else
