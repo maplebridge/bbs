@@ -3834,8 +3834,9 @@ post_append_score(xo, choose)
   int pos, cur, ans, ans2, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
   char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
-  char my_ansi_ip[96];
   int  num_reason_record = 0;
+  int  ip_len = 0;
+  char my_ip[128] = {0};
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
@@ -3912,13 +3913,34 @@ post_append_score(xo, choose)
     verb = "7m─";
     vtlen = 2;
   }
+  
+  ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
+  
+  if(currbattr & BRD_POST_IP)
+  {
+#ifdef HAVE_ANONYMOUS
+    if(currbattr & BRD_ANONYMOUS)
+      strcpy(my_ip, "才不告訴你呢");
+    else
+#endif
+      strcpy(my_ip, get_my_ip());
+  }
+  else
+  {
+#ifdef HAVE_ANONYMOUS
+    if(currbattr & BRD_ANONYMOUS)
+      strcpy(my_ip, "xxxx");
+    else
+#endif
+      strcpy(my_ip, get_my_ansi_ip());
+  }
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
-    maxlen = 63 - IDLEN - vtlen - 5;
+    maxlen = 63 - IDLEN - vtlen - ip_len;
   else
 #endif
-    maxlen = 63 - strlen(cuser.userid) - vtlen - 5;
+    maxlen = 63 - strlen(cuser.userid) - vtlen - ip_len;
 
   if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
     return XO_INIT;
@@ -3941,19 +3963,12 @@ post_append_score(xo, choose)
       userid = cuser.userid;
     else
       strcat(userid, ".");		/* 自定的話，最後加 '.' */
-    maxlen = 63 - strlen(userid) - vtlen - 5;
+    maxlen = 63 - strlen(userid) - vtlen - ip_len;
   }
   else
 #endif
     userid = cuser.userid;
 
-  /* smiler.090204: 推文記錄ip，若匿名板則不記錄 */
-#ifdef HAVE_ANONYMOUS
-  if(currbattr & BRD_ANONYMOUS)
-    strcpy(my_ansi_ip, "xxxx");
-  else
-#endif
-    strcpy(my_ansi_ip, get_my_ansi_ip());
 
   dir = xo->dir;
   hdr_fpath(fpath, dir, hdr);
@@ -3968,7 +3983,7 @@ post_append_score(xo, choose)
 
     fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
       verb, userid, maxlen, reason,
-      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ansi_ip);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
       
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -4001,7 +4016,7 @@ post_append_score(xo, choose)
        
        fprintf(fp, "\033[1;3%s \033[36m%-*s\033[m  \033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
          "0m  ", strlen(userid), " ",maxlen, reason,
-         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ansi_ip);
+         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -4291,7 +4306,10 @@ post_ishowbm(xo)
       (currbattr & BRD_PUBLIC) ? "公眾看板" : "非公眾板");
     prints("%s", (currbattr & BRD_IAS) ? " | 藝文館看板" : "");
     prints("%s", (currbattr & BRD_ATOM) ? " | ATOM看板" : "");
-    prints("\n");
+    
+    move(8, 45);
+    prints("%s%s - 看板推文顯示: %s\n", mark, "!\033[m",
+      (currbattr & BRD_POST_IP) ? "ip" : "ip代碼");
 
     prints("   - 匿名看板: %s匿名%s",
       (currbattr & BRD_ANONYMOUS) ? "可" : "不可",
@@ -4378,9 +4396,6 @@ post_ishowbm(xo)
       (ch == 'm' || ch == 'i' || ch == 'x' || ch == 'v'))
       return reload ? XO_INIT : XO_HEAD;
 
-    if (isbm && ch == '4')	/* 板主的 4 就是看板友名單 */
-      ch = '5';
-
     move(b_lines, 0);
     clrtoeol();
     switch (ch |= 0x20)
@@ -4438,6 +4453,9 @@ post_ishowbm(xo)
       break;
     case 'a':
       DL_func("bin/manage.so:post_showturn");
+      break;
+    case '!':
+      DL_func("bin/manage.so:post_brd_ip_char");
       break;
     case 'w':
       DL_func("bin/manage.so:post_memo_edit");
@@ -4871,7 +4889,7 @@ int
 post_trans_ip(xo)
   XO *xo;
 {
-  switch(vans("1)ip碼查詢ip  2)ip查詢ip碼 [Q]"))
+  switch(vans("(1)以ip碼查詢ip  (2)以ip查詢ip碼 [Q]"))
   {
   case '1':
     post_char_to_ip(xo);

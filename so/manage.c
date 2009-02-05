@@ -521,6 +521,36 @@ post_brd_prefix()
 /* ----------------------------------------------------- */
 
 
+/* smiler.090206: 設定看板推文ip顯示 */
+int
+post_brd_ip_char()
+{
+  BRD *oldbrd, newbrd;
+
+  oldbrd = bshm->bcache + currbno;
+  memcpy(&newbrd, oldbrd, sizeof(BRD));
+
+  switch (vkans("看板推文顯示 (1)ip (2)ip代碼 (Q)取消設定？[Q] "))
+  {
+  case '1':
+    newbrd.battr |= BRD_POST_IP;
+    break;
+  case '2':
+    newbrd.battr &= ~BRD_POST_IP;
+    break;
+  default:
+    return 0;
+  }
+
+  if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
+  {
+    memcpy(oldbrd, &newbrd, sizeof(BRD));
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+  }
+
+  return 0;
+}
+
 #ifdef HAVE_SCORE
 int
 post_battr_noscore()
