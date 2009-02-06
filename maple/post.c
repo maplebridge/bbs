@@ -4396,6 +4396,9 @@ post_ishowbm(xo)
       (ch == 'm' || ch == 'i' || ch == 'x' || ch == 'v'))
       return reload ? XO_INIT : XO_HEAD;
 
+    if (isbm && ch == '4')	/* 板主的 4 就是看板友名單 */
+       ch = '5';
+
     move(b_lines, 0);
     clrtoeol();
     switch (ch |= 0x20)
