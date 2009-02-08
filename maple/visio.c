@@ -799,12 +799,6 @@ process_score_ip(dateip)
 {
   extern int more_ip;
 
-#if 0
-推文格式長這樣：
-......推文到這裡*[30m**|*[1m02/08 16:30*[m*[30m**/*[137mm*[130ma*[130ma*[131ma*[m// strlen(dateip)==60
-......推文到這裡*[30m**|*[1m02/08 18:11*[m 127.0.0.1
-#endif
-
   if (dateip[2] == '|')	/* date */
   {
     if (strlen(dateip) != 60 || strncmp(dateip + 26, "\033*/", 3))
@@ -912,9 +906,9 @@ outx(str)
 	continue;
       case '/':
 	outc(' ');
-	if (!(cuser.ufo2 & USR_SHOW_MORE_IP))		/* 暗色顯示 */
-	  prints("\033[1;32m%s", str + 3);
-	else						/* 彩色顯示 */
+//	if (!(cuser.ufo2 & USR_SHOW_MORE_IP))		/* 暗色顯示 */
+//	  prints("\033[1;32m%s", str + 3);
+//	else						/* 彩色顯示 */
 	  process_score_ip(str);
 	outs("\033[m");
 	return;	/* 後面的字串全部略過 */
