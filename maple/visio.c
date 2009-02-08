@@ -793,6 +793,86 @@ outs(str)
 }
 
 
+static int
+process_score_ip(dateip)
+  char *dateip;
+{
+  extern int more_ip;
+
+#if 0
+推文格式長這樣：
+......推文到這裡*[30m**|*[1m02/08 16:30*[m*[30m**/*[137mm*[130ma*[130ma*[131ma*[m// strlen(dateip)==60
+......推文到這裡*[30m**|*[1m02/08 18:11*[m 127.0.0.1
+#endif
+
+  if (dateip[2] == '|')	/* date */
+  {
+    if (strlen(dateip) != 60 || strncmp(dateip + 26, "\033*/", 3))
+      return 3;
+
+    if (more_ip)
+    {
+      // skip date, and jump to ipcode position, prepare to print IP
+      outs("\033[32m");
+      return 26;
+    }
+    else
+    {
+      // print date as usual
+      return 3;
+    }
+  }
+
+  else if (dateip[2] == '/' && strlen(dateip) == 34)	/* ipcode */
+  {
+    char *ptr, ipcode[4];
+    int i, ansi[4], ip[4];
+
+    for (i = 0, ptr = dateip + 9; i < 4; i++, ptr += 7)
+      ipcode[i] = *ptr;
+    for (i = 0, ptr = dateip + 7; i < 4; i++, ptr += 7)
+      ansi[i] = *ptr - '0';
+
+    for (i = 0; i < 4; i++)
+    {
+      if (ansi[i] > 7 || ansi[i] < 0)
+	ip[i] = -1;
+      else if (ipcode[i] >= 'a' && ipcode[i] <= 'z')
+	ip[i] = (ipcode[i] - 'a') * 10 + ansi[i];
+      else if (ipcode[i] >= 'A' && ipcode[i] <= 'Z')
+      {
+	if (ansi[i] > 1)
+	  ip[i] = -1;
+	else
+	  ip[i] = (ipcode[i] - 'A') * 10 + ansi[i] + 8;
+      }
+
+      if (ip[i] < 0 && more_ip)
+      {
+	outs("--Error IP--");
+	return 0;
+      }
+    }
+
+    if (more_ip)
+    {
+      // trans ipcede => IP, and print it;
+      prints("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+    }
+    else
+    {
+      // get ansi_ipcode, and print it;
+      for (i = 0; i < 4; i++)
+	prints("\033[;%s3%dm%c", ansi[i] ? "" : "1;", ansi[i], ipcode[i]);
+    }
+  }
+  else
+    outs(dateip + 3);
+
+  return 0;
+}
+
+
 /* ----------------------------------------------------- */
 /* eXtended output: 秀出 user 的 name 和 nick		 */
 /* ----------------------------------------------------- */
@@ -826,6 +906,18 @@ outx(str)
 	outs(cuser.username);
 	str += 3;
 	continue;
+      case '|':
+	str += process_score_ip(str);
+	outc(' ');
+	continue;
+      case '/':
+	outc(' ');
+	if (!(cuser.ufo2 & USR_SHOW_MORE_IP))		/* 暗色顯示 */
+	  prints("\033[1;32m%s", str + 3);
+	else						/* 彩色顯示 */
+	  process_score_ip(str);
+	outs("\033[m");
+	return;	/* 後面的字串全部略過 */
       }
     }
     outc(ch);

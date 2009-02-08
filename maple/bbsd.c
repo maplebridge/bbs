@@ -625,7 +625,7 @@ utmp_setup(mode)
 char *
 get_my_ip(void)
 {
-  static char my_ip[15] = {0};
+  static char my_ip[16] = {0};
   uschar *addr;
   addr = (uschar *) &tn_addr;
   if (!my_ip[0])
@@ -633,15 +633,16 @@ get_my_ip(void)
   return my_ip;
 }
 
+
 char *
 get_my_ansi_ip(void)
 {
-  static char ansi_ip[96] = {0};
+  static char ansi_ip[48] = {0};
   uschar *addr;
   addr = (uschar *) &tn_addr;
   int ip1, ip2, ip3, ip4;
-  
-  if(!ansi_ip[0])
+
+  if (!ansi_ip[0])
   {
     ip1 = (int) addr[0] ;
     ip2 = (int) addr[1] ;
@@ -649,47 +650,63 @@ get_my_ansi_ip(void)
     ip4 = (int) addr[3] ;
     sprintf(ansi_ip, "%s", get_my_ansi_ip_char(ip1, ip2, ip3, ip4));
   }
-  
+
   return ansi_ip;
 
 }
 
+
 char *
 get_my_ansi_ip_char(ip1, ip2, ip3, ip4)
-  int ip1;
-  int ip2;
-  int ip3;
-  int ip4;
+  int ip1, ip2, ip3, ip4;
 {
-  static char ansi_ip_now[96] = {0};
-  
+  static char ansi_ip_now[48] = {0};
+
   sprintf(ansi_ip_now,
-       "\033[m"
-       "\033[3%d%s%c\033[m"
-       "\033[3%d%s%c\033[m"
-       "\033[3%d%s%c\033[m"
-       "\033[3%d%s%c\033[m",
-                     
+#if 0
+       "\033[;%s3%dm%c"
+       "\033[;%s3%dm%c"
+       "\033[;%s3%dm%c"
+       "\033[;%s3%dm%c\033[m",
+
+    ( ( ip1 % 10 ) % 8) ? "" : "1;",
     ( ip1 % 10 ) % 8,
-    ( ( ip1 % 10 ) % 8) ? "m" : ";1m",
     ( ( ip1 % 10 ) / 8) ? (int) 'A' + ip1 / 10 : (int) 'a' + ip1 / 10,
-                     
+
+    ( ( ip2 % 10 ) % 8) ? "" : "1;",
     ( ip2 % 10 ) % 8,
-    ( ( ip2 % 10 ) % 8) ? "m" : ";1m",
     ( ( ip2 % 10 ) / 8) ? (int) 'A' + ip2 / 10 : (int) 'a' + ip2 / 10,
-    
+
+    ( ( ip3 % 10 ) % 8) ? "" : "1;",
     ( ip3 % 10 ) % 8,
-    ( ( ip3 % 10 ) % 8) ? "m" : ";1m",
     ( ( ip3 % 10 ) / 8) ? (int) 'A' + ip3 / 10 : (int) 'a' + ip3 / 10,
-                     
+
+    ( ( ip4 % 10 ) % 8) ? "" : "1;",
     ( ip4 % 10 ) % 8,
-    ( ( ip4 % 10 ) % 8) ? "m" : ";1m",
     ( ( ip4 % 10 ) / 8) ? (int) 'A' + ip4 / 10 : (int) 'a' + ip4 / 10
-                     
+#else
+       "\033[13%dm%c"
+       "\033[13%dm%c"
+       "\033[13%dm%c"
+       "\033[13%dm%c\033[m",
+
+    ( ip1 % 10 ) % 8,
+    ( ( ip1 % 10 ) / 8) ? (int) 'A' + ip1 / 10 : (int) 'a' + ip1 / 10,
+
+    ( ip2 % 10 ) % 8,
+    ( ( ip2 % 10 ) / 8) ? (int) 'A' + ip2 / 10 : (int) 'a' + ip2 / 10,
+
+    ( ip3 % 10 ) % 8,
+    ( ( ip3 % 10 ) / 8) ? (int) 'A' + ip3 / 10 : (int) 'a' + ip3 / 10,
+
+    ( ip4 % 10 ) % 8,
+    ( ( ip4 % 10 ) / 8) ? (int) 'A' + ip4 / 10 : (int) 'a' + ip4 / 10
+#endif
   );
 
   return ansi_ip_now;
 }
+
 
 int
 get_my_ansi_char_ip(i)
@@ -697,13 +714,13 @@ get_my_ansi_char_ip(i)
 {
   char buf[2];
   int i1;
-  
+
   move(i, 0);
   clrtoeol();
 
   move(i, 0);
   outs("色碼: \033[1;30m0\033[m\033[31m1\033[32m2\033[33m3\033[34m4\033[35m5\033[36m6\033[37m7\033[m");
-  
+
   i++;
   clrtoeol();
   if(!vget(i, 0, "請輸入上方所顯示色碼[0-7]", buf, 2, DOECHO))
@@ -713,12 +730,12 @@ get_my_ansi_char_ip(i)
 
   if(i1 > 7 || i1 < 0)
     return 0;
-  
-  i++;  
+
+  i++;
   clrtoeol();
   if(!vget(i, 0, "請輸入英文代碼[a-zA-Z]: ", buf, 2, DOECHO))
     return 0;
-  
+
   if(buf[0] >= 'a' && buf[0] <= 'z')
   {
     return ((int) buf[0] - (int) 'a') * 10 + i1;
@@ -735,6 +752,7 @@ get_my_ansi_char_ip(i)
 
   return 0;
 }
+
 
 /* ----------------------------------------------------- */
 /* user login						 */

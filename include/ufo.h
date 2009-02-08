@@ -113,8 +113,9 @@
 #define USR_SHOW_POST_SCORE		BFLAG(9)	/* 文章推文皆顯示 */
 #define USR_SHOW_POST_MODIFY_UNREAD	BFLAG(10)	/* 文章修文/推文未讀提示 */
 #define USR_SHOW_MF_FOLDER_UNREAD	BFLAG(11)	/* 最愛卷宗未讀顯示 */
+#define USR_SHOW_MORE_IP		BFLAG(12)	/* 文章推文顯示IP碼 */
 
-#define NUM_USR_SHOW	12
+#define NUM_USR_SHOW	13
 
 
 /* ----------------------------------------------------- */
@@ -134,7 +135,7 @@
 #define NUMUFOS2_GUEST	1	/* guest 可以用前 1 個 ufo */
 #define NUMUFOS2_USER	3	/* 一般使用者 可以用前 3 個 ufo */
 
-#define STR_UFO2	"YMF-----------------------------"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
+#define STR_UFO2	"FLBGTXNM01~fx-------------------"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_
@@ -244,7 +245,8 @@ char *usr_show_tbl[NUM_USR_SHOW] =
   "推文歸0 顯示    (顯示/取消)",
   "推文分數顯示    (顯示/取消)",
   "推文未讀提示    (顯示/取消)",
-  "最愛卷宗未讀顯示(顯示/取消)"
+  "最愛卷宗未讀顯示(顯示/取消)",
+  "文章推文顯示IP碼(顯示/取消)"
 };
 
 

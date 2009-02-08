@@ -10,6 +10,8 @@
 #include "bbs.h"
 
 
+int more_ip;
+
 /* ----------------------------------------------------- */
 /* buffered file read					 */
 /* ----------------------------------------------------- */
@@ -318,7 +320,7 @@ outs_header(str, header_len)	/* 印出檔頭 */
   }
 
   /* 如果不是檔頭，就當一般文字印出 */
-  outs_line(str);  
+  outs_line(str);
   //20070410 smiler : 其餘不印出,避免標線顯示混亂
   //"其餘"部分,只會有轉信路徑的結尾而已
 }
@@ -331,7 +333,7 @@ outs_footer(buf, lino, fsize)
   int fsize;
 {
   int i;
-  
+
   /* P.1 有 (PAGE_SCROLL + 1) 列，其他 Page 都是 PAGE_SCROLL 列 */
 
   /* prints(FOOTER_MORE, (lino - 2) / PAGE_SCROLL + 1, ((foff - fimage) * 100) / fsize); */
@@ -497,6 +499,8 @@ more(fpath, footer)
 #ifdef SLIDE_SHOW
   slideshow = 0;
 #endif
+
+  more_ip = 0;
 
   if (hunt[0])		/* 在 xxxx_browse() 請求搜尋字串 */
   {

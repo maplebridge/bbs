@@ -944,20 +944,70 @@ t_pal()
 
 
 #ifdef HAVE_LIST
+static void
+save_list_title(title)
+  char title[][16];
+{
+  FILE *fp;
+  int i;
+  char fpath[32];
+
+  usr_fpath(fpath, cuser.userid, "friend_list_title");
+  if (fp = fopen(fpath, "w"))
+  {
+    for (i = 0; i <= 4; i++)
+      fprintf(fp, "%s\n", title[i]);
+    fclose(fp);
+    vmsg("更名成功\");
+  }
+}
+
+
+static void
+load_list_title(title)
+  char title[][16];
+{
+  FILE *fp;
+  int i;
+  char fpath[32], buf[32];
+
+  usr_fpath(fpath, cuser.userid, "friend_list_title");
+  if (!dashf(fpath))
+  {
+    for (i = 0; i <= 4; i++)
+      sprintf(title[i], "群組名單.%d", i + 1);
+    return;
+  }
+
+  if (fp = fopen(fpath, "r"))
+  {
+    for (i = 0; i <= 4; i++)
+    {
+      fgets(buf, sizeof(buf), fp);
+      buf[strlen(buf) - 1] = '\0';
+      strcpy(title[i], buf);
+    }
+    fclose(fp);
+  }
+}
+
+
 int
 t_list()
 {
   int n;
-  char fpath[64], buf[8];
+  char fpath[64], buf[8], title[5][16];
   XO *xo;
 
   move(MENU_XPOS, 0);
   clrtobot();
 
+  load_list_title(title);
+
   for (n = 1; n <= 5; n++)
   {
     move(n + MENU_XPOS - 1, MENU_YPOS - 1);
-    prints("(\033[1;36m%d\033[m) 群組名單.%d", n, n);
+    prints("(\033[1;36m%d\033[m) %s", n, title[n - 1]);
   }
 
   n = vans("請選擇檔案編號，或按 [0] 取消：") - '0';
@@ -967,7 +1017,7 @@ t_list()
   sprintf(buf, "%s.%d", FN_LIST, n);
   usr_fpath(fpath, cuser.userid, buf);
 
-  switch (vget(b_lines, 36, "(D)刪除 (E)編輯 [Q]取消？", buf, 3, LCECHO))
+  switch (vget(b_lines, 36, "(D)刪除 (E)編輯 (R)更名 [Q]取消？", buf, 3, LCECHO))
   {
   case 'd':
     unlink(fpath);
@@ -979,6 +1029,14 @@ t_list()
     xo->key = PALTYPE_LIST;
     xover(XZ_PAL);
     free(xo);
+    break;
+
+  case 'r':
+    strcpy(fpath, title[n - 1]);
+    if (vget(b_lines - 1, 0, "請輸入新的名稱：", title[n - 1], 16, GCARRY) && strcmp(fpath, title[n - 1]))
+      save_list_title(title);
+    else
+      vmsg("取消更名");
     break;
   }
 

@@ -1950,9 +1950,10 @@ re_key:
       break;
 
 #ifdef HAVE_SCORE
-	case 'e':
-	  post_e_score(xo);
-	  return post_init(xo);
+    case 'e':
+      post_e_score(xo);
+      return post_init(xo);
+
     case '%':
       post_score(xo);
       return post_init(xo);
@@ -3913,26 +3914,26 @@ post_append_score(xo, choose)
     verb = "7m─";
     vtlen = 2;
   }
-  
+
   ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
-  
-  if(currbattr & BRD_POST_IP)
+
+  if (currbattr & BRD_POST_IP)
   {
 #ifdef HAVE_ANONYMOUS
-    if(currbattr & BRD_ANONYMOUS)
-      strcpy(my_ip, "才不告訴你呢");
+    if (currbattr & BRD_ANONYMOUS)
+      strcpy(my_ip, " 才不告訴你呢");
     else
 #endif
-      strcpy(my_ip, get_my_ip());
+      sprintf(my_ip, " %s", get_my_ip());
   }
   else
   {
 #ifdef HAVE_ANONYMOUS
-    if(currbattr & BRD_ANONYMOUS)
-      strcpy(my_ip, "xxxx");
+    if (currbattr & BRD_ANONYMOUS)
+      strcpy(my_ip, "\033[30m\033*/----");
     else
 #endif
-      strcpy(my_ip, get_my_ansi_ip());
+      sprintf(my_ip, "\033[30m\033*/%s", get_my_ansi_ip());
   }
 
 #ifdef HAVE_ANONYMOUS
@@ -3942,14 +3943,16 @@ post_append_score(xo, choose)
 #endif
     maxlen = 63 - strlen(cuser.userid) - vtlen - ip_len;
 
-  if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
-    return XO_INIT;
+  move(b_lines, 0);
+  outs("請注意：推文將紀錄您的IP\n");
+  if (!vget(b_lines - 1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
+    return XO_HEAD;
 
   ans2 = vans("◎ Y)確定 N)取消 E)繼續 [Y] ");
 
-  if(ans2 == 'N' || ans2 == 'n')
-    return XO_INIT;
-    
+  if (ans2 == 'n')
+    return XO_HEAD;
+
   move(b_lines, 46);
   prints("(行數: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
 
@@ -3969,7 +3972,6 @@ post_append_score(xo, choose)
 #endif
     userid = cuser.userid;
 
-
   dir = xo->dir;
   hdr_fpath(fpath, dir, hdr);
 
@@ -3981,53 +3983,49 @@ post_append_score(xo, choose)
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
-      verb, userid, maxlen, reason,
+    fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+      verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
-      
-#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
-  if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
-    log_anonyscore(hdr->xname, reason);
-#endif      
-
-
-    num_reason_record ++;
-    
-    while((ans2 == 'E' || ans2 == 'e' ) && (num_reason_record < MAX_REASON_RECORD))
-    {
-
-       time(&now);
-       ptime = localtime(&now);
-
-       if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
-          break;
-          
-       ans2 = vans("◎ Y)完成推文 N)重新輸入 E)繼續推文 [E] ");
-       
-       move(b_lines, 46);
-       prints("(行數: %d/%d)\n", (ans2 == 'E' || ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
-                                 (ans2 == 'E' || ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
-       
-       if(ans2 == 'N' || ans2 == 'n')
-       {
-         ans2 = 'E';
-         continue;
-       }
-       
-       fprintf(fp, "\033[1;3%s \033[36m%-*s\033[m  \033[33m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m %s\n",
-         "0m  ", strlen(userid), " ",maxlen, reason,
-         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
     log_anonyscore(hdr->xname, reason);
 #endif
-       num_reason_record ++;
-         
 
-      if(ans2 != 'Y' && ans2 != 'y')
-         ans2 = 'E';
+    num_reason_record ++;
 
+    while ((ans2 == 'e') && (num_reason_record < MAX_REASON_RECORD))
+    {
+      time(&now);
+      ptime = localtime(&now);
+
+      if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
+	break;
+
+      ans2 = vans("◎ Y)完成推文 N)此行重新輸入 E)繼續推文 [E] ");
+
+      move(b_lines, 46);
+      prints("(行數: %d/%d)\n", (ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
+				(ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
+
+      if (ans2 == 'n')
+      {
+	ans2 = 'e';
+	continue;
+      }
+
+      fprintf(fp, "%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+	strlen(userid) + 5, "", maxlen - 1, reason,
+	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+
+#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
+      if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
+	log_anonyscore(hdr->xname, reason);
+#endif
+      num_reason_record ++;
+
+      if (ans2 != 'y')
+	ans2 = 'e';
     }
 
     fclose(fp);
@@ -4077,7 +4075,7 @@ post_noscore(xo)
   HDR *hdr;
   int pos, cur;
 
-  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章加密 */
+  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章設定 */
     return XO_NONE;
 
   pos = xo->pos;
@@ -4104,7 +4102,7 @@ post_noforward(xo)
   HDR *hdr;
   int pos, cur;
 
-  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章加密 */
+  if (!cuser.userlevel)	/* guest 不能對其他 guest 的文章設定 */
     return XO_NONE;
 
   pos = xo->pos;
@@ -4749,72 +4747,73 @@ post_whereami(xo)
   return XO_HEAD;
 }
 
+
 static int
 post_ip_to_char(xo)
 {
   int i, ip1, ip2, ip3, ip4;
   char buf[4];
-  
+
   move(0, 0);
   clrtobot();
-  
+
   move(3, 0);
-  
+
   prints("ip 以 ip1.ip2.ip3.ip4 表示 : \n");
-  
-  i=5;
-  
+
+  i = 5;
+
   if(!vget(i, 0, "請輸入ip1: ", buf, 4, DOECHO))
     return XO_INIT;
-    
+
   ip1 = atoi(buf);
   if(ip1 > 255  || ip1 < 1)
   {
     vmsg("輸入不正確:  0 < ip1 < 256 ");
     return XO_INIT;
   }
-  
+
   i=i+2;
-  
+
   if(!vget(i, 0, "請輸入ip2: ", buf, 4, DOECHO))
     return XO_INIT;
-  
+
   ip2 = atoi(buf);
   if(ip2 > 255  || ip2 < 1)
   {
     vmsg("輸入不正確:  0 < ip2 < 256 ");
     return XO_INIT;
   }
-   
+
   i=i+2;
-  
+
   if(!vget(i, 0, "請輸入ip3: ", buf, 4, DOECHO))
     return XO_INIT;
-    
+
   ip3 = atoi(buf);
   if(ip3 > 255  || ip3 < 1)
   {
     vmsg("輸入不正確:  0 < ip3 < 256 ");
     return XO_INIT;
   }
-  
+
   i=i+2;
-  
+
   if(!vget(i, 0, "請輸入ip4: ", buf, 4, DOECHO))
     return XO_INIT;
-    
+
   ip4 = atoi(buf);
   if(ip4 > 255  || ip4 < 1)
   {
     vmsg("輸入不正確:  0 < ip4 < 256 ");
     return XO_INIT;
   }
-   
+
   prints("\n\n ip代碼=> %s \n", get_my_ansi_ip_char(ip1, ip2, ip3, ip4) );
-  
+
   vmsg(NULL);
-  
-  return XO_INIT;
+
+  return XO_HEAD;
 }
 
 
@@ -4835,12 +4834,12 @@ post_char_to_ip(xo)
   move(4, 0);
   clrtoeol();  
   prints("\033[1;33m 請依序輸入ip代碼以解出 \033[5m? \033[m");
-  
+
   move(5, 0);
   clrtoeol();
-  
+
   prints("\033[1;33;5m?\033[m.x.x.x");
-  
+
   ip1 = get_my_ansi_char_ip(6);
   if(!ip1 || ip1>255 || ip1<1)
   {
@@ -4858,7 +4857,7 @@ post_char_to_ip(xo)
     vmsg("輸入有誤 !!");
     return XO_INIT;
   }
-  
+
   move(5, 0);
   clrtoeol();
   prints("\033[1;33m%d.%d.\033[1;33;5m?\033[m.x", ip1, ip2);
@@ -4885,9 +4884,10 @@ post_char_to_ip(xo)
   clrtoeol();
   prints("\033[1;33m%d.%d.%d.%d <===== 查詢結果\033[m", ip1, ip2, ip3, ip4);
   vmsg(NULL);
-    
-  return XO_INIT;
+
+  return XO_HEAD;
 }
+
 
 int
 post_trans_ip(xo)
@@ -4896,15 +4896,14 @@ post_trans_ip(xo)
   switch(vans("(1)以ip碼查詢ip  (2)以ip查詢ip碼 [Q]"))
   {
   case '1':
-    post_char_to_ip(xo);
-    return XO_INIT;
+    return post_char_to_ip(xo);
   case '2':
-    post_ip_to_char(xo);
-    return XO_INIT;
+    return post_ip_to_char(xo);
   default:
-    return XO_INIT;
+    return XO_HEAD;
   }
 }
+
 
 static int
 post_help(xo)
@@ -4944,7 +4943,6 @@ KeyFunc post_cb[] =
   '_', post_bottom,
   'D', post_rangedel,
   'o', post_noforward,
-  '!', post_trans_ip,
 #ifdef HAVE_SCORE
   '%', post_score,
   'e', post_e_score,
