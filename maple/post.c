@@ -4301,13 +4301,14 @@ post_ishowbm(xo)
     prints("                      %s%s - 轉錄文章%s顯示記錄\n", mark, "a\033[m",
       (currbattr & BRD_SHOWTURN) ? "" : "不");
 
-    prints(" %s - 看板種類: %s",
-      (currbattr & BRD_PUBLIC) ? "\033[1;33mu\033[m" : " ",
-      (currbattr & BRD_PUBLIC) ? "公眾看板" : "非公眾板");
-    prints("%s", (currbattr & BRD_IAS) ? " | 藝文館看板" : "");
-    prints("%s", (currbattr & BRD_ATOM) ? " | ATOM看板" : "");
-    
-    move(8, 45);
+    char buf[64];
+    sprintf(buf, "%s%s%s",
+      (currbattr & BRD_PUBLIC) ? "公眾看板" : "非公眾板",
+      (currbattr & BRD_IAS) ? " | 藝文館看板" : "",
+      (currbattr & BRD_ATOM) ? " | ATOM看板" : "");
+    prints(" %s - 看板種類: %-30s",
+      (currbattr & BRD_PUBLIC) ? "\033[1;33mu\033[m" : " ", buf);
+
     prints("%s%s - 看板推文顯示: %s\n", mark, "!\033[m",
       (currbattr & BRD_POST_IP) ? "ip" : "ip代碼");
 
