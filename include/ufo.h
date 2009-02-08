@@ -135,7 +135,7 @@
 #define NUMUFOS2_GUEST	1	/* guest 可以用前 1 個 ufo */
 #define NUMUFOS2_USER	3	/* 一般使用者 可以用前 3 個 ufo */
 
-#define STR_UFO2	"FLBGTXNM01~fx-------------------"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
+#define STR_UFO2	"YMF-----------------------------"	/* itoc: 新增習慣的時候別忘了改這裡啊 */
 
 
 #ifdef _ADMIN_C_

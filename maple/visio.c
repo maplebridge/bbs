@@ -906,8 +906,8 @@ outx(str)
 	continue;
       case '/':
 	outc(' ');
-//	if (!(cuser.ufo2 & USR_SHOW_MORE_IP))		/* 暗色顯示 */
-//	  prints("\033[1;32m%s", str + 3);
+//	if (!(USR_SHOW & USR_SHOW_MORE_IP))		/* 暗色顯示 */
+//	  prints("\033[32m%s", str + 3);
 //	else						/* 彩色顯示 */
 	  process_score_ip(str);
 	outs("\033[m");
