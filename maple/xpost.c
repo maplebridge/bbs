@@ -1073,6 +1073,7 @@ xpost_browse(xo)
   HDR *hdr;
   int key;
   char *dir, fpath[64];
+  extern int more_ip;
 
   dir = xo->dir;
 
@@ -1166,13 +1167,18 @@ re_key:
       break;
 
 #ifdef HAVE_SCORE
-	case 'e':
-	  post_e_score(xo);
-	  return xpost_init(xo);
-    case '%': 
-      post_score(xo);
-      return xpost_init(xo);
+      case 'e':
+	post_e_score(xo);
+	return xpost_init(xo);
+
+      case '%': 
+	post_score(xo);
+	return xpost_init(xo);
 #endif
+
+    case '!':
+      more_ip ^= 1;
+      continue;
 
     case '/':
       if (vget(b_lines, 0, "·j´M¡G", hunt, sizeof(hunt), DOECHO))

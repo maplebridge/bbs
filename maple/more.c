@@ -10,7 +10,7 @@
 #include "bbs.h"
 
 
-int more_ip;
+int more_ip = 0;
 
 /* ----------------------------------------------------- */
 /* buffered file read					 */
@@ -499,8 +499,6 @@ more(fpath, footer)
 #ifdef SLIDE_SHOW
   slideshow = 0;
 #endif
-
-  more_ip = 0;
 
   if (hunt[0])		/* ¦b xxxx_browse() ½Ð¨D·j´M¦r¦ê */
   {

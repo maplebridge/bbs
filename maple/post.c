@@ -1894,6 +1894,7 @@ post_browse(xo)
   HDR *hdr;
   int xmode, pos, key;
   char *dir, fpath[64];
+  extern int more_ip;
 
   dir = xo->dir;
 
@@ -1960,7 +1961,8 @@ re_key:
 #endif
 
     case '!':
-      return post_trans_ip(xo);
+      more_ip ^= 1;
+      continue;
 
     case '/':
       if (vget(b_lines, 0, "·j´M¡G", hunt, sizeof(hunt), DOECHO))
@@ -1988,6 +1990,7 @@ re_key:
     case 'h':
       xo_help("post");
       break;
+
     case 'o':
       if ((bbstate & STAT_BOARD) && !(xmode & POST_NOFORWARD))
       {
@@ -4749,7 +4752,7 @@ post_whereami(xo)
 
 
 static int
-post_ip_to_char(xo)
+post_ip_to_char()
 {
   int i, ip1, ip2, ip3, ip4;
   char buf[4];
