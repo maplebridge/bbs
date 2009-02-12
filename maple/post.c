@@ -26,8 +26,11 @@ extern char brd_bits[];
 extern char anonymousid[];	/* itoc.010717: 自定匿名 ID */
 #endif
 
+
+#define DO_POST_FILTER
 static char bbs_dog_str[80];
 static char bbs_dog_title[80];
+#endif
 
 
 int
@@ -38,6 +41,7 @@ cmpchrono(hdr)
 }
 
 
+#define DO_POST_FILTER
 static int
 IS_BIGGER_AGE(age)
   int age;
@@ -65,31 +69,6 @@ IS_BIGGER_1STLG(month)
 {
   /* 一個月以 30 天計算 */
   return (((time(0) - cuser.firstlogin) / (86400 * 30)) >= month);
-#if 0
-  time_t this_time;
-  struct tm *ptime;
-  int my_year, my_month, my_day;
-  int now_year, now_month, now_day;
-
-  time(&this_time);
-  ptime = localtime(&this_time);
-
-  now_year  = ptime->tm_year;
-  now_month = ptime->tm_mon;
-  now_day   = ptime->tm_mday;
-
-  ptime = localtime(&cuser.firstlogin);
-
-  my_year = ptime->tm_year;
-  my_month = ptime->tm_mon;
-  my_day = ptime->tm_mday;
-
-  return ((my_year   + (month / 12)) < now_year   ) ? 1 :
-	((my_year   + (month / 12)) > now_year   ) ? 0 :
-	((my_month  + (month % 12)) < now_month  ) ? 1 :
-	((my_month  + (month % 12)) > now_month  ) ? 0 :
-	( my_day                    > now_day    ) ? 0 : 1 ;
-#endif
 }
 
 
@@ -236,17 +215,20 @@ IS_BBS_DOG_FOOD(fpath)
 
 }
 
-/* smiler.080830 : 看門狗對文章內容過濾 */
-int	/* 0: 一般正常文章  1: 被擋下來了 */
-post_filter(fpath)
-  char *fpath;			/* file name of access control list */
+
+static int	/* 0: 一般正常文章  1: 被擋下來了 */
+post_filter(fpath)	/* smiler.080830 : 看門狗對文章內容過濾 */
+  char *fpath;		/* file path to be test */
 {
+  BRD *brd;
   char warn[70];
   char fpath_log[64];
   char content_log[256];
 
+  brd = bshm->bcache + currbno;
+
   /* smiler.080910: 讓使用者決定是否加入BBS看門狗計畫 */
-  if ((currbattr & BRD_BBS_DOG) && (IS_BBS_DOG_FOOD(fpath)))
+  if (((currbattr & BRD_BBS_DOG) || brd->BM[0] <= ' ') && (IS_BBS_DOG_FOOD(fpath)))
   {
     brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
     sprintf(content_log, "%s BBS看門狗計畫: 文章寄回給原po\n作者: %s\n標題: %s\n\n",
@@ -298,6 +280,8 @@ post_filter(fpath)
 
   return 0;
 }
+#endif
+
 
 /* ----------------------------------------------------- */
 /* 改良 innbbsd 轉出信件、連線砍信之處理程序		 */
@@ -2143,15 +2127,11 @@ post_cross(xo)
   char content_log[256];
 
   /*  解決信箱轉錄問題 */
-  int comefrom;		// 0: 從信箱轉錄 1: 從看板轉錄
+  int comefrom = (xo->dir[0] == 'u') ? 0 : 1;	/* 0: 從信箱轉錄 1: 從看板轉錄 */
 
   /* smiler.080830: 判斷轉錄是否有被 BBS 看門狗吃掉 */
   int is_bite = 0;
-
-  if (xo->dir[0] == 'u')
-    comefrom = 0;
-  else
-    comefrom = 1;
+  BRD xbrd;
 
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
@@ -2270,7 +2250,10 @@ post_cross(xo)
     }
     hdr_fpath(fpath, dir, hdr);
 
-    if ((xbattr & BRD_BBS_DOG ) && IS_BBS_DOG_FOOD(fpath))
+#define DO_POST_FILTER
+    xbrd = bshm->bcache + xbno;
+
+    if (((xbattr & BRD_BBS_DOG) || xbrd->BM[0] <= ' ') && IS_BBS_DOG_FOOD(fpath))
     {
       brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
       sprintf(content_log, "%s BBS看門狗計畫: 轉錄失敗\n作者: %s\n來源: %s\n標題: %s\n\n",
@@ -2302,6 +2285,7 @@ post_cross(xo)
       is_bite = 1;
       continue;
     }
+#endif
 
 #ifdef HAVE_DETECT_CROSSPOST
     if (check_crosspost(fpath, xbno))

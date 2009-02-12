@@ -856,8 +856,13 @@ process_score_ip(dateip)
     else
     {
       // get ansi_ipcode, and print it;
-      for (i = 0; i < 4; i++)
-	prints("\033[;%s3%dm%c", ansi[i] ? "" : "1;", ansi[i], ipcode[i]);
+      if (USR_SHOW & USR_SHOW_MORE_IP)		/* 彩色顯示 */
+      {
+	for (i = 0; i < 4; i++)
+	  prints("\033[;%s3%dm%c", ansi[i] ? "" : "1;", ansi[i], ipcode[i]);
+      }
+      else		/* 暗色顯示 */
+	prints("\033[32m%c%c%c%c", ipcode[0], ipcode[1], ipcode[2], ipcode[3]);
     }
   }
   else
@@ -906,10 +911,7 @@ outx(str)
 	continue;
       case '/':
 	outc(' ');
-	if (!(USR_SHOW & USR_SHOW_MORE_IP))		/* 暗色顯示 */
-	  prints("\033[32m%s", str + 3);
-	else						/* 彩色顯示 */
-	  process_score_ip(str);
+	process_score_ip(str);
 	outs("\033[m");
 	return;	/* 後面的字串全部略過 */
       }
