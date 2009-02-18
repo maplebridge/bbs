@@ -3822,7 +3822,8 @@ post_append_score(xo, choose)
   HDR *hdr;
   int pos, cur, ans, ans2, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
-  char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
+  //char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
+  char prompt[64];
   int  num_reason_record = 0;
   int  ip_len = 0;
   char my_ip[128] = {0};
@@ -3931,19 +3932,6 @@ post_append_score(xo, choose)
 #endif
     maxlen = 63 - strlen(cuser.userid) - vtlen - ip_len;
 
-  move(b_lines, 0);
-  outs("請注意：推文將紀錄您的IP\n");
-  if (!vget(b_lines - 1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
-    return XO_HEAD;
-
-  ans2 = vans("◎ Y)確定 N)取消 E)繼續 [Y] ");
-
-  if (ans2 == 'n')
-    return XO_HEAD;
-
-  move(b_lines, 46);
-  prints("(行數: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
-
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
   {
@@ -3960,6 +3948,23 @@ post_append_score(xo, choose)
 #endif
     userid = cuser.userid;
 
+  sprintf(prompt, "%s %s：", (ans == '1') ? "△" :
+                             (ans == '2') ? "▽" :
+                                            "─" , userid);
+
+  move(b_lines, 0);
+  clrtoeol();
+  outs("請注意：推文將紀錄您的IP，推文完畢按 ! 可切換顯示推文IP/IP碼\n");
+  if (!vget(b_lines - 1, 0, prompt, reason, maxlen, DOECHO))
+    return XO_HEAD;
+    
+  ans2 = vans("◎ Y)確定 N)取消 E)繼續 [Y] ");
+  if (ans2 == 'n')
+    return XO_HEAD;
+    
+  move(b_lines, 48);
+  prints("(行數: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
+    
   dir = xo->dir;
   hdr_fpath(fpath, dir, hdr);
 
@@ -3987,12 +3992,12 @@ post_append_score(xo, choose)
       time(&now);
       ptime = localtime(&now);
 
-      if (!vget(b_lines-1, 0, prompt[ans - '1'], reason, maxlen, DOECHO))
+      if (!vget(b_lines-1, 0, prompt, reason, maxlen, DOECHO))
 	break;
 
       ans2 = vans("◎ Y)完成推文 N)此行重新輸入 E)繼續推文 [E] ");
 
-      move(b_lines, 46);
+      move(b_lines, 48);
       prints("(行數: %d/%d)\n", (ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
 				(ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
 
