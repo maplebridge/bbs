@@ -3979,6 +3979,18 @@ post_append_score(xo, choose)
     fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+      
+    
+    move(0, 0);
+    clrtoeol();
+    prints("您的\033[1;3%s文\033[m內容：\n", (ans == '1') ? "1m推" :
+                                           (ans == '2') ? "2m噓" :
+                                                          "7m接");
+    prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+      verb, userid, maxlen - 1, reason,
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+    prints("\033[1;30m=============================================================================\033[m");
+    
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -4016,6 +4028,13 @@ post_append_score(xo, choose)
 	log_anonyscore(hdr->xname, reason);
 #endif
       num_reason_record ++;
+      
+      move(num_reason_record, 0);
+      clrtoeol();
+      prints("%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+        strlen(userid) + 5, "", maxlen - 1, reason,
+        ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+      prints("\033[1;30m=============================================================================\033[m");
 
       if (ans2 != 'y')
 	ans2 = 'e';
