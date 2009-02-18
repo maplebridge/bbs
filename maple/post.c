@@ -3868,7 +3868,7 @@ post_append_score(xo, choose)
 
   if (!(ans = choose))
   {
-    switch (ans = vans("◎ 1)說的真好 2)聽你鬼扯 3)其他意見 [3] "))
+    switch (ans = vans("◎ 1)\033[1;31m推文△\033[m 2)\033[1;32m噓文▽\033[m 3)\033[1;37m接文─ [3] \033[m"))
     {
     case '1':
       verb = "1m△";
@@ -3954,7 +3954,7 @@ post_append_score(xo, choose)
 
   move(b_lines, 0);
   clrtoeol();
-  outs("請注意：推文將紀錄您的IP，\閱\讀文章時按 ! 可切換顯示推文IP/IP碼\n");
+  prints("\033[1;37m請注意：推文將記錄您的IP，\閱\讀文章時按\033[33m ! \033[37m可切換顯示推文IP/IP碼\033[m");
   if (!vget(b_lines - 1, 0, prompt, reason, maxlen, DOECHO))
     return XO_HEAD;
     
@@ -3989,7 +3989,7 @@ post_append_score(xo, choose)
     prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
-    prints("\033[1;30m=============================================================================\033[m");
+    prints("\033[1;30m==============================================================================\033[m");
     
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
@@ -4030,11 +4030,10 @@ post_append_score(xo, choose)
       num_reason_record ++;
       
       move(num_reason_record, 0);
-      clrtoeol();
       prints("%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
         strlen(userid) + 5, "", maxlen - 1, reason,
         ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
-      prints("\033[1;30m=============================================================================\033[m");
+      prints("\033[1;30m==============================================================================\033[m");
 
       if (ans2 != 'y')
 	ans2 = 'e';
