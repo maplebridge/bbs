@@ -27,7 +27,7 @@ extern char anonymousid[];	/* itoc.010717: 自定匿名 ID */
 #endif
 
 
-#define DO_POST_FILTER
+#ifdef DO_POST_FILTER
 static char bbs_dog_str[80];
 static char bbs_dog_title[80];
 #endif
@@ -215,7 +215,7 @@ IS_BBS_DOG_FOOD(fpath)
 
 }
 
-
+#ifdef	DO_POST_FILTER
 static int	/* 0: 一般正常文章  1: 被擋下來了 */
 post_filter(fpath)	/* smiler.080830 : 看門狗對文章內容過濾 */
   char *fpath;		/* file path to be test */
@@ -2131,7 +2131,7 @@ post_cross(xo)
 
   /* smiler.080830: 判斷轉錄是否有被 BBS 看門狗吃掉 */
   int is_bite = 0;
-  BRD xbrd;
+  BRD *xbrd;
 
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
@@ -2271,6 +2271,7 @@ post_cross(xo)
       continue;
     }
 
+#ifdef	DO_POST_FILTER
     if (IS_BRD_DOG_FOOD(fpath, xboard))
     {
       brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
