@@ -3954,7 +3954,7 @@ post_append_score(xo, choose)
 
   move(b_lines, 0);
   clrtoeol();
-  outs("請注意：推文將紀錄您的IP，推文完畢按 ! 可切換顯示推文IP/IP碼\n");
+  outs("請注意：推文將紀錄您的IP，\閱\讀文章時按 ! 可切換顯示推文IP/IP碼\n");
   if (!vget(b_lines - 1, 0, prompt, reason, maxlen, DOECHO))
     return XO_HEAD;
     
