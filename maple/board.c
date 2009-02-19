@@ -2595,6 +2595,33 @@ Class()
   return 0;
 }
 
+int
+Class2()
+{
+  int chn, min_chn;
+  short *chx;
+  char *img, *str;
+  const char *name = "NthuMeichu/";
+  
+  class_flag |= BFO_YANK;
+  
+  min_chn = bshm->min_chn;
+  img = class_img;
+  
+  for (chn = CH_END - 2; chn >= min_chn; chn--)
+  {
+    chx = (short *) img + (CH_END - chn);
+    if (!strncmp(img + *chx, name, strlen(name)))
+    {
+      more("brd/MeichuWin/note", NULL);
+      if (XoClass(chn))
+        return 0;
+    }
+  }    
+  vmsg("無此分類群組");
+  return XEASY;
+}
+
 
 void
 board_main()

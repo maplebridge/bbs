@@ -1111,6 +1111,9 @@ static MENU menu_main[] =
 
   Class, 0, M_BOARD,
   "Class     【 分組討論區 】",
+  
+  Class2, 0, M_BOARD,
+  "MeichuWin \033[1;33m【 !!! 己丑梅竹 清大必勝 快進來加油 !!! 】\033[m",
 
 #ifdef MY_FAVORITE
   MyFavorite, PERM_BASIC, M_MF,
@@ -1462,7 +1465,7 @@ default_key:
 	mptr = table[cc];
 	str = mptr->desc;
 	//prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c\033[m"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	prints("%s[ (%c)%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1);
+	prints("%s[ (%c)%s%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1, UCBAR[UCBAR_MENU]);
 	cx = cc;
       }
 //#else		/* 沒有 CURSOR_BAR */
@@ -1488,7 +1491,7 @@ default_key:
 	mptr = table[cc];
 	str = mptr->desc;
 	//prints(COLORBAR_MENU "[ (\033[m\033[0;34;47m%c"COLORBAR_MENU")%s ]\033[m", *str, str + 1);
-	prints("%s[ (%c)%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1);
+	prints("%s[ (%c)%s%s ]\033[m", UCBAR[UCBAR_MENU], *str, str + 1, UCBAR[UCBAR_MENU]);
       }
 //#else
       else

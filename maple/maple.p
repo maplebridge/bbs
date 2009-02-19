@@ -58,6 +58,7 @@ int last_nobottom(char *folder);
 int XoPost(int bno);
 int Select(void);
 int Class(void);
+int Class2(void);
 int MFclass_browse(char *name);
 void board_main(void);
 int Boards(void);
