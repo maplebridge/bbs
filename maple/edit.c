@@ -1515,6 +1515,39 @@ get_sign_select()
   return select;
 }
 
+static void
+append_banner_meichu(fp, my_ip)       /* 梅竹站簽 */
+  FILE *fp;
+  char *my_ip;
+{
+  int i;
+  char buf[64];
+  
+  i = 30;               /* 設定顯示寬度 */
+  sprintf(buf, "%s @ %s",
+#ifdef HAVE_ANONYMOUS
+    (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
+#endif
+#ifdef SYSOP_MBOX_BRD
+    sysop_reply ? "SYSOP" :
+#endif
+    cuser.userid,
+#ifdef HAVE_ANONYMOUS
+    (curredit & EDIT_ANONYMOUS) ? "納美克星" :
+#endif
+    my_ip);
+    
+  fprintf(fp,
+  "\n--\n"
+  "\033[42m   \033[0;30;42m◢\033[0;42m▏\033[0;30;42m◢\033[0;42m▏ \033[0;31;43m  我要  \033[0;42m                                                  \033[0;30;42m(((逃  \033[m\n"
+  "\033[42m \033[0;32;47m▉\033[1;37;40m▇█▇\033[42m◣ \033[0;31;43m 吃竹子 \033[42m  \033[0;33m   己丑梅竹賽將於 3/6 ~ 3/8 展開    \033[0;31;42m          ◣  ◣   \033[m\n"
+  "\033[42m \033[0;32;47m▊\033[1;37;40m███\033[1;37m -\033[1;37;42m▏   \033[0;33;42m▎                                                  \033[0;30;41m @) @)\033[0;31;40m\033[42m   \033[m\n"
+  "\033[42m \033[1;37;42m █████\033[42m    \033[0;33;42m▎    \033[0;33m 楓橋驛站邀請您  一同為清華大學加油 \033[0;31;42m    @     \033[0;31;42m◥\033[0;30;41m人\033[0;31;42m◤   \033[m\n"
+  "\033[0;32;47m▋\033[1;37;42m████◤  \033[1;37;42m,,\033[0;33;42m▎                                             \033[0;31;42m\\◢██\033[42m\033[1;30m█\033[0;31;42m▎   \033[m\n"
+  "\033[0;32;47m▌\033[1;37;40m█◤    \033[0;32m◥\033[0;30;42m◢█\033[m\033[42m     \033[1;34m From:%-*.*s      \033[0;31;42m/\\     /\\     \033[m\n",
+  i, i, buf
+  );
+}
 
 static void
 append_banner1(fp, my_ip)	/* 站簽2 */
@@ -1667,6 +1700,8 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
     if (select == 0)	/* 站簽1 */
 #endif
     {
+      append_banner_meichu(fp, my_ip);
+#if 0
       fprintf(fp, EDIT_BANNER,
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
@@ -1679,6 +1714,7 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
 	(curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
 #endif
 	my_ip);
+#endif
     }
 
 #ifdef HAVE_MULTI_SIGN
