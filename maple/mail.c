@@ -17,7 +17,7 @@ extern char xo_pool[];
 extern UCACHE *ushm;
 
 #ifdef SYSOP_MBOX_BRD
-extern sysop_reply;
+int sysop_reply;
 #endif
 
 
@@ -1963,6 +1963,9 @@ static KeyFunc mbox_cb[] =
 void
 mbox_main()
 {
+#ifdef SYSOP_MBOX_BRD
+  sysop_reply = 0;
+#endif
   cmbox.mail_xo.pos = XO_TAIL;
   cmbox.mail_xo.xyz = str_site;
   usr_fpath(cmbox.dir, cuser.userid, fn_dir);

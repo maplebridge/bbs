@@ -982,7 +982,7 @@ chkrescofo(hdr)	/* restrict / copy / forward */
 
 
 #ifdef SYSOP_MBOX_BRD
-int sysop_reply = 0;
+extern int sysop_reply;
 
 
 static int
