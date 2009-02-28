@@ -905,7 +905,7 @@ nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
       currchrono = nbrd->btime;
       rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
 
-      if (*nbrd->innsrv && *nbrd->inngrp && vans("是否一併設定看板轉信(Y/N)？[Y] ") != 'n')
+      if ((nbrd->mode & NBRD_INN) && vans("是否一併設定看板轉信(Y/N)？[Y] ") != 'n')
 	nbrd_nf_add(nbrd);
 
       time(&now);
@@ -1178,6 +1178,7 @@ XoNewBoard()
   xz[XZ_COSIGN - XO_ZONE].xo = xo = xo_new(fpath);
   xz[XZ_COSIGN - XO_ZONE].cb = nbrd_cb;
   xo->key = XZ_COSIGN;
+  xo->pos = XO_TAIL;
   xover(XZ_COSIGN);
   free(xo);
 
