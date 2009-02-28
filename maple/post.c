@@ -644,6 +644,22 @@ do_post(xo, title)
     return XO_FOOT;
   }
 
+  if (HAS_PERM(PERM_VALID) && !strcmp(currboard, "newbm"))
+  {
+    void (*p)();
+    switch (vans("(1)申請公眾板板主名單異動 (2)請辭板主/其他 [Q] "))
+    {
+      case '1':
+        p = DL_get("bin/bmtrans.so:bmt_add");
+	(*p)(xo);
+        return XO_INIT;
+      case '2':
+        break;
+      default:
+        return XO_FOOT;
+    }
+  }
+
   film_out(FILM_POST, 0);
 
   move(19, 0);
@@ -2360,7 +2376,7 @@ post_cross(xo)
 
 
     char str_tag_score[50];
-    sprintf(str_tag_score, " 轉錄至 %s 看板 ", xboard);
+    sprintf(str_tag_score, "轉錄至 %s 看板 ", xboard);
 
     if (can_showturn)	/* 只有看板才有可能有 can_showturn */
       post_t_score(xo,str_tag_score,hdr);
@@ -2437,7 +2453,7 @@ post_forward(xo)
     *quote_file = '\0';
 
     char str_tag_score[50];
-    sprintf(str_tag_score, " 轉寄至 %s 的bbs信箱 ", muser.userid);
+    sprintf(str_tag_score, "轉寄至 %s 的bbs信箱 ", muser.userid);
     if (xo->dir[0] == 'b')
     {
       if (currbattr & BRD_SHOWTURN)
@@ -3745,6 +3761,8 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
 {
   int pos, cur, ans, vtlen, maxlen;
   char *dir, *userid, *verb, fpath[64], reason[80];
+  int  ip_len;
+  char my_ip[128];
   FILE *fp;
 
   pos = xo->pos;
@@ -3757,7 +3775,14 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   verb = "0m==";
   vtlen = 2;
 
-  maxlen = 63 - strlen(cuser.userid) - vtlen - 6;
+  ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
+
+  if (currbattr & BRD_POST_IP)
+    sprintf(my_ip, " %s", get_my_ip());
+  else
+    sprintf(my_ip, "\033[30m\033*/%s", get_my_ansi_ip());
+
+  maxlen = 63 - strlen(cuser.userid) - vtlen - ip_len;
 
   userid = cuser.userid;
   str_ncpy(reason, log, maxlen);
@@ -3773,9 +3798,9 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d/%02d %02d:%02d:%02d\033[m\n",
+    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m%s\n",
       verb, userid, maxlen, reason,
-      ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
     fclose(fp);
   }
 
@@ -3825,8 +3850,8 @@ post_append_score(xo, choose)
   //char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
   char prompt[64];
   int  num_reason_record = 0;
-  int  ip_len = 0;
-  char my_ip[128] = {0};
+  int  ip_len;
+  char my_ip[128];
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
@@ -3845,6 +3870,22 @@ post_append_score(xo, choose)
   {
     vmsg("這篇文章被設定為不能推文哦！");
     return XO_FOOT;
+  }
+
+  if (!strcmp(currboard, "newbm"))
+  {
+    void (*p)();
+    switch (vans("(1)新任板主附議 (2)推文 [Q] "))
+    {
+      case '1':
+	p = DL_get("bin/bmtrans.so:bmt_sign");
+	(*p)(xo, hdr);
+        return XO_LOAD;
+      case '2':
+        break;
+      default:
+        return XO_FOOT;
+    }
   }
 
 #ifdef HAVE_REFUSEMARK

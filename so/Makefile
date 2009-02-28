@@ -15,7 +15,7 @@
 
 SO =	admutil.so aloha.so bank.so chat.so dictd.so help.so innbbs.so manage.so newbrd.so \
 	song.so vote.so xyz.so rss.so bitlbee.so \
-	calendar.so classtable.so credit.so todo.so
+	calendar.so classtable.so credit.so todo.so bmtrans.so
 
 
 .SUFFIXES:
