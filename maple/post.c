@@ -609,7 +609,7 @@ do_ias_post_log(hdr)
 {
   char fpath[64];
   char buf[512];
-  
+
   if( ( (currbattr & BRD_IAS) || (strstr(currboard, "IS_")) || 
         (strstr(currboard, "IA_")) || (strstr(currboard, "IAS_")) ) && 
         (bbstate & STAT_BM) )
@@ -644,19 +644,31 @@ do_post(xo, title)
     return XO_FOOT;
   }
 
-  if (HAS_PERM(PERM_VALID) && !strcmp(currboard, "newbm"))
+  if (HAS_PERM(PERM_VALID))
   {
-    void (*p)();
-    switch (vans("(1)申請公眾板板主名單異動 (2)請辭板主/其他 [Q] "))
+    if (!strcmp(currboard, "newbm"))
     {
-      case '1':
-        p = DL_get("bin/bmtrans.so:bmt_add");
-	(*p)(xo);
-        return XO_INIT;
-      case '2':
-        break;
-      default:
-        return XO_FOOT;
+      void (*p)();
+      switch (vans("(1)申請公眾板板主名單異動 (2)請辭板主/其他 [Q] "))
+      {
+	case '1':
+	  p = DL_get("bin/bmtrans.so:bmt_add");
+	  (*p)(xo);
+	  return XO_INIT;
+	case '2':
+	  break;
+	default:
+	  return XO_FOOT;
+      }
+    }
+    else if (!strcmp(currboard, "newboard"))
+    {
+      if (vans("是否要申請開板(Y/N)？[N] ") == 'y')
+      {
+	vmsg("進入開板/連署系統。進入後請按 Ctrl + P 申請開板");
+	DL_func("bin/newbrd.so:XoNewBoard");
+	return XO_INIT;
+      }
     }
   }
 
@@ -895,7 +907,7 @@ do_post(xo, title)
 
   clear();
   outs("順利貼出文章，");
-  
+
   /* smiler.090120: 藝文館板主po文記錄 */
   do_ias_post_log(hdr);
 
@@ -933,6 +945,32 @@ do_post(xo, title)
   vmsg(NULL);
 
   return XO_INIT;
+}
+
+
+void
+add_post(brdname, fpath, title, owner, nick, mode, fhdr)	/* 發文到看板 */
+  char *brdname;	/* 欲 post 的看板 */
+  char *fpath;		/* 檔案路徑 */
+  char *title;		/* 文章標題 */
+  char *owner, *nick;	/* 文章作者/暱稱 */
+  int mode;
+  HDR *fhdr;		/* return */
+{
+  HDR hdr;
+  char folder[64];
+
+  brd_fpath(folder, brdname, fn_dir);
+  hdr_stamp(folder, HDR_LINK | 'A', &hdr, fpath);
+  hdr.xmode = mode;
+  strcpy(hdr.owner, owner);
+  strcpy(hdr.nick, nick);
+  strcpy(hdr.title, title);
+  rec_bot(folder, &hdr, sizeof(HDR));
+  if (fhdr)
+    memcpy(fhdr, &hdr, sizeof(HDR));
+
+  btime_update(brd_bno(brdname));
 }
 
 

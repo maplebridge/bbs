@@ -161,13 +161,14 @@ int t_list(void);
 int belong_pal(int *pool, int max, int userno);
 
 /* post.c */
-inline int cal_day(  char *date);                            /* itoc.010217: 計算星期幾 */
+inline int cal_day(  char *date);		/* itoc.010217: 計算星期幾 */
 int cmpchrono(HDR *hdr);
-void RefusePal_kill(char *board, HDR *hdr);   /* redfox:加密文章可見名單 */
-int RefusePal_belong(char *board, HDR *hdr);  /* redfox:加密文章可見名單 */
+void RefusePal_kill(char *board, HDR *hdr);	/* redfox:加密文章可見名單 */
+int RefusePal_belong(char *board, HDR *hdr);	/* redfox:加密文章可見名單 */
 int IS_WELCOME(char *board, char *f_mode);
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
+void add_post(char *brdname, char *fpath, char *title, char *owner, char *nick, int mode, HDR *fhdr);
 int do_reply(XO *xo, HDR *hdr);
 int chkrestrict(HDR *hdr);
 int chkrescofo(HDR *hdr);

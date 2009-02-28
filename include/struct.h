@@ -445,9 +445,12 @@ typedef struct NewBoardHeader
   time4_t etime;
   char xname[32];
   char owner[IDLEN + 1];
+  char innsrv[32];
+  char inngrp[32];
   char date[9];
   usint mode;
   int total;
+  int readlevel;
 }	NBRD;
 
 
@@ -457,6 +460,7 @@ typedef struct NewBoardHeader
 #define NBRD_ANONYMOUS	0x00100	/* 匿名 */
 #define NBRD_NEWBOARD	0x10000	/* 新板連署 */
 #define NBRD_OTHER	0x20000	/* 其他連署 */
+#define NBRD_INN	0x01000	/* 設定轉信 */
 
 #endif	/* HAVE_COSIGN */
 

@@ -40,33 +40,9 @@
 
 extern BCACHE *bshm;
 
-static HDR bhdr;
 
 #define	MSG_SEPERATE	"\033[36m"MSG_SEPERATOR"\033[m\n"
 #define BRD_NEWBM	"newbm"		/* 提供申請異動板主的板名 */
-
-
-static void
-add_post(brdname, fpath, title, mode)	/* 發文到看板 */
-  char *brdname;	/* 欲 post 的看板 */
-  char *fpath;		/* 檔案路徑 */
-  char *title;		/* 文章標題 */
-  int mode;
-{
-  char folder[64];
-
-  brd_fpath(folder, brdname, fn_dir);
-  hdr_stamp(folder, HDR_LINK | 'A', &bhdr, fpath);
-  bhdr.xmode = mode;
-  strcpy(bhdr.owner, cuser.userid);
-  strcpy(bhdr.nick, cuser.username);
-  strcpy(bhdr.title, title);
-  rec_bot(folder, &bhdr, sizeof(HDR));
-  unlink(fpath);
-  strcpy(fpath, bhdr.xname);	/* 傳回新檔名 */
-
-  btime_update(brd_bno(brdname));
-}
 
 
 static int
@@ -107,7 +83,6 @@ bmt_setperm(xo, hdr)
     sprintf(buf, "\033[1;30m== sysop\033[m：\033[1;33m%-51s\033[1;30m%02d/%02d %02d:%02d:%02d\033[m\n",
       "申請案通過",
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
-//    sprintf(fpath, "brd/%s/%c/%s", BRD_NEWBM, xname[7], xname);
     hdr_fpath(fpath, xo->dir, hdr);
     f_cat(fpath, buf);
 
@@ -178,8 +153,9 @@ bmt_add(xo)
   BRD *brd;
   ACCT acct;
   PAL pal;
+  HDR hdr;
   char fpath[64], buf[80];
-  char BMlist[BMLEN + 1], xname[28];
+  char BMlist[BMLEN + 1];
   char *blist, *ptr;
   int bno, BMlen, len;
   FILE *fp;
@@ -346,8 +322,8 @@ bmt_add(xo)
     fprintf(fp, "新板主名單：%s\n", BMlist);
     fprintf(fp, "\n\n\n--\n※ 楓橋驛站 - 板主交接系統\n");
     fclose(fp);
-    add_post(BRD_NEWBM, fpath, buf, 0, 0);
-    strcpy(xname, fpath);
+    add_post(BRD_NEWBM, fpath, buf, cuser.userid, cuser.username, 0, &hdr);
+    unlink(fpath);
   }
 
 // add PAL file that contains BM changes
@@ -355,7 +331,7 @@ bmt_add(xo)
 // add function key to let BM changes
 // add detect function if all new BM got sign
 
-  sprintf(fpath, "brd/%s/bmt/%s", BRD_NEWBM, xname);
+  sprintf(fpath, "brd/%s/bmt/%s", BRD_NEWBM, hdr.xname);
   blist = BMlist;
 
   do
@@ -388,7 +364,7 @@ bmt_add(xo)
   rec_add(fpath, &pal, sizeof(PAL));
 
   if (rec_num(fpath, sizeof(PAL)) == 1)
-    bmt_setperm(xo, &bhdr);
+    bmt_setperm(xo, &hdr);
   else
     vmsg("申請完成，請新任板主附議");
 

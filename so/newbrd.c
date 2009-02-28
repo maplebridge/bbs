@@ -143,7 +143,7 @@ nbrd_item(num, nbrd)
 {
   prints("%6d %c %-5s %-13s [%-13s] %.*s\n", 
     num, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner, 
-    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m", d_cols + 20, nbrd->title);
+    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站連署\033[m", d_cols + 20, nbrd->title);
 }
 
 
@@ -160,8 +160,8 @@ nbrd_item_bar(xo, mode)
   prints("%s%6d %c %-5s %-13s [%-13s%s]:%-*.*s%s%s",
     mode ? UCBAR[UCBAR_NBRD] : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
-    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站公投\033[m",
-    mode ? UCBAR[UCBAR_NBRD] : "", d_cols + 23, d_cols + 23, nbrd->title,
+    (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站連署\033[m",
+    mode ? UCBAR[UCBAR_NBRD] : "", d_cols + 22, d_cols + 22, nbrd->title,
     (nbrd->mode & NBRD_NEWBOARD) ? "           " :"                ",
     mode ? "\033[m" : "");
 
@@ -208,7 +208,7 @@ static int
 nbrd_head(xo)
   XO *xo;
 {
-  vs_head("連署系統", str_site);
+  vs_head("申請看板", str_site);
   prints(NECKER_COSIGN, d_cols, "");
   return nbrd_body(xo);
 }
@@ -242,9 +242,9 @@ static int
 nbrd_add(xo)
   XO *xo;
 {
-  int fd, ans, days, numbers;
-  char *dir, fpath[64], path[64];
-  char *brdname, *class, *title;
+  int i, fd, ans, days, numbers, ntype, readlevel, isinn;
+  char *dir, fpath[64], path[64], buf[32], group[64];
+  char *brdname, *class, *title, *prefix, *plevel;
   FILE *fp;
   NBRD nbrd;
 
@@ -272,25 +272,118 @@ nbrd_add(xo)
   class = nbrd.class;
   title = nbrd.title;
 
+  clear();
+  vs_bar("申請看板");
   if (ans == '1')	/* 新板連署 */
   {
-    if (!vget(b_lines, 0, "英文板名：", brdname, sizeof(nbrd.brdname), DOECHO))
-      return XO_FOOT;
+    move (i = 2, 0);
+    outs("開板種類：1)個人/情侶 2)寢板 3)實驗室 4)社團 5)各系(級)所相關/活動板/課程板\n");
+    if (!vget(++i, 0, "          6)校隊/校務看板 7)團體板 8)綜合/其他[Q] ", buf, 3, LCECHO))
+      return XO_HEAD;
 
-    if (brd_bno(brdname) >= 0 || !valid_brdname(brdname))
+    switch (ntype = (*buf - '0'))
+    {
+    case 1:
+      plevel = "個人";
+      prefix = "P_";
+      break;
+    case 2:
+      plevel = "寢板";
+      prefix = "R_";
+      break;
+    case 3:
+      plevel = "累伯";
+      prefix = "LAB_";
+      break;
+    case 4:
+      plevel = "社團";
+      prefix = "";
+      move(++i, 0);
+      outs("\n                  英文板名限定為 xxxxxxxxxxxx\n");
+      outs("                  若貴社團有多個看板，建議板名為：[英文縮寫].xxxxxxx\n");
+      i += 2;
+      break;
+    case 5:
+      plevel = prefix = "";	/* 讓站長自己手動改 */
+      move(++i, 0);
+      outs("\n                  系(級)板：[系名].[系級]      例：cs.12 清大資工 12 級級板\n");
+      outs("                    活動板：[系名].xxxxxx      例：cs.camp09 資工2009營隊板\n");
+      outs("                    課程板：板名自訂\n");
+      i += 3;
+      break;
+    case 6:
+      plevel = prefix = "";
+      move(++i, 0);
+      outs("\n                  校隊看板： nthu_xxxxxxx\n");
+      outs("                  校務看板： nthu.xxxxxxx\n");
+      i += 2;
+      break;
+    case 7:
+      plevel = "團體";
+      prefix = "G_";
+      break;
+    case 8:
+      plevel = prefix = "";
+      break;
+    default:
+      return XO_HEAD;
+    }
+
+    sprintf(buf, "英文板名：%s", prefix);
+    if (!vget(++i, 0, buf, brdname, sizeof(nbrd.brdname) - strlen(prefix), DOECHO))
+      return XO_HEAD;
+
+    sprintf(buf, "%s%s", prefix, brdname);
+    if (brd_bno(buf) >= 0 || !valid_brdname(buf))
     {
       vmsg("已有此板或板名不合法");
-      return XO_FOOT;
+      return XO_HEAD;
     }
-    if (nbrd_find(xo->dir, brdname))
+    if (nbrd_find(xo->dir, buf))
     {
-      vmsg("正在連署中");
-      return XO_FOOT;
+      vmsg("已有此看板的申請案");
+      return XO_HEAD;
     }
 
-    if (!vget(b_lines, 0, "看板分類：", class, sizeof(nbrd.class), DOECHO) ||
-      !vget(b_lines, 0, "看板主題：", title, sizeof(nbrd.title), DOECHO))
-      return XO_FOOT;
+    strcpy(brdname, buf);
+    strcpy(nbrd.class, plevel);
+
+    if (!*class && ntype <= 7)
+    {
+      switch (ntype)
+      {
+      case 5:
+	vget(++i, 0, "看板所屬社團/社團種類：", group, 50, DOECHO);
+	break;
+      case 6:
+	vget(++i, 0, "看板所屬系(級)所/活動/課程：", group, 50, DOECHO);
+	break;
+      case 7:
+	vget(++i, 0, "看板所屬校隊/學校處室：", group, 50, DOECHO);
+	break;
+      }
+      if (!*group)
+	return XO_HEAD;
+    }
+
+    if (!vget(++i, 0, "中文板名：", title, sizeof(nbrd.title), DOECHO))
+      return XO_HEAD;
+
+    readlevel = vget(++i, 0, "看板屬性：1)公開 2)秘密 3)好友 [Q] ", buf, 3, DOECHO) - '0';
+    switch (readlevel)
+    {
+    case 1:
+      plevel = "公開";
+      break;
+    case 2:
+      plevel = "秘密";
+      break;
+    case 3:
+      plevel = "好友";
+      break;
+    default:
+      return XO_HEAD;
+    }
 
     days = NBRD_DAY_BRD;
     numbers = NBRD_NUM_BRD;
@@ -323,7 +416,26 @@ nbrd_add(xo)
     nbrd.mode = (ans == '2') ? (NBRD_OTHER | NBRD_START) : (NBRD_OTHER | NBRD_START | NBRD_ANONYMOUS);
   }
 
-  vmsg("開始編輯 [看板說明與板主抱負或連署原因]");
+  if (vget(++i, 0, "是否申請轉信(Y/N)？[N] ", buf, 3, LCECHO) == 'y')
+  {
+    isinn = 1;
+    strcpy(nbrd.innsrv, "group.nctu.edu.tw");
+    strcpy(nbrd.inngrp, "group.nthucs.");
+    if (!vget(++i, 0, "轉信站台名稱：", nbrd.innsrv, sizeof(nbrd.innsrv), GCARRY) ||
+      !vget(++i, 0, "轉信群組名稱：", nbrd.inngrp, sizeof(nbrd.inngrp), GCARRY))
+    {
+      vmsg("取消設定轉信");
+      isinn = 0;
+      nbrd.innsrv[0] = nbrd.inngrp[0] = '\0';
+    }
+  }
+  else
+    isinn = 0;
+
+  if (isinn)
+    nbrd.mode |= NBRD_INN;
+
+  vmsg("開始編輯 [看板說明與板主抱負]");
   sprintf(path, "tmp/%s.nbrd", cuser.userid);	/* 連署原因的暫存檔案 */
   if (fd = vedit(path, 0))
   {
@@ -337,35 +449,77 @@ nbrd_add(xo)
     return nbrd_head(xo);
   close(fd);
 
-  nbrd.etime = nbrd.btime + days * 86400;
-  nbrd.total = numbers;
+  if (ans != '1' || ntype >= 7)
+  {
+    nbrd.etime = nbrd.btime + days * 86400;
+    nbrd.mode = 0;
+    nbrd.total = (ntype == 8) ? 20 : numbers;
+  }
+  else
+  {
+    nbrd.mode |= NBRD_END;	/* 不用連署，申請就開的看板 */
+  }
+
+  nbrd.readlevel = readlevel;
   strcpy(nbrd.owner, cuser.userid);
 
   fp = fopen(fpath, "a");
-  fprintf(fp, "作者: %s (%s) 站內: 連署系統\n", cuser.userid, cuser.username);
-  fprintf(fp, "標題: %s\n", title);
+  fprintf(fp, "作者: %s (%s) 站內: newboard\n", cuser.userid, cuser.username);
+  if (ans == '1')
+    fprintf(fp, "標題: [提案] 申請 %s 看板\n", brdname);
+  else
+    fprintf(fp, "標題: %s\n", title);
   fprintf(fp, "時間: %s\n\n", Now());
 
   if (ans == '1')
   {
     fprintf(fp, "英文板名：%s\n", brdname);
-    fprintf(fp, "看板分類：%s\n", class);
-    fprintf(fp, "看板主題：%s\n", title);
-    fprintf(fp, "板主名稱：%s\n", cuser.userid);
+    fprintf(fp, "中文板名：%s\n", title);
+    fprintf(fp, "板主名單：%s\n", cuser.userid);
     fprintf(fp, "電子信箱：%s\n", cuser.email);
+    fprintf(fp, "看板分類：%s\n", class);
+    if (!*class && ntype <= 7)
+    {
+      switch (ntype)
+      {
+      case 5:
+	fprintf(fp, "    所屬社團/社團種類：%s\n", group);
+	break;
+      case 6:
+	fprintf(fp, "    所屬系(級)所/活動/課程：%s\n", group);
+	break;
+      case 7:
+	fprintf(fp, "    所屬校隊/學校處室：%s\n", group);
+	break;
+      }
+    }
+    fprintf(fp, "看板屬性：%s\n", (readlevel == 1) ? "公開" : 
+      (readlevel == 2) ? "秘密" : "好友");
+    if (isinn)
+    {
+      fprintf(fp, "申請轉信：\n    站台：%s\n", nbrd.innsrv);
+      fprintf(fp, "    群組：%s\n", nbrd.inngrp);
+    }
   }
   else
   {
     fprintf(fp, "連署主題：%s\n", title);
   }
-  fprintf(fp, "舉辦日期：%s\n", nbrd.date);
-  fprintf(fp, "到期天數：%d\n", days);
-  fprintf(fp, "需連署人：%d\n", numbers);
-  fprintf(fp, split_line);
-  fprintf(fp, "連署說明：\n");
+
+  if (ans != '1' || ntype >= 7)
+  {
+    fprintf(fp, "舉辦日期：%s\n", nbrd.date);
+    fprintf(fp, "到期天數：%d\n", days);
+    fprintf(fp, "需連署人：%d\n", numbers);
+    fprintf(fp, split_line);
+    fprintf(fp, "連署說明：\n");
+  }
+
   f_suck(fp, path);
   unlink(path);
-  fprintf(fp, split_line);
+  fprintf(fp, "\n--\n※ 本文章由 %s 從 %s 申請\n", cuser.userid, fromhost);
+  if (ans != '1' || ntype >= 7)
+    fprintf(fp, split_line);
   fclose(fp);
 
   rec_add(dir, &nbrd, sizeof(NBRD));
@@ -373,7 +527,10 @@ nbrd_add(xo)
 #ifdef SYSOP_START_COSIGN
   vmsg(ans == '1' ? "送交申請了，請等候核准吧" : "連署開始了！");
 #else
-  vmsg("連署開始了！");
+  if (ans != '1' || ntype >= 7)
+    vmsg("連署開始了！");
+  else
+    vmsg("請等待站長開板！");
 #endif
   return nbrd_init(xo);
 }
@@ -601,7 +758,8 @@ nbrd_finish(xo)
 
 
 static int			/* 1:開板成功 */
-nbrd_newbrd(nbrd)		/* 開新板 */
+nbrd_newbrd(xo, nbrd)		/* 開新板 */
+  XO *xo;
   NBRD *nbrd;
 {
   BRD newboard;
@@ -617,7 +775,22 @@ nbrd_newbrd(nbrd)		/* 開新板 */
   memset(&newboard, 0, sizeof(BRD));
 
   /* itoc.010805: 新看板預設 battr = 不轉信; postlevel = PERM_POST; 看板板主為提起連署者 */
-  newboard.battr = BRD_NOTRAN;
+  /* itoc.010805: 新看板預設 battr = 不轉信; 看板板主為提起連署者 */
+  switch (nbrd->readlevel)
+  {
+  case 2:	/* 秘密 */
+    newboard.readlevel = PERM_SYSOP;
+    newboard.battr = BRD_NOTRAN | BRD_NOSTAT | BRD_NOVOTE;
+    break;
+  case 3:	/* 好友 */
+    newboard.readlevel = PERM_BOARD;
+    newboard.battr = BRD_NOTRAN | BRD_NOSTAT | BRD_NOVOTE;
+    break;
+  default:	/* 公開 */
+    newboard.postlevel = PERM_POST;
+    newboard.battr = BRD_NOTRAN;
+    break;
+  }
   newboard.postlevel = PERM_POST;
   strcpy(newboard.brdname, nbrd->brdname);
   strcpy(newboard.class, nbrd->class);
@@ -630,8 +803,80 @@ nbrd_newbrd(nbrd)		/* 開新板 */
   if (brd_new(&newboard) < 0)
     return 0;
 
-  vmsg("新板成立，記著加入分類群組");
+  vmsg("新板成立，現在加入分類群組");
+
+  XoGem("gem/@/@Class", "看板精華", (GEM_W_BIT | GEM_X_BIT | GEM_M_BIT));
+  nbrd_init(xo);
+
   return 1;
+}
+
+
+static int	/* 1:成功 0:失敗 */
+nbrd_nf_add(nbrd)
+  NBRD *nbrd;
+{
+  nodelist_t nl;
+  newsfeeds_t nf;
+  int fd, high;
+  char fpath[32], ans[12];
+  BRD *brd;
+
+  strcpy(fpath, "innd/newsfeeds.bbs");
+  memset(&nf, 0, sizeof(newsfeeds_t));
+
+  /* 找出轉信站台在 nodelist.bbs 中的資訊 */
+  if ((fd = open("innd/nodelist.bbs", O_RDONLY)) >= 0)
+  {
+    while (read(fd, &nl, sizeof(nodelist_t)) == sizeof(nodelist_t))
+    {
+      if (!strcmp(nl.host, nbrd->innsrv))
+      {
+	strcpy(nf.path, nl.name);
+	break;
+      }
+    }
+    close(fd);
+  }
+
+  nf.high = INT_MAX;		/* 第一次取信強迫 reload */
+  strcpy(nf.board, nbrd->brdname);
+  strcpy(nf.newsgroup, nbrd->inngrp);
+
+  if (!*nf.path)
+  {
+    vmsg("轉信設定站台尚未被設定在 newsfeeds.bbs 中，請手動設定轉信！");
+    return 0;
+  }
+
+  if (vget(b_lines, 0, "英文站名：", nf.path, sizeof(nf.path), GCARRY) &&
+    vget(b_lines, 0, "群組：", nf.newsgroup, /* sizeof(nf.newsgroup) */ 70, GCARRY))
+  {
+    if (!vget(b_lines, 0, "字集 [" MYCHARSET "]：", nf.charset, sizeof(nf.charset), GCARRY))
+      str_ncpy(nf.charset, MYCHARSET, sizeof(nf.charset));
+    nf.xmode = (vans("是否轉進(Y/N)？[Y] ") == 'n') ? INN_NOINCOME : 0;
+
+    if (vans("是否更改轉信的 high-number 設定，這設定對被餵信的群組無效(Y/N)？[N] ") == 'y')
+    {
+      sprintf(ans, "%d", nf.high);
+      vget(b_lines, 0, "目前篇數：", ans, 11, GCARRY);
+      if ((high = atoi(ans)) >= 0)
+	nf.high = high;
+    }
+
+    rec_add(fpath, &nf, sizeof(newsfeeds_t));
+
+    high = brd_bno(nf.board);
+    brd = bshm->bcache + high;
+    if ((brd->battr & BRD_NOTRAN) && vans("本板屬性目前為不轉出，是否改為轉出(Y/N)？[Y] ") != 'n')
+    {
+      brd->battr &= ~BRD_NOTRAN;
+      rec_put(FN_BRD, brd, sizeof(BRD), high, NULL);
+    }
+
+    return 1;
+  }
+  return 0;
 }
 
 
@@ -640,6 +885,9 @@ nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
   XO *xo;
 {
   NBRD *nbrd;
+  char fpath[64], title[TTLEN + 1], buf[256];
+  time_t now;
+  struct tm *ptime;
 
   if (!HAS_PERM(PERM_ALLBOARD))
     return XO_NONE;
@@ -651,13 +899,27 @@ nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
 
   if (vans("請確定開啟看板(Y/N)？[N] ") == 'y')
   {
-    if (nbrd_newbrd(nbrd))
+    if (nbrd_newbrd(xo, nbrd))
     {
       nbrd->mode ^= NBRD_FINISH;
       currchrono = nbrd->btime;
       rec_put(xo->dir, nbrd, sizeof(NBRD), xo->pos, cmpbtime);
+
+      if (*nbrd->innsrv && *nbrd->inngrp && vans("是否一併設定看板轉信(Y/N)？[Y] ") != 'n')
+	nbrd_nf_add(nbrd);
+
+      time(&now);
+      ptime = localtime(&now);
+      sprintf(buf, "\033[1;30m== %s\033[m：\033[1;33m%-*s\033[1;30m%02d/%02d %02d:%02d:%02d\033[m\n",
+         cuser.userid, 56 - strlen(cuser.userid), "申請案通過",
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
+      nbrd_fpath(fpath, xo->dir, nbrd);
+      f_cat(fpath, buf);
+
+      sprintf(title, "[開板] %s", nbrd->brdname);
+      add_post("newboard", fpath, title, nbrd->owner, "", POST_MARKED | POST_SCORE, NULL);
     }
-    return nbrd_head(xo);
+    return nbrd_init(xo);
   }
 
   return XO_FOOT;
@@ -749,6 +1011,9 @@ nbrd_delete(xo)
 
   nbrd = (NBRD *) xo_pool + (xo->pos - xo->top);
   if (strcmp(cuser.userid, nbrd->owner) && !HAS_PERM(PERM_ALLBOARD))
+    return XO_NONE;
+
+  if (nbrd->mode & NBRD_FINISH)
     return XO_NONE;
 
   if (vans(msg_del_ny) != 'y')
