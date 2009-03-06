@@ -127,19 +127,19 @@ bmt_sign(xo, hdr)
 	rec_put(fpath, &pal, sizeof(PAL), pos, NULL);
         post_t_score(xo, "附議此篇申請案", hdr);
 	vmsg("附議成功\");
+	mode |= 0x01;	/* signed */
       }
-      if (!mode)
-        mode = 1;
+      mode |= 0x02;	/* find */
     }
 
-    if (mode && pal.ftype)
-      mode = -1;	/* not completed */
+    if (pal.ftype)
+      mode |= 0x10;	/* not completed */
     pos++;
   }
 
-  if (!mode)
+  if (!(mode & 0x02))
     vmsg("您不需要附議此申請案");
-  else if (mode > 0)	/* completed */
+  else if (!(mode & 0x10))	/* completed */
     bmt_setperm(xo, hdr);
 
   return 0;

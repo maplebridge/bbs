@@ -1684,10 +1684,11 @@ post_item(num, hdr)
     prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
   else
     prints("%6d%c%s", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-  if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
+  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
+	!chkrestrict(hdr))
   {
     num = hdr->score;
-    if (!num && (!(USR_SHOW & USR_SHOW_POST_SCORE_0)))
+    if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
       outs("  ");
     else if (num <= 99 && num >= -99)
       prints("\033[1;3%cm%2d\033[m",
@@ -1739,7 +1740,8 @@ post_item_bar(xo, mode)
       num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
   }
 
-  if ((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE))
+  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
+	!chkrestrict(hdr))
   {
     num = hdr->score;
     if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
@@ -1761,7 +1763,6 @@ post_item_bar(xo, mode)
     hdr_outs_bar(hdr, d_cols + 45);	/* 少一格來放分數 */
   else
     hdr_outs(hdr, d_cols + 45);
-
 #else
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
