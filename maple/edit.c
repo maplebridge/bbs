@@ -1515,6 +1515,7 @@ get_sign_select()
   return select;
 }
 
+#ifdef	MEICHU_WIN
 static void
 append_banner_meichu(fp, my_ip)       /* 梅竹站簽 */
   FILE *fp;
@@ -1548,6 +1549,7 @@ append_banner_meichu(fp, my_ip)       /* 梅竹站簽 */
   i, i, buf
   );
 }
+#endif
 
 static void
 append_banner1(fp, my_ip)	/* 站簽2 */
@@ -1700,8 +1702,9 @@ ve_banner(fp, modify)       /* 加上來源等訊息 */
     if (select == 0)	/* 站簽1 */
 #endif
     {
+#ifdef	MEICHU_WIN
       append_banner_meichu(fp, my_ip);
-#if 0
+#else
       fprintf(fp, EDIT_BANNER,
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :

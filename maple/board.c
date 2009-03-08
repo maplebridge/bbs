@@ -2598,6 +2598,7 @@ Class()
 int
 Class2()
 {
+#ifdef	MEICHU_WIN
   int chn, min_chn;
   short *chx;
   char *img, *str;
@@ -2620,6 +2621,7 @@ Class2()
   }    
   vmsg("無此分類群組");
   return XEASY;
+#endif
 }
 
 
