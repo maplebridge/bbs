@@ -56,7 +56,7 @@ brd_get(bname)
 
 
 static void
-add_post(brdname, fpath, title, userid, nick)	/* 發文到看板 */
+add_post_util(brdname, fpath, title, userid, nick)	/* 發文到看板 */
   char *brdname;	/* 欲 post 的看板 */
   char *fpath;		/* 檔案路徑 */
   char *title;		/* 文章標題 */
@@ -124,7 +124,7 @@ main(argc, argv)
     str_ncpy(nick, argv[3], 40-3);
   }
 
-  add_post(argv[1], filepath, title, owner, nick);
+  add_post_util(argv[1], filepath, title, owner, nick);
 
   return 0;
 }
