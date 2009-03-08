@@ -1826,6 +1826,13 @@ ve_filer(fpath, ve_op)
   case 'x':
    if (ve_op < 0)		/* itoc.010301: 不能儲存 */
      return VE_FOOTER;
+     
+   if (currbattr & BRD_PUBLIC)
+   {
+      vmsg("本看板為公眾板，不接受文章加密");
+      return VE_FOOTER;
+   }
+      
    curredit |= EDIT_RESTRICT;
    curredit &= ~EDIT_OUTGO;	/* 加密必是 local save */
    break;

@@ -2242,13 +2242,24 @@ post_cross(xo)
       return XO_HEAD;
   }
 
+
+  xbno = brd_bno(xboard);
+  xbattr = (bshm->bcache + xbno)->battr;
+
 #ifdef HAVE_REFUSEMARK
-  rc = vget(2, 0, "(S)存檔 (L)站內 (X)密封 (Q)取消？[Q] ", buf, 3, LCECHO);
+  if (xbattr & BRD_PUBLIC)
+     rc = vget(2, 0, "(S)存檔 (L)站內 (Q)取消？[Q] ", buf, 3, LCECHO);
+  else
+     rc = vget(2, 0, "(S)存檔 (L)站內 (X)密封 (Q)取消？[Q] ", buf, 3, LCECHO);
+
   if (rc != 'l' && rc != 's' && rc != 'x')
 #else
   rc = vget(2, 0, "(S)存檔 (L)站內 (Q)取消？[Q] ", buf, 3, LCECHO);
   if (rc != 'l' && rc != 's')
 #endif
+    return XO_HEAD;
+    
+  if ((xbattr & BRD_PUBLIC) && (rc == 'x'))	/* smiler.090308: 轉文至公眾板不得隱藏 */
     return XO_HEAD;
 
   if (method && *dir == 'b')	/* 從看板轉出，先檢查此看板是否為秘密板 */
@@ -2258,9 +2269,6 @@ post_cross(xo)
     if (tmpbattr == PERM_SYSOP || tmpbattr == PERM_BOARD)
       method = 2;
   }
-
-  xbno = brd_bno(xboard);
-  xbattr = (bshm->bcache + xbno)->battr;
 
   /* Thor.990111: 在可以轉出前，要檢查有沒有轉出的權力? */
   if ((rc == 's') && (!HAS_PERM(PERM_INTERNET) || (xbattr & BRD_NOTRAN)))
