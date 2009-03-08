@@ -348,17 +348,17 @@ nbrd_add(xo)
     strcpy(brdname, buf);
     strcpy(nbrd.class, plevel);
 
-    if (!*class && ntype <= 7)
+    if (ntype >= 4 && ntype <= 7)
     {
       switch (ntype)
       {
-      case 5:
+      case 4:
 	vget(++i, 0, "看板所屬社團/社團種類：", group, 50, DOECHO);
 	break;
-      case 6:
+      case 5:
 	vget(++i, 0, "看板所屬系(級)所/活動/課程：", group, 50, DOECHO);
 	break;
-      case 7:
+      case 6:
 	vget(++i, 0, "看板所屬校隊/學校處室：", group, 50, DOECHO);
 	break;
       }
@@ -376,10 +376,10 @@ nbrd_add(xo)
       plevel = "公開";
       break;
     case 2:
-      plevel = "秘密";
+      plevel = "\033[1;31m秘密\033[m";
       break;
     case 3:
-      plevel = "好友";
+      plevel = "\033[1;33m好友\033[m";
       break;
     default:
       return XO_HEAD;
@@ -481,23 +481,22 @@ nbrd_add(xo)
     fprintf(fp, "板主名單：%s\n", cuser.userid);
     fprintf(fp, "電子信箱：%s\n", cuser.email);
     fprintf(fp, "看板分類：%s\n", class);
-    if (!*class && ntype <= 7)
+    if (ntype >= 4 && ntype <= 7)
     {
       switch (ntype)
       {
-      case 5:
+      case 4:
 	fprintf(fp, "    所屬社團/社團種類：%s\n", group);
 	break;
-      case 6:
+      case 5:
 	fprintf(fp, "    所屬系(級)所/活動/課程：%s\n", group);
 	break;
-      case 7:
+      case 6:
 	fprintf(fp, "    所屬校隊/學校處室：%s\n", group);
 	break;
       }
     }
-    fprintf(fp, "看板屬性：%s\n", (readlevel == 1) ? "公開" : 
-      (readlevel == 2) ? "秘密" : "好友");
+    fprintf(fp, "看板屬性：%s\n", plevel);
     if (isinn)
     {
       fprintf(fp, "申請轉信：\n    站台：%s\n", nbrd.innsrv);
