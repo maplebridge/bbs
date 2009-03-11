@@ -514,11 +514,14 @@ static MENU menu_admin[] =
 
 static MENU menu_system[] =
 {
-  "bin/admutil.so:a_system_setup", PERM_ALLADMIN, - M_XFILES,
+  "bin/admutil.so:a_system_setup", PERM_SYSOP, - M_XFILES,
   "Setup      【 控制設定 】",
 
-  "bin/admutil.so:a_xfile", PERM_ALLADMIN, - M_XFILES,
+  "bin/admutil.so:a_xfile", PERM_SYSOP, - M_XFILES,
   "Xfile      【 系統檔案 】",
+  
+  "bin/admutil.so:a_ias_bank", PERM_ALLADMIN, - M_XFILES,
+  "IAS_Bank   【 增刪福利 】",
 
   menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
   "系統維護"

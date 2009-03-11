@@ -37,6 +37,103 @@ a_user()
   return 0;
 }
 
+int
+a_ias_bank()
+{
+  int ans, ch, fd;
+  char fpath[80], reason[50], buf[512];
+  ACCT acct;
+  
+  move(1, 0);
+  clrtobot();
+  
+  while (ans = acct_get(msg_uid, &acct))
+  {
+    if (ans > 0)
+    {
+      if (!vget(b_lines, 0, "請輸入觀看/設定資料的理由：", reason, 50, DOECHO))
+      {
+        alog("IAS_Bank_觀看資料", acct.userid);
+        return;
+      }
+      else
+      {
+        sprintf(buf, "%s 理由：%s", acct.userid, reason);
+        alog("IAS_Bank_設定資料", buf);
+      }
+      
+      sprintf(reason, "永久保留帳號 : %s", (acct.userlevel & PERM_XEMPT) ? "有" : "無");
+      sprintf(buf, "%s 設定前  %s", acct.userid, reason);
+      alog("IAS_Bank_設定資料", buf);
+      
+      sprintf(reason, "永久免認證   : %s", (acct.userlevel & PERM_XVALID) ? "有" : "無");
+      sprintf(buf, "%s 設定前  %s", acct.userid, reason);
+      alog("IAS_Bank_設定資料", buf);
+    
+      usr_fpath(fpath, acct.userid, fn_acct);
+      fd = open(fpath, O_RDWR);
+      if (fd > 0)
+      {
+        ch = 1;
+        while (ch >= 1 && ch <= 4)
+        {
+          move(5, 0);
+        
+          prints("帳號 : \033[1;33m%s\033[m\n\n", acct.userid);
+          prints("永久保留帳號 : %s\n\n", (acct.userlevel & PERM_XEMPT) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
+          prints("永久免認證   : %s\n", (acct.userlevel & PERM_XVALID) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
+        
+          switch(ch = vans("◎ 增刪福利 1)增永保 2)增永免 3)刪永保 4)刪永免：[Q] ") - '0')
+          {
+            case 1:
+              acct.userlevel |= PERM_XEMPT;
+              break;
+            case 2:
+              acct.userlevel |= PERM_XVALID;
+              break;
+            case 3:
+              acct.userlevel &= (~PERM_XEMPT);
+              break;
+            case 4:
+              acct.userlevel &= (~PERM_XVALID);
+              break;
+            default:
+              ch = 0;
+              break;
+          }
+        
+        }
+
+        ch = vans("◎ Y)確定 N)取消：[N] ");
+
+        if (ch == 'y')
+        {        
+          lseek(fd, (off_t) 0, SEEK_SET);
+          write(fd, &acct, sizeof(ACCT));        
+          close(fd);
+          vmsg("設定完成，將於使用者下次上站時自動生效 !!");
+        }
+        else
+          vmsg("取消更動 !!");
+      }
+      
+      sprintf(reason, "永久保留帳號 : %s", (acct.userlevel & PERM_XEMPT) ? "有" : "無");
+      sprintf(buf, "%s 設定前  %s", acct.userid, reason);
+      alog("IAS_Bank_設定資料", buf);
+      
+      sprintf(reason, "永久免認證   : %s", (acct.userlevel & PERM_XVALID) ? "有" : "無");
+      sprintf(buf, "%s 設定前  %s", acct.userid, reason);
+      alog("IAS_Bank_設定資料", buf);
+    }
+    
+    move(1, 0);
+    clrtobot();
+    
+  }
+  
+  return 0;
+}
+
 
 /* smiler.071110: 站務系統設定:控制設定 */
 int
