@@ -37,6 +37,10 @@ a_user()
   return 0;
 }
 
+#define	IAS_Can_Delete
+#undef	IAS_Can_Delete
+
+/* smiler.090311: 楓橋藝文館可自行給予 id 福利 */
 int
 a_ias_bank()
 {
@@ -75,15 +79,23 @@ a_ias_bank()
       if (fd > 0)
       {
         ch = 1;
+#ifdef	IAS_Can_Delete
         while (ch >= 1 && ch <= 4)
+#else
+        while (ch >= 1 && ch <= 2)
+#endif
         {
           move(5, 0);
-        
+
           prints("帳號 : \033[1;33m%s\033[m\n\n", acct.userid);
           prints("永久保留帳號 : %s\n\n", (acct.userlevel & PERM_XEMPT) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
           prints("永久免認證   : %s\n", (acct.userlevel & PERM_XVALID) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
-        
+
+#ifdef	IAS_Can_Delete
           switch(ch = vans("◎ 增刪福利 1)增永保 2)增永免 3)刪永保 4)刪永免：[Q] ") - '0')
+#else
+          switch(ch = vans("◎ 給予福利 1)增永保 2)增永免：[Q] ") - '0')
+#endif
           {
             case 1:
               acct.userlevel |= PERM_XEMPT;
@@ -91,12 +103,14 @@ a_ias_bank()
             case 2:
               acct.userlevel |= PERM_XVALID;
               break;
+#ifdef	IAS_Can_Delete
             case 3:
               acct.userlevel &= (~PERM_XEMPT);
               break;
             case 4:
               acct.userlevel &= (~PERM_XVALID);
               break;
+#endif
             default:
               ch = 0;
               break;

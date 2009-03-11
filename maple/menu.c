@@ -521,7 +521,7 @@ static MENU menu_system[] =
   "Xfile      【 系統檔案 】",
   
   "bin/admutil.so:a_ias_bank", PERM_ALLADMIN, - M_XFILES,
-  "IAS_Bank   【 增刪福利 】",
+  "IAS_Bank   【 給予福利 】",
 
   menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
   "系統維護"
