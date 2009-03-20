@@ -185,9 +185,9 @@ IS_BBS_DOG_FOOD(fpath)
 {
   char fpath_filter[64];
   char filter[73];
-
   FILE *fp;
-  sprintf(fpath_filter, BBSHOME"/"FN_ETC_BBSDOG);
+
+  sprintf(fpath_filter, BBSHOME "/%s", FN_ETC_BBSDOG);
 
   if (!(fp = fopen(fpath_filter, "r")))
     return 0;
@@ -354,7 +354,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
   str_stamp(hdr.date, &datevalue);	/* 依 DATE: 欄位的日期，與 hdr.chrono 不同步 */
   str_ncpy(hdr.title, SUBJECT, sizeof(hdr.title));
 
-  if ((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath))	/* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
+  if (((mybattr & BRD_BBS_DOG) || brdp->BM[0] <= ' ') && IS_BBS_DOG_FOOD(fpath))	/* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
     brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
     sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
@@ -589,7 +589,7 @@ bbspost_add(board, addr, nick)
     }
   } while (++brdp < bend);
 
-  if ((mybattr & BRD_BBS_DOG) && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
+  if (((mybattr & BRD_BBS_DOG) || brdp->BM[0] <= ' ') && IS_BBS_DOG_FOOD(fpath)) /* smiler.080910: 讓使用者決定是否加入BBS DOG 計畫 */
   {
     brd_fpath(fpath_log, board, FN_BBSDOG_LOG);
     sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n標題: %s\n\n", Now(), hdr.owner, hdr.title);
