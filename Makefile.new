@@ -27,7 +27,7 @@ SUBMODULES= \
 
 CC= gcc
 CPUFLAGS=
-CFLAGS+= -Wunused -O2 -fomit-frame-pointer -pipe -I$(PWD)/include $(CPUFLAGS) 
+CFLAGS+= -Wunused -O2 -fomit-frame-pointer -pipe -fPIC -I$(PWD)/include $(CPUFLAGS) 
 LD= ld
 LDFLAGS+= -s -L$(PWD)/lib -ldao
 EXTRA_LDFLAGS=
