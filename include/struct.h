@@ -636,7 +636,7 @@ typedef struct
   char author[IDLEN + 1];
   char board[BNLEN + 1];
   char title[66];
-  time4_t date;		/* last post's date */
+  time_t date;		/* last post's date */
   int number;		/* post number */
 } POSTLOG;
 
