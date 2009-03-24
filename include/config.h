@@ -42,12 +42,16 @@
 
 #define MYCHARSET	"big5"			/* BBS 所使用的字集 */
 
-#define BBSHOME		"/home/maple"		/* BBS 的家 */
-#define BAKPATH		"/bak/maple"		/* 備份檔的路徑 */
+//#define BBSHOME		"/home/maple"		/* BBS 的家 */
+//#define BAKPATH		"/bak/maple"		/* 備份檔的路徑 */
+#define BBSHOME			"/var/maple_move"	/* BBS 的家 */
+#define BAKPATH			"/var/maple_move/bak"	/* 備份檔的路徑 */
 
 
-#define BBSUID		10000
-#define BBSGID		100			/* Linux 請設為 999 */
+//#define BBSUID		10000
+//#define BBSGID		100			/* Linux 請設為 999 */
+#define BBSUID          	1005
+#define BBSGID          	1005			/* Linux 請設為 999 */
 
 
 #undef SITE_LEXEL

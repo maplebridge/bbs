@@ -41,6 +41,11 @@
 #undef ICON_TRAN_BRD
 #undef GOODBYE_MSG
 #undef NECKER_ULIST
+#undef BRDSHM_KEY       /* shm - 看板 */
+#undef UTMPSHM_KEY      /* shm - 使用者 */
+#undef FILMSHM_KEY      /* shm - 動態看板 */
+#undef PIPSHM_KEY       /* shm - 電子雞對戰 */
+#undef BSEM_KEY         /* semaphore key */
 
 /* ----------------------------------------------------- */
 /* 定義 BBS 站名位址					 */
@@ -61,6 +66,18 @@
 
 #define BBSUID		1002
 #define BBSGID		1002			/* Linux 請設為 999 */
+
+
+/* ----------------------------------------------------- */
+/* SHM 及 SEM 所用的 key                                 */
+/* ----------------------------------------------------- */
+
+#define BRDSHM_KEY     12997    /* 看板 */
+#define UTMPSHM_KEY    11998    /* 使用者 */
+#define FILMSHM_KEY    12999    /* 動態看板 */
+#define PIPSHM_KEY     14998    /* 電子雞對戰 */
+
+#define BSEM_KEY       12000    /* semaphore key */
 
 
   /* ------------------------------------------------- */
