@@ -123,6 +123,9 @@
 #define	HAVE_MODERATED_BOARD	/* 提供好友秘密板 */
 				/* 秘密看板的閱讀權限要是 PERM_SYSOP 才會被當成秘密看板 */
 				/* 好友看板的閱讀權限要是 PERM_BOARD 才會被當成好友看板 */
+
+#define	DO_POST_FILTER
+
 #define	CHECK_ONLINE		/* itoc.010306: 文章列表中可以顯示使用者是否在站上 */
 
 #define	HAVE_BADPAL		/* itoc.010302: 提供壞人的功能 */

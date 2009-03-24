@@ -54,6 +54,8 @@ void brh_save(void);
 void brd_force(void);
 void class_item(int num, int bno, int brdpost, int infav, int label);
 int is_bm(char *list, char *userid);
+int IS_BIGGER_AGE(int age);
+int IS_BIGGER_1STLG(int month);
 int last_nobottom(char *folder);
 int XoPost(int bno);
 int Select(void);
@@ -165,7 +167,6 @@ inline int cal_day(  char *date);		/* itoc.010217: 計算星期幾 */
 int cmpchrono(HDR *hdr);
 void RefusePal_kill(char *board, HDR *hdr);	/* redfox:加密文章可見名單 */
 int RefusePal_belong(char *board, HDR *hdr);	/* redfox:加密文章可見名單 */
-int IS_WELCOME(char *board, char *f_mode);
 void btime_update(int bno);
 void cancel_post(HDR *hdr);
 void add_post(char *brdname, char *fpath, char *title, char *owner, char *nick, int mode, HDR *fhdr);
@@ -184,7 +185,6 @@ int post_e_score(XO *xo);
 int post_score(XO *xo);
 void hdr_outs_bar(HDR *hdr, int cc);
 void post_history(XO *xo, HDR *hdr);
-int post_trans_ip(XO *xo);
 
 /* talk.c */
 char *bmode(UTMP *up, int simple);

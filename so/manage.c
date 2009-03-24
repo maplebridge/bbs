@@ -912,9 +912,11 @@ XoBM()
 #endif	/* HAVE_MODERATED_BOARD */
 
 
+#ifdef DO_POST_FILTER
 /* ----------------------------------------------------- */
 /* 看門狗						 */
 /* ----------------------------------------------------- */
+
 
 static int
 post_bbs_dog()
@@ -1050,6 +1052,7 @@ post_article_filter()
   return 0;
 }
 
+
 /* smiler.080831: 板主自定 可讀/可寫/可列
    目前判斷項次 :
    1. 生日     (年齡限制　: 18禁　or any level)
@@ -1063,18 +1066,41 @@ post_article_filter()
    9. 金幣　　 (不得少於多少枚)
   10. 發信次數 (不得小於多少次)
   11. 註冊時間 (不得低於多少月)
-
 */
-
 static int
-post_my_level(fname, title)
-  char *fname, *title;
+post_my_level(mode)
+  int mode;
 {
-  FILE *fr, *fw;
+  FILE *fw;
+  BPERM newperm, *perm;
   char fpath_r[64], fpath_w[64], wd[64], buf[16];
-  int i, wi;
+  char *title, *list;
+  int i;
 
-  brd_fpath(fpath_r, currboard, fname);
+  switch (mode)
+  {
+    case 0:
+      perm = bshm->rperm + currbno;
+      title = "閱\讀限制";
+      list = FN_NO_READ;
+      break;
+    case 1:
+      perm = bshm->wperm + currbno;
+      title = "發文限制";
+      list = FN_NO_WRITE;
+      break;
+    case 2:
+    default:
+      perm = bshm->lperm + currbno;
+      title = "列出限制";
+      list = FN_NO_LIST;
+      break;
+  }
+  memset(&newperm, 0, sizeof(BPERM));
+  if (perm->exist)
+    memcpy(&newperm, perm, sizeof(BPERM));
+
+  brd_fpath(fpath_r, currboard, list);
   sprintf(fpath_w, "%s.tmp", fpath_r);
 
   sprintf(wd, "%s E)編輯 D)刪除 Q)取消 [E] ", title);
@@ -1083,151 +1109,152 @@ post_my_level(fname, title)
   case 'd':
     if (dashf(fpath_r))
       unlink(fpath_r);
+    perm->exist = 0;
   case 'q':
     return 0;
-  }
-
-  if (!dashf(fpath_r))
-  {
-    fr = fopen(fpath_r, "w");
-    for (i = 0; i < 10; i++)
-    fprintf(fr, "0\n");
-    fclose(fr);
   }
 
   while (1)
   {
     clear();
 
-    if (!(fr = fopen(fpath_r, "r")))
-      return 0;
-
     if (!(fw = fopen(fpath_w, "w")))
-    {
-      fclose(fr);
-      return 0;
-    }
+     return 0;
 
+    i = 3;
     move(1, 0);
     prints(" - \033[1;33m%s\033[m", title);
-    i = 3;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "年齡限制 >= [%2d歲]：", wi);
-    if (vget(i, 0, wd, buf, 3, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
-    else
-      fprintf(fw, "0\n");
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "性別限制 (0)不限(1)中性 (2)男性 (3)女性：[%d] ", wi);
-    if (vget(i, 0, wd, buf, 2, DOECHO))
-      wi = (atoi(buf) % 4);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "年齡限制 >= [%2d歲]：", newperm.age);
+    if (vget(i++, 0, wd, buf, 3, DOECHO))
+      newperm.age = atoi(buf);
+    if (newperm.age >= 0)
+      fprintf(fw, "%d\n", newperm.age);
     else
+    {
+      newperm.age = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "上線次數 >= [%d次] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "性別限制 (0)不限(1)中性 (2)男性 (3)女性：[%d] ", newperm.sex);
+    if (vget(i++, 0, wd, buf, 2, DOECHO))
+      newperm.sex = (atoi(buf) % 4);
+    if (newperm.sex >= 0)
+      fprintf(fw, "%d\n", newperm.sex);
     else
+    {
+      newperm.sex = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "文章篇數 >= [%d篇] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "上線次數 >= [%d次] ", newperm.numlogins);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.numlogins = atoi(buf);
+    if (newperm.numlogins >= 0)
+      fprintf(fw, "%d\n", newperm.numlogins);
     else
+    {
+      newperm.numlogins = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "優文篇數 >= [%d篇] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "文章篇數 >= [%d篇] ", newperm.numposts);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.numposts = atoi(buf);
+    if (newperm.numposts >= 0)
+      fprintf(fw, "%d\n", newperm.numposts);
     else
+    {
+      newperm.numposts = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "劣文篇數 <  [%d篇] (0：取消) ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "優文篇數 >= [%d篇] ", newperm.good_article);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.good_article = atoi(buf);
+    if (newperm.good_article >= 0)
+      fprintf(fw, "%d\n", newperm.good_article);
     else
+    {
+      newperm.good_article = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "違規次數 <  [%d次] (0：取消) ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "劣文篇數 <  [%d篇] (0：取消) ", newperm.poor_article);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.poor_article = atoi(buf);
+    if (newperm.poor_article >= 0)
+      fprintf(fw, "%d\n", newperm.poor_article);
     else
+    {
+      newperm.poor_article = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "銀幣     >= [%d枚] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "違規次數 <  [%d次] (0：取消) ", newperm.violation);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.violation = atoi(buf);
+    if (newperm.violation >= 0)
+      fprintf(fw, "%d\n", newperm.violation);
     else
+    {
+      newperm.violation = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "金幣     >= [%d枚] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "銀幣     >= [%d枚] ", newperm.money);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.money = atoi(buf);
+    if (newperm.money >= 0)
+      fprintf(fw, "%d\n", newperm.money);
     else
+    {
+      newperm.money = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "發信次數 >= [%d次] ", wi);
-    if (vget(i, 0, wd, buf, 10, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "金幣     >= [%d枚] ", newperm.gold);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.gold = atoi(buf);
+    if (newperm.gold >= 0)
+      fprintf(fw, "%d\n", newperm.gold);
     else
+    {
+      newperm.gold = 0;
       fprintf(fw, "0\n");
+    }
 
-    i++;
-    fscanf(fr, "%d", &wi);
-    sprintf(wd, "註冊時間 >= [%3d月] ", wi);
-    if (vget(i, 0, wd, buf, 4, DOECHO))
-      wi = atoi(buf);
-    if (wi >= 0)
-      fprintf(fw, "%d\n", wi);
+    sprintf(wd, "發信次數 >= [%d次] ", newperm.numemails);
+    if (vget(i++, 0, wd, buf, 10, DOECHO))
+      newperm.numemails = atoi(buf);
+    if (newperm.numemails >= 0)
+      fprintf(fw, "%d\n", newperm.numemails);
     else
+    {
+      newperm.numemails = 0;
       fprintf(fw, "0\n");
+    }
 
-    fclose(fr);
+    sprintf(wd, "註冊時間 >= [%2d月] ", newperm.regmonth);
+    if (vget(i++, 0, wd, buf, 3, DOECHO))
+      newperm.regmonth = atoi(buf);
+    if (newperm.regmonth >= 0)
+      fprintf(fw, "%d\n", newperm.regmonth);
+    else
+    {
+      newperm.regmonth = 0;
+      fprintf(fw, "0\n");
+    }
+
     fclose(fw);
 
-    switch (vkans("進板畫面 (S)存檔 (E)繼續 (Q)取消？[Q] "))
+    switch (vkans("確定更改權限設定 (S)存檔 (E)繼續 (Q)取消？[Q] "))
     {
     case 's':
       unlink(fpath_r);
       rename(fpath_w, fpath_r);
+      newperm.exist = 1;
+      memcpy(perm, &newperm, sizeof(BPERM));
       return 0;
 
     case 'e':
@@ -1283,14 +1310,14 @@ post_guard_dog()
     "BQ",
     "BBSdog  BBS看門狗計畫",
     "Post    文章內容限制",
-    "Write   看板發文限制",
     "Read    看板閱\讀限制",
+    "Write   看板發文限制",
     "List    看板列出限制",
     "Vlog    擋文log記錄",
     NULL
   };
 #else
-  char *menu = "◎ (B)看門狗計畫  限制(P)文章內容 (W)發文 (R)閱\讀 (L)列出 (V)擋文記錄？[Q] ";
+  char *menu = "◎ (B)看門狗計畫  限制(P)文章內容 (R)閱\讀 (W)發文 (L)列出 (V)擋文記錄？[Q] ";
 #endif
 
   sprintf(fpath, BBSHOME"/gem/@/@BBS_DOG_WARN");
@@ -1307,17 +1334,18 @@ post_guard_dog()
     return post_bbs_dog();
   case 'p':
     return post_article_filter();
-  case 'w':
-    return post_my_level(FN_NO_WRITE, "發文限制");
   case 'r':
-    return post_my_level(FN_NO_READ, "閱\讀限制");
+    return post_my_level(0);
+  case 'w':
+    return post_my_level(1);
   case 'l':
-    return post_my_level(FN_NO_LIST, "列出限制");
+    return post_my_level(2);
   case 'v':
     return post_view_bbs_dog_log();
   }
   return 0;
 }
+#endif
 
 
 #if 0
@@ -1350,7 +1378,9 @@ post_manage(xo)
     "RLock   板友可否鎖文",
     "Nfward  看板禁止轉錄",
     "Fshow   轉錄記錄開啟",
+#ifdef DO_POST_FILTER
     "Guard   BBS 看門狗",
+#endif
     NULL
   };
 #else
@@ -1368,7 +1398,10 @@ post_manage(xo)
 #  ifdef HAVE_MODERATED_BOARD
     " (V)名單"
 #  endif
-    " (R)鎖文 (N)轉錄 (F)紀錄 (G)看門狗"
+    " (R)鎖文 (N)轉錄 (F)紀錄"
+#ifdef DO_POST_FILTER
+    " (G)看門狗"
+#endif
     "？[Q] ";
 #endif
 
@@ -1428,8 +1461,10 @@ post_manage(xo)
     return post_noforward(xo);
   case 'f':
     return post_showturn(xo);
+#ifdef DO_POST_FILTER
   case 'g':
     return post_guard_dog(xo);
+#endif
   }
 
   return XO_HEAD;

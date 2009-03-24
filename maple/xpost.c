@@ -227,7 +227,6 @@ filter_select(head, hdr)
   HDR *hdr;	/* 條件 */
 {
   char *title;
-  char *xname;
   usint str4;
 
   /* 借用 hdr->xid 當 strlen(hdr->owner) */
@@ -244,13 +243,6 @@ filter_select(head, hdr)
       title += 4;
     if (!str_sub(title, hdr->title))
       return 0;
-  }
-
-  if (hdr->xname[0])
-  {
-     xname = head->xname;
-     if (strcmp(xname, hdr->xname))
-       return 0;
   }
 
   return 1;
@@ -337,8 +329,6 @@ set_owner:
   if (!hdr.title[0] && !hdr.xid)
     return XO_BODY;
 
-  hdr.xname[0] = '\0';
-
   return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
 }
 
@@ -387,45 +377,10 @@ XoXauthor(xo)
     sprintf(HintAuthor, "\033[1;33m排除\033[m %s", author);
 
   hdr.title[0] = '\0';
-  hdr.xname[0] = '\0';
   str_lower(author, author);
   hdr.xid = strlen(author);
 
   return XoXpost(xo, &hdr, 0, INT_MAX, ReverseSearch ? filter_R_select : filter_select);
-}
-
-  /* --------------------------------------------------- */
-  /* 搜尋檔名						 */
-  /* --------------------------------------------------- */
-
-static int
-XoXxname(xo)
-  XO *xo;
-{
-  HDR hdr;
-  char *xname;
-
-#ifdef EVERY_Z
-  if (z_status && xz[XZ_XPOST - XO_ZONE].xo)    /* itoc.020308: 不得累積進入二次 */
-  {
-    vmsg(MSG_XYDENY);
-    return XO_BODY;
-  }
-#endif
-
-  xname = hdr.xname;
-  sprintf(xname, "%c", xs_ch ? xs_ch : '\0');
-  xs_ch = 0;
-  if (!vget(b_lines, 0, "檔名關鍵字：", xname, 9, GCARRY))
-    return XO_BODY;
-
-  strcpy(HintWord, xname);
-  HintAuthor[0] = '\0';
-
-  hdr.xid = 0;
-  hdr.title[0] = '\0';
-
-  return XoXpost(xo, &hdr, 0, INT_MAX, filter_select);
 }
 
 
@@ -474,7 +429,6 @@ XoXtitle(xo)
 
   str_lowest(title, title);
   hdr.xid = 0;
-  hdr.xname[0] = '\0';
 
   return XoXpost(xo, &hdr, 0, INT_MAX, ReverseSearch ? filter_R_select : filter_select);
 }
@@ -768,6 +722,12 @@ XoXscore(xo)
   }
 #endif
 
+  if (xs_ch < 0)
+  {
+    hdr.xmode = hdr.score = xs_ch = 0;
+    goto search;
+  }
+
   sprintf(score, "%c", xs_ch ? xs_ch : '\0');
   xs_ch = 0;
   vget(b_lines, 0, "搜尋評分數 >= + / <= - 多少的文章？ (反向搜尋請前置 ! 符號) ", score, 5, GCARRY);
@@ -782,12 +742,13 @@ XoXscore(xo)
     hdr.score = atoi(score);
   }
 
+search:
   HintAuthor[0] = '\0';
   if (!hdr.score)
     strcpy(HintWord, hdr.xmode ? "\033[1;33m所有未被評分過文章\033[m" : "\033[1;33m所有被評分過文章\033[m");
   else if (hdr.score > 0)
     sprintf(HintWord, "\033[1;33m評分數%s於等於 %d 的文章\033[m", hdr.xmode ? "小": "大", hdr.score);
-  else  /* (hdr.score < 0) */
+  else	/* (hdr.score < 0) */
     sprintf(HintWord, "\033[1;33m評分數%s於等於 %d 的文章\033[m", hdr.xmode ? "大" : "小", hdr.score);
 
   return XoXpost(xo, &hdr, 0, INT_MAX, filter_score);
@@ -830,120 +791,6 @@ XoXrefuse(xo)
 
 
 int
-XOXpost_search_all(xo)
-  XO *xo;
-{
-  static char *smenu[] = {"作者標題", "作者", "標題", "全文", "檔名", NULL};
-  static char *lmenu[] = {"相同標題", "推文", "加密", "mark", "local", NULL};
-  static char *prompt[] = {"標題", "作者", "標題", "內文", "檔名", NULL};
-  static int plen[] = {30, IDLEN + 1, 30, 30, 9};
-
-  char buf[64];
-  int i, ch = 2;
-
-  move(b_lines - 2, 0);
-  clrtobot();
-  memset(buf, 0, sizeof(buf));
-
-  while (1)
-  {
-    move(b_lines - 2, 0);
-    clrtoeol();
-    outs(" ◎搜尋 ");
-    for (i = 0; i < 5; i++)
-      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", smenu[i], (ch == i) ? "\033[m" : "");
-
-    move(b_lines - 1, 0);
-    clrtoeol();
-    outs("   串接 ");
-    for (i = 5; i < 10; i++)
-      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", lmenu[i - 5], (ch == i) ? "\033[m" : "");
-
-    move(b_lines, 0);
-    clrtoeol();
-    if (ch < 5)
-    {
-      prints("%s關鍵字： \033[7m%-*s\033[m", prompt[ch], plen[ch] - 1, "");
-      move(b_lines, 12 + 1);
-    }
-    else if (ch == 6)
-    {
-      prints("搜尋評分數 >= + / <= - 多少的文章？ (反向搜尋請前置 ! 符號) \033[7m     \033[m");
-      move(b_lines, 60);
-    }
-    else
-      move(b_lines - 2, 0);
-
-    switch (i = vkey())
-    {
-      case KEY_UP:
-	ch -= 5;
-	break;
-      case KEY_DOWN:
-	ch += 5;
-	break;
-      case KEY_LEFT:
-	ch--;
-	break;
-      case KEY_RIGHT:
-	ch++;
-	break;
-      case '\n':
-	if (ch == 1 || ch == 2 || ch == 3 || ch == 4 || ch == 6)
-          return XO_BODY;
-	xs_ch = 1;
-	break;
-      default:
-	if (isprint2(i))
-	  xs_ch = i;
-	break;
-    }
-
-    if (xs_ch)
-      break;
-
-    if (ch < 0)
-      ch += 10;
-    else if (ch > 9)
-      ch -= 10;
-  }
-  
-  if (xs_ch == 1 && ch != 0)
-    xs_ch = 0;
-
-  switch (ch)
-  {
-    case 0:
-      return XoXselect(xo);  /* itoc.001220: 搜尋作者/標題 */
-    case 1:
-      return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
-    case 3:
-      return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
-    case 4:
-      return XoXxname(xo);   /* smiler.080201: 搜尋檔名 */
-    case 5:
-      return XoXsearch(xo);  /* itoc.001220: 搜尋相同標題文章 */
-#ifdef HAVE_SCORE
-    case 6:
-      return XoXscore(xo);
-#endif
-#ifdef HAVE_REFUSEMARK
-    case 7:
-      return XoXrefuse(xo);
-#endif
-    case 8:
-      return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
-    case 9:
-      return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
-    case 2:
-    default:
-      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
-  }
-  return XO_BODY;
-}
-
-
-int
 XoRXsearch(xo)
   XO *xo;
 {
@@ -979,6 +826,125 @@ XoRXsearch(xo)
   }
 
   return XO_FOOT;
+}
+
+
+int
+XOXpost_search_all(xo)
+  XO *xo;
+{
+  static char *smenu[] = {"作者標題", "作者", "標題", "全文", "排除搜尋", NULL};
+  static char *lmenu[] = {"相同標題", "推文", "加密", "mark", "local", NULL};
+  static char *prompt[] = {"標題", "作者", "標題", "內文", "檔名", NULL};
+  static int plen[] = {30, IDLEN + 1, 30, 30, 9};
+
+  char buf[64];
+  int i, ch = 2;
+
+  move(b_lines - 2, 0);
+  clrtobot();
+  memset(buf, 0, sizeof(buf));
+
+  while (1)
+  {
+    move(b_lines - 2, 0);
+    clrtoeol();
+    outs(" ◎搜尋 ");
+    for (i = 0; i < 5; i++)
+      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", smenu[i], (ch == i) ? "\033[m" : "");
+
+    move(b_lines - 1, 0);
+    clrtoeol();
+    outs("   串接 ");
+    for (i = 5; i < 10; i++)
+      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", lmenu[i - 5], (ch == i) ? "\033[m" : "");
+
+    move(b_lines, 0);
+    clrtoeol();
+    if (ch < 4)
+    {
+      prints("%s關鍵字： \033[7m%-*s\033[m", prompt[ch], plen[ch] - 1, "");
+      move(b_lines, 12 + 1);
+    }
+    else if (ch == 6)
+    {
+      prints("搜尋評分數 >= + / <= - 多少的文章？ (反向搜尋請前置 ! 符號) \033[7m     \033[m");
+      move(b_lines, 60);
+    }
+    else
+      move(b_lines - 2, 0);
+
+    switch (i = vkey())
+    {
+      case KEY_UP:
+	ch -= 5;
+	break;
+      case KEY_DOWN:
+	ch += 5;
+	break;
+      case KEY_LEFT:
+	ch--;
+	break;
+      case KEY_RIGHT:
+	ch++;
+	break;
+      case '\n':
+	if (ch == 1 || ch == 2 || ch == 3)// || ch == 4 || ch == 6)
+          return XO_BODY;
+	else if (ch == 6)
+	{
+	  xs_ch = -1;
+	  return XoXscore(xo);
+	}
+	xs_ch = 1;
+	break;
+      default:
+	if (isprint2(i))
+	  xs_ch = i;
+	break;
+    }
+
+    if (xs_ch)
+      break;
+
+    if (ch < 0)
+      ch += 10;
+    else if (ch > 9)
+      ch -= 10;
+  }
+
+  if (xs_ch == 1 && ch != 0)
+    xs_ch = 0;
+
+  switch (ch)
+  {
+    case 0:
+      return XoXselect(xo);  /* itoc.001220: 搜尋作者/標題 */
+    case 1:
+      return XoXauthor(xo);  /* itoc.001220: 搜尋作者 */
+    case 3:
+      return XoXfull(xo);    /* itoc.030608: 全文搜尋 */
+    case 4:
+      return XoRXsearch(xo);
+    case 5:
+      return XoXsearch(xo);  /* itoc.001220: 搜尋相同標題文章 */
+#ifdef HAVE_SCORE
+    case 6:
+      return XoXscore(xo);
+#endif
+#ifdef HAVE_REFUSEMARK
+    case 7:
+      return XoXrefuse(xo);
+#endif
+    case 8:
+      return XoXmark(xo);    /* itoc.010325: 搜尋 mark 文章 */
+    case 9:
+      return XoXlocal(xo);   /* itoc.010822: 搜尋本地文章 */
+    case 2:
+    default:
+      return XoXtitle(xo);   /* itoc.001220: 搜尋標題 */
+  }
+  return XO_BODY;
 }
 
 

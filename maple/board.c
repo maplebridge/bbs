@@ -555,6 +555,88 @@ is_bm(list, userid)
 }
 
 
+#ifdef DO_POST_FILTER
+int
+IS_BIGGER_AGE(age)
+  int age;
+{
+  time_t now;
+  struct tm *ptime;
+
+  if (age && !cuser.year)	/* 生日未填 */
+    return 0;
+
+  time(&now);
+  ptime = localtime(&now);
+
+  return ((cuser.year + 11 + age) < ptime->tm_year) ? 1 :
+	((cuser.year + 11 + age) > ptime->tm_year) ? 0 :
+	(cuser.month < (ptime->tm_mon + 1))        ? 1 :
+	(cuser.month > (ptime->tm_mon + 1))        ? 0 :
+	(cuser.day > (ptime->tm_mday))             ? 0 : 1;
+}
+
+
+int
+IS_BIGGER_1STLG(month)
+  int month;
+{
+  /* 一個月以 30 天計算 */
+  return (((time(0) - cuser.firstlogin) / (86400 * 30)) >= month);
+}
+
+
+static int
+IS_WELCOME(perm)
+  BPERM *perm;
+{
+  if (!perm->exist)
+    return 1;
+
+  while (1)
+  {
+    if (!IS_BIGGER_AGE(perm->age))
+      break;
+
+    if (perm->sex && (perm->sex != cuser.sex + 1))
+      break;
+
+    if (cuser.numlogins < perm->numlogins)
+      break;
+
+    if (cuser.numposts < perm->numposts)
+      break;
+
+    if (cuser.good_article < perm->good_article)
+      break;
+
+    if (perm->poor_article && (cuser.poor_article >= perm->poor_article))
+      break;
+
+    if (perm->violation && (cuser.violation >= perm->violation))
+      break;
+
+    if (cuser.money < perm->money)
+      break;
+
+    if (cuser.gold < perm->gold)
+      break;
+
+    if (cuser.numemails < perm->numemails)
+      break;
+
+    if (!IS_BIGGER_1STLG(perm->regmonth))
+      break;
+
+    /* 會走到這裡就表示過關了 */
+    return 1;
+  }
+
+  return 0;
+}
+#endif
+
+
 static inline int
 Ben_Perm(bno, ulevel)
   int bno;
@@ -621,12 +703,14 @@ Ben_Perm(bno, ulevel)
     if (!postlevel || (postlevel & ulevel))	/* 全站應只有 sysop 板沒有 postlevel */
       bits |= BRD_W_BIT;
 
-    if (!IS_WELCOME(bname, FN_NO_LIST))
+#ifdef DO_POST_FILTER
+    if (!IS_WELCOME(bshm->lperm + bno))
       bits &= ~(BRD_L_BIT | BRD_R_BIT | BRD_W_BIT);
-    else if (!IS_WELCOME(bname, FN_NO_READ))
+    else if (!IS_WELCOME(bshm->rperm + bno))
       bits &= ~(BRD_R_BIT | BRD_W_BIT);
-    else if (!IS_WELCOME(bname, FN_NO_WRITE))
+    else if (!IS_WELCOME(bshm->wperm + bno))
       bits &= ~BRD_W_BIT;
+#endif
   }
   else					/* 有設看板讀取權限的板， guest 就無法看見 */
   {
@@ -1420,14 +1504,26 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
 
   /* 處理 人氣 */
   bno = bshm->mantime[bno];
-  if (bno > 99)
-    str3 = "\033[1;31m爆\033[m";
-  else if (bno > 0)
-    sprintf(str3 = buf, "%2d", bno);
+  if (bno > 400)
+    str3 = "\033[1;36m爆了\033[m";
+  else if (bno > 290)
+    str3 = "\033[1;35m爆了\033[m";
+  else if (bno > 160)
+    str3 = "\033[1;34m爆了\033[m";
+  else if (bno > 90)
+    str3 = "\033[1;32m爆了\033[m";
+  else if (bno > 50)
+    str3 = "\033[1;31m熱門\033[m";
+  else if (bno > 25)
+    str3 = "\033[1;33m有勁\033[m";
+  else if (bno > 10)
+    sprintf(str3 = buf, "\033[1;31m%4d\033[m", bno);
+  else if (bno > 5)
+    sprintf(str3 = buf, "\033[1;33m%4d\033[m", bno);
   else
-    str3 = "  ";
+    str3 = "";
 
-  /* smiler.070724: 看板配色,人氣 */
+  /* smiler.070724: 看板配色 */
   if (!infav)
   {
     prints("%6d%c%s", num, token, str1);
@@ -1446,45 +1542,31 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
   else	/* smiler.070724: 我的最愛看板另外上色*/
     prints("%6d%c%s\033[1;36m%-13s\033[m", num, label ? 'T' : token, str1, brd->brdname);
 
-  if (!strcmp(brd->class,"楓橋") || !strcmp(brd->class,"系統"))
+  if (!strcmp(brd->class, "楓橋") || !strcmp(brd->class, "系統"))
     prints("\033[1;31m");
-  else if (!strcmp(brd->class,"地方") || !strcmp(brd->class,"體育"))
+  else if (!strcmp(brd->class, "地方") || !strcmp(brd->class, "體育"))
     prints("\033[1;32m");
-  else if (!strcmp(brd->class,"個人"))
+  else if (!strcmp(brd->class, "個人"))
     prints("\033[1;33m");
-  else if (!strcmp(brd->class,"清華") || !strcmp(brd->class,"資訊") || !strcmp(brd->class,"校隊"))
+  else if (!strcmp(brd->class, "清華") || !strcmp(brd->class, "資訊") || !strcmp(brd->class, "校隊"))
     prints("\033[1;34m");
-  else if (!strcmp(brd->class,"Comp") || !strcmp(brd->class,"電腦"))
+  else if (!strcmp(brd->class, "Comp") || !strcmp(brd->class, "電腦"))
     prints("\033[1;36m");
-  else if (!strcmp(brd->class,"社團"))
+  else if (!strcmp(brd->class, "社團"))
     prints("\033[33m");
-  else if (!strcmp(brd->class,"嗜好"))
+  else if (!strcmp(brd->class, "嗜好"))
     prints("\033[35m");
   else
-    prints("\033[1;3%dm",brd->class[3] & 7);
-  prints("%-5s\033[m%s ",brd->class,str2);
+    prints("\033[1;3%dm", brd->class[3] & 7);
+
+  prints("%-5s\033[m%s ", brd->class, str2);
 
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
   str1 = brd->title;
-  num = (d_cols >> 1) + 31; /* smiler.070724: 33->31 for 中文板名減短 */
+  num = (d_cols >> 1) + 31;	/* smiler.070724: 33->31 for 中文板名減短 */
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
 
-  /* smiler.070724: 獨立處理看板人氣 */
-  if (bno > 60)
-    prints("\033[1;35m爆了\033[m ");
-  else if (bno > 40)
-    prints("\033[1;31m熱門\033[m ");
-  else if (bno > 20)
-    prints("\033[1;33m有勁\033[m ");
-  else if (bno > 10)
-    prints("\033[1;31m%4d\033[m ", bno);
-  else if (bno > 5)
-    prints("\033[1;33m%4d\033[m ", bno);
-  else if (bno > 0)
-    prints("%4d ", bno);
-  else
-    prints("     ");
-  prints("%.*s\n",d_cols - (d_cols >> 1) + 12, brd->BM);
+  prints("%-5s%.*s\n", str3, d_cols - (d_cols >> 1) + 12, brd->BM);
 }
 
 
@@ -1541,14 +1623,26 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
 
   /* 處理 人氣 */
   bno = bshm->mantime[chn];
-  if (bno > 99)
-    str3 = "\033[1;31m爆\033[m";
-  else if (bno > 0)
-    sprintf(str3 = buf, "%2d", bno);
+  if (bno > 400)
+    str3 = "\033[1;36m爆了\033[m";
+  else if (bno > 290)
+    str3 = "\033[1;35m爆了\033[m";
+  else if (bno > 160)
+    str3 = "\033[1;34m爆了\033[m";
+  else if (bno > 90)
+    str3 = "\033[1;32m爆了\033[m";
+  else if (bno > 50)
+    str3 = "\033[1;31m熱門\033[m";
+  else if (bno > 25)
+    str3 = "\033[1;33m有勁\033[m";
+  else if (bno > 10)
+    sprintf(str3 = buf, "\033[1;31m%4d\033[m", bno);
+  else if (bno > 5)
+    sprintf(str3 = buf, "\033[1;33m%4d\033[m", bno);
   else
-    str3 = "  ";
+    str3 = "";
 
-  /*smiler.070724: 看板配色,人氣 */
+  /*smiler.070724: 看板配色 */
   if (!infav)
   {
     prints("\033[m%s%6d%c%s%s", UCBAR[UCBAR_BRD], num, token, str1, UCBAR[UCBAR_BRD]);
@@ -1569,23 +1663,24 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
       UCBAR[UCBAR_BRD], num, label ? 'T' : token, str1,
       UCBAR[UCBAR_BRD], brd->brdname, UCBAR[UCBAR_BRD]);
 
-  if (!strcmp(brd->class,"楓橋") || !strcmp(brd->class,"系統"))
+  if (!strcmp(brd->class, "楓橋") || !strcmp(brd->class, "系統"))
     prints("\033[1;31m");
-  else if (!strcmp(brd->class,"地方") || !strcmp(brd->class,"體育"))
+  else if (!strcmp(brd->class, "地方") || !strcmp(brd->class, "體育"))
     prints("\033[1;32m");
-  else if (!strcmp(brd->class,"個人"))
+  else if (!strcmp(brd->class, "個人"))
     prints("\033[1;33m");
-  else if (!strcmp(brd->class,"清華") || !strcmp(brd->class,"資訊") || !strcmp(brd->class,"校隊"))
+  else if (!strcmp(brd->class, "清華") || !strcmp(brd->class, "資訊") || !strcmp(brd->class, "校隊"))
     prints("\033[1;34m");
-  else if (!strcmp(brd->class,"Comp") || !strcmp(brd->class,"電腦"))
+  else if (!strcmp(brd->class, "Comp") || !strcmp(brd->class, "電腦"))
     prints("\033[1;36m");
-  else if (!strcmp(brd->class,"社團"))
+  else if (!strcmp(brd->class, "社團"))
     prints("\033[33m");
-  else if (!strcmp(brd->class,"嗜好"))
+  else if (!strcmp(brd->class, "嗜好"))
     prints("\033[35m");
   else
-    prints("\033[1;3%dm",brd->class[3] & 7);
-  prints("%-5s\033[m%s%s%s ",brd->class, UCBAR[UCBAR_BRD], str2, UCBAR[UCBAR_BRD]);
+    prints("\033[1;3%dm", brd->class[3] & 7);
+
+  prints("%-5s\033[m%s%s%s ", brd->class, UCBAR[UCBAR_BRD], str2, UCBAR[UCBAR_BRD]);
 
   /* itoc.060530: 借用 str1、num 來處理看板敘述顯示的中文斷字 */
   str1 = brd->title;
@@ -1593,23 +1688,8 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
 
   /* smiler.070724: 獨立處理看板人氣 */
-  prints("%s", UCBAR[UCBAR_BRD]);
-  if (bno > 60)
-    prints("\033[1;35m爆了\033[m%s ", UCBAR[UCBAR_BRD]);
-  else if (bno > 40)
-    prints("\033[1;31m熱門\033[m%s ", UCBAR[UCBAR_BRD]);
-  else if (bno > 20)
-    prints("\033[1;33m有勁\033[m%s ", UCBAR[UCBAR_BRD]);
-  else if (bno > 10)
-    prints("\033[1;31m%4d\033[m%s ", bno, UCBAR[UCBAR_BRD]);
-  else if (bno > 5)
-    prints("\033[1;33m%4d\033[m%s ", bno, UCBAR[UCBAR_BRD]);
-  else if (bno > 0)
-    prints("%4d ", bno);
-  else
-    prints("     ");
+  prints("%s%-5s%s", UCBAR[UCBAR_BRD], str3, UCBAR[UCBAR_BRD]);
 
-  prints("%s", UCBAR[UCBAR_BRD]);
   prints("%-*.*s\033[m", d_cols - (d_cols >> 1) + 12, d_cols - (d_cols >> 1) + 12, brd->BM);
 }
 

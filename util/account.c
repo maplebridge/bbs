@@ -84,6 +84,65 @@ fix_brd()
 }
 
 
+#ifdef DO_POST_FILTER
+static void
+perm_allowed_set(perm, board, fname)
+  BPERM *perm;
+  char *board;
+  char *fname;
+{
+  FILE *fp;
+  char fpath[64];
+  int i;
+
+  brd_fpath(fpath, board, fname);
+
+  if (!(fp = fopen(fpath, "r")))
+  {
+    perm->exist = 0;
+    return;
+  }
+  perm->exist = 1;
+
+  fscanf(fp, "%d", &i);
+  perm->age = i;
+
+  fscanf(fp, "%d", &i);
+  perm->sex = i;
+
+  fscanf(fp, "%d", &i);
+  perm->numlogins = i;
+
+  fscanf(fp, "%d", &i);
+  perm->numposts = i;
+
+  fscanf(fp, "%d", &i);
+  perm->good_article = i;
+
+  fscanf(fp, "%d", &i);
+  perm->poor_article = i;
+
+  fscanf(fp, "%d", &i);
+  perm->violation = i;
+
+  fscanf(fp, "%d", &i);
+  perm->money = i;
+
+  fscanf(fp, "%d", &i);
+  perm->gold = i;
+
+  fscanf(fp, "%d", &i);
+  perm->numemails = i;
+
+  fscanf(fp, "%d", &i);
+  perm->regmonth = i;
+
+  fclose(fp);
+  return;
+}
+#endif
+
+
 #ifdef HAVE_MODERATED_BOARD
 static int
 int_cmp(a, b)
@@ -103,11 +162,20 @@ init_allbrd()
   char fpath[64];
   BPAL *bpal;
 #endif
+#ifdef DO_POST_FILTER
+  BPERM *perm[3];
+  char *permlist[3] = {FN_NO_READ, FN_NO_WRITE, FN_NO_LIST};
+#endif
 
   head = bshm->bcache;
   tail = head + bshm->number;
 #ifdef HAVE_MODERATED_BOARD
   bpal = bshm->pcache;
+#endif
+#ifdef DO_POST_FILTER
+  perm[0] = bshm->rperm;
+  perm[1] = bshm->wperm;
+  perm[2] = bshm->lperm;
 #endif
 
   do
@@ -152,6 +220,13 @@ init_allbrd()
     }
 
     bpal++;
+#endif
+#ifdef DO_POST_FILTER
+    for (fd = 0; fd < 3; fd++)
+    {
+      perm_allowed_set(perm[fd], head->brdname, permlist[fd]);
+      perm[fd]++;
+    }
 #endif
 
   } while (++head < tail);

@@ -377,6 +377,26 @@ typedef struct
 }	BPAL;
 
 
+#ifdef DO_POST_FILTER
+/* 看板權限: 36 bytes */
+typedef struct
+{
+  char exist;		/* 權限檔是否存在: 是否需要判斷 */
+  char age;
+  char sex;
+  char regmonth;
+  int numlogins;
+  int numposts;
+  int good_article;
+  int poor_article;
+  int violation;
+  int money;
+  int gold;
+  int numemails;
+}	BPERM;
+#endif
+
+
 /* ----------------------------------------------------- */
 /* Class image						 */
 /* ----------------------------------------------------- */
@@ -544,6 +564,11 @@ typedef struct
 {
   BRD bcache[MAXBOARD];
   BPAL pcache[MAXBOARD];
+#ifdef DO_POST_FILTER
+  BPERM rperm[MAXBOARD];	/* 看板讀取權限 */
+  BPERM wperm[MAXBOARD];	/* 看板寫入權限 */
+  BPERM lperm[MAXBOARD];	/* 看板列出權限 */
+#endif
   int mantime[MAXBOARD];	/* 各板目前正有多少人在閱讀 */
   int number;			/* 全部看板的數目 */
   int numberOld;		/* 剛開站時看板的數目 */

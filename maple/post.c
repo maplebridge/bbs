@@ -9,8 +9,6 @@
 
 #include "bbs.h"
 
-#define DO_POST_FILTER
-
 
 extern BCACHE *bshm;
 extern XZ xz[];
@@ -41,109 +39,10 @@ cmpchrono(hdr)
 }
 
 
-#define DO_POST_FILTER
-static int
-IS_BIGGER_AGE(age)
-  int age;
-{
-  time_t now;
-  struct tm *ptime;
-
-  if (age && !cuser.year)	/* 生日未填 */
-    return 0;
-
-  time(&now);
-  ptime = localtime(&now);
-
-  return ((cuser.year + 11 + age) < ptime->tm_year) ? 1 :
-	((cuser.year + 11 + age) > ptime->tm_year) ? 0 :
-	(cuser.month < (ptime->tm_mon + 1))        ? 1 :
-	(cuser.month > (ptime->tm_mon + 1))        ? 0 :
-	(cuser.day > (ptime->tm_mday))             ? 0 : 1;
-}
-
-
-static int
-IS_BIGGER_1STLG(month)
-  int month;
-{
-  /* 一個月以 30 天計算 */
-  return (((time(0) - cuser.firstlogin) / (86400 * 30)) >= month);
-}
-
+#ifdef DO_POST_FILTER
 
 #define	COLOR_NOT_ACP	"\033[1;31m"
 #define	COLOR_ACP	"\033[1;37m"	
-
-
-int
-IS_WELCOME(board, fname)
-  char *board;
-  char *fname;
-{
-  FILE *fp;
-  char fpath[64];
-  int wi = 0;
-
-  brd_fpath(fpath, board, fname);
-
-  if (!(fp = fopen(fpath, "r")))
-    return 1;
-
-  while (1)
-  {
-    fscanf(fp, "%d", &wi);
-    if (!IS_BIGGER_AGE(wi))
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (wi && (wi != cuser.sex + 1))
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.numlogins < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.numposts < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.good_article < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (wi && (cuser.poor_article >= wi))
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (wi && (cuser.violation >= wi))
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.money < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.gold < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (cuser.numemails < wi)
-      break;
-
-    fscanf(fp, "%d", &wi);
-    if (!IS_BIGGER_1STLG(wi))
-      break;
-
-    /* 會走到這裡就表示過關了 */
-    fclose(fp);
-    return 1;
-  }
-
-  fclose(fp);
-  return 0;
-}
 
 
 /* smiler.080830 : 看門狗 */
@@ -215,7 +114,7 @@ IS_BBS_DOG_FOOD(fpath)
 
 }
 
-#ifdef	DO_POST_FILTER
+
 static int	/* 0: 一般正常文章  1: 被擋下來了 */
 post_filter(fpath)	/* smiler.080830 : 看門狗對文章內容過濾 */
   char *fpath;		/* file path to be test */
@@ -2313,7 +2212,7 @@ post_cross(xo)
     }
     hdr_fpath(fpath, dir, hdr);
 
-#define DO_POST_FILTER
+#ifdef DO_POST_FILTER
     xbrd = bshm->bcache + xbno;
 
     if (((xbattr & BRD_BBS_DOG) || xbrd->BM[0] <= ' ') && IS_BBS_DOG_FOOD(fpath))
@@ -2334,7 +2233,6 @@ post_cross(xo)
       continue;
     }
 
-#ifdef	DO_POST_FILTER
     if (IS_BRD_DOG_FOOD(fpath, xboard))
     {
       brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
@@ -3884,7 +3782,9 @@ log_anonyscore(fname, say)
 }
 #endif
 
+
 #define	MAX_REASON_RECORD	20
+
 
 static int
 post_append_score(xo, choose)
@@ -4279,67 +4179,48 @@ post_viewpal()
 }
 
 
+#ifdef DO_POST_FILTER
 static int
-post_show_dog(fname)
-  char *fname;
+post_show_dog(perm, prompt)
+  BPERM *perm;
+  char *prompt;
 {
-  FILE *fp;
-  char fpath[64];
-
-  int wi = 0;
-
-  brd_fpath(fpath, currboard, fname);
-
-  if (!(fp = fopen(fpath, "r")))
+  if (!perm->exist)
     return vmsg("目前無此設定！");
 
   clear();
   move(1, 0);
-  prints("\033[1;33m %s \033[m\n\n", (!strcmp(fname, FN_NO_WRITE)) ? "發文推文條件限制" :
-				!strcmp(fname, FN_NO_READ ) ? "進入看板條件限制" :
-				!strcmp(fname, FN_NO_LIST ) ? "看板列表顯示本板" : "");
+  prints("\033[1;33m %s \033[m\n\n", prompt);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(wi) ? COLOR_ACP : COLOR_NOT_ACP , wi);
+  prints("%s年齡限制 >= [%2d歲]\033[m\n", IS_BIGGER_AGE(perm->age) ? COLOR_ACP : COLOR_NOT_ACP , perm->age);
 
-  fscanf(fp, "%d", &wi);
   prints("%s性別限制 : [%s] \033[m\n",
-    (wi == 0) ? COLOR_ACP : (wi == cuser.sex + 1) ? COLOR_ACP : COLOR_NOT_ACP,
-    (wi == 0) ? "不限" : (wi == 1) ? "中性" : (wi == 2) ? "男性" : "女性");
+    (perm->sex == 0) ? COLOR_ACP : (perm->sex == cuser.sex + 1) ? COLOR_ACP : COLOR_NOT_ACP,
+    (perm->sex == 0) ? "不限" : (perm->sex == 1) ? "中性" : (perm->sex == 2) ? "男性" : "女性");
 
-  fscanf(fp, "%d", &wi);
-  prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s上線次數 >= [%d次] \033[m\n", (cuser.numlogins >= perm->numlogins) ? COLOR_ACP : COLOR_NOT_ACP, perm->numlogins);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s文章篇數 >= [%d篇] \033[m\n", (cuser.numposts >= perm->numposts) ? COLOR_ACP : COLOR_NOT_ACP, perm->numposts);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s優文篇數 >= [%d篇] \033[m\n", (cuser.good_article >= perm->good_article) ? COLOR_ACP : COLOR_NOT_ACP, perm->good_article);
 
-  fscanf(fp, "%d", &wi);
   prints("%s劣文篇數 <  [%d篇] (0：不限) \033[m\n",
-    (wi == 0) ? COLOR_ACP :(cuser.poor_article < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+    (perm->poor_article == 0) ? COLOR_ACP :(cuser.poor_article < perm->poor_article) ? COLOR_ACP : COLOR_NOT_ACP, perm->poor_article);
 
-  fscanf(fp, "%d", &wi);
   prints("%s違規次數 <  [%d次] (0：不限) \033[m\n",
-    (wi == 0) ? COLOR_ACP : (cuser.violation < wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+    (perm->violation == 0) ? COLOR_ACP : (cuser.violation < perm->violation) ? COLOR_ACP : COLOR_NOT_ACP, perm->violation);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s銀幣     >= [%d枚] \033[m\n", (cuser.money >= perm->money) ? COLOR_ACP : COLOR_NOT_ACP, perm->money);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s金幣     >= [%d枚] \033[m\n", (cuser.gold >= perm->gold) ? COLOR_ACP : COLOR_NOT_ACP, perm->gold);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
+  prints("%s發信次數 >= [%d次] \033[m\n", (cuser.numemails >= perm->numemails) ? COLOR_ACP : COLOR_NOT_ACP, perm->numemails);
 
-  fscanf(fp, "%d", &wi);
-  prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(wi) ? COLOR_ACP : COLOR_NOT_ACP, wi);
-
-  fclose(fp);
+  prints("%s註冊時間 >= [%3d月] \033[m\n", IS_BIGGER_1STLG(perm->regmonth) ? COLOR_ACP : COLOR_NOT_ACP, perm->regmonth);
 
   return vmsg(NULL);
 }
+#endif
 
 
 #ifdef HAVE_RSS
@@ -4463,7 +4344,7 @@ post_ishowbm(xo)
     move(b_lines - 5, 0);
     prints("\033[1;30m============================== "
       "\033[;37;44m[觀看看板設定]\033[;1;30m ===============================\033[m\n\n");
-    prints(" %s1%s - 發文限制  %s2%s - 讀取限制  %s3%s - 顯示限制  ",
+    prints(" %s1%s - 閱\讀限制  %s2%s - 發文限制  %s3%s - 列出限制  ",
       "\033[1;36m", "\033[m", "\033[1;36m", "\033[m", "\033[1;36m", "\033[m");
 #ifdef HAVE_RSS
     if (!isbm)
@@ -4499,15 +4380,17 @@ post_ishowbm(xo)
     clrtoeol();
     switch (ch |= 0x20)
     {
+#ifdef DO_POST_FILTER
     case '1':
-      post_show_dog(FN_NO_WRITE);
+      post_show_dog(bshm->rperm + currbno, "進入看板條件限制");
       break;
     case '2':
-      post_show_dog(FN_NO_READ);
+      post_show_dog(bshm->wperm + currbno, "發文推文條件限制");
       break;
     case '3':
-      post_show_dog(FN_NO_LIST);
+      post_show_dog(bshm->lperm + currbno, "看板列表顯示本板");
       break;
+#endif
 #ifdef HAVE_RSS
     case '4':
     case 'r':
@@ -4842,163 +4725,6 @@ post_whereami(xo)
   }
 
   return XO_HEAD;
-}
-
-
-static int
-post_ip_to_char()
-{
-  int i, ip1, ip2, ip3, ip4;
-  char buf[4];
-
-  move(0, 0);
-  clrtobot();
-
-  move(3, 0);
-
-  prints("ip 以 ip1.ip2.ip3.ip4 表示 : \n");
-
-  i = 5;
-
-  if(!vget(i, 0, "請輸入ip1: ", buf, 4, DOECHO))
-    return XO_INIT;
-
-  ip1 = atoi(buf);
-  if(ip1 > 255  || ip1 < 1)
-  {
-    vmsg("輸入不正確:  0 < ip1 < 256 ");
-    return XO_INIT;
-  }
-
-  i=i+2;
-
-  if(!vget(i, 0, "請輸入ip2: ", buf, 4, DOECHO))
-    return XO_INIT;
-
-  ip2 = atoi(buf);
-  if(ip2 > 255  || ip2 < 1)
-  {
-    vmsg("輸入不正確:  0 < ip2 < 256 ");
-    return XO_INIT;
-  }
-
-  i=i+2;
-
-  if(!vget(i, 0, "請輸入ip3: ", buf, 4, DOECHO))
-    return XO_INIT;
-
-  ip3 = atoi(buf);
-  if(ip3 > 255  || ip3 < 1)
-  {
-    vmsg("輸入不正確:  0 < ip3 < 256 ");
-    return XO_INIT;
-  }
-
-  i=i+2;
-
-  if(!vget(i, 0, "請輸入ip4: ", buf, 4, DOECHO))
-    return XO_INIT;
-
-  ip4 = atoi(buf);
-  if(ip4 > 255  || ip4 < 1)
-  {
-    vmsg("輸入不正確:  0 < ip4 < 256 ");
-    return XO_INIT;
-  }
-
-  prints("\n\n ip代碼=> %s \n", get_my_ansi_ip_char(ip1, ip2, ip3, ip4) );
-
-  vmsg(NULL);
-
-  return XO_HEAD;
-}
-
-
-static int
-post_char_to_ip(xo)
-  XO *xo;
-{
-  int ip1=0;
-  int ip2=0;
-  int ip3=0;
-  int ip4=0;
-
-  move(8, 0);
-  clrtoeol();
-  move(9, 0);
-  clrtoeol();
-
-  move(4, 0);
-  clrtoeol();  
-  prints("\033[1;33m 請依序輸入ip代碼以解出 \033[5m? \033[m");
-
-  move(5, 0);
-  clrtoeol();
-
-  prints("\033[1;33;5m?\033[m.x.x.x");
-
-  ip1 = get_my_ansi_char_ip(6);
-  if(!ip1 || ip1>255 || ip1<1)
-  {
-    vmsg("輸入有誤 !!");
-    return XO_INIT;
-  }
-
-  move(5, 0);
-  clrtoeol();
-  prints("\033[1;33m%d.\033[1;33;5m?\033[m.x.x", ip1);
-
-  ip2 = get_my_ansi_char_ip(6);
-  if(!ip2 || ip2>255 || ip2<1)
-  {
-    vmsg("輸入有誤 !!");
-    return XO_INIT;
-  }
-
-  move(5, 0);
-  clrtoeol();
-  prints("\033[1;33m%d.%d.\033[1;33;5m?\033[m.x", ip1, ip2);
-
-  ip3 = get_my_ansi_char_ip(6);
-  if(!ip3 || ip3>255 || ip3<1)
-  {
-    vmsg("輸入有誤 !!");
-    return XO_INIT;
-  }
-
-  move(5, 0);
-  clrtoeol();
-  prints("\033[1;33m%d.%d.%d.\033[1;33;5m?\033[m", ip1, ip2, ip3);
-
-  ip4 = get_my_ansi_char_ip(6);
-  if(!ip4 || ip4>255 || ip4<1)
-  {
-    vmsg("輸入有誤 !!");
-    return XO_INIT;
-  }
-
-  move(5, 0);
-  clrtoeol();
-  prints("\033[1;33m%d.%d.%d.%d <===== 查詢結果\033[m", ip1, ip2, ip3, ip4);
-  vmsg(NULL);
-
-  return XO_HEAD;
-}
-
-
-int
-post_trans_ip(xo)
-  XO *xo;
-{
-  switch(vans("(1)以ip碼查詢ip  (2)以ip查詢ip碼 [Q]"))
-  {
-  case '1':
-    return post_char_to_ip(xo);
-  case '2':
-    return post_ip_to_char(xo);
-  default:
-    return XO_HEAD;
-  }
 }
 
 
