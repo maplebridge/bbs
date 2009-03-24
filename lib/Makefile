@@ -11,7 +11,7 @@
 CC	= gcc
 RANLIB	= ranlib
 CPROTO	= cproto -E"gcc -pipe -E" -I../include # -s -v
-CFLAGS	= -O2 -s -pipe -fomit-frame-pointer -Wunused -I../include
+CFLAGS	= -O2 -s -pipe -fomit-frame-pointer -Wunused -I../include -fPIC
 
 
 # ------------------------------------------------------ #

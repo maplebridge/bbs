@@ -14,9 +14,10 @@
 #include <sys/types.h>
 
 
-#undef TIMET64
+#undef	TIMET64
+#define	TIMET64		/* smiler.090325: 若非64bit機器，請將此行mark掉 */
 
-#ifdef TIMET64
+#ifdef	TIMET64
 typedef int32_t time4_t;
 #else
 typedef time_t time4_t;

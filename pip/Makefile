@@ -47,7 +47,7 @@ freebsd:
 	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include" $(SO)
 
 bsd:
-	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include" $(SO)
+	@$(MAKE) CC=gcc CFLAGS="-DBSD44 -O2 -pipe -fomit-frame-pointer -Wunused -I../include -fPIC" $(SO)
 
 cygwin:
 	@cd ../maple; make cygwin
