@@ -851,13 +851,15 @@ XOXpost_search_all(xo)
     clrtoeol();
     outs(" ¡··j´M ");
     for (i = 0; i < 5; i++)
-      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", smenu[i], (ch == i) ? "\033[m" : "");
+      prints("/%s %s \033[m", (ch == i) ? "\033[1;44m" : "\033[1;30m", smenu[i]);
+    outs("\033[m");
 
     move(b_lines - 1, 0);
     clrtoeol();
     outs("   ¦ê±µ ");
     for (i = 5; i < 10; i++)
-      prints("/%s %s %s", (ch == i) ? "\033[1;44m" : "", lmenu[i - 5], (ch == i) ? "\033[m" : "");
+      prints("/%s %s \033[m", (ch == i) ? "\033[1;44m" : "\033[1;30m", lmenu[i - 5]);
+    outs("\033[m");
 
     move(b_lines, 0);
     clrtoeol();

@@ -1504,11 +1504,11 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
 
   /* 處理 人氣 */
   bno = bshm->mantime[bno];
-  if (bno > 400)
+  if (bno > 730)
     str3 = "\033[1;36m爆了\033[m";
-  else if (bno > 290)
+  else if (bno > 400)
     str3 = "\033[1;35m爆了\033[m";
-  else if (bno > 160)
+  else if (bno > 180)
     str3 = "\033[1;34m爆了\033[m";
   else if (bno > 90)
     str3 = "\033[1;32m爆了\033[m";
@@ -1520,6 +1520,8 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
     sprintf(str3 = buf, "\033[1;31m%4d\033[m", bno);
   else if (bno > 5)
     sprintf(str3 = buf, "\033[1;33m%4d\033[m", bno);
+  else if (bno > 0)
+    sprintf(str3 = buf, "%4d", bno);
   else
     str3 = "";
 
@@ -1566,7 +1568,7 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
   num = (d_cols >> 1) + 31;	/* smiler.070724: 33->31 for 中文板名減短 */
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
 
-  prints("%-5s%.*s\n", str3, d_cols - (d_cols >> 1) + 12, brd->BM);
+  prints("%-4s %.*s\n", str3, d_cols - (d_cols >> 1) + 12, brd->BM);
 }
 
 
@@ -1623,11 +1625,11 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
 
   /* 處理 人氣 */
   bno = bshm->mantime[chn];
-  if (bno > 400)
+  if (bno > 730)
     str3 = "\033[1;36m爆了\033[m";
-  else if (bno > 290)
+  else if (bno > 400)
     str3 = "\033[1;35m爆了\033[m";
-  else if (bno > 160)
+  else if (bno > 180)
     str3 = "\033[1;34m爆了\033[m";
   else if (bno > 90)
     str3 = "\033[1;32m爆了\033[m";
@@ -1639,6 +1641,8 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
     sprintf(str3 = buf, "\033[1;31m%4d\033[m", bno);
   else if (bno > 5)
     sprintf(str3 = buf, "\033[1;33m%4d\033[m", bno);
+  else if (bno > 0)
+    sprintf(str3 = buf, "%4d", bno);
   else
     str3 = "";
 
@@ -1688,7 +1692,7 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
   prints("%-*.*s", num, IS_ZHC_LO(str1, num - 1) ? num - 2 : num - 1, str1);
 
   /* smiler.070724: 獨立處理看板人氣 */
-  prints("%s%-5s%s", UCBAR[UCBAR_BRD], str3, UCBAR[UCBAR_BRD]);
+  prints("%s%-4s%s ", UCBAR[UCBAR_BRD], str3, UCBAR[UCBAR_BRD]);
 
   prints("%-*.*s\033[m", d_cols - (d_cols >> 1) + 12, d_cols - (d_cols >> 1) + 12, brd->BM);
 }
