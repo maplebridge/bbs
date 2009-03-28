@@ -26,6 +26,7 @@ static int nbrd_head();
 
 static char *split_line = "\033[33m──────────────────────────────\033[m\n";
 
+static int check_adm;
 
 typedef struct
 {
@@ -157,7 +158,7 @@ nbrd_item_bar(xo, mode)
 
   nbrd = (NBRD *) xo_pool + xo->pos - xo->top;
 
-  prints("%s%6d %c %-5s %-13s [%-13s%s]:%-*.*s%s%s",
+  prints("%s%6d %c %-5s %-13s [%-13s%s] %-*.*s%s%s",
     mode ? UCBAR[UCBAR_NBRD] : "",         //這裡是光棒的顏色，可以自己改
     xo->pos + 1, nbrd_attr(nbrd), nbrd->date + 3, nbrd->owner,
     (nbrd->mode & NBRD_NEWBOARD) ? nbrd->brdname : "\033[1;33m本站連署\033[m",
@@ -901,6 +902,13 @@ nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
   if (nbrd->mode & NBRD_FINISH || !(nbrd->mode & NBRD_NEWBOARD))
     return XO_NONE;
 
+  if (!check_adm)
+  {
+    if (!adm_check())
+      return XO_FOOT;
+    check_adm = 1;
+  }
+
   if (vans("請確定開啟看板(Y/N)？[N] ") == 'y')
   {
     if (nbrd_newbrd(xo, nbrd))
@@ -1178,6 +1186,7 @@ XoNewBoard()
   XO *xo;
   char fpath[64];
 
+  check_adm = 0;
   sprintf(fpath, "run/newbrd/%s", fn_dir);
   xz[XZ_COSIGN - XO_ZONE].xo = xo = xo_new(fpath);
   xz[XZ_COSIGN - XO_ZONE].cb = nbrd_cb;

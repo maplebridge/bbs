@@ -775,6 +775,9 @@ xo_usetup(xo)
   if (strchr(userid, '.') || (acct_load(&acct, userid) < 0))
     return XO_NONE;
 
+  if (!adm_check())
+    return XO_FOOT;
+
   move(3, 0);
   acct_setup(&acct, 1);
   return XO_HEAD;

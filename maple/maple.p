@@ -5,6 +5,7 @@ int acct_userno(char *userid);
 int acct_get(char *msg, ACCT *acct);
 void bitmsg(char *msg, char *str, int level);
 usint bitset(usint pbits, int count, int maxon, char *msg, char *perms[]);
+int adm_check(void);
 void acct_show(ACCT *u, int adm);
 void acct_setup(ACCT *u, int adm);
 void acct_setperm(ACCT *u, usint leveup, usint leveldown);

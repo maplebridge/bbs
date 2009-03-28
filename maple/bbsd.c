@@ -1439,15 +1439,27 @@ tn_main()
   sprintf(tn_addr_buf, "%s", get_my_ip());
   if (acl_has(BBS_ACPFILE, "", "") != -1)	/* BBS_ACLFILE不存在*/
   {
-    if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf))) /* smiler.070724 */
-       login_abort("\n系統維護中,請稍後連入\n");
+    if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf)))	/* smiler.070724 */
+    {
+      move(2, 0);
+      outs("系統維護中,請稍後連入");
+      refresh();
+      sleep(60);
+      login_abort("\n系統維護中,請稍後連入\n");
+    }
   }
   else
   {
     if (acl_has(BBS_DNYFILE, "", "") != -1)
     {
       if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", tn_addr_buf)))	/* smiler.070724 */
+      {
+	move(2, 0);
+	outs("您的機器不被本站台接受");
+	refresh();
+	sleep(60);
 	login_abort("\n您的機器不被本站台接受\n");
+      }
     }
   }
 #endif

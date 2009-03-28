@@ -47,10 +47,10 @@ a_ias_bank()
   int ans, ch, fd;
   char fpath[80], reason[50], buf[512];
   ACCT acct;
-  
+
   move(1, 0);
   clrtobot();
-  
+
   while (ans = acct_get(msg_uid, &acct))
   {
     if (ans > 0)
@@ -65,15 +65,15 @@ a_ias_bank()
         sprintf(buf, "%s 理由：%s", acct.userid, reason);
         alog("IAS_Bank_設定資料", buf);
       }
-      
+
       sprintf(reason, "永久保留帳號 : %s", (acct.userlevel & PERM_XEMPT) ? "有" : "無");
       sprintf(buf, "%s 設定前  %s", acct.userid, reason);
       alog("IAS_Bank_設定資料", buf);
-      
+
       sprintf(reason, "永久免認證   : %s", (acct.userlevel & PERM_XVALID) ? "有" : "無");
       sprintf(buf, "%s 設定前  %s", acct.userid, reason);
       alog("IAS_Bank_設定資料", buf);
-    
+
       usr_fpath(fpath, acct.userid, fn_acct);
       fd = open(fpath, O_RDWR);
       if (fd > 0)
@@ -115,36 +115,34 @@ a_ias_bank()
               ch = 0;
               break;
           }
-        
         }
 
         ch = vans("◎ Y)確定 N)取消：[N] ");
 
         if (ch == 'y')
-        {        
+        {
           lseek(fd, (off_t) 0, SEEK_SET);
-          write(fd, &acct, sizeof(ACCT));        
+          write(fd, &acct, sizeof(ACCT));
           close(fd);
           vmsg("設定完成，將於使用者下次上站時自動生效 !!");
         }
         else
           vmsg("取消更動 !!");
       }
-      
+
       sprintf(reason, "永久保留帳號 : %s", (acct.userlevel & PERM_XEMPT) ? "有" : "無");
       sprintf(buf, "%s 設定前  %s", acct.userid, reason);
       alog("IAS_Bank_設定資料", buf);
-      
+
       sprintf(reason, "永久免認證   : %s", (acct.userlevel & PERM_XVALID) ? "有" : "無");
       sprintf(buf, "%s 設定前  %s", acct.userid, reason);
       alog("IAS_Bank_設定資料", buf);
     }
-    
+
     move(1, 0);
     clrtobot();
-    
   }
-  
+
   return 0;
 }
 
@@ -832,8 +830,9 @@ scan_register_form(fd)
 int
 a_register()
 {
+  FILE *fp;
   int num;
-  char buf[80];
+  char buf[80], tmp[80];
 
   num = rec_num(FN_RUN_RFORM, sizeof(RFORM));
   if (num <= 0)
@@ -848,13 +847,27 @@ a_register()
   if (vans(buf) == 'y')
   {
     sprintf(buf, "%s.tmp", FN_RUN_RFORM);
+    sprintf(tmp, "%s.sysop", FN_RUN_RFORM);
     if (dashf(buf))
     {
-      vmsg("其他 SYSOP 也在審核註冊申請單");
+      if (fp = fopen(tmp, "r"))
+      {
+	fgets(tmp, sizeof(tmp), fp);
+	sprintf(buf, "站務 %s 正在審核註冊申請單", tmp);
+	vmsg(buf);
+      }
+      else
+	vmsg("其他 SYSOP 也在審核註冊申請單");
     }
     else
     {
       int fd;
+
+      if (fp = fopen(tmp, "w"))
+      {
+	fputs(cuser.userid, fp);
+	fclose(fp);
+      }
 
       rename(FN_RUN_RFORM, buf);
       fd = open(buf, O_RDONLY);
@@ -863,6 +876,7 @@ a_register()
 	scan_register_form(fd);
 	close(fd);
 	unlink(buf);
+	unlink(tmp);
 	num = 0;
       }
       else
@@ -892,6 +906,8 @@ a_regmerge()			/* itoc.000516: 斷線時註冊單修復 */
       {
 	f_suck(fp, fpath);
 	fclose(fp);
+	unlink(fpath);
+	sprintf(fpath, "%s.sysop", FN_RUN_RFORM);
 	unlink(fpath);
       }
       vmsg("處理完畢，以後請小心！");

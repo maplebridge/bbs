@@ -984,6 +984,9 @@ ulist_edit(xo)			/* Thor: 可線上查看及修改使用者 */
   if (!HAS_PERM(PERM_ALLACCT) || acct_load(&acct, ulist_pool[xo->pos]->userid) < 0)
     return XO_NONE;
 
+  if (!adm_check())
+    return XO_FOOT;
+
   vs_bar("使用者設定");
   acct_setup(&acct, 1);
   return ulist_head(xo);

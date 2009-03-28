@@ -1129,6 +1129,7 @@ XoPost(bno)
   BRD *brd;
   int bits;
   char *str, fpath[64];
+  char BMstr[17];	/*by ryancid 砍到剩16*/
 
   brd = bshm->bcache + bno;
   if (!brd->brdname[0])	/* 已刪除的看板 */
@@ -1138,21 +1139,19 @@ XoPost(bno)
 
   if (currbno != bno)	/* 看板沒換通常是因為 every_Z() 回原看板 */
   {
-  /* 070403.songsongboy：不能亂看反匿名版 */
 #ifdef HAVE_UNANONYMOUS_BOARD
-    if (!strcmp(brd->brdname,BN_UNANONYMOUS))
+    /* 070403.songsongboy：不能亂看反匿名版 */
+    if (!strcmp(brd->brdname, BN_UNANONYMOUS))
     {
-      char reason[50];
-      char buf[80];
+      char reason[64];
 
-      if (vans("您確定要進入反匿名版嗎(Y/N)？[N] ") != 'y')
+      if (vans("您確定要進入反匿名版嗎(y/n)？[N] ") != 'y')
 	return -1;
 
       vmsg("請輸入觀看反匿名版之理由");
-      vget(b_lines, 0, "請輸入設定資料的理由：", reason, 50, DOECHO);
-      sprintf(buf, "理由：%s", reason);
-      alog("反匿名版", buf);
-
+      sprintf(reason, "理由：");
+      vget(b_lines, 0, "請輸入設定資料的理由：", reason + 6, 50, DOECHO);
+      alog("反匿名版", reason);
     }
 #endif
 #ifdef HAVE_MODERATED_BOARD
@@ -1173,8 +1172,8 @@ XoPost(bno)
       bbstate |= STAT_POST;
 
 #ifdef LOG_BRD_USIES
-  /* lkchu.981201: 閱讀看板記錄 */
-  brd_usies();
+    /* lkchu.981201: 閱讀看板記錄 */
+    brd_usies();
 #endif
 
     /* itoc.050613.註解: 人氣的減少不是在離開看板時，而是在進入新的看板或是離站時，
@@ -1187,15 +1186,15 @@ XoPost(bno)
     currbattr = brd->battr;
     strcpy(currboard, brd->brdname);
     str = brd->BM;
-    char BMstr[17];	/*by ryancid 砍到剩16*/
-    strncpy(BMstr, str, 16);
+
+    str_ncpy(BMstr, str, 16);
     if (strlen(str) > 16)
     {
       BMstr[14] = 0xA1;
       BMstr[15] = 0x4B;
-    }/*印出...*/
-    BMstr[16] = '\0';
-    sprintf(currBM, "板主：%s", *str <= ' ' ? "徵求中" : BMstr);/**/
+    }	/* 印出 "…" */
+
+    sprintf(currBM, "板主：%s", *str <= ' ' ? "徵求中" : BMstr);
 #ifdef HAVE_BRDMATE
     strcpy(cutmp->reading, currboard);
 #endif
@@ -2248,6 +2247,9 @@ class_newbrd(xo)
 
   if (!HAS_PERM(PERM_ALLBOARD))
     return XO_NONE;
+
+  if (!adm_check())
+    return;
 
   memset(&newboard, 0, sizeof(BRD));
 

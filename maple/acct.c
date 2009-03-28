@@ -285,6 +285,24 @@ adm_log(old, new)
 }
 
 
+int
+adm_check()
+{
+  char passbuf[PSWDLEN + 1];
+
+  if (!vget(b_lines, 0, "您即將使用站務功\能，請輸入密碼以確認：", passbuf, PSWDLEN + 1, NOECHO))
+    return 0;
+
+  if (chkpasswd(cuser.passwd, passbuf))
+  {
+    vmsg("密碼錯誤！");
+    return 0;
+  }
+
+  return 1;
+}
+
+
 void
 acct_show(u, adm)
   ACCT *u;
@@ -473,17 +491,6 @@ acct_setup(u, adm)
   ACCT x;
   int i, num;
   char *str, buf[80], pass[PSWDLEN + 1];
-#if 0
-  FILE *hello;          /* smiler.071030: 站簽個人化內使用者想對大家說的話 */
-  char helloworld[37];
-  char user_hello_path[256];
-
-  FILE *file_host;      /* smiler.071110: 個人選擇站簽 */
-  char host_path_name[64];
-  char host_choice_char[3];
-  int  host_choice_int;
-  char userid_tmp[64];
-#endif
 
   acct_show(u, adm);
 
@@ -1106,6 +1113,9 @@ brd_edit(bno)
 {
   BRD *bhdr, newbh;
   char *bname, src[64], dst[64];;
+
+  if (!adm_check())
+    return;
 
   vs_bar("看板設定");
   bhdr = bshm->bcache + bno;

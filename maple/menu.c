@@ -519,7 +519,7 @@ static MENU menu_system[] =
 
   "bin/admutil.so:a_xfile", PERM_SYSOP, - M_XFILES,
   "Xfile      【 系統檔案 】",
-  
+
   "bin/admutil.so:a_ias_bank", PERM_ALLADMIN, - M_XFILES,
   "IAS_Bank   【 給予福利 】",
 
@@ -1279,10 +1279,19 @@ menu()
 
       if (cmd <= M_XMENU)	/* 子目錄的 mode 要 <= M_XMENU */
       {
+	mode = 0;
+	if ((cmd == M_AMENU))
+	{
+	  if (!adm_check())
+	    goto every_key;
+	  else
+	    mode = MENU_FILM;
+	}
+
 	menu->level = PERM_MENU + mptr->desc[0];
 	menu = (MENU *) mptr->func;
 
-	mode = MENU_LOAD | MENU_DRAW;
+	mode |= MENU_LOAD | MENU_DRAW;
 	/* mode = MENU_LOAD | MENU_DRAW | MENU_FILM;	/* itoc.010304: 進入子選單重撥 movie */
 
 	depth++;

@@ -364,9 +364,9 @@ typedef struct BoardHeader
   usint readlevel;		/* 閱讀文章的權限 */
   usint postlevel;		/* 發表文章的權限 */
   usint battr;			/* 看板屬性 */
-  time4_t btime;			/* -1:bpost/blast 需要更新 */
+  time4_t btime;		/* -1:bpost/blast 需要更新 */
   int bpost;			/* 共有幾篇 post */
-  time4_t blast;			/* 最後一篇 post 的時間 */
+  time4_t blast;		/* 最後一篇 post 的時間 */
 }           BRD;
 
 
@@ -593,13 +593,13 @@ typedef struct
 typedef struct screenline
 {
   int oldlen;		/* previous line length */
-  int len;			/* current length of line */
-  int width;			/* padding length of ANSI codes */
-  int smod;			/* start of modified data */
-  int emod;			/* end of modified data */
-  int sso;			/* start of standout data */
-  int eso;			/* end of standout data */
-  uschar mode;			/* status of line, as far as update */ /* 由於 SL_* 的 mode 不超過八個，故用 uschar 即可 */
+  int len;		/* current length of line */
+  int width;		/* padding length of ANSI codes */
+  int smod;		/* start of modified data */
+  int emod;		/* end of modified data */
+  int sso;		/* start of standout data */
+  int eso;		/* end of standout data */
+  uschar mode;		/* status of line, as far as update */ /* 由於 SL_* 的 mode 不超過八個，故用 uschar 即可 */
   uschar data[ANSILINELEN];
 }          screenline;
 
