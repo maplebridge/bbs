@@ -3704,8 +3704,8 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   char *log;
   HDR *hdr;
 {
-  int pos, cur, ans, vtlen, maxlen;
-  char *dir, *userid, *verb, fpath[64], reason[80];
+  int pos, cur, maxlen;
+  char *dir, *userid, fpath[64], reason[80];
   int  ip_len;
   char my_ip[128];
   FILE *fp;
@@ -3716,10 +3716,6 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   if (hdr->xmode & POST_NOSCORE)
     return XO_NONE;
 
-  ans = '3';
-  verb = "0m==";
-  vtlen = 2;
-
   ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
 
   if (currbattr & BRD_POST_IP)
@@ -3727,7 +3723,7 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   else
     sprintf(my_ip, "\033[30m\033*/%s", get_my_ansi_ip());
 
-  maxlen = 63 - strlen(cuser.userid) - vtlen - ip_len;
+  maxlen = 63 - strlen(cuser.userid) - 2 - ip_len;
 
   userid = cuser.userid;
   str_ncpy(reason, log, maxlen);
@@ -3743,8 +3739,8 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;3%s\033[m \033[1;30m%s\033[m：\033[1;30m%-*s\033[1;30m%02d/%02d %02d:%02d\033[m%s\n",
-      verb, userid, maxlen, reason,
+    fprintf(fp, "\033[1;30m== %s：%-*s\033[;30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+      userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
     fclose(fp);
   }
@@ -3973,9 +3969,9 @@ post_append_score(xo, choose)
     prints("您的\033[1;3%s文\033[m內容：\n", (ans == '1') ? "1m推" :
                                            (ans == '2') ? "2m噓" :
                                                           "7m接");
-    prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+    prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s \033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen - 1, reason,
-      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     prints("\033[1;30m==============================================================================\033[m");
 
 #ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */

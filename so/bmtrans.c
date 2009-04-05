@@ -71,11 +71,11 @@ bmt_setperm(xo, hdr)
     pos++;
   }
 
-  if (!strcmp(pal.userid, "--------"))
+  if ((pal.userno == -1) && ((pos = brd_bno(pal.userid)) >= 0))
   {
-    brd = bshm->bcache + pal.userno;
+    brd = bshm->bcache + pos;
     strcpy(brd->BM, pal.ship);
-    rec_put(FN_BRD, brd, sizeof(BRD), pal.userno, NULL);
+    rec_put(FN_BRD, brd, sizeof(BRD), pos, NULL);
     unlink(fpath);
 
     time(&now);
@@ -95,7 +95,7 @@ bmt_setperm(xo, hdr)
     return 1;
   }
 
-  vmsg("申請案設定失敗，請至 sysop 板回報");
+  vmsg("設定申請案時發生錯誤，請至 sysop 板回報");
   return 0;
 }
 
@@ -358,8 +358,8 @@ bmt_add(xo)
   } while (ptr);
 
   memset(&pal, 0, sizeof(PAL));
-  strcpy(pal.userid, "--------");
-  pal.userno = bno;
+  strcpy(pal.userid, brd->brdname);
+  pal.userno = -1;
   strcpy(pal.ship, BMlist);
   rec_add(fpath, &pal, sizeof(PAL));
 
