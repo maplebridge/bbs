@@ -418,7 +418,7 @@ typedef	struct
 {
   int count;
   char title[CH_TTLEN];
-  short chno[0];
+  int chno[0];
 }	ClassHeader;
 
 

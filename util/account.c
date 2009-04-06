@@ -716,7 +716,7 @@ class_parse(key, key_xname)
       return CH_END;
     }
 
-    chx[chn++] = chp = (ClassHeader *) malloc(sizeof(ClassHeader) + count * sizeof(short));
+    chx[chn++] = chp = (ClassHeader *) malloc(sizeof(ClassHeader) + count * sizeof(int));
     memset(chp->title, 0, CH_TTLEN);
     strcpy(chp->title, key);
 
@@ -776,7 +776,7 @@ class_parse(key, key_xname)
 
 static int
 brdname_cmp(i, j)
-  short *i, *j;
+  int *i, *j;
 {
   return str_cmp(bhead[*i].brdname, bhead[*j].brdname);
 }
@@ -784,7 +784,7 @@ brdname_cmp(i, j)
 
 static int
 brdtitle_cmp(i, j)		/* itoc.010413: 依看板中文敘述排序 */
-  short *i, *j;
+  int *i, *j;
 {
   /* return strcmp(bhead[*i].title, bhead[*j].title); */
 
@@ -806,7 +806,7 @@ class_sort(cmp)
   bhead = bp = bshm->bcache;
   btail = bp + max;
 
-  chp = (ClassHeader *) malloc(sizeof(ClassHeader) + max * sizeof(short));
+  chp = (ClassHeader *) malloc(sizeof(ClassHeader) + max * sizeof(int));
 
   for (i = j = 0; i < max; i++, bp++)
   {
@@ -816,7 +816,7 @@ class_sort(cmp)
 
   chp->count = j;
 
-  qsort(chp->chno, j, sizeof(short), cmp);
+  qsort(chp->chno, j, sizeof(int), cmp);
 
   memset(chp->title, 0, CH_TTLEN);
   strcpy(chp->title, "Boards");
@@ -829,7 +829,7 @@ class_image()
 {
   int i, times;
   FILE *fp;
-  short len, pos[CH_MAX];
+  int len, pos[CH_MAX];
   ClassHeader *chp;
 
   for (times = 2; times > 0; times--)	/* itoc.010413: 產生二份 class image */
@@ -841,23 +841,23 @@ class_image()
     if (chn < 2)		/* lkchu.990106: 尚沒有分類 */
       return;
 
-    len = sizeof(short) * (chn + 1);
+    len = sizeof(int) * (chn + 1);
 
     for (i = 0; i < chn; i++)
     {
       pos[i] = len;
-      len += CH_TTLEN + chx[i]->count * sizeof(short);
+      len += CH_TTLEN + chx[i]->count * sizeof(int);
     }
 
     pos[i++] = len;
 
     if (fp = fopen(CLASS_RUNFILE, "w"))
     {
-      fwrite(pos, sizeof(short), i, fp);
+      fwrite(pos, sizeof(int), i, fp);
       for (i = 0; i < chn; i++)
       {
 	chp = chx[i];
-	fwrite(chp->title, 1, CH_TTLEN + chp->count * sizeof(short), fp);
+	fwrite(chp->title, 1, CH_TTLEN + chp->count * sizeof(int), fp);
 	free(chp);
       }
       fclose(fp);
