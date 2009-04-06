@@ -653,8 +653,9 @@ static BRD *bhead, *btail;
 
 
 static int
-class_parse(key)
+class_parse(key, key_xname)
   char *key;
+  char *key_xname;
 {
   char *str, *ptr, fpath[64];
   ClassHeader *chp;
@@ -687,6 +688,9 @@ class_parse(key)
   }
 
   /* build classes */
+  
+  if (key_xname)
+    sprintf(fpath, "gem/@/%s", key_xname);
 
   if (fp = fopen(fpath, "r"))
   {
@@ -748,7 +752,10 @@ class_parse(key)
       else
       {
 	/* recursive 地一層一層進去建 Class */
-	i = class_parse(hdr.title);
+	if (!strncmp(hdr.title, hdr.xname, strlen(hdr.xname)))
+	  i = class_parse(hdr.title, NULL);
+        else
+          i = class_parse(hdr.title, hdr.xname);
 
 	if (i == CH_END)
 	  continue;
@@ -829,7 +836,7 @@ class_image()
   {
     chn = 0;
     class_sort(times == 1 ? brdname_cmp : brdtitle_cmp);
-    class_parse(CLASS_INIFILE);
+    class_parse(CLASS_INIFILE, NULL);
 
     if (chn < 2)		/* lkchu.990106: 尚沒有分類 */
       return;
