@@ -751,6 +751,8 @@ bstamp2bno(stamp)
 {
   BRD *brd;
   int bno, max;
+  
+  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   bno = 0;
   brd = bshm->bcache;
@@ -781,6 +783,8 @@ brh_load()
 #ifndef ENHANCED_VISIT
   time4_t *bstp;
 #endif
+
+  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   memset(bits = brd_bits, 0, sizeof(brd_bits));
 #ifndef ENHANCED_VISIT
@@ -921,6 +925,8 @@ brh_save()
   int *base, *head, *tail, bhno, size;
   BRD *bhdr, *bend;
   char *bits;
+  
+  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   /* Thor.980830: lkchu patch:  還沒 load 就不用 save */
   if (!(base = brh_base))
@@ -2077,6 +2083,8 @@ class_zapall(xo)
 {
   BRD *brdp, *bend;
   int ans, bno;
+  
+  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   ans = vans("設定所有看板 (U)訂閱\ (Z)不訂閱\ (Q)取消？ [Q] ");
   if (ans != 'z' && ans != 'u')

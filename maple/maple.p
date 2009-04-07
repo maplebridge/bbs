@@ -77,6 +77,7 @@ UTMP *utmp_seek(HDR *hdr);
 void utmp_admset(int userno, usint status);
 int utmp_count(int userno, int show);
 UTMP *utmp_search(int userno, int order);
+void bshm_check(void);
 void bshm_init(void);
 void bshm_reload(void);
 int brd_bno(char *bname);

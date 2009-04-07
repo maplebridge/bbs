@@ -346,6 +346,8 @@ cmd_list(ap)
   fp = fopen(ftemp, "w");
 
   fputs("215 list of newsgroups follows\r\n", fp);
+  
+  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   brdp = bshm->bcache;
   bend = brdp + bshm->number;
@@ -373,6 +375,8 @@ brd_get(brdname)
   char *brdname;
 {
   BRD *bhdr, *tail;
+  
+  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   bhdr = bshm->bcache;
   tail = bhdr + bshm->number;

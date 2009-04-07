@@ -454,6 +454,8 @@ main(argc, argv)
 
   synctime = time(NULL) - 10 * 60;	/* 十分鐘內的新文章不需要 sync */
   number = synctime / 86400;
+  
+  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   brdp = bshm->bcache;
   bend = brdp + bshm->number;

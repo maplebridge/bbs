@@ -1484,6 +1484,8 @@ tn_main()
 
   tn_signals();	/* Thor.980806: 放於 tn_login前, 以便 call in不會被踢 */
   tn_login();
+  
+  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   board_main();
   gem_main();

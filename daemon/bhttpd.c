@@ -1411,6 +1411,8 @@ brd_get(bname)
   char *bname;
 {
   BRD *bhdr, *tail;
+  
+  system(FN_BIN_ACCOUNT);	/* smiler.090408: 準備好 bshm */
 
   bhdr = bshm->bcache;
   tail = bhdr + bshm->number;
@@ -1695,6 +1697,8 @@ init_mybrd(ap)
   char *uid;
   usint ulevel;
   BRD *bhdr, *tail;
+  
+  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   acct_fetch(ap);
   uno = ap->userno;

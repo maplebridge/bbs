@@ -246,7 +246,9 @@ init_bshm()
   for (;;)
   {
     n = *uptime;
-    if (n > 0)		/* bshm 已 initial 完成 */
+    
+    /* smiler.090408: 若 bshm 有異常狀況，強制 initial */
+    if (n > 0 && bshm->number)		/* bshm 已 initial 完成 */
       return;
 
     if (n < 0)

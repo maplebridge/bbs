@@ -373,6 +373,12 @@ BCACHE *bshm;
 
 
 void
+bshm_check()
+{
+  system(FN_BIN_ACCOUNT);       /* ½T©w¬O bshm ¥¿½T */
+}
+
+void
 bshm_init()
 {
   int i;

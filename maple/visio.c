@@ -1596,6 +1596,8 @@ vget_match(prefix, len, op)
 
     extern BCACHE *bshm;
     extern char brd_bits[];
+    
+    bshm_check();         /* smiler.090408: �ǳƦn bshm */
 
     perm = op & (BRD_L_BIT | BRD_R_BIT | BRD_W_BIT);
     bits = brd_bits;
