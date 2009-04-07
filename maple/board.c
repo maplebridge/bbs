@@ -1193,7 +1193,7 @@ XoPost(bno)
     strcpy(currboard, brd->brdname);
     str = brd->BM;
 
-    str_ncpy(BMstr, str, 16);
+    str_ncpy(BMstr, str, 17);
     if (strlen(str) > 16)
     {
       BMstr[14] = 0xA1;
