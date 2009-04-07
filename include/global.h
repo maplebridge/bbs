@@ -125,7 +125,7 @@
   /* --------------------------------------------------- */
   
   
-#define	FN_BIN_ACCOUNT	"/bin/account"	/* account.c 執行檔 */
+#define	FN_BIN_ACCOUNT	"bin/account"	/* account.c 執行檔 */
 
   /* --------------------------------------------------- */
   /* run/ 目錄下系統檔案                                 */

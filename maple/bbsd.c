@@ -1484,8 +1484,8 @@ tn_main()
 
   tn_signals();	/* Thor.980806: 放於 tn_login前, 以便 call in不會被踢 */
   tn_login();
-  
-  bshm_check();         /* smiler.090408: 準備好 bshm */
+
+  system(FN_BIN_ACCOUNT);       /* smiler.090408: 確定是 bshm 正確，若不正確直接修正 bshm */  
 
   board_main();
   gem_main();
