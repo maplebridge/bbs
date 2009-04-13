@@ -485,8 +485,6 @@ copy_post_IAS(hdr, fpath)
   char folder[64];
   HDR post;
   BRD *brdp, *bend;
-  
-  bshm_check();         /* smiler.090408: �ǳƦn bshm */
 
   brdp = bshm->bcache;
   bend = brdp + bshm->number;

@@ -228,8 +228,6 @@ bm_list(userid)			/* 顯示 userid 是哪些板的板主 */
 
   len = strlen(userid);
   outs("  \033[32m擔任板主：\033[37m");		/* itoc.010922: 換 user info 版面 */
-  
-  bshm_check();		/* smiler.090408: 準備好 bshm */
 
   bhead = bshm->bcache;
   btail = bhead + bshm->number;
@@ -996,8 +994,6 @@ brd_new(brd)
 {
   int bno;
   char fpath[64];
-  
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   vs_bar("建立新板");
 
@@ -1120,8 +1116,6 @@ brd_edit(bno)
 
   if (!adm_check())
     return;
-    
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   vs_bar("看板設定");
   bhdr = bshm->bcache + bno;

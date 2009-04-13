@@ -377,8 +377,6 @@ brd_get(bname)
   char *bname;
 {
   BRD *bhdr, *tail;
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   bhdr = bshm->bcache;
   tail = bhdr + bshm->number;
@@ -1318,8 +1316,6 @@ bbs_brd(ap, data, brdname)	/* itoc.030323: 寄信給看板 */
 
   char fpath_log[64];
   char content_log[256];
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   usint mybattr;
   BRD *brdp, *bend;

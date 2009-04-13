@@ -201,8 +201,6 @@ mf_item_bar(xo, mode)
   {
     BRD *bhead, *btail;
     int chn;
-    
-    bshm_check();         /* smiler.090408: �ǳƦn bshm */
 
     chn = 0;
     invalid = 1;

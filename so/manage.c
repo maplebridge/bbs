@@ -81,8 +81,6 @@ post_terminator(xo)		/* Thor.980521: 終極文章刪除大法 */
 
     /* Thor.980616: 記下 currboard，以便復原 */
     strcpy(tmpboard, currboard);
-    
-    system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
     head = bhdr = bshm->bcache;
     tail = bhdr + bshm->number;

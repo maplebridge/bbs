@@ -751,8 +751,6 @@ bstamp2bno(stamp)
 {
   BRD *brd;
   int bno, max;
-  
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   bno = 0;
   brd = bshm->bcache;
@@ -783,8 +781,6 @@ brh_load()
 #ifndef ENHANCED_VISIT
   time4_t *bstp;
 #endif
-
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   memset(bits = brd_bits, 0, sizeof(brd_bits));
 #ifndef ENHANCED_VISIT
@@ -925,8 +921,6 @@ brh_save()
   int *base, *head, *tail, bhno, size;
   BRD *bhdr, *bend;
   char *bits;
-  
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   /* Thor.980830: lkchu patch:  還沒 load 就不用 save */
   if (!(base = brh_base))
@@ -1048,7 +1042,11 @@ static void
 czh_load()
 {
   int fsize, chn, min_chn;
+#ifdef	DEBUG_ClassHeader_INT
   int *chx;
+#else
+  short *chx;
+#endif
   char *img, fpath[64];
   CZH *chead, *ctail, *czh;
 
@@ -1066,7 +1064,11 @@ czh_load()
     {
       for (chn = CH_END - 2;; chn--)	/* 在所有的分類中找一個板名相同的 */
       {
-	chx = (int *) img + (CH_END - chn);
+#ifdef	DEBUG_ClassHeader_INT
+        chx = (int *) img + (CH_END - chn);
+#else
+	chx = (short *) img + (CH_END - chn);
+#endif
 	if (!strncmp(czh->brdname, img + *chx, BNLEN))
 	{
 	  class_bits[-chn] |= BRD_Z_BIT;
@@ -1286,8 +1288,13 @@ static int class_hot = 0;
 
 static int
 mantime_cmp(a, b)	/* smiler.070602: 看板人氣排序 */
+#ifdef	DEBUG_ClassHeader_INT
 int *a;
 int *b;
+#else
+short *a;
+short *b;
+#endif
 {
   return bshm->mantime[*b] - bshm->mantime[*a];
 }
@@ -1300,7 +1307,11 @@ static int
 class_load(xo)
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *cbase, *chead, *ctail;
+#else
+  short *cbase, *chead, *ctail;
+#endif
   int chn;			/* ClassHeader number */
   int pos, max, val, zap;
   int bnum = 0;			/* smiler.070602: for熱門看板 */
@@ -1313,21 +1324,37 @@ class_load(xo)
 
   chn = CH_END - xo->key;
 
+#ifdef	DEBUG_ClassHeader_INT
   cbase = (int *) class_img;
+#else
+  cbase = (short *) class_img;
+#endif
   chead = cbase + chn;
 
   pos = chead[0] + CH_TTLEN;
   max = chead[1];
 
+#ifdef	DEBUG_ClassHeader_INT
   chead = (int *) ((char *) cbase + pos);
   ctail = (int *) ((char *) cbase + max);
+#else
+  chead = (short *) ((char *) cbase + pos);
+  ctail = (short *) ((char *) cbase + max);
+#endif
 
   max -= pos;
 
+#ifdef	DEBUG_ClassHeader_INT
   if (cbase = (int *) xo->xyz)
     cbase = (int *) realloc(cbase, max);
   else
     cbase = (int *) malloc(max);
+#else
+  if (cbase = (short *) xo->xyz)
+    cbase = (short *) realloc(cbase, max);
+  else
+    cbase = (short *) malloc(max);
+#endif
 
   xo->xyz = (char *) cbase;
 
@@ -1363,7 +1390,11 @@ class_load(xo)
   if (class_hot && bnum > 0)
   {
     cbase -= bnum;
-    xsort(cbase, bnum, sizeof(int), mantime_cmp);
+#ifdef	DEBUG_ClassHeader_INT
+    xsort(cbase, bnum, sizeof(int), mantime_cmp)
+#else
+    xsort(cbase, bnum, sizeof(short), mantime_cmp);
+#endif
   }
 
   xo->max = max;
@@ -1708,12 +1739,20 @@ class_bar(xo, mode)
   XO *xo;
   int mode;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   BRD *brd;
   int chn, cnt, brdpost;
 
   cnt = xo->pos + 1;
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
   chn = *chp;
   brd = bshm->bcache + chn;
   brdpost = class_flag & UFO_BRDPOST;
@@ -1727,11 +1766,19 @@ class_bar(xo, mode)
   }
   else
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chx;
+#else
+    short *chx;
+#endif
     char *img, *str;
 
     img = class_img;
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     str = img + *chx;
     prints("%s%6d%c  %-13.13s\033[1;3%dm%5.5s\033[m%s%-*.*s%s",
       mode ? UCBAR[UCBAR_BRD] : "",
@@ -1752,7 +1799,11 @@ static int
 class_body(xo)
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   BRD *bcache;
   int n, cnt, max, chn, brdpost;
 #ifdef AUTO_JUMPBRD
@@ -1771,7 +1822,11 @@ class_body(xo)
   {
     class_jumpnext = 0;
     n = xo->pos;
+#ifdef	DEBUG_ClassHeader_INT
     chp = (int *) xo->xyz + n;
+#else
+    chp = (short *) xo->xyz + n;
+#endif
 
     while (n < max)
     {
@@ -1804,7 +1859,11 @@ class_body(xo)
 #endif
 
   brdpost = class_flag & UFO_BRDPOST;
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + cnt;
+#else
+  chp = (short *) xo->xyz + cnt;
+#endif
 
   n = 3;
   move(3, 0);
@@ -1824,11 +1883,19 @@ class_body(xo)
       }
       else			/* 分類群組 */
       {
-	int *chx;
+#ifdef	DEBUG_ClassHeader_INT
+        int *chx;
+#else
+	short *chx;
+#endif
 	char *img, *str;
 
 	img = class_img;
-	chx = (int *) img + (CH_END - chn);
+#ifdef	DEBUG_ClassHeader_INT
+        chx = (int *) img + (CH_END - chn);
+#else
+	chx = (short *) img + (CH_END - chn);
+#endif
 	str = img + *chx;
 	prints("%6d%c  %-13.13s\033[1;3%dm%-5.5s\033[m%s\n",
 	  cnt, class_bits[-chn] & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ',
@@ -1936,7 +2003,11 @@ class_search(xo)
 
   if (vget(b_lines, 0, MSG_BID, buf, BNLEN + 1, DOECHO))
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chp, chn;
+#else
+    short *chp, chn;
+#endif
     BRD *bcache, *brd;
 
     str_lowest(buf, buf);
@@ -1944,7 +2015,11 @@ class_search(xo)
     bcache = bshm->bcache;
     pos = num = xo->pos;
     max = xo->max;
+#ifdef	DEBUG_ClassHeader_INT
     chp = (int *) xo->xyz;
+#else
+    chp = (short *) xo->xyz;
+#endif
 
     do
     {
@@ -1976,7 +2051,11 @@ class_searchBM(xo)
 
   if (vget(b_lines, 0, "請輸入板主：", buf, IDLEN + 1, DOECHO))
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chp, chn;
+#else
+    short *chp, chn;
+#endif
     BRD *bcache, *brd;
 
     str_lower(buf, buf);
@@ -1984,7 +2063,11 @@ class_searchBM(xo)
     bcache = bshm->bcache;
     pos = num = xo->pos;
     max = xo->max;
+#ifdef	DEBUG_ClassHeader_INT
     chp = (int *) xo->xyz;
+#else
+    chp = (short *) xo->xyz;
+#endif
 
     do
     {
@@ -2027,12 +2110,20 @@ class_zap(xo)
   XO *xo;
 {
   BRD *brd;
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   int pos, num, chn;
   char token;
 
   pos = xo->pos;
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + pos;
+#else
+  chp = (short *) xo->xyz + pos;
+#endif
   chn = *chp;
   if (chn >= 0)		/* 一般看板 */
   {
@@ -2058,7 +2149,11 @@ class_zap(xo)
   }
   else			/* 分類群組 */
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chx;
+#else
+    short *chx;
+#endif
     char *img, brdname[BNLEN + 1];
 
     /* itoc.010909: 要隨 class_body() 版面變 */
@@ -2067,7 +2162,11 @@ class_zap(xo)
     outc(num & BRD_Z_BIT ? TOKEN_ZAP_BRD : ' ');
 
     img = class_img;
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     str_ncpy(brdname, img + *chx, BNLEN + 1);
     czh_put(brdname);
   }
@@ -2083,8 +2182,6 @@ class_zapall(xo)
 {
   BRD *brdp, *bend;
   int ans, bno;
-  
-  bshm_check();         /* smiler.090408: 準備好 bshm */
 
   ans = vans("設定所有看板 (U)訂閱\ (Z)不訂閱\ (Q)取消？ [Q] ");
   if (ans != 'z' && ans != 'u')
@@ -2117,10 +2214,18 @@ static int
 class_visit(xo)		/* itoc.010128: 看板列表設定看板已讀 */
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   int chn;
 
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
   chn = *chp;
   if (chn >= 0)
   {
@@ -2140,10 +2245,18 @@ static int
 class_unvisit(xo)		/* itoc.010129: 看板列表設定看板未讀 */
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   int chn;
 
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
   chn = *chp;
   if (chn >= 0)
   {
@@ -2164,13 +2277,21 @@ class_nextunread(xo)
   XO *xo;
 {
   int max, pos, chn;
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   BRD *bcache, *brd;
 
   bcache = bshm->bcache;
   max = xo->max;
   pos = xo->pos;
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + pos;
+#else
+  chp = (short *) xo->xyz + pos;
+#endif
 
   while (++pos < max)
   {
@@ -2200,10 +2321,18 @@ class_edit(xo)
 {
   if (HAS_PERM(PERM_ALLBOARD | PERM_BM))
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chp;
+#else
+    short *chp;
+#endif
     int chn;
 
+#ifdef	DEBUG_ClassHeader_INT
     chp = (int *) xo->xyz + xo->pos;
+#else
+    chp = (short *) xo->xyz + xo->pos;
+#endif
     chn = *chp;
     if (chn >= 0)
     {
@@ -2270,12 +2399,20 @@ class_newbrd(xo)
 
   if (xo->key < CH_END)		/* 在分類群組裡面 */
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chx;
+#else
+    short *chx;
+#endif
     char *img, *str;
     char xname[BNLEN + 1];
 
     img = class_img;
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - xo->key);
+#else
+    chx = (short *) img + (CH_END - xo->key);
+#endif
     str = img + *chx;
 
     str_ncpy(xname, str, sizeof(xname));
@@ -2302,19 +2439,35 @@ static int
 class_browse(xo)
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   int chn;
 
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
   chn = *chp;
   if (chn < 0)		/* 進入分類 */
   {
 #if 1
     /* smiler.070602: for熱門看板 */
+#ifdef	DEBUG_ClassHeader_INT
     int *chx;
+#else
+    short *chx;
+#endif
     char *img, *str;
     img = class_img;
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     str = img + *chx;
 
     if (!strncmp(str, "HOT/", 4))	/* "HOT/" 名稱可自定，若改名也要順便改後面的長度 4 */
@@ -2426,7 +2579,11 @@ static int
 class_addMF(xo)
   XO *xo;
 {
+#ifdef	DEBUG_ClassHeader_INT
   int *chp;
+#else
+  short *chp;
+#endif
   int chn;
   MF mf;
   char fpath[64];
@@ -2434,7 +2591,11 @@ class_addMF(xo)
   if (!cuser.userlevel)
     return XO_NONE;
 
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
   chn = *chp;
 
   if (chn >= 0)		/* 一般看板 */
@@ -2461,11 +2622,19 @@ class_addMF(xo)
   }
   else			/* 分類群組 */
   {
+#ifdef	DEBUG_ClassHeader_INT
     int *chx;
+#else
+    short *chx;
+#endif
     char *img, *str, *ptr;
 
     img = class_img;
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     str = img + *chx;
 
     memset(&mf, 0, sizeof(MF));
@@ -2496,7 +2665,11 @@ MFclass_browse(name)
   char *name;
 {
   int chn, min_chn, len;
+#ifdef	DEBUG_ClassHeader_INT
   int *chx;
+#else
+  short *chx;
+#endif
   char *img, cname[BNLEN + 2];
 
   min_chn = bshm->min_chn;
@@ -2507,7 +2680,11 @@ MFclass_browse(name)
 
   for (chn = CH_END - 2; chn >= min_chn; chn--)
   {
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     if (!strncmp(img + *chx, cname, len))
     {
       if (XoClass(chn))
@@ -2532,7 +2709,11 @@ XoAuthor(xo)
   XO *xo;
 {
   int chn, len, max, tag, value;
+#ifdef	DEBUG_ClassHeader_INT
   int *chp, *chead, *ctail;
+#else
+  short *chp, *chead, *ctail;
+#endif
   BRD *brd;
   char key[30], author[IDLEN + 1];
   XO xo_a, *xoTmp;
@@ -2548,12 +2729,20 @@ XoAuthor(xo)
   str_lower(author, author);
   len = strlen(author);
 
+#ifdef	DEBUG_ClassHeader_INT
   chead = (int *) xo->xyz;
+#else
+  chead = (short *) xo->xyz;
+#endif
   max = xo->max;
   ctail = chead + max;
 
   tag = 0;
+#ifdef	DEBUG_ClassHeader_INT
   chp = (int *) malloc(max * sizeof(int));
+#else
+  chp = (short *) malloc(max * sizeof(short));
+#endif
   brd = bshm->bcache;
 
   do
@@ -2694,7 +2883,11 @@ Class2()
 {
 #ifdef	MEICHU_WIN
   int chn, min_chn;
+#ifdef	DEBUG_ClassHeader_INT
   int *chx;
+#else
+  short *chx;
+#endif
   char *img, *str;
   const char *name = "NthuMeichu/";
   
@@ -2705,7 +2898,11 @@ Class2()
   
   for (chn = CH_END - 2; chn >= min_chn; chn--)
   {
+#ifdef	DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
+#else
+    chx = (short *) img + (CH_END - chn);
+#endif
     if (!strncmp(img + *chx, name, strlen(name)))
     {
       more("brd/MeichuWin/note", NULL);

@@ -373,16 +373,6 @@ BCACHE *bshm;
 
 
 void
-bshm_check()
-{
-  /* smiler.090408: 若 bshm 不正常，直接趕使用者下站，
-     並由重上站之過程重新 initial 正確之 bshm         */
-
-  if (bshm->number < 1)
-     abort_bbs();
-}
-
-void
 bshm_init()
 {
   int i;

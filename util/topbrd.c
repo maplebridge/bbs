@@ -47,8 +47,6 @@ brd_get(brdname)
   char *brdname;
 {
   BRD *bhdr, *tail;
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: �ǳƦn bshm */
 
   bhdr = bshm->bcache;
   tail = bhdr + bshm->number;

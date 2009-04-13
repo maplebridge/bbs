@@ -130,8 +130,6 @@ update_btime(brdname)
   char *brdname;
 {
   BRD *brdp, *bend;
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   brdp = bshm->bcache;
   bend = brdp + bshm->number;
@@ -306,8 +304,6 @@ bbspost_topic_add(board, addr, nick ,board_from)
     return;
   }
 #endif
-
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   brdp = bshm->bcache;
   bend = brdp + bshm->number;
@@ -527,8 +523,6 @@ bbspost_add(board, addr, nick)
 
   char fpath_log[64];
   char content_log[256];
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   usint mybattr;
   BRD *brdp, *bend;

@@ -418,7 +418,11 @@ typedef	struct
 {
   int count;
   char title[CH_TTLEN];
-  int chno[0];
+#ifdef	DEBUG_ClassHeader_INT
+  int  chno[0];
+#else
+  short chno[0];
+#endif
 }	ClassHeader;
 
 

@@ -246,9 +246,7 @@ init_bshm()
   for (;;)
   {
     n = *uptime;
-    
-    /* smiler.090408: 若 bshm 有異常狀況，強制 initial */
-    if (n > 0 && bshm->number)		/* bshm 已 initial 完成 */
+    if (n > 0)		/* bshm 已 initial 完成 */
       return;
 
     if (n < 0)
@@ -718,7 +716,11 @@ class_parse(key, key_xname)
       return CH_END;
     }
 
+#ifdef	DEBUG_ClassHeader_INT
     chx[chn++] = chp = (ClassHeader *) malloc(sizeof(ClassHeader) + count * sizeof(int));
+#else
+    chx[chn++] = chp = (ClassHeader *) malloc(sizeof(ClassHeader) + count * sizeof(short));
+#endif
     memset(chp->title, 0, CH_TTLEN);
     strcpy(chp->title, key);
 
@@ -778,7 +780,11 @@ class_parse(key, key_xname)
 
 static int
 brdname_cmp(i, j)
+#ifdef	DEBUG_ClassHeader_INT
   int *i, *j;
+#else
+  short *i, *j;
+#endif
 {
   return str_cmp(bhead[*i].brdname, bhead[*j].brdname);
 }
@@ -786,7 +792,11 @@ brdname_cmp(i, j)
 
 static int
 brdtitle_cmp(i, j)		/* itoc.010413: 依看板中文敘述排序 */
+#ifdef	DEBUG_ClassHeader_INT
   int *i, *j;
+#else
+  short *i, *j;
+#endif
 {
   /* return strcmp(bhead[*i].title, bhead[*j].title); */
 
@@ -808,7 +818,11 @@ class_sort(cmp)
   bhead = bp = bshm->bcache;
   btail = bp + max;
 
+#ifdef	DEBUG_ClassHeader_INT
   chp = (ClassHeader *) malloc(sizeof(ClassHeader) + max * sizeof(int));
+#else
+  chp = (ClassHeader *) malloc(sizeof(ClassHeader) + max * sizeof(short));
+#endif
 
   for (i = j = 0; i < max; i++, bp++)
   {
@@ -818,7 +832,11 @@ class_sort(cmp)
 
   chp->count = j;
 
+#ifdef	DEBUG_ClassHeader_INT
   qsort(chp->chno, j, sizeof(int), cmp);
+#else
+  qsort(chp->chno, j, sizeof(short), cmp);
+#endif
 
   memset(chp->title, 0, CH_TTLEN);
   strcpy(chp->title, "Boards");
@@ -831,7 +849,11 @@ class_image()
 {
   int i, times;
   FILE *fp;
+#ifdef	DEBUG_ClassHeader_INT
   int len, pos[CH_MAX];
+#else
+  short len, pos[CH_MAX];
+#endif
   ClassHeader *chp;
 
   for (times = 2; times > 0; times--)	/* itoc.010413: 產生二份 class image */
@@ -843,23 +865,39 @@ class_image()
     if (chn < 2)		/* lkchu.990106: 尚沒有分類 */
       return;
 
+#ifdef	DEBUG_ClassHeader_INT
     len = sizeof(int) * (chn + 1);
+#else
+    len = sizeof(short) * (chn + 1);
+#endif
 
     for (i = 0; i < chn; i++)
     {
       pos[i] = len;
+#ifdef	DEBUG_ClassHeader_INT
       len += CH_TTLEN + chx[i]->count * sizeof(int);
+#else
+      len += CH_TTLEN + chx[i]->count * sizeof(short);
+#endif
     }
 
     pos[i++] = len;
 
     if (fp = fopen(CLASS_RUNFILE, "w"))
     {
+#ifdef	DEBUG_ClassHeader_INT
       fwrite(pos, sizeof(int), i, fp);
+#else
+      fwrite(pos, sizeof(short), i, fp);
+#endif
       for (i = 0; i < chn; i++)
       {
 	chp = chx[i];
-	fwrite(chp->title, 1, CH_TTLEN + chp->count * sizeof(int), fp);
+#ifdef	DEBUG_ClassHeader_INT
+        fwrite(chp->title, 1, CH_TTLEN + chp->count * sizeof(int), fp);
+#else
+	fwrite(chp->title, 1, CH_TTLEN + chp->count * sizeof(short), fp);
+#endif
 	free(chp);
       }
       fclose(fp);

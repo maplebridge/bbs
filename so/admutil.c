@@ -954,8 +954,6 @@ make_bm_list(list)
   char *ptr, *str, buf[BMLEN + 1];
 
   /* 去 bshm 中抓出所有 brd->BM */
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   head = bshm->bcache;
   tail = head + bshm->number;

@@ -1270,8 +1270,6 @@ vote_all()		/* itoc.010414: 投票中心 */
   BRD *bhead, *btail;
   XO *xo;
   vbrd_t vbrd[MAXBOARD], *vb;
-  
-  system(FN_BIN_ACCOUNT);       /* smiler.090408: 準備好 bshm */
 
   bhead = bshm->bcache;
   btail = bhead + bshm->number;
