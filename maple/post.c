@@ -430,7 +430,8 @@ check_crosspost(fpath, bno)
     }
     board_main();
     mail_self(FN_ETC_CROSSPOST, str_sysop, "Cross-Post 停權", 0);
-    vmsg("您因為過度 Cross-Post 已被停權");
+    vmsg("您因為過度 Cross-Post 已被停權，請重新上站取得新權限");
+    abort_bbs();
     return 1;
   }
   return 0;
