@@ -66,7 +66,7 @@ telnet_flush(data, size)
   char *data;
   int size;
 {
-  int oset;
+  long oset;
 
   oset = 1;
 
@@ -1163,7 +1163,7 @@ zkey()				/* press any key or timeout */
   /* static */ struct timeval tv = {1, 100};  
   /* Thor.980806: man page 假設 timeval struct是會改變的 */
 
-  int rset;
+  long rset;
 
   rset = 1;
   select(1, (fd_set *) &rset, NULL, NULL, &tv);
@@ -1349,7 +1349,8 @@ igetch()
   static int imode = 0;
   static int idle = 0;
 
-  int cc, fd, nfds, rset;
+  int cc, fd, nfds;
+  long rset;
   uschar *data;
 
   data = vi_pool;

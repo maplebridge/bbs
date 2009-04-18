@@ -3772,7 +3772,7 @@ main(argc, argv)
         "\t-h  help\n",
         argv[0]);
       exit(0);
-    }       
+    }
   }
 
   servo_daemon(sock); 

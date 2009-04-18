@@ -1519,7 +1519,7 @@ telnet_init()
 
   int n, len;
   char *cmd;
-  int rset;
+  long rset;
   struct timeval to;
   char buf[64];
 
@@ -1567,7 +1567,7 @@ term_init()
     IAC, DO, TELOPT_NAWS
   };
 
-  int rset;
+  long rset;
   char buf[64], *rcv;
   struct timeval to;
 
@@ -1877,6 +1877,7 @@ main(argc, argv)
   char *argv[];
 {
   int csock;			/* socket for Master and Child */
+  long rset;
   int value;
   int *totaluser;
   struct sockaddr_in sin;
@@ -1913,8 +1914,8 @@ main(argc, argv)
 
   for (;;)
   {
-    value = 1;
-    if (select(1, (fd_set *) & value, NULL, NULL, NULL) < 0)
+    rset = 1;
+    if (select(1, (fd_set *) & rset, NULL, NULL, NULL) < 0)
       continue;
 
     value = sizeof(sin);

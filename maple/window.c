@@ -435,6 +435,7 @@ pmsg(msg)
   return x;
 }
 
+
 /* smiler.080201: 彈出式視窗，不需按按鍵，即會在delay一下後消失 */
 int
 delay_msg(msg,delay)
@@ -480,7 +481,7 @@ delay_msg(msg,delay)
 
   //x = vkey();
 
-  int ch;
+  long ch;
   int slideshow=delay;
   struct timeval tv[9] =
   {

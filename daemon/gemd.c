@@ -875,7 +875,7 @@ main(argc, argv)
         argv[0]);
       exit(0);
     }
-  }        
+  }
 
   servo_daemon(state);
 
@@ -962,7 +962,7 @@ main(argc, argv)
     tv.tv_usec = 0;
 
     nfds = select(nfds + 1, &rset, &wset, &xset, &tv);
-        
+
     if (nfds == 0)
     {
       continue;

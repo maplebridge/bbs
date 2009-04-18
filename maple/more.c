@@ -359,7 +359,7 @@ static int slideshow;		/* !=0: 播放 movie 的速度 */
 static int
 more_slideshow()
 {
-  int ch;
+  long ch;
 
   if (!slideshow)
   {
@@ -396,7 +396,7 @@ more_slideshow()
     }
   }
 
-  return ch;
+  return ((int) ch);
 }
 #endif
 

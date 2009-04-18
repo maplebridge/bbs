@@ -283,7 +283,7 @@ arrived()
 static int
 getkey()
 {
-  int fd;
+  long fd;
   struct timeval tv;
 
   fd = 1;

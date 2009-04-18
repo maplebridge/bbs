@@ -2708,7 +2708,8 @@ static int
 XoAuthor(xo)
   XO *xo;
 {
-  int chn, len, max, tag, value;
+  int chn, len, max, tag;
+  long value;
 #ifdef	DEBUG_ClassHeader_INT
   int *chp, *chead, *ctail;
 #else
