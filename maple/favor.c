@@ -1181,7 +1181,10 @@ mf_edit(xo)		/* itoc.010110: 我的最愛中看板修改 */
     if (bno >= 0)
     {
       if (!HAS_PERM(PERM_ALLBOARD))
-	brd_title(bno);
+      {
+	if (!brd_title(bno))
+	  return XO_NONE;
+      }
       else
 	brd_edit(bno);  
       return mf_init(xo);
@@ -1331,6 +1334,44 @@ pagewrap:
 
 
 static int
+mf_info(xo)
+  XO *xo;
+{
+  MF *mf;
+  BRD *brd;
+  int bno;
+
+  mf = (MF *) xo_pool + (xo->pos - xo->top);
+  if (mf->mftype & MF_BOARD)
+  {
+    if ((bno = brd_bno(mf->xname)) >= 0)
+    {
+      if (brd_bits[bno] & BRD_L_BIT)
+      {
+	brd = bshm->bcache + bno;
+
+	move(0, 0);
+	clrtoeol();
+	prints("   - 英文板名: %-13s                   - 看板分類: %s\n",
+	  brd->brdname, brd->class);
+	prints("   - 中文板名: %s\n", brd->title);
+	if (*brd->BM > ' ')
+	  prints("   - 板主名單: %s", brd->BM);
+	else
+	  prints("   - 本板應徵板主中");
+
+	clrtoeol();
+	move(xo->pos - xo->top + 3, 0);
+	vkey();
+	return mf_head(xo);
+      }
+    }
+  }
+  return XO_NONE;
+}
+
+
+static int
 mf_help(xo)
   XO *xo;
 {
@@ -1362,6 +1403,7 @@ static KeyFunc mf_cb[] =
   'v', mf_visit,
   'V', mf_unvisit,
   '`', mf_nextunread,
+  'i', mf_info,
 
   Ctrl('P'), mf_add,
   'C', mf_copy,

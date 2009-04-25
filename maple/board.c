@@ -2337,11 +2337,56 @@ class_edit(xo)
     if (chn >= 0)
     {
       if (!HAS_PERM(PERM_ALLBOARD))
-	brd_title(chn);		/* itoc.000312: 板主修改中文敘述 */
+      {
+	if (!brd_title(chn))		/* itoc.000312: 板主修改中文敘述 */
+	  return XO_NONE;
+      }
       else
 	brd_edit(chn);
       return class_init(xo);
     }
+  }
+  return XO_NONE;
+}
+
+
+static int
+class_info(xo)
+  XO *xo;
+{
+  BRD *bhdr;
+#ifdef	DEBUG_ClassHeader_INT
+  int *chp;
+#else
+  short *chp;
+#endif
+  int chn;
+
+#ifdef	DEBUG_ClassHeader_INT
+  chp = (int *) xo->xyz + xo->pos;
+#else
+  chp = (short *) xo->xyz + xo->pos;
+#endif
+  chn = *chp;
+
+  if (chn >= 0)
+  {
+    bhdr = bshm->bcache + chn;
+
+    move(0, 0);
+    clrtoeol();
+    prints("   - 英文板名: %-13s                   - 看板分類: %s\n",
+      bhdr->brdname, bhdr->class);
+    prints("   - 中文板名: %s\n", bhdr->title);
+    if (*bhdr->BM > ' ')
+      prints("   - 板主名單: %s", bhdr->BM);
+    else
+      prints("   - 本板應徵板主中");
+
+    clrtoeol();
+    move(xo->pos - xo->top + 3, 0);
+    vkey();
+    return class_head(xo);
   }
   return XO_NONE;
 }
@@ -2850,6 +2895,7 @@ static KeyFunc class_cb[] =
   'V', class_unvisit,
   '`', class_nextunread,
   'E', class_edit,
+  'i', class_info,
 
 #ifdef AUTHOR_EXTRACTION
   'A', XoAuthor,

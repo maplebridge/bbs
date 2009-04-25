@@ -3449,6 +3449,9 @@ post_edit_merge(hdr, fpath)
 }
 
 
+static void change_stamp(char *folder, HDR *hdr);
+
+
 int
 post_edit(xo)
   XO *xo;
@@ -3472,7 +3475,13 @@ post_edit(xo)
       return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
 
-    post_edit_merge(hdr, fpath);
+    if (!post_edit_merge(hdr, fpath))
+    {
+      change_stamp(xo->dir, hdr);
+      currchrono = hdr->chrono;
+      rec_put(xo->dir, hdr, sizeof(HDR), xo->pos, cmpchrono);
+      post_history(xo, hdr);
+    }
   }
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* 板主/原作者修改 */
   {
@@ -3482,7 +3491,13 @@ post_edit(xo)
       return XO_HEAD;
     }
 
-    post_edit_merge(hdr, fpath);
+    if (!post_edit_merge(hdr, fpath))
+    {
+      change_stamp(xo->dir, hdr);
+      currchrono = hdr->chrono;
+      rec_put(xo->dir, hdr, sizeof(HDR), xo->pos, cmpchrono);
+      post_history(xo, hdr);
+    }
   }
   else		/* itoc.010301: 提供使用者修改(但不能儲存)其他人發表的文章 */
 #if 1

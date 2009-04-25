@@ -1199,7 +1199,7 @@ brd_edit(bno)
 }
 
 
-void
+int
 brd_title(bno)		/* itoc.000312: 板主修改中文敘述 */
   int bno;
 {
@@ -1219,5 +1219,7 @@ brd_title(bno)		/* itoc.000312: 板主修改中文敘述 */
       memcpy(bhdr, &newbh, sizeof(BRD));
       rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
     }
+    return 1;
   }
+  return 0;
 }
