@@ -423,7 +423,8 @@ nbrd_add(xo)
     strcpy(nbrd.innsrv, "group.nctu.edu.tw");
     strcpy(nbrd.inngrp, "group.nthucs.");
     if (!vget(++i, 0, "轉信站台名稱：", nbrd.innsrv, sizeof(nbrd.innsrv), GCARRY) ||
-      !vget(++i, 0, "轉信群組名稱：", nbrd.inngrp, sizeof(nbrd.inngrp), GCARRY))
+      !vget(++i, 0, "轉信群組名稱：", nbrd.inngrp, sizeof(nbrd.inngrp), GCARRY) ||
+      !str_cmp(nbrd.inngrp, "group.nthucs."))
     {
       vmsg("取消設定轉信");
       isinn = 0;

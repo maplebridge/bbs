@@ -27,7 +27,6 @@ extern char anonymousid[];	/* itoc.010717: ¦Û©w°Î¦W ID */
 
 #ifdef DO_POST_FILTER
 static char bbs_dog_str[80];
-static char bbs_dog_title[80];
 #endif
 
 
@@ -116,8 +115,9 @@ IS_BBS_DOG_FOOD(fpath)
 
 
 static int	/* 0: ¤@¯ë¥¿±`¤å³¹  1: ³Q¾×¤U¨Ó¤F */
-post_filter(fpath)	/* smiler.080830 : ¬Ýªùª¯¹ï¤å³¹¤º®e¹LÂo */
+post_filter(fpath, title)	/* smiler.080830 : ¬Ýªùª¯¹ï¤å³¹¤º®e¹LÂo */
   char *fpath;		/* file path to be test */
+  char *title;
 {
   BRD *brd;
   char warn[70];
@@ -131,11 +131,11 @@ post_filter(fpath)	/* smiler.080830 : ¬Ýªùª¯¹ï¤å³¹¤º®e¹LÂo */
   {
     brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
     sprintf(content_log, "%s BBS¬Ýªùª¯­pµe: ¤å³¹±H¦^µ¹­ìpo\n§@ªÌ: %s\n¼ÐÃD: %s\n\n",
-      Now(), cuser.userid, bbs_dog_title);
+      Now(), cuser.userid, title);
     f_cat(fpath_log, content_log);
 
     sprintf(content_log, "%s BBS¬Ýªùª¯­pµe: ¤å³¹±H¦^µ¹­ìpo\n§@ªÌ: %s\n¬ÝªO: %s\n¼ÐÃD: %s\n¦r¦ê: %s\n\n",
-      Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
+      Now(), cuser.userid, currboard, title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
     vmsg("±z©Òpost¤å³¹¤£¬°¥»¯¸±µ¨ü¡A½Ð¬¢¥»¯¸¯¸°È¸s");
@@ -151,11 +151,11 @@ post_filter(fpath)	/* smiler.080830 : ¬Ýªùª¯¹ï¤å³¹¤º®e¹LÂo */
   {
     brd_fpath(fpath_log, currboard, FN_BBSDOG_LOG);
     sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: ¤å³¹±H¦^µ¹­ìpo\n§@ªÌ: %s\n¼ÐÃD: %s\n\n",
-      Now(), cuser.userid, bbs_dog_title);
+      Now(), cuser.userid, title);
     f_cat(fpath_log, content_log);
 
     sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: ¤å³¹±H¦^µ¹­ìpo\n§@ªÌ: %s\n¬ÝªO: %s\n¼ÐÃD: %s\n¦r¦ê: %s\n\n",
-      Now(), cuser.userid, currboard, bbs_dog_title, bbs_dog_str);
+      Now(), cuser.userid, currboard, title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
     vmsg("±z©Òpost¤å³¹¤£¬°¥»¬ÝªO±µ¨ü¡A½Ð¬¢¥»¬ÝªOªO¥D");
@@ -697,8 +697,7 @@ do_post(xo, title)
   }
 
 #ifdef DO_POST_FILTER
-  strcpy(bbs_dog_title, ve_title);
-  if (post_filter(fpath))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
+  if (post_filter(fpath, ve_title))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
   {
     unlink(fpath);
     pcurrhdr = NULL;
@@ -1475,7 +1474,7 @@ sysop_mbox_attr(hdr, attr, unread)
 #endif
 
 
-static char*
+static char *
 post_attr(hdr)
   HDR *hdr;
 {
@@ -1561,10 +1560,9 @@ post_attr(hdr)
 
   if (unread)
   {
-    if (attr == 'm' || attr == 'b')
+    if ((attr == 'm' || attr == 'b') || (mode & POST_BOTTOM))
       attr = '=';
-    else if (!(mode & POST_BOTTOM) &&
-      (attr != 'l' || (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))) )
+    else if (attr != 'l' || (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM)))
       attr = '~';
   }
 
@@ -2158,7 +2156,7 @@ post_cross(xo)
   if (rc != 'l' && rc != 's')
 #endif
     return XO_HEAD;
-    
+
   if ((xbattr & BRD_PUBLIC) && (rc == 'x'))	/* smiler.090308: Âà¤å¦Ü¤½²³ªO¤£±oÁôÂÃ */
     return XO_HEAD;
 
@@ -2197,8 +2195,6 @@ post_cross(xo)
 	strcpy(ve_title, hdr->title);
     }
 
-    strcpy(bbs_dog_title, ve_title);
-
     if (comefrom)	/* smiler.071114: »Ý¬°³B¦b¬ÝªO,¤U­±´X¦æ¤~»Ý§@§PÂ_ */
     {
       if (hdr->xmode & GEM_FOLDER)	/* «D plain text ¤£¯àÂà */
@@ -2220,13 +2216,13 @@ post_cross(xo)
     {
       brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
       sprintf(content_log, "%s BBS¬Ýªùª¯­pµe: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¼ÐÃD: %s\n\n",
-	Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", bbs_dog_title);
+	Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", ve_title);
       f_cat(fpath_log, content_log);
 
       sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
       sprintf(content_log, "%s BBS¬Ýªùª¯­pµe: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¬ÝªO: %s\n¼ÐÃD: %s\n¦r¦ê: %s\n\n",
 	Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c",
-	xboard, bbs_dog_title, bbs_dog_str);
+	xboard, ve_title, bbs_dog_str);
       f_cat(fpath_log, content_log);
 
       vmsg("±z©ÒÂà¿ý¤å³¹¤£¬°¥»¯¸±µ¨ü¡A½Ð¬¢¥»¯¸¯¸°È¸s");
@@ -2237,11 +2233,11 @@ post_cross(xo)
     if (IS_BRD_DOG_FOOD(fpath, xboard))
     {
       brd_fpath(fpath_log, xboard, FN_BBSDOG_LOG);
-      sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¼ÐÃD: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", bbs_dog_title);
+      sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¼ÐÃD: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", ve_title);
       f_cat(fpath_log, content_log);
 
       sprintf(fpath_log, FN_ETC_BBSDOG_LOG);
-      sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¬ÝªO: %s\n¼ÐÃD: %s\n¦r¦ê: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", xboard, bbs_dog_title, bbs_dog_str);
+      sprintf(content_log, "%s ¤å³¹¤º®e­­¨î: Âà¿ý¥¢±Ñ\n§@ªÌ: %s\n¨Ó·½: %s\n¬ÝªO: %s\n¼ÐÃD: %s\n¦r¦ê: %s\n\n", Now(), cuser.userid, comefrom ? (method ? tmpboard : currboard) : "­Ó¤H«H½c", xboard, ve_title, bbs_dog_str);
       f_cat(fpath_log, content_log);
 
       vmsg("±z©ÒÂà¿ý¤å³¹¤£¬°¹ï¤è¬ÝªO±µ¨ü¡A½Ð¬¢¬ÝªOªO¥D");
@@ -3066,7 +3062,6 @@ post_delete(xo)	/* ³æ¤@§R¤å */
   int pos, cur, by_BM;
   HDR *hdr;
   char buf[256];
-  char copied[64];
   char fpath[64], reason[55], title[70];
 
   /* smiler.1111: «OÅ@Deletelog ¥H¤Î Editlog ªº °O¿ý¤£³Q²¾°£ */
@@ -3148,13 +3143,6 @@ post_delete(xo)	/* ³æ¤@§R¤å */
       }
     }
 
-    /* smiler 1031 */
-    if (deletelog_use)
-    {
-      hdr_fpath(copied,xo->dir,hdr);
-      backup_post_log(copied, BN_DELLOG, hdr, 1);
-    }
-
     currchrono = hdr->chrono;
 
     if (!rec_del(xo->dir, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono))
@@ -3213,16 +3201,11 @@ delpost(xo, hdr)
   HDR *hdr;
 {
   char fpath[64];
-  char copied[64];
-
-  if (deletelog_use)
-  {
-    hdr_fpath(copied, xo->dir, hdr);
-    backup_post_log(copied, BN_DELLOG, hdr, 1);
-  }
 
   cancel_post(hdr);
   hdr_fpath(fpath, xo->dir, hdr);
+  if (deletelog_use)
+    backup_post_log(fpath, BN_DELLOG, hdr, 1);
   unlink(fpath);
   if (hdr->xmode & POST_RESTRICT)
     RefusePal_kill(currboard, hdr);
@@ -3361,27 +3344,123 @@ find_xname_by_chrono(chrono, xpath, mode)	/* °t¦X¬Ýªùª¯¡A­×§ï¤å³¹«á§ä°Æ¥»¤@¨Ö­×§
 
   return find;
 }
+
+
+static void	/* ­×§ï¤å³¹«á¡A¸ÕµÛ±N­ì¤å»P¸m©³¤å¦P¨B */
+post_bottom_sync(hdr, fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char xpath[64];
+
+  if (hdr->xmode & POST_BOTTOM)	/* ­×§ï¸m©³¤å¡A¥h§ä­ì¤å¤@°_§ï */
+  {
+    if (find_xname_by_chrono(hdr->parent_chrono, xpath, 1))
+    {
+      unlink(xpath);
+      f_ln(fpath, xpath);
+    }
+  }
+  else if (hdr->parent_chrono)	/* ¦¹½g¤å³¹¦³¸m©³°Æ¥»¡A¤@¨Ö§ó§ï¤§ */
+  {
+    if (find_xname_by_chrono(hdr->chrono, xpath, 0))
+    {
+      unlink(xpath);
+      f_ln(fpath, xpath);	/* ­«³] link, ¥H¨Ï¤º¤å¦P¨B */
+    }
+  }
+}
 #endif
+
+
+static int
+post_edit_merge(hdr, fpath)
+  HDR *hdr;
+  char *fpath;
+{
+  char tmp[64], ori[64], patch[64];
+  char cmd[128];
+  FILE *fp;
+  time4_t stamp = 0;
+  struct stat st;
+
+  sprintf(ori, "tmp/%s.%s.ori", currboard, hdr->xname);
+  if (dashf(ori))
+  {
+    vmsg("¦³¨ä¥L¤H¥¿¦b­×§ï³o½g¤å³¹");
+    return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
+  }
+  f_cp(fpath, ori, O_TRUNC);
+
+  if (!stat(fpath, &st))
+    stamp = st.st_size;
+
+  sprintf(tmp, "tmp/%s.%s.tmp", currboard, hdr->xname);
+  f_cp(fpath, tmp, O_TRUNC);	/* tmp ¦s³Æ¥÷¡A¨Ã¥B®³¨Ó°µ½s¿è */
+
+  /* ®³ tmp ¤U¥h°µ½s¿è¡A¦Ó«D­ì©lÀÉ */
+#ifdef DO_POST_FILTER	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
+  if (vedit(tmp, 0) || post_filter(tmpfile, hdr->title))
+#else
+  if (vedit(tmp, 0))
+#endif
+  {
+    unlink(ori);
+    unlink(tmp);
+    return 1;
+  }
+  else	/* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
+  {
+    if (!HAS_PERM(PERM_ALLBOARD) && (fp = fopen(tmp, "a")))
+    {
+      ve_banner(fp, 1);
+      fclose(fp);
+    }
+  }
+
+#if 1
+  sprintf(patch, "tmp/%s.%s.patch", currboard, hdr->xname);
+  sprintf(cmd, "diff -Nau %s %s > %s", ori, tmp, patch);
+  system(cmd);
+  backup_post_log(patch, BN_EDITLOG, hdr, 0);	/* °O¿ý­×§ï«e«á®t²§ */
+#else
+//  backup_post_log(fpath, BN_EDITLOG, hdr, 0);	/* ­×§ï«eªº­ì©l¤å³¹³Æ¥÷ */
+//  backup_post_log(tmp, BN_EDITLOG, hdr, 0);	/* §â­×§ï¹L«áªº¤å³¹³Æ¥÷ */
+#endif
+
+  if (!stat(fpath, &st) && (stamp == st.st_size))	/* ­ì©lÀÉ®×¥¼³Q­×§ï: ¨S¦³·s±À¤å */
+  {
+    unlink(fpath);
+    f_mv(tmp, fpath);
+  }
+  else		/* ­ì©lÀÉ®×¤w³Q­×§ï¡A¶i¦æ¦X¨Ö */
+  {
+    sprintf(cmd, "patch -s %s %s", fpath, patch);
+    system(cmd);
+
+    unlink(tmp);
+  }
+
+  unlink(ori);
+  unlink(patch);
+  post_bottom_sync(hdr, fpath);	/* ­×§ï¤å³¹«á¡A¸ÕµÛ±N­ì¤å»P¸m©³¤å¦P¨B */
+
+  return 0;
+}
 
 
 int
 post_edit(xo)
   XO *xo;
 {
-  char fpath[64], tmpfile[64];
+  char fpath[64];
   HDR *hdr;
-  FILE *fp;
-  /* smiler 1031 */
-  char copied[64];
 
   /* smiler.071111 «OÅ@ Editlog ¥H¤Î Deletelog ªOªº³Æ¥÷¸ê®Æ */
   if (!strcmp(currboard, BN_DELLOG) || !strcmp(currboard, BN_EDITLOG))
     return XO_NONE;
 
   hdr = (HDR *) xo_pool + (xo->pos - xo->top);
-
-  /* smiler 1031 */
-  hdr_fpath(copied, xo->dir, hdr);
   hdr_fpath(fpath, xo->dir, hdr);
 
   curredit = 0;
@@ -3393,50 +3472,7 @@ post_edit(xo)
       return (cutmp->mode == M_READA) ? XO_HEAD : XO_NONE;
 #endif
 
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
-
-#ifdef DO_POST_FILTER
-    strcpy(tmpfile, "tmp/");
-    strcat(tmpfile, hdr->xname);
-    f_cp(fpath, tmpfile, O_TRUNC);
-
-    vedit(tmpfile, 0);
-#else
-    vedit(fpath, 0);
-#endif
-
-#ifdef DO_POST_FILTER
-    strcpy(bbs_dog_title, hdr->title);
-    if (post_filter(tmpfile))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
-      unlink(tmpfile);
-    else
-    {
-      char xpath[64];
-
-      unlink(fpath);
-      f_ln(tmpfile, fpath);
-      unlink(tmpfile);
-
-      if (hdr->xmode & POST_BOTTOM)	/* ­×§ï¸m©³¤å¡A¥h§ä­ì¤å¤@°_§ï */
-      {
-	if (find_xname_by_chrono(hdr->parent_chrono, xpath, 1))
-	{
-	  unlink(xpath);
-	  f_ln(fpath, xpath);
-	}
-      }
-      else if (hdr->parent_chrono)	/* ¦¹½g¤å³¹¦³¸m©³°Æ¥»¡A¤@¨Ö§ó§ï¤§ */
-      {
-	if (find_xname_by_chrono(hdr->chrono, xpath, 0))
-	{
-	  unlink(xpath);
-	  f_ln(fpath, xpath);
-	}
-      }
-    }
-#endif
-
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
+    post_edit_merge(hdr, fpath);
   }
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* ªO¥D/­ì§@ªÌ­×§ï */
   {
@@ -3446,60 +3482,7 @@ post_edit(xo)
       return XO_HEAD;
     }
 
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
-
-#ifdef DO_POST_FILTER
-    strcpy(tmpfile, "tmp/");
-    strcat(tmpfile, hdr->xname);
-    f_cp(fpath, tmpfile, O_TRUNC);
-
-    if (!vedit(tmpfile, 0))	/* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
-    {
-      if (fp = fopen(tmpfile, "a"))
-      {
-#else
-    if (!vedit(fpath, 0))	/* ­Y«D¨ú®ø«h¥[¤W­×§ï¸ê°T */
-    {
-      if (fp = fopen(fpath, "a"))
-      {
-#endif
-	ve_banner(fp, 1);
-	fclose(fp);
-      }
-    }
-
-#ifdef DO_POST_FILTER
-    strcpy(bbs_dog_title, hdr->title);
-    if (post_filter(tmpfile))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
-      unlink(tmpfile);
-    else
-    {
-      char xpath[64];
-
-      unlink(fpath);
-      f_ln(tmpfile, fpath);
-      unlink(tmpfile);
-
-      if (hdr->xmode & POST_BOTTOM)	/* ­×§ï¸m©³¤å¡A¥h§ä­ì¤å¤@°_§ï */
-      {
-	if (find_xname_by_chrono(hdr->parent_chrono, xpath, 1))
-	{
-	  unlink(xpath);
-	  f_ln(fpath, xpath);
-	}
-      }
-      else if (hdr->parent_chrono)	/* ¦¹½g¤å³¹¦³¸m©³°Æ¥»¡A¤@¨Ö§ó§ï¤§ */
-      {
-	if (find_xname_by_chrono(hdr->chrono, xpath, 0))
-	{
-	  unlink(xpath);
-	  f_ln(fpath, xpath);
-	}
-      }
-    }
-#endif
-
-    backup_post_log(copied, BN_EDITLOG, hdr, 0);	/* smiler 1031 */
+    post_edit_merge(hdr, fpath);
   }
   else		/* itoc.010301: ´£¨Ñ¨Ï¥ÎªÌ­×§ï(¦ý¤£¯àÀx¦s)¨ä¥L¤Hµoªíªº¤å³¹ */
 #if 1
@@ -3588,13 +3571,14 @@ post_title(xo)
 
   /* smiler.080913: °»´ú©Ò§ï¼ÐÃD¬O§_²Å¦X¬Ýªùª¯³W©w */
   sprintf(tmpfile, "tmp/%s_%s_title", cuser.userid, mhdr.xname);
-  fp = fopen(tmpfile, "w");
-  fprintf(fp, "%s", mhdr.title);
-  fclose(fp);
+  if (fp = fopen(tmpfile, "w"))
+  {
+    fprintf(fp, "%s", mhdr.title);
+    fclose(fp);
+  }
 
 #ifdef DO_POST_FILTER
-  strcpy(bbs_dog_title, tmptitle);
-  if (post_filter(tmpfile))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
+  if (post_filter(tmpfile, tmptitle))	/* smiler.080830: °w¹ï¤å³¹¼ÐÃD¤º®e°»´ú¦³µL¤£·í¤§³B */
   {
     unlink(tmpfile);
     return XO_HEAD;
@@ -4574,6 +4558,7 @@ post_info(xo)
   value = atoi(hdr->value);
 
   move(0, 0);
+  clrtoeol();
   prints("ÀÉ®×¦WºÙ¡G#%s @ %-*s", hdr->xname, BNLEN + 2, currboard);
   prints("§@ªÌ¡G%-19.18s\n", hdr->owner);
 #ifdef HAVE_REFUSEMARK
