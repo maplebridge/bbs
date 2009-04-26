@@ -1522,9 +1522,11 @@ ve_banner(fp, modify)	/* 加上來源等訊息 */
   char *banner[5] = {EDIT_BANNER, EDIT_BANNER_1, EDIT_BANNER_2,
 			EDIT_BANNER_3, EDIT_BANNER_MEICHU_WIN};
 #else
-  char format[1] = {"%s @ %s"};
-  int width[1] = {54};
+  char *format[1] = {"%s從 (\033[1;30m%s"};
+  int width[1] = {11};
   char *banner[1] = {EDIT_BANNER};
+
+  width[0] += strlen(cuser.userid) + strlen(fromhost);
 #endif
 
 #ifdef HAVE_MULTI_SIGN
