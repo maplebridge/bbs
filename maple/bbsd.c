@@ -1259,7 +1259,7 @@ sysop_sudoer()
   sprintf(msg, "帳號 %s 正常SYSOP_SUDOER  ip: %s", usr_sysop_id, usr_sysop_ip);
   alog("站長登入", msg);
 
-  sprintf(buf, "%s，歡迎使用本系統，請小心使用 SYSOP 管理權限 !!", usr_sysop_id);
+  sprintf(buf, "%s，歡迎使用本系統，請小心使用 SYSOP 管理權限", usr_sysop_id);
   vmsg(buf);
 }
 #endif

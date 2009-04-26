@@ -1459,282 +1459,124 @@ ve_header(fp)
 /* ----------------------------------------------------- */
 
 
-#ifdef HAVE_MULTI_SIGN		/* 多種站簽選擇 */
+#ifdef HAVE_MULTI_SIGN	/* 多種站簽選擇 */
 static int
 get_sign_select()
 {
-  FILE *host_personal;
-  char host_personal_path[64];
-  char host_personal_choice_char[3];
-  int  host_personal_choice_int;
+  FILE *fp;
+  char fpath[64], buf[3];
+  int user_choice, select = 0;
 
-  FILE *file_tmp;
-  char buf_tmp[64];
+#define HOST_SIGN_NUMBER	4	/* 目前有四個站簽 */
 
-  int select;
-  int select_devide = 1;
-
-  host_sight_number = 4;  
-  if (host_sight_number)
+  sprintf(fpath, "gem/@/@host_%d", HOST_SIGN_NUMBER - 1);
+  if (dashf(fpath))
   {
-    sprintf(buf_tmp, "gem/@/@host_%d", host_sight_number - 1);
-    if (dashf(buf_tmp))
-    {
-      select_devide = host_sight_number;
-    }
+    select = time(0) % (HOST_SIGN_NUMBER * 2);	/* smiler.071030: 亂數站簽 */
+    if (select >= HOST_SIGN_NUMBER)
+      select = 0;
   }
 
-  select = time(0) % (select_devide);	/* smiler.071030: select witch 站簽 */
-
-  usr_fpath(host_personal_path, cuser.userid, "host");
-  if (host_personal = fopen(host_personal_path, "r"))
+  usr_fpath(fpath, cuser.userid, "host");
+  if (fp = fopen(fpath, "r"))
   {
-    fgets(host_personal_choice_char, 3, host_personal);
-    fclose(host_personal);
-  }
+    fgets(buf, 3, fp);
+    fclose(fp);
 
-  host_personal_choice_int = atoi(host_personal_choice_char);
-  if(host_personal_choice_int != 0)
-  {
-    if (host_personal_choice_int > 0 && host_personal_choice_int <= host_sight_number)
-      select = host_personal_choice_int - 1;
+    user_choice = atoi(buf);
+    if (user_choice > 0 && user_choice <= HOST_SIGN_NUMBER)
+      select = user_choice - 1;
+    else
+      select = 0;
   }
-
 
   /* 站長指定全站站簽選擇 */
   if (host_sight_select)
   {
-    sprintf(buf_tmp, "gem/@/@host_%d", host_sight_select-1);
-    if (file_tmp = fopen(buf_tmp, "r"))
-    {
-      fclose(file_tmp);
+    sprintf(fpath, "gem/@/@host_%d", host_sight_select - 1);
+    if (dashf(fpath))
       select = host_sight_select - 1;
-    }
   }
 
+#ifdef MEICHU_WIN
+  if (select == 0)
+    select = 4;
+#endif
+
   return select;
-}
-
-#ifdef	MEICHU_WIN
-static void
-append_banner_meichu(fp, my_ip)       /* 梅竹站簽 */
-  FILE *fp;
-  char *my_ip;
-{
-  int i;
-  char buf[64];
-  
-  i = 30;               /* 設定顯示寬度 */
-  sprintf(buf, "%s @ %s",
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
-#endif
-#ifdef SYSOP_MBOX_BRD
-    sysop_reply ? "SYSOP" :
-#endif
-    cuser.userid,
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? "納美克星" :
-#endif
-    my_ip);
-    
-  fprintf(fp,
-  "\n--\n"
-  "\033[42m   \033[0;30;42m◢\033[0;42m▏\033[0;30;42m◢\033[0;42m▏ \033[0;31;43m  我要  \033[0;42m                                                  \033[0;30;42m(((逃  \033[m\n"
-  "\033[42m \033[0;32;47m▉\033[1;37;40m▇█▇\033[42m◣ \033[0;31;43m 吃竹子 \033[42m  \033[0;33m   己丑梅竹賽將於 3/6 ~ 3/8 展開    \033[0;31;42m          ◣  ◣   \033[m\n"
-  "\033[42m \033[0;32;47m▊\033[1;37;40m███\033[1;37m -\033[1;37;42m▏   \033[0;33;42m▎                                                  \033[0;30;41m @) @)\033[0;31;40m\033[42m   \033[m\n"
-  "\033[42m \033[1;37;42m █████\033[42m    \033[0;33;42m▎    \033[0;33m 楓橋驛站邀請您  一同為清華大學加油 \033[0;31;42m    @     \033[0;31;42m◥\033[0;30;41m人\033[0;31;42m◤   \033[m\n"
-  "\033[0;32;47m▋\033[1;37;42m████◤  \033[1;37;42m,,\033[0;33;42m▎                                             \033[0;31;42m\\◢██\033[42m\033[1;30m█\033[0;31;42m▎   \033[m\n"
-  "\033[0;32;47m▌\033[1;37;40m█◤    \033[0;32m◥\033[0;30;42m◢█\033[m\033[42m     \033[1;34m From:%-*.*s      \033[0;31;42m/\\     /\\     \033[m\n",
-  i, i, buf
-  );
-}
-#endif
-
-static void
-append_banner1(fp, my_ip)	/* 站簽2 */
-  FILE *fp;
-  char *my_ip;
-{
-  int i;
-  char buf[64];
-
-  i = 31;		/* 設定顯示寬度 */
-  sprintf(buf, "%s從%s",
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
-#endif
-#ifdef SYSOP_MBOX_BRD
-    sysop_reply ? "SYSOP" :
-#endif
-    cuser.userid,
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? "納美克星" : 
-#endif
-    my_ip);
-/*
-　: ffffffa1 ffffff40
-◤: ffffffa2 ffffffab
-楓: ffffffb7 ffffffac
-橋: ffffffbe fffffff4
-驛: ffffffc5 ffffffe6
-站: ffffffaf ffffffb8
-˙: ffffffa3 ffffffbb
-◢: ffffffa2 ffffffa8
-▅: ffffffa2 00000066
-▌: ffffffa2 0000006d
-◆: ffffffa1 ffffffbb
-◣: ffffffa2 ffffffa9
-●: ffffffa1 ffffffb4
-◥: ffffffa2 ffffffaa
-
-*/
-  fprintf(fp,
-	"\n--\n"
-	"              \033[;30m%c\033[47m%c \033[m◣  \033[31m─\033[1;37m 楓橋藝文站正式開張！\033[;31m─\033[1;31m%c\033[;31m%c─\033[1;31m%c\033[;31m%c─\033[30;41m▍   \033[m \033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[1;36m%c\033[;36m%c\033[37m         \n"
-	"   \033[1;37m竟然不是 ‵\033[m \033[30;45m◣\033[47m︹\033[m▉ \033[1;36m　　　　　　　　　　\033[m            \033[30;41m▋ │\033[31;40m▉▄▅▆\033[37m             \n"
-	"   \033[1;37m紅蘿蔔！\033[m▄▅▇\033[1;30;47m \033[m;\033[47m \033[;30;47m \033[m \033[1;36m快來尋找你愛的作家。\033[m       \033[1;31m▃▆\033[41m◤\033[;30;41m ／＼\033[31m     \033[36m◢\033[46m    \033[30;47m◥\033[m       \n"
-	"          \033[30m \033[47m◣▃\033[45m%c\033[37;47m%c \033[1;31m%c\033[41m%c\033[;30;47m%c\033[40m%c\033[36m為你嘔心瀝血的作品找個窩。\033[37m \033[30;41m◣       \033[31m%c\033[36m%c\033[30m   \033[31m◢\033[30;46m＝＝＝\033[47m \033[37m%c\033[33;40m%c\033[37m      \n"
-	"                 \033[30;47m ◥\033[m  \033[1;36m文學版＋美工板，強烈邀請您。\033[m \033[30;41m◣▁▂  \033[36;46m \033[41m▆\033[46m         \033[30;47m◢\033[m       \n"
-	"      \033[30;42m%c\033[32m%c     \033[37m   %c\033[47m%c\033[30m.\033[37m%c\033[42m%c %-*.*s\033[30m \033[37m \033[31m◢\033[32;41m◢\033[42m          %c\033[30m%c\033[m         \033[m\n",
-
-	/*◤*/0xffffffa2,0xffffffab,/*˙*/0xffffffa3,0xffffffbb,/*˙*/0xffffffa3,0xffffffbb,/*楓*/0xffffffb7,0xffffffac,/*橋*/0xffffffbe,0xfffffff4,/*驛*/0xffffffc5,0xffffffe6,/*站*/0xffffffaf,0xffffffb8,/*˙*/0xffffffa3,0xffffffbb,
-	/*▅*/0xffffffa2,0x00000066,/*　*/0xffffffa1,0x00000040,/*◢*/0xffffffa2,0xffffffa8,/*◣*/0xffffffa2,0xffffffa9,/*◆*/0xffffffa1,0xffffffbb,
-	/*◣*/0xffffffa2,0xffffffa9,/*●*/0xffffffa1,0xffffffb4,/*●*/0xffffffa1,0xffffffb4,
-	i, i, buf,
-	/*◥*/0xffffffa2,0xffffffaa);
-}
-
-
-static void
-append_banner2(fp, my_ip)	/* 站簽3 */
-  FILE *fp;
-  char *my_ip;
-{
-  int i;
-  char buf[64];
-
-  i = 35 + 10;		/* 設定顯示寬度，記得把色碼長度加進去 */
-  sprintf(buf, "%s\033[37m 從\033[33m %s",
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS : 
-#endif
-#ifdef SYSOP_MBOX_BRD
-    sysop_reply ? "SYSOP" :
-#endif
-    cuser.userid,
-#ifdef HAVE_ANONYMOUS
-    (curredit & EDIT_ANONYMOUS) ? "納美克星" : 
-#endif
-    my_ip);
-
-  fprintf(fp,
-	"\n--\n"
-	"  ▄       ◢ ▄▄▄ ▄▄▄ ▄     ▄▄▄ \033[1;37m 清大資工\033[m                             \n"
-	"\033[1;37;44m  █ █◣◢█ █▄█ █▄█ █     █▄▄  \033[33m%-*.*s\033[m  \n"
-	"  █ █◥◤█ █  █ █     █▄▄ █▄▄ \033[1;37m【楓橋驛站】 telnet://imaple.tw\033[m       \033[m\n",
-	i, i, buf);
-}
-
-
-static void
-append_banner3(fp, my_ip)	/* 站簽4 */
-  FILE *fp;
-  char *my_ip;
-{
-/*
-▂ 0xffffffa2,0x00000063
-＿ 0xffffffa1,0xffffffc4
-◣ 0xffffffa2,0xffffffa9
-◢ 0xffffffa2,0xffffffa8
-。 0xffffffa1,0x00000043
-． 0xffffffa1,0x00000044
-◆ 0xffffffa1,0xffffffbb
-▁ 0xffffffa2,0x00000062
-￣ 0xffffffa1,0xffffffc3
-川 0xffffffa4,0x00000074
-◤ 0xffffffa2,0xffffffab
-兀 0xffffffa4,0x00000061
-。 0xffffffa1,0x00000043
-人 0xffffffa4,0x00000048
-*/
-  fprintf(fp,
-	"\n--\n"
-	"\033[;30m%c\033[44m%c_%c\033[1;30m%cˍ\033[33m（_\033[;34m▇▆\033[1;31;44m' * \033[;34;44m%c\033[31m%c_ \033[34;41m%c\033[31;44m%c%c\033[41m%c\033[34;40m▆▇\033[30;44m \033[37m▁_\033[30m ▄▆▇\033[m%c\033[33m%c\033[31m.\033[1;34m楓橋驛站%c\033[37m%c\033[30mtelnet://imaple.tw\033[;30m%c\033[41m%c\033[31;40m%c\033[41m%c\033[40m}\033[37m   \n"
-	" \033[34m=\033[37m%c\033[44m%c  ▔﹊\033[30m%c\033[34m%c   \033[31m*\033[33m.   \033[34;41m▆\033[1;30;44m%c\033[;30;41m%c@\033[31;44m▋ \033[30m▃\033[m▔   \033[1;35m▂~\033[5m+\033[;33m                                  \033[30m%c\033[31m%c\033[1;31m%c\033[;30m%c\033[37m   \n"
-	"   ￣\033[30;44m▃▂▁▂%c\033[31m%c\033[30m▁▂ˍ\033[31m_%c\033[41m%c\033[30m〢\033[44m_▇\033[33;40m.\033[31m*   \033[1;35m├=rom：\033[37m%s\033[m    \n"
-	"   \033[31m﹊￣﹊￣￣﹊﹊￣￣﹊￣﹊￣￣﹊\033[35m@%c\033[30m%c\033[31m￣￣﹊￣﹊￣￣﹊﹊￣￣﹊﹊￣￣﹊﹊￣﹊￣\033[37m    \033[m\n",
-	/*▂*/0xffffffa2,0x00000063,/*＿*/0xffffffa1,0xffffffc4,/*◣*/0xffffffa2,0xffffffa9,/*◣*/0xffffffa2,0xffffffa9,/*◢*/0xffffffa2,0xffffffa8,/*。*/0xffffffa1,0x00000043,/*．*/0xffffffa1,0x00000044,/*◆*/0xffffffa1,0xffffffbb,/*◣*/0xffffffa2,0xffffffa9,
-	/*▁*/0xffffffa2,0x00000062,/*￣*/0xffffffa1,0xffffffc3,/*川*/0xffffffa4,0x00000074,/*◤*/0xffffffa2,0xffffffab,/*兀*/0xffffffa4,0x00000061,
-	/*。*/0xffffffa1,0x00000043,/*◢*/0xffffffa2,0xffffffa8,
-#ifdef HAVE_ANONYMOUS
-	(curredit & EDIT_ANONYMOUS) ? "納美克星" :
-#endif
-	my_ip,
-	/*人*/0xffffffa4,0x00000048
-  );
 }
 #endif
 
 
 void
-ve_banner(fp, modify)       /* 加上來源等訊息 */
+ve_banner(fp, modify)	/* 加上來源等訊息 */
   FILE *fp;
-  int modify;           /* 1:修改 0:原文 */
+  int modify;	/* 1:修改 0:原文 */
 {
   /* itoc: 建議 banner 不要超過三行，過長的站簽可能會造成某些使用者的反感 */
+  char info[64], from[15];
+  int select = 0;
+#ifdef HAVE_MULTI_SIGN
+  char *format[5] = {"%s @ %s", "%s從%s", "%s\033[37m 從\033[33m %s", "%s", "%s @ %s"};
+  int width[5] = {54, 31, 45, 37, 30};	/* 設定顯示寬度，記得把色碼長度加進去 */
+  char *banner[5] = {EDIT_BANNER, EDIT_BANNER_1, EDIT_BANNER_2,
+			EDIT_BANNER_3, EDIT_BANNER_MEICHU_WIN};
+#else
+  char format[1] = {"%s @ %s"};
+  int width[1] = {54};
+  char *banner[1] = {EDIT_BANNER};
+#endif
 
 #ifdef HAVE_MULTI_SIGN
-  int select = get_sign_select();
+  select = get_sign_select();
 #endif
 
-  char my_ip[15];
 #ifdef HAVE_HIDE_FROM
   if (cuser.ufo2 & UFO2_CFROM)
-    str_ncpy(my_ip, cuser.cfrom, sizeof(my_ip));
+    str_ncpy(from, cuser.cfrom, sizeof(from));
   else
 #endif
-    sprintf(my_ip, "%s", get_my_ip());
+    sprintf(from, "%s", fromhost);
 
   if (!modify)
   {
 #ifdef HAVE_MULTI_SIGN
-    if (select == 0)	/* 站簽1 */
+    if (select == 3)
+      sprintf(info, format[3],
+#ifdef HAVE_ANONYMOUS
+	(curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
+#endif
+	from);
+    else
 #endif
     {
-#ifdef	MEICHU_WIN
-      append_banner_meichu(fp, my_ip);
-#else
-      fprintf(fp, EDIT_BANNER,
+      sprintf(info, format[select],
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? STR_ANONYMOUS :
 #endif
 #ifdef SYSOP_MBOX_BRD
 	sysop_reply ? "SYSOP" :
 #endif
-	cuser.userid,
+	cuser.userid, "");
+
+      if (strlen(info) + strlen(from) > width[select])
+	sprintf(from, "%s", get_my_ip());
+
+      sprintf(info, "%s%s", info,
 #ifdef HAVE_ANONYMOUS
 	(curredit & EDIT_ANONYMOUS) ? "雲與山的彼端 ^O^||" :
 #endif
-	my_ip);
-#endif
+	from);
     }
 
-#ifdef HAVE_MULTI_SIGN
-    else if (select == 1)		/* 站簽2 */
-      append_banner1(fp, my_ip);
-    else if (select == 2)		/* 站簽3 */
-      append_banner2(fp, my_ip);
-    else	/* 站簽4 */
-      append_banner3(fp, my_ip);
-#endif	/* HAVE_MULTI_SIGN */
+    fprintf(fp, banner[select], width[select], width[select], info);
   }
 
 #ifndef NO_MODIFY_BANNER
   else	/* 修改文章在此記錄 */
   {
     //fprintf(fp, MODIFY_BANNER, cuser.userid, fromhost, Now());
-      fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), my_ip);
+      fprintf(fp, MODIFY_BANNER, cuser.userid, Now(), from);
   }
 #endif
 }

@@ -295,7 +295,7 @@ adm_check()
 
   if (chkpasswd(cuser.passwd, passbuf))
   {
-    vmsg("密碼錯誤！");
+    vmsg("密碼錯誤");
     return 0;
   }
 
@@ -1148,7 +1148,7 @@ brd_edit(bno)
 	brd_classchange("gem/@/@"CLASS_INIFILE, bname, NULL);	/* itoc.020117: 刪除 @Class 中的看板精華區捷徑 */
 	/* if (!(bhdr->battr & BRD_NOTRAN)) */	/* 有可能只設定轉入不轉出，直接去 newsfeeds.bbs 找 */
 	if (brd_innchange(bname, NULL))
-	  vmsg("轉信資料已一併刪除！");
+	  vmsg("轉信資料已一併刪除");
 	memset(&newbh, 0, sizeof(BRD));
 	sprintf(newbh.title, "[%s] deleted by %s", bname, cuser.userid);
 	memcpy(bhdr, &newbh, sizeof(BRD));
@@ -1183,7 +1183,7 @@ brd_edit(bno)
 	  brd_classchange("gem/@/@"CLASS_INIFILE, bname, &newbh);/* itoc.050329: 異動 @Class 中的看板精華區捷徑 */
 	  /* if (!(bhdr->battr & BRD_NOTRAN)) */	/* 有可能只設定轉入不轉出，直接去 newsfeeds.bbs 找 */
 	  if (brd_innchange(bname, newbh.brdname))
-	    vmsg("轉信資料已一併更改！");
+	    vmsg("轉信資料已一併更改");
 
 	  /* itoc.050520: 改了板名會造成看板不是按字母排序，所以要修正 numberOld */
 	  if (bshm->numberOld > bno)
