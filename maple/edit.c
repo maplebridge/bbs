@@ -1538,7 +1538,7 @@ ve_banner(fp, modify)	/* 加上來源等訊息 */
     str_ncpy(from, cuser.cfrom, sizeof(from));
   else
 #endif
-    sprintf(from, "%s", fromhost);
+    str_ncpy(from, fromhost, sizeof(from));
 
   if (!modify)
   {
