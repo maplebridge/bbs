@@ -3707,7 +3707,6 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
   int pos, cur, maxlen;
   char *dir, *userid, fpath[64], reason[80];
   int  ip_len;
-  char my_ip[128];
   FILE *fp;
 
   pos = xo->pos;
@@ -3717,12 +3716,6 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     return XO_NONE;
 
   ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
-
-  if (currbattr & BRD_POST_IP)
-    sprintf(my_ip, " %s", get_my_ip());
-  else
-    sprintf(my_ip, "\033[30m\033*/%s", get_my_ansi_ip());
-
   maxlen = 63 - strlen(cuser.userid) - 2 - ip_len;
 
   userid = cuser.userid;
@@ -3739,9 +3732,11 @@ post_t_score(xo, log, hdr)	/* 轉錄文章記錄 */
     time(&now);
     ptime = localtime(&now);
 
-    fprintf(fp, "\033[1;30m== %s：%-*s\033[;30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
+    fprintf(fp, "\033[1;30m== %s：%-*s\033[;30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s%s\n",
       userid, maxlen - 1, reason,
-      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min,
+      (currbattr & BRD_POST_IP) ? " " : "\033[30m\033*/",
+      (currbattr & BRD_POST_IP) ? fromip : fromipcode);
     fclose(fp);
   }
 
@@ -3794,7 +3789,7 @@ post_append_score(xo, choose)
   char prompt[64];
   int  num_reason_record = 0;
   int  ip_len;
-  char my_ip[128];
+  char ip_str[48];
   FILE *fp;
 #ifdef HAVE_ANONYMOUS
   char uid[IDLEN + 1];
@@ -3891,23 +3886,9 @@ post_append_score(xo, choose)
   ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
 
   if (currbattr & BRD_POST_IP)
-  {
-#ifdef HAVE_ANONYMOUS
-    if (currbattr & BRD_ANONYMOUS)
-      strcpy(my_ip, " 才不告訴你呢");
-    else
-#endif
-      sprintf(my_ip, " %s", get_my_ip());
-  }
+    sprintf(ip_str, " %s", fromip);
   else
-  {
-#ifdef HAVE_ANONYMOUS
-    if (currbattr & BRD_ANONYMOUS)
-      strcpy(my_ip, "\033[30m\033*/----");
-    else
-#endif
-      sprintf(my_ip, "\033[30m\033*/%s", get_my_ansi_ip());
-  }
+    sprintf(ip_str, "\033[30m\033*/%s", fromipcode);
 
 #ifdef HAVE_ANONYMOUS
   if (currbattr & BRD_ANONYMOUS)
@@ -3927,6 +3908,14 @@ post_append_score(xo, choose)
     else
       strcat(userid, ".");		/* 自定的話，最後加 '.' */
     maxlen = 63 - strlen(userid) - vtlen - ip_len;
+
+    if (userid[0] != 'r' || userid[1] != '\0')	/* 匿名也要隱藏 IP */
+    {
+      if (currbattr & BRD_POST_IP)
+	strcpy(ip_str, " 才不告訴你呢");
+      else
+	strcpy(ip_str, "\033[30m\033*/----");
+    }
   }
   else
 #endif
@@ -3962,7 +3951,7 @@ post_append_score(xo, choose)
 
     fprintf(fp, "\033[1;3%s \033[36m%s\033[m：\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
       verb, userid, maxlen - 1, reason,
-      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+      ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
 
     move(0, 0);
     clrtoeol();
@@ -3974,7 +3963,7 @@ post_append_score(xo, choose)
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
     prints("\033[1;30m==============================================================================\033[m");
 
-#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
+#ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
     log_anonyscore(hdr->xname, reason);
 #endif
@@ -4003,18 +3992,18 @@ post_append_score(xo, choose)
 
       fprintf(fp, "%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
 	strlen(userid) + 5, "", maxlen - 1, reason,
-	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
 
-#ifdef HAVE_ANONYMOUS           /* 匿名推文記錄 */
+#ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
       if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
 	log_anonyscore(hdr->xname, reason);
 #endif
-      num_reason_record ++;
+      num_reason_record++;
 
       move(num_reason_record, 0);
       prints("%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
         strlen(userid) + 5, "", maxlen - 1, reason,
-        ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, my_ip);
+        ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
       prints("\033[1;30m==============================================================================\033[m");
 
       if (ans2 != 'y')
@@ -4282,7 +4271,7 @@ post_ishowbm(xo)
       (currbattr & BRD_PUBLIC) ? "\033[1;33mu\033[m" : " ", buf);
 
     prints("%s%s - 看板推文顯示: %s\n", mark, "!\033[m",
-      (currbattr & BRD_POST_IP) ? "ip" : "ip代碼");
+      (currbattr & BRD_POST_IP) ? "IP" : "IP 代碼");
 
     prints("   - 匿名看板: %s匿名%s",
       (currbattr & BRD_ANONYMOUS) ? "可" : "不可",

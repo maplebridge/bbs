@@ -622,135 +622,39 @@ utmp_setup(mode)
 }
 
 
-char *
-get_my_ip(void)
+static inline int
+ip_encode_color(num)
+  int num;
 {
-  static char my_ip[16] = {0};
-  uschar *addr;
-  addr = (uschar *) &tn_addr;
-  if (!my_ip[0])
-    sprintf(my_ip, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
-  return my_ip;
+  return (130 + ((num % 10) % 8));
 }
 
 
-char *
-get_my_ansi_ip(void)
+static inline char
+ip_encode_char(num)
+  int num;
 {
-  static char ansi_ip[48] = {0};
-  uschar *addr;
-  addr = (uschar *) &tn_addr;
-  int ip1, ip2, ip3, ip4;
-
-  if (!ansi_ip[0])
-  {
-    ip1 = (int) addr[0] ;
-    ip2 = (int) addr[1] ;
-    ip3 = (int) addr[2] ;
-    ip4 = (int) addr[3] ;
-    sprintf(ansi_ip, "%s", get_my_ansi_ip_char(ip1, ip2, ip3, ip4));
-  }
-
-  return ansi_ip;
-
+  return ((num % 10 ) / 8) ? ('A' + num / 10): ('a' + num / 10);
 }
 
 
-char *
-get_my_ansi_ip_char(ip1, ip2, ip3, ip4)
-  int ip1, ip2, ip3, ip4;
+static void
+ip_set()
 {
-  static char ansi_ip_now[48] = {0};
+  uschar *addr;
+  addr = (uschar *) &tn_addr;
 
-  sprintf(ansi_ip_now,
-#if 0
-       "\033[;%s3%dm%c"
-       "\033[;%s3%dm%c"
-       "\033[;%s3%dm%c"
-       "\033[;%s3%dm%c\033[m",
-
-    ( ( ip1 % 10 ) % 8) ? "" : "1;",
-    ( ip1 % 10 ) % 8,
-    ( ( ip1 % 10 ) / 8) ? (int) 'A' + ip1 / 10 : (int) 'a' + ip1 / 10,
-
-    ( ( ip2 % 10 ) % 8) ? "" : "1;",
-    ( ip2 % 10 ) % 8,
-    ( ( ip2 % 10 ) / 8) ? (int) 'A' + ip2 / 10 : (int) 'a' + ip2 / 10,
-
-    ( ( ip3 % 10 ) % 8) ? "" : "1;",
-    ( ip3 % 10 ) % 8,
-    ( ( ip3 % 10 ) / 8) ? (int) 'A' + ip3 / 10 : (int) 'a' + ip3 / 10,
-
-    ( ( ip4 % 10 ) % 8) ? "" : "1;",
-    ( ip4 % 10 ) % 8,
-    ( ( ip4 % 10 ) / 8) ? (int) 'A' + ip4 / 10 : (int) 'a' + ip4 / 10
-#else
-       "\033[13%dm%c"
-       "\033[13%dm%c"
-       "\033[13%dm%c"
-       "\033[13%dm%c\033[m",
-
-    ( ip1 % 10 ) % 8,
-    ( ( ip1 % 10 ) / 8) ? (int) 'A' + ip1 / 10 : (int) 'a' + ip1 / 10,
-
-    ( ip2 % 10 ) % 8,
-    ( ( ip2 % 10 ) / 8) ? (int) 'A' + ip2 / 10 : (int) 'a' + ip2 / 10,
-
-    ( ip3 % 10 ) % 8,
-    ( ( ip3 % 10 ) / 8) ? (int) 'A' + ip3 / 10 : (int) 'a' + ip3 / 10,
-
-    ( ip4 % 10 ) % 8,
-    ( ( ip4 % 10 ) / 8) ? (int) 'A' + ip4 / 10 : (int) 'a' + ip4 / 10
-#endif
+  sprintf(fromip, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
+  sprintf(fromipcode,
+       "\033[%dm%c"
+       "\033[%dm%c"
+       "\033[%dm%c"
+       "\033[%dm%c\033[m",
+    ip_encode_color(addr[0]), ip_encode_char(addr[0]),
+    ip_encode_color(addr[1]), ip_encode_char(addr[1]),
+    ip_encode_color(addr[2]), ip_encode_char(addr[2]),
+    ip_encode_color(addr[3]), ip_encode_char(addr[3])
   );
-
-  return ansi_ip_now;
-}
-
-
-int
-get_my_ansi_char_ip(i)
-  int i;
-{
-  char buf[2];
-  int i1;
-
-  move(i, 0);
-  clrtoeol();
-
-  move(i, 0);
-  outs("色碼: \033[1;30m0\033[m\033[31m1\033[32m2\033[33m3\033[34m4\033[35m5\033[36m6\033[37m7\033[m");
-
-  i++;
-  clrtoeol();
-  if(!vget(i, 0, "請輸入上方所顯示色碼[0-7]", buf, 2, DOECHO))
-    return 0;
-
-  i1 = (int)buf[0] - (int)'0';
-
-  if(i1 > 7 || i1 < 0)
-    return 0;
-
-  i++;
-  clrtoeol();
-  if(!vget(i, 0, "請輸入英文代碼[a-zA-Z]: ", buf, 2, DOECHO))
-    return 0;
-
-  if(buf[0] >= 'a' && buf[0] <= 'z')
-  {
-    return ((int) buf[0] - (int) 'a') * 10 + i1;
-  }
-  else if(buf[0] >= 'A' && buf[0] <= 'Z')
-  {
-    if(i1 > 1)
-      return 0;
-
-    return ((int) buf[0] - (int) 'A') * 10 + i1 + 8;
-  }
-  else
-    return 0;
-
-  return 0;
 }
 
 
@@ -1182,14 +1086,11 @@ sysop_sudoer()
   ACCT usr_sysop;
   char usr_sysop_id[IDLEN + 1];
   char usr_sysop_pw[PSWDLEN + 1];
-  char usr_sysop_ip[16];
   char msg[512], buf[64];
   int exit = 1;
 
-  sprintf(usr_sysop_ip, "%s", get_my_ip());
-
   /* 記錄登入 ip 來源 */
-  sprintf(msg, "登入來源: %s", usr_sysop_ip);
+  sprintf(msg, "登入來源: %s", fromip);
   alog("站長登入", msg);
 
   clear();
@@ -1202,7 +1103,7 @@ sysop_sudoer()
   {
     if (exit++ > 3)
     {
-      sprintf(msg, "嘗試過多錯誤離開SYSOP_SUDOER  登入來源: %s", usr_sysop_ip);
+      sprintf(msg, "嘗試過多錯誤離開SYSOP_SUDOER  登入來源: %s", fromip);
       alog("站長登入", msg);
       login_abort("\n嘗試錯誤過多次，請重新連線，再見 ...");
     }
@@ -1212,7 +1113,7 @@ sysop_sudoer()
 
     if (!str_cmp(usr_sysop_id, "exit"))
     {
-      sprintf(msg, "輸入exit以離開SYSOP_SUDOER  登入來源: %s", usr_sysop_ip);
+      sprintf(msg, "輸入exit以離開SYSOP_SUDOER  登入來源: %s", fromip);
       alog("站長登入", msg);
       login_abort("\n您輸入exit離開本系統，再見 ...");
     }
@@ -1235,7 +1136,7 @@ sysop_sudoer()
 
   if (chkpasswd(usr_sysop.passwd, usr_sysop_pw))
   {
-    sprintf(msg, "帳號 %s 輸入錯誤密碼而離開SYSOP_SUDOER  ip: %s", usr_sysop_id, usr_sysop_ip);
+    sprintf(msg, "帳號 %s 輸入錯誤密碼而離開SYSOP_SUDOER  ip: %s", usr_sysop_id, fromip);
     alog("站長登入", msg);
 
     /* 錯誤登入 log 記錄至被 try 的 id 裡 */
@@ -1251,12 +1152,12 @@ sysop_sudoer()
 
   if (!(usr_sysop.userlevel & PERM_ATOM))
   {
-    sprintf(msg, "帳號 %s 不具 ATOM權限而離開SYSOP_SUDOER  ip: %s", usr_sysop_id, usr_sysop_ip);
+    sprintf(msg, "帳號 %s 不具 ATOM權限而離開SYSOP_SUDOER  ip: %s", usr_sysop_id, fromip);
     alog("站長登入", msg);
     login_abort("\n您不具ATOM成員身分，再見 ...");
   }
 
-  sprintf(msg, "帳號 %s 正常SYSOP_SUDOER  ip: %s", usr_sysop_id, usr_sysop_ip);
+  sprintf(msg, "帳號 %s 正常SYSOP_SUDOER  ip: %s", usr_sysop_id, fromip);
   alog("站長登入", msg);
 
   sprintf(buf, "%s，歡迎使用本系統，請小心使用 SYSOP 管理權限", usr_sysop_id);
@@ -1435,31 +1336,26 @@ tn_main()
   clear();
 
 #ifdef HAVE_LOGIN_DENIED
-  char tn_addr_buf[15];		/* smiler.070719: ip address of string form */
-  sprintf(tn_addr_buf, "%s", get_my_ip());
-  if (acl_has(BBS_ACPFILE, "", "") != -1)	/* BBS_ACLFILE不存在*/
+  if (dashf(BBS_ACPFILE))
   {
-    if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", tn_addr_buf)))	/* smiler.070724 */
+    if ((!acl_has(BBS_ACPFILE, "", fromhost)) && (!acl_has(BBS_ACPFILE, "", fromip)))
     {
       move(2, 0);
-      outs("系統維護中,請稍後連入");
+      outs("系統維護中，請稍候再試");
       refresh();
       sleep(60);
-      login_abort("\n系統維護中,請稍後連入\n");
+      login_abort("\n系統維護中，請稍候再試\n");
     }
   }
-  else
+  else if (dashf(BBS_DNYFILE))
   {
-    if (acl_has(BBS_DNYFILE, "", "") != -1)
+    if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", fromip)))
     {
-      if ((acl_has(BBS_DNYFILE, "", fromhost)) || (acl_has(BBS_DNYFILE, "", tn_addr_buf)))	/* smiler.070724 */
-      {
-	move(2, 0);
-	outs("您的機器不被本站台接受");
-	refresh();
-	sleep(60);
-	login_abort("\n您的機器不被本站台接受\n");
-      }
+      move(2, 0);
+      outs("您的機器不被本站台接受");
+      refresh();
+      sleep(60);
+      login_abort("\n您的機器不被本站台接受\n");
     }
   }
 #endif
@@ -1910,8 +1806,6 @@ main(argc, argv)
   totaluser = &ushm->count;
   /* avgload = &ushm->avgload; */
 
-
-
   for (;;)
   {
     rset = 1;
@@ -1970,6 +1864,7 @@ main(argc, argv)
     tn_addr = sin.sin_addr.s_addr;
     dns_name((char *) &sin.sin_addr, fromhost);
     /* str_ncpy(fromhost, (char *)inet_ntoa(sin.sin_addr), sizeof(fromhost)); */
+    ip_set();
 
     telnet_init();
     term_init();

@@ -521,7 +521,7 @@ post_brd_prefix()
 /* ----------------------------------------------------- */
 
 
-/* smiler.090206: 設定看板推文ip顯示 */
+/* smiler.090206: 設定看板推文 IP 顯示 */
 int
 post_brd_ip_char()
 {
@@ -530,7 +530,7 @@ post_brd_ip_char()
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
-  switch (vkans("看板推文顯示 (1)ip (2)ip代碼 (Q)取消設定？[Q] "))
+  switch (vkans("看板推文顯示 (1)IP (2)IP 代碼 (Q)取消設定？[Q] "))
   {
   case '1':
     newbrd.battr |= BRD_POST_IP;
@@ -729,7 +729,10 @@ post_changeBM()
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
     return 0;
 
-  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+  if (oldbrd->battr & BRD_PUBLIC)	/* 公眾板不允許隨意更動 */
+    return 0;
+
+  if (!str_ncmp(oldbrd->brdname, "P_", 2))	/* 個人板不允許更改板主 */
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));

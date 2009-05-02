@@ -22,10 +22,6 @@ void alog(char *mode, char *msg);
 void blog(char *mode, char *msg);
 void u_exit(char *mode);
 void abort_bbs(void);
-char *get_my_ip(void);
-char *get_my_ansi_ip(void);
-char *get_my_ansi_ip_char(int ip1, int ip2, int ip3, int ip4);
-int get_my_ansi_char_ip(int i);
 
 /* bmw.c */
 int can_override(UTMP *up);

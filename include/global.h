@@ -455,6 +455,8 @@ VAR int b_cols;			/* bottom columns */
 VAR int d_cols;			/* difference columns from standard */
 
 VAR char fromhost[48];		/* from FQDN */
+VAR char fromip[16];		/* from IP */
+VAR char fromipcode[32];	/* from IP code */
 
 VAR char ve_title[80];		/* edited title */
 VAR char quote_file[80];

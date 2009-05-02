@@ -1514,17 +1514,17 @@ ve_banner(fp, modify)	/* ㄓ方单癟 */
   int modify;	/* 1:э 0:ゅ */
 {
   /* itoc: 某 banner ぃ璶禬筁︽筁帽穦硑Θ琘ㄇㄏノは稰 */
-  char info[64], from[15];
+  char info[64], *from;
   int select = 0;
 #ifdef HAVE_MULTI_SIGN
   char *format[5] = {"%s @ %s", "%s眖%s", "%s\033[37m 眖\033[33m %s", "%s", "%s @ %s"};
-  int width[5] = {54, 31, 45, 37, 30};	/* 砞﹚陪ボ糴癘眔р︹絏秈 */
   char *banner[5] = {EDIT_BANNER, EDIT_BANNER_1, EDIT_BANNER_2,
 			EDIT_BANNER_3, EDIT_BANNER_MEICHU_WIN};
+  int width[5] = {54, 31, 45, 37, 30};	/* 砞﹚陪ボ糴癘眔р︹絏秈 */
 #else
   char *format[1] = {"%s眖 (\033[1;30m%s"};
-  int width[1] = {11};
   char *banner[1] = {EDIT_BANNER};
+  int width[1] = {11};		/* strlen(眖 (\033[1;30m) */
 
   width[0] += strlen(cuser.userid) + strlen(fromhost);
 #endif
@@ -1535,10 +1535,10 @@ ve_banner(fp, modify)	/* ㄓ方单癟 */
 
 #ifdef HAVE_HIDE_FROM
   if (cuser.ufo2 & UFO2_CFROM)
-    str_ncpy(from, cuser.cfrom, sizeof(from));
+    from = cuser.cfrom;
   else
 #endif
-    str_ncpy(from, fromhost, sizeof(from));
+    from = fromhost;
 
   if (!modify)
   {
@@ -1562,7 +1562,7 @@ ve_banner(fp, modify)	/* ㄓ方单癟 */
 	cuser.userid, "");
 
       if (strlen(info) + strlen(from) > width[select])
-	sprintf(from, "%s", get_my_ip());
+	from = fromip;
 
       sprintf(info, "%s%s", info,
 #ifdef HAVE_ANONYMOUS

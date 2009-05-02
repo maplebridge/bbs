@@ -298,7 +298,7 @@ post_sibala(xo)
   fp = fopen(fpath, "w");
   fprintf(fp, "丟骰人   : %s\n", cuser.userid);
   fprintf(fp, "來源     : %s\n", fromhost);
-  fprintf(fp, "IP位址   : %s\n", get_my_ip());
+  fprintf(fp, "IP位址   : %s\n", fromip);
   fprintf(fp, "丟骰時間 : %02d/%02d/%02d %02d:%02d:%02d\n", 
     ptime->tm_year % 100, ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ptime->tm_sec);
   fprintf(fp, "標題名稱 : %s\n", title);

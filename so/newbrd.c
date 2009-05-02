@@ -245,7 +245,8 @@ nbrd_add(xo)
 {
   int i, fd, ans, days, numbers, ntype, readlevel, isinn;
   char *dir, fpath[64], path[64], buf[32], group[64];
-  char *brdname, *class, *title, *prefix, *plevel;
+  char class[BCLEN + 1], sub[BNLEN + 1];
+  char *brdname, *title, *prefix, *plevel;
   FILE *fp;
   NBRD nbrd;
 
@@ -270,7 +271,6 @@ nbrd_add(xo)
   memset(&nbrd, 0, sizeof(NBRD));
 
   brdname = nbrd.brdname;
-  class = nbrd.class;
   title = nbrd.title;
 
   clear();
@@ -278,8 +278,15 @@ nbrd_add(xo)
   if (ans == '1')	/* 新板連署 */
   {
     move (i = 2, 0);
-    outs("開板種類：1)個人/情侶 2)寢板 3)實驗室 4)社團 5)各系(級)所相關/活動板/課程板\n");
-    if (!vget(++i, 0, "          6)校隊/校務看板 7)團體板 8)綜合/其他[Q] ", buf, 3, LCECHO))
+    outs("          \033[1;33m1)\033[m個人\033[1;36m/\033[m情侶     "
+	"\033[1;33m2)\033[m寢板     \033[1;33m3)\033[m實驗室\n"
+	"          \033[1;33m4)\033[m社團\033[1;36m/\033[m校友會   "
+	"\033[1;33m5)\033[m各系(級)所相關|活動板\033[1;36m/\033[m官方課程板\n"
+	"          \033[1;33m6)\033[m校隊\033[1;36m/\033[m校務看板 "
+	"\033[1;33m7)\033[m團體板\033[1;36m/\033[m課程小組討論板 "
+	"\033[1;33m8)\033[m綜合\033[1;36m/\033[m其他\n");
+    i += 3;
+    if (!vget(i, 0, "開板種類？[Q] ", buf, 3, LCECHO))
       return XO_HEAD;
 
     switch (ntype = (*buf - '0'))
@@ -300,16 +307,18 @@ nbrd_add(xo)
       plevel = "社團";
       prefix = "";
       move(++i, 0);
-      outs("\n                  英文板名限定為 xxxxxxxxxxxx\n");
-      outs("                  若貴社團有多個看板，建議板名為：[英文縮寫].xxxxxxx\n");
-      i += 2;
+      outs("\n                  1. [社團主要看板] 英文板名應為：xxxxxxxxxxxx\n");
+      outs("                  2. 若您想申請社團的附屬看板，\n");
+      outs("                         板名應為：[英文縮寫].xxxxxxx，\n");
+      outs("                         [社團分類簡稱]、[英文縮寫] 請填寫一致的分類名稱\n");
+      i += 4;
       break;
     case 5:
       plevel = prefix = "";	/* 讓站長自己手動改 */
       move(++i, 0);
-      outs("\n                  系(級)板：[系名].[系級]      例：cs.12 清大資工 12 級級板\n");
-      outs("                    活動板：[系名].xxxxxx      例：cs.camp09 資工2009營隊板\n");
-      outs("                    課程板：板名自訂\n");
+      outs("\n                系(級)板：[系名].[系級]        例：cs.12 清大資工 12 級級板\n");
+      outs("                  活動板：[系名].xxxxxx        例：cs.camp09 資工2009營隊板\n");
+      outs("                  課程板：以課務組之課號為板名 例：isa5571  (限教師或助教開板)\n");
       i += 3;
       break;
     case 6:
@@ -328,6 +337,20 @@ nbrd_add(xo)
       break;
     default:
       return XO_HEAD;
+    }
+
+    if (ntype == 4)
+    {
+      if (vget(++i, 0, "社團分類簡稱：", class, BCLEN + 1, DOECHO) && strlen(class) == 4)
+	plevel = class;
+
+      if (vget(++i, 0, "是否要申請 [社團主要看板](y/n)？[N] ", buf, 3, LCECHO) != 'y')
+      {
+	if (!vget(++i, 0, "社團英文縮寫：", sub, sizeof(nbrd.brdname) - 3, DOECHO))
+	  return XO_HEAD;
+	strcat(sub, ".");
+	prefix = sub;
+      }
     }
 
     sprintf(buf, "英文板名：%s", prefix);
@@ -440,7 +463,7 @@ nbrd_add(xo)
   if ((ntype >= 4 && ntype <= 6) || ntype == 8)
     nbrd.mode |= NBRD_PUBLIC;
 
-  vmsg("開始編輯 [看板說明與板主抱負]");
+  vmsg("開始編輯 [看板說明與板主抱負]，不需再將申請看板的資料貼上一次！");
   sprintf(path, "tmp/%s.nbrd", cuser.userid);	/* 連署原因的暫存檔案 */
   if (fd = vedit(path, 0))
   {
@@ -482,7 +505,7 @@ nbrd_add(xo)
     fprintf(fp, "中文板名：%s\n", title);
     fprintf(fp, "板主名單：%s\n", cuser.userid);
     fprintf(fp, "電子信箱：%s\n", cuser.email);
-    fprintf(fp, "看板分類：%s\n", class);
+    fprintf(fp, "看板分類：%s\n", nbrd.class);
     if (ntype >= 4 && ntype <= 7)
     {
       switch (ntype)
@@ -886,6 +909,37 @@ nbrd_nf_add(nbrd)
 }
 
 
+static void
+personal_bm_list(userid)			/* 顯示 userid 是哪些個人板的板主 */
+  char *userid;
+{
+  int len;
+  char *list;
+  BRD *bhead, *btail;
+
+  len = strlen(userid);
+  outs("  \033[32m擔任個人板主：\033[37m");	/* itoc.010922: 換 user info 版面 */
+
+  bhead = bshm->bcache;
+  btail = bhead + bshm->number;
+
+  do
+  {
+    if (str_ncmp(bhead->brdname, "P_", 2))
+      continue;
+
+    list = bhead->BM;
+    if (str_has(list, userid, len))
+    {
+      outs(bhead->brdname);
+      outc(' ');
+    }
+  } while (++bhead < btail);
+
+  outc('\n');
+}
+
+
 static int
 nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
   XO *xo;
@@ -912,6 +966,15 @@ nbrd_open(xo)		/* itoc.010805: 開新板連署，連署完畢開新看板 */
 
   if (vans("請確定開啟看板(Y/N)？[N] ") == 'y')
   {
+    if (!str_ncmp(nbrd->brdname, "P_", 2))	/* 讓站務檢查申請人已擔任哪些看板板主 */
+    {
+      clear();
+      move(1, 0);
+      personal_bm_list(nbrd->owner);
+      if (vans("是否繼續(Y/N)？[N] ") != 'y')
+	return nbrd_init(xo);
+    }
+
     if (nbrd_newbrd(xo, nbrd))
     {
       nbrd->mode ^= NBRD_FINISH;
