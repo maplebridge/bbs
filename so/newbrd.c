@@ -331,6 +331,9 @@ nbrd_add(xo)
     case 7:
       plevel = "團體";
       prefix = "G_";
+      move(++i, 0);
+      outs("\n                若已您的團體已有其他看板，[團體分類簡稱] 請填寫一致的分類名稱\n");
+      i++;
       break;
     case 8:
       plevel = prefix = "";
@@ -351,6 +354,11 @@ nbrd_add(xo)
 	strcat(sub, ".");
 	prefix = sub;
       }
+    }
+    else if (ntype == 7)
+    {
+      if (vget(++i, 0, "團體分類簡稱：", class, BCLEN + 1, DOECHO) && strlen(class) == 4)
+	plevel = class;
     }
 
     sprintf(buf, "英文板名：%s", prefix);
