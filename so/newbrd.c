@@ -792,6 +792,22 @@ nbrd_finish(xo)
 }
 
 
+static void
+add_class(brd, class_name)
+  BRD *brd;
+  char *class_name;
+{
+  HDR hdr;
+  char fpath[64];
+
+  sprintf(fpath, "gem/@/@%s", class_name);
+
+  /* 加入適當的分類 */
+  brd2gem(brd, &hdr);
+  rec_add(fpath, &hdr, sizeof(HDR));
+}
+
+
 static int			/* 1:開板成功 */
 nbrd_newbrd(xo, nbrd)		/* 開新板 */
   XO *xo;
@@ -839,6 +855,9 @@ nbrd_newbrd(xo, nbrd)		/* 開新板 */
 
   if (brd_new(&newboard) < 0)
     return 0;
+
+  /* 加入分類群組 */
+  add_class(&newboard, "NewBoard");
 
   vmsg("新板成立，現在加入分類群組");
 

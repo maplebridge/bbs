@@ -1525,8 +1525,6 @@ ve_banner(fp, modify)	/* ㄓ方单癟 */
   char *format[1] = {"%s眖 (\033[1;30m%s"};
   char *banner[1] = {EDIT_BANNER};
   int width[1] = {11};		/* strlen(眖 (\033[1;30m) */
-
-  width[0] += strlen(cuser.userid) + strlen(fromhost);
 #endif
 
 #ifdef HAVE_MULTI_SIGN
@@ -1539,6 +1537,10 @@ ve_banner(fp, modify)	/* ㄓ方单癟 */
   else
 #endif
     from = fromhost;
+
+#ifndef HAVE_MULTI_SIGN
+  width[0] += strlen(cuser.userid) + strlen(from);
+#endif
 
   if (!modify)
   {
