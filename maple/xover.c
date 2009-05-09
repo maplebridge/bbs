@@ -604,7 +604,7 @@ xo_forward(xo)
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
     {
-      vmsg("本看板禁止轉錄 !!");
+      vmsg("本看板禁止轉錄");
       return XO_NONE;
     }
   }

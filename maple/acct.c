@@ -423,7 +423,7 @@ acct_set_violation(u)
     return 0;
 
   ans = vans("設定 1)優文 2)劣文 3)違規 Q)取消 [Q] ");
-  ans2 = vans("選擇 1)數字設定  2)觀看記錄  Q)取消 [Q] ");
+  ans2 = vans("選擇 1)數字設定 2)觀看記錄 Q)取消 [Q] ");
 
   if((ans > '3') || (ans < '1') || (ans2 > '2') || (ans2 < '1'))
     return 0;
@@ -431,7 +431,7 @@ acct_set_violation(u)
   move(3, 0);
   clrtobot();
   move(4, 0);
-  prints("%s --- %s\n", (ans=='1') ? "優文" : (ans=='2') ? "劣文" : "違規" ,
+  prints("%s --- %s\n", (ans=='1') ? "優文" : (ans=='2') ? "劣文" : "違規",
 			(ans2 == '1') ? "數字設定" : "觀看記錄");
 
   usr_fpath(fpath, acct.userid, (ans=='1') ? FN_GOOD_ARTICLE : (ans=='2') ? FN_POOR_ARTICLE : FN_VIOLATION);
@@ -441,20 +441,14 @@ acct_set_violation(u)
   if (ans2 == '1')
   {
     if (!vget(6, 0, "請輸入理由：", reason, 55, DOECHO))
-    {
-      vmsg("取消修改 !!");
-      return 0;
-    }
+      return vmsg("取消修改");
 
     sprintf(buf,"%d",(ans=='1') ? x.good_article : (ans=='2') ? x.poor_article : x.violation);
     vget(8, 0, "輸入數字：", buf, 10, GCARRY);
-    if ((num = atoi(buf)) > 0)
+    if ((num = atoi(buf)) >= 0)
       (ans=='1') ? (x.good_article = num) : (ans=='2') ? (x.poor_article=num) : (x.violation = num);
     else
-    {
-      vmsg("取消修改 !!");
-      return 0;
-    }
+      return vmsg("取消修改");
 
     sprintf(buf, "%s %-13s 站務  : 修改前:%d 修改後:%d %s\n",
       Now(), cuser.userid,

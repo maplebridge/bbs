@@ -2925,27 +2925,28 @@ Class()
   return 0;
 }
 
+
+#ifdef MEICHU_WIN
 int
 Class2()
 {
-#ifdef	MEICHU_WIN
   int chn, min_chn;
-#ifdef	DEBUG_ClassHeader_INT
+#ifdef DEBUG_ClassHeader_INT
   int *chx;
 #else
   short *chx;
 #endif
   char *img, *str;
   const char *name = "NthuMeichu/";
-  
+
   class_flag |= BFO_YANK;
-  
+
   min_chn = bshm->min_chn;
   img = class_img;
-  
+
   for (chn = CH_END - 2; chn >= min_chn; chn--)
   {
-#ifdef	DEBUG_ClassHeader_INT
+#ifdef DEBUG_ClassHeader_INT
     chx = (int *) img + (CH_END - chn);
 #else
     chx = (short *) img + (CH_END - chn);
@@ -2954,13 +2955,13 @@ Class2()
     {
       more("brd/MeichuWin/note", NULL);
       if (XoClass(chn))
-        return 0;
+	return 0;
     }
-  }    
+  }
   vmsg("無此分類群組");
   return XEASY;
-#endif
 }
+#endif
 
 
 void

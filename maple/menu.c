@@ -1114,10 +1114,10 @@ static MENU menu_main[] =
 
   Class, 0, M_BOARD,
   "Class     【 分組討論區 】",
-  
-#ifdef	MEICHU_WIN
+
+#ifdef MEICHU_WIN
   Class2, 0, M_BOARD,
-  "WinMeichu \033[1;33m【 !!! 己丑梅竹 清大必勝 快進來加油 !!! 】\033[m",
+  "WinMeichu \033[1;36m【 !!! 己丑梅竹 清大必勝 快進來加油 !!! 】\033[m",
 #endif
 
 #ifdef MY_FAVORITE

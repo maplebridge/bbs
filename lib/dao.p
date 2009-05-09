@@ -4,6 +4,8 @@ int is_alnum(int ch);
 int is_alpha(int ch);
 /* not_addr.c */
 int not_addr(char *addr);
+/* is_struct.c */
+int is_struct(char *fpath, size_t struct_size)
 
 #ifdef _RESOLV_H
 /* dns.c */

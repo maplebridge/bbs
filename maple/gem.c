@@ -491,22 +491,24 @@ gem_log(folder, action, hdr)
   fclose(fp1);
 }
 
-int
-gem_check_if_data_class(xo, fpath, key)
+
+static int
+gem_check_if_data_class(xo, fpath, type)
   XO *xo;
   char *fpath;
-  char key;
+  char type;
 {
   char check_fpath[64];
   if (strstr(xo->dir, "gem/.DIR") || strstr(xo->dir, "gem/@/"))
   {
     sprintf(check_fpath, "gem/@/@%s", fpath);
-    if ((key == 'C' && is_struct(check_fpath, sizeof(HDR)) == (-1)) || 
-        (key == 'D' && is_struct(check_fpath, sizeof(HDR)) == 1))
+    if ((type == 'c' && is_struct(check_fpath, sizeof(HDR)) == (-1)) ||
+        (type == 'd' && is_struct(check_fpath, sizeof(HDR)) == 1))
       return 0;
   }
   return 1;
 }
+
 
 static int
 gem_add(xo, gtype)
@@ -571,20 +573,20 @@ gem_add(xo, gtype)
       sprintf(hdr.xname, "@%s", fpath);
       if (gtype == 'c')
       {
-        if(!gem_check_if_data_class(xo, fpath, 'C'))
+        if (!gem_check_if_data_class(xo, fpath, gtype))
         {
-          vmsg("已存在同檔名之資料檔案，請重新輸入並更名 !!");
+          vmsg("已存在同檔名之資料檔案，請重新輸入並更名");
           return XO_INIT;
         }
 	strcat(fpath, "/");
 	sprintf(hdr.title, "%-13s分類 □ %.50s", fpath, title);
 	hdr.xmode = GEM_FOLDER;
       }
-      else
+      else	/* if (gtype == 'd') */
       {
-        if(!gem_check_if_data_class(xo, fpath, 'D'))
+        if (!gem_check_if_data_class(xo, fpath, gtype))
         {
-          vmsg("已存在同檔名之分類，請重新輸入並更名 !!");
+          vmsg("已存在同檔名之分類，請重新輸入並更名");
           return XO_INIT;
         }
 	strcpy(hdr.title, title);
@@ -592,7 +594,7 @@ gem_add(xo, gtype)
       }
       gtype = 1;
     }
-    else
+    else	/* 'a', 'f', 'l' */
     {
       if ((fd = gem_hdr_stamp(dir, gtype, &hdr, fpath)) < 0)
 	return XO_FOOT;
@@ -686,14 +688,14 @@ gem_edit(xo)
   if (!(hdr = gem_check(xo, fpath, GEM_PLAIN)))
     return XO_NONE;
 
-  if(is_struct(fpath, sizeof(HDR)) == 1)
+  if (!strncmp(fpath, "gem/@/@", 7) && is_struct(fpath, sizeof(HDR)) == 1)
   {
-    vmsg("此檔案已變更為分類而非資料，請將此連結刪除並更名重編新檔 !!");
+    vmsg("此檔案已變更為分類而非資料，請將此連結刪除並更名重編新檔");
     return XO_INIT;
   }
 
   level = xo->key;
-  
+
   curredit = EDIT_GEM;
 
   if (!(level & GEM_W_BIT) || ((hdr->xmode & GEM_RESERVED) && !(level & GEM_X_BIT)))
