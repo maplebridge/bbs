@@ -186,6 +186,7 @@
 
 #ifdef HAVE_WHERE
 #  define GUEST_WHERE		/* itoc.010208: guest 亂數取故鄉 */
+#  undef  GUEST_WHERE
 #endif
 
 #define	GUEST_NICK		/* itoc.000319: guest 亂數取暱稱 */
