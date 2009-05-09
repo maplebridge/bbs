@@ -1,3 +1,15 @@
+#include <ctype.h>
+
+
+int
+is_alnum(ch)
+  int ch;
+{
+  return isalnum(ch);
+}
+
+
+#if 0
 int
 is_alnum(ch)
   int ch;
@@ -5,3 +17,4 @@ is_alnum(ch)
   return ((ch >= '0' && ch <= '9') ||
     (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z'));
 }
+#endif

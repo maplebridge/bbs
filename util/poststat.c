@@ -21,7 +21,7 @@ static char *mytitle[] = {"日十", "週五十", "月百", "年度百"};
 #define FN_RUN_POST_AUTHOR	"run/var/post.author"
 #define FN_RUN_POST_OLD		"run/var/post.old"
 #define FN_RUN_DAY_0		"run/var/day.0"
-  
+
 
 #define HASHSIZE		1024		/* 2's power */
 #define TOPCOUNT		200
@@ -41,7 +41,7 @@ struct postrec
 }      *bucket[HASHSIZE];
 
 
-static POSTLOG top[TOPCOUNT], *tp;          
+static POSTLOG top[TOPCOUNT], *tp;
 
 
 static int
@@ -235,6 +235,7 @@ poststat(mytype)
   if (fp = fopen(curfile, "w"))
   {
     int max, cnt;
+    time4_t temp;
 
     fprintf(fp, "\t\t\033[1;34m-----\033[37m=====\033[41m 本%s大熱門話題 \033[40m=====\033[34m-----\033[0m\n\n", 
       mytitle[mytype]);
@@ -244,7 +245,8 @@ poststat(mytype)
     for (i = cnt = 0; (cnt < max) && (i < j); i++)
     {
       tp = &top[i];
-      strcpy(buf, Btime(&(tp->date)));
+      temp = tp->date;
+      strcpy(buf, Btime(&temp));
       buf[23] = '\0';
       fprintf(fp,
 	"\033[1;31m%3d. \033[33m看板 : \033[32m%-16s\033[35m《%s》\033[36m%4d 篇\033[33m%+16s\n"
