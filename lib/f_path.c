@@ -1,3 +1,6 @@
+#include <string.h>
+
+
 /* ----------------------------------------------------- */
 /* file structure : set file path for boards/user home	 */
 /* ----------------------------------------------------- */
@@ -80,7 +83,7 @@ usr_fpath(fpath, user, fname)
   /* Thor.981027: 防止 buffer overflow, 雖然 SunOS 4.1.x上無此情況, 以後再想好的改法 */
   str_ncpy(buf, user, sizeof(buf));
   str_lower(buf, buf);
-    
+
   *fpath++ = *buf;
   mak_fpath(fpath, buf, fname);
 }

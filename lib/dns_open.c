@@ -7,6 +7,7 @@
 /*-------------------------------------------------------*/
 
 
+#include <string.h>
 #include "dns.h"
 
 /* Thor.990811: find out A record */

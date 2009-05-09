@@ -1,3 +1,15 @@
+#include <strings.h>
+
+
+int
+str_cmp(s1, s2)
+  char *s1, *s2;
+{
+  return strcasecmp(s1, s2);
+}
+
+
+#if 0
 int
 str_cmp(s1, s2)
   char *s1, *s2;
@@ -17,3 +29,4 @@ str_cmp(s1, s2)
   } while (c1);
   return 0;
 }
+#endif

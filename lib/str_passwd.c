@@ -1,3 +1,6 @@
+#include <string.h>
+
+
 #define	PASSLEN	13
 
 

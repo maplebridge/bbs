@@ -1,4 +1,5 @@
 #include "dao.h"
+#include <string.h>
 
 
 void

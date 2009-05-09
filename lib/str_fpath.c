@@ -1,3 +1,6 @@
+#include <string.h>
+
+
 void
 setdirpath(fpath, direct, fname)
   char *fpath, *direct, *fname;

@@ -1,3 +1,16 @@
+#include <strings.h>
+
+
+int
+str_ncmp(s1, s2, n)
+  char *s1, *s2;
+  int n;
+{
+  return strncasecmp(s1, s2, n);
+}
+
+
+#if 0
 int
 str_ncmp(s1, s2, n)
   char *s1, *s2;
@@ -24,3 +37,4 @@ str_ncmp(s1, s2, n)
 
   return 0;
 }
+#endif
