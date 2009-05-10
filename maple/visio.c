@@ -1442,7 +1442,7 @@ igetch()
     {
 #ifdef GUEST_KICKER
           time_t now;
-          time(&now);
+          time4(&now);
           stay = (now - cutmp->login_time) / 60;
                     
 	  if (idle > IDLE_TIMEOUT || (!strcmp(cutmp->userid, "guest") && stay >= GUEST_VISIT_TIME))

@@ -565,7 +565,7 @@ utmp_setup(mode)
 #endif
 
 #ifdef GUEST_KICKER
-  time(&utmp.login_time);
+  time4(&utmp.login_time);
 #endif
 
 #ifdef GUEST_NICK
