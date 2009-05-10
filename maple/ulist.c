@@ -878,7 +878,7 @@ ulist_query(xo)
 {
   move(1, 0);
   clrtobot();
-  my_query(ulist_pool[xo->pos]->userid);
+  my_query(ulist_pool[xo->pos]->userid, ulist_pool[xo->pos]->from);
   return ulist_neck(xo);
 }
 

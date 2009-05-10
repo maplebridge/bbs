@@ -754,7 +754,7 @@ xo_uquery(xo)
 
   move(1, 0);
   clrtobot();
-  my_query(userid);
+  my_query(userid, NULL);
   return XO_HEAD;
 }
 

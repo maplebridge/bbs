@@ -392,7 +392,7 @@ aloha_query(xo)
   move(1, 0);
   clrtobot();
 
-  my_query(aloha->userid);
+  my_query(aloha->userid, NULL);
   return aloha_head(xo);
 }
 

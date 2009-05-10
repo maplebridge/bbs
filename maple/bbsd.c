@@ -600,6 +600,10 @@ utmp_setup(mode)
 
     /* 先比對 FQDN */
     str_lower(name, fromhost);	/* itoc.011011: 大小寫均可，etc/fqdn 裡面都要寫小寫 */
+#ifndef	GUEST_WHERE
+    if (cuser.userlevel)	/* smiler.090510: 非guest */
+    {
+#endif
     if (!belong_list(FN_ETC_FQDN, name, utmp.from))
     {
       /* 再比對 ip */
@@ -607,6 +611,11 @@ utmp_setup(mode)
       if (!belong_list(FN_ETC_HOST, name, utmp.from))
 	str_ncpy(utmp.from, fromhost, sizeof(utmp.from));	/* 如果都沒找到對應故鄉，就是用 fromhost */
     }
+#ifndef	GUEST_WHERE
+    }
+    else
+      str_ncpy(utmp.from, fromhost, sizeof(utmp.from)); /* smiler.090510: guest 強制顯示fromhost */
+#endif
   }
 
 #else

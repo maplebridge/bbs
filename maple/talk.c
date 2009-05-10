@@ -106,8 +106,9 @@ showplans(userid)
 
 
 static void
-do_query(acct)
+do_query(acct, from_fpath)
   ACCT *acct;
+  char *from_fpath;
 {
   UTMP *up;
   int userno, rich;
@@ -175,8 +176,11 @@ do_query(acct)
     prints("[ㄓ方] %s\n", up ? up->cfrom : acct->cfrom);
   else
 #endif
-    prints("[ㄓ方] (%s) %s\n",
-      Btime(&acct->lastlogin), acct->lasthost);
+    prints("[ㄓ方] (%s) %-32.32s\n",
+      Btime(&acct->lastlogin), 
+      !strcmp(userid, "guest") ? 
+      (from_fpath == NULL ? "\033[1;33m叫パ呼ね琩高\033[m" : from_fpath) :
+      acct->lasthost);
 
   showplans(userid);
   vmsg(NULL);
@@ -184,13 +188,14 @@ do_query(acct)
 
 
 void
-my_query(userid)
+my_query(userid, from_fpath)
   char *userid;
+  char *from_fpath;
 {
   ACCT acct;
 
   if (acct_load(&acct, userid) >= 0)
-    do_query(&acct);
+    do_query(&acct, from_fpath);
   else
     vmsg(err_uid);
 }
@@ -1399,7 +1404,7 @@ talk_rqst()
   {
     ans = vget(1, 0, "==> Q)琩高 Y)册ぱ N)[Y] ", buf, 3, LCECHO);
     if (ans == 'q')
-      my_query(up->userid);
+      my_query(up->userid, NULL);
     else
       break;
   }

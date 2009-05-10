@@ -901,7 +901,7 @@ pal_query(xo)
   pal = (PAL *) xo_pool + (xo->pos - xo->top);
   move(1, 0);
   clrtobot();
-  my_query(pal->userid);
+  my_query(pal->userid, NULL);
   return pal_head(xo);
 }
 

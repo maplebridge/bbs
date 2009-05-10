@@ -1038,7 +1038,7 @@ bmw_query(xo)
   strcpy(userid, bmw->userid);
   if (str = strchr(userid, '>'))	/* ¼s¼½ */
     *str = '\0';
-  my_query(userid);
+  my_query(userid, NULL);
   return bmw_head(xo);
 }
 

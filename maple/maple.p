@@ -188,7 +188,7 @@ char *bmode(UTMP *up, int simple);
 void frienz_sync(char *fpath);
 void aloha();
 void loginNotify();
-void my_query(char *userid);
+void my_query(char *userid, char *from_fpath);
 int t_loginNotify(void);
 void loginNotify(void);
 int talk_page(UTMP *up);

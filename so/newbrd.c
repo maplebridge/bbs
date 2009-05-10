@@ -1208,7 +1208,7 @@ nbrd_uquery(xo)
 
   move(1, 0);
   clrtobot();
-  my_query(nbrd->owner);
+  my_query(nbrd->owner, NULL);
   return nbrd_head(xo);
 }
 
