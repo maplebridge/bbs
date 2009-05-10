@@ -1348,6 +1348,9 @@ igetch()
 
   static int imode = 0;
   static int idle = 0;
+#ifdef GUEST_KICKER
+  static int stay = 0;
+#endif
 
   int cc, fd, nfds;
   long rset;
@@ -1437,9 +1440,21 @@ igetch()
 //    if (cutmp->ufo & UFO_TIMEKICKER) /* smiler.070724*/
     if (1)
     {
-	  if (idle > IDLE_TIMEOUT)
+#ifdef GUEST_KICKER
+          time_t now;
+          time(&now);
+          stay = (now - cutmp->login_time) / 60;
+                    
+	  if (idle > IDLE_TIMEOUT || (!strcmp(cutmp->userid, "guest") && stay >= GUEST_VISIT_TIME))
+#else
+          if (idle > IDLE_TIMEOUT)
+#endif
 	  {
-	    outs("★ 超過閒置時間！");
+	    bell();
+	    move(0, 0);
+	    clrtobot();
+	    move(0, 0);
+	    outs("\n★ 超過閒置時間！");
 	    refresh();
 	    abort_bbs();
 	  }

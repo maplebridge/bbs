@@ -195,6 +195,10 @@
 
 #define	TIME_KICKER		/* itoc.030514: 是否自動簽退 idle 過久的使用者 */
 
+#ifdef	TIME_KICKER		/* smiler.090510: 若要使用 GUEST_KICKER 功能，必須define TIME_KICKER */
+#define	GUEST_KICKER		/* smiler.090510: 自動簽退 guest */
+#endif
+
 #define	HAVE_BRDMATE		/* itoc.020602: 板伴 (閱讀同一看板) */
 
 #define	HAVE_SUPERCLOAK		/* itoc.020602: 紫隱，站長超級隱形 */
@@ -421,6 +425,9 @@
 #ifdef TIME_KICKER
 #  define IDLE_TIMEOUT	1440	/* visio.c bguard.c 發呆過久自動簽退(分) */
 #  define IDLE_WARNOUT	3	/* visio.c 發呆過久提醒(分) -- 自動簽退前三分鐘前 */
+#ifdef	GUEST_KICKER
+#  define GUEST_VISIT_TIME	10	/* smiler.090510: 於10分鐘後簽退 guest */
+#endif
 #endif
 
 /* more.c edit.c 翻頁 */

@@ -564,6 +564,10 @@ utmp_setup(mode)
   utmp.idle_time = ap_start;
 #endif
 
+#ifdef GUEST_KICKER
+  time(&utmp.login_time);
+#endif
+
 #ifdef GUEST_NICK
   if (!cuser.userlevel)		/* guest */
   {
@@ -881,6 +885,11 @@ login_user(content)
       cuser.userlevel = 0;	/* Thor.981207: 怕人亂玩, 強制寫回cuser.userlevel */
       cuser.ufo = UFO_DEFAULT_GUEST;
       cuser.ufo2 = UFO2_DEFAULT_GUEST;
+
+      move(0, 0);
+      clrtobot();      
+      vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號\擺\脫受限 !!");
+      
       break;	/* Thor.980917: 註解: cuser ok! */
     }
   }

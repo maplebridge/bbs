@@ -320,6 +320,9 @@ struct UTMP
   usint ufo2;			/* the same as ACCT.ufo2 */
   usint status;			/* status */
 
+#ifdef	GUEST_KICKER
+  time4_t login_time;		/* login time */
+#endif
   time4_t idle_time;		/* active time for last event */
   u_long in_addr;		/* Internet address */
   int sockport;			/* socket port for talk */

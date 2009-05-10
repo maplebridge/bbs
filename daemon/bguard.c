@@ -258,6 +258,9 @@ ushm_guard()
   usint count;
   UTMP *uentp, *uceil, *utail;
   int idle;
+#ifdef GUEST_KICKER
+  int stay;
+#endif
   pid_t pid;
   UCACHE *xshm;
   char buf[128];
@@ -289,10 +292,21 @@ ushm_guard()
 #else
       idle = uentp->idle_time;
 #endif
+
+#ifdef GUEST_KICKER
+      /* smiler.090510: 記錄上站停留時間 */
+      stay = (now - uentp->login_time) / 60;
+#endif
+
       if (flop & 15)
       {
 #ifdef TIME_KICKER
-	if (idle >= IDLE_TIMEOUT)
+
+#ifdef GUEST_KICKER
+	if (idle >= IDLE_TIMEOUT || (!strcmp(uentp->userid, "guest") && stay >= GUEST_VISIT_TIME))
+#else
+        if (idle >= IDLE_TIMEOUT)
+#endif
 	{
 	  errno = 0;
 	  if ((kill(pid, SIGTERM) < 0) && (errno == ESRCH))
@@ -316,7 +330,11 @@ ushm_guard()
 	errno = sig = 0;
 
 #ifdef TIME_KICKER
-	if (idle >= IDLE_TIMEOUT)
+#ifdef GUEST_KICKER
+	if (idle >= IDLE_TIMEOUT || stay >= GUEST_VISIT_TIME)
+#else
+        if (idle >= IDLE_TIMEOUT)
+#endif
 	  sig = SIGTERM;
 #endif
 
