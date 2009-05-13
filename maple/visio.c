@@ -1786,6 +1786,8 @@ vget_match(prefix, len, op)
   return 0;
 }
 
+/* smiler.090516: for XOXpost_search_all(xo) ªº KEY_UP */
+int xo_post_ch = 0;
 
 char lastcmd[MAXLASTCMD + 1][80];
 
@@ -1856,7 +1858,14 @@ vget(line, col, prompt, data, max, echo)
   for (;;)
   {
     move(x, y + col);
-    ch = vkey();
+    
+    if (xo_post_ch != (-1))
+      ch = vkey();
+    else
+      ch = KEY_UP;
+      
+    xo_post_ch = 0;  /* smiler.090516: °O±oÂk0 */
+    
     if (ch == '\n')
     {
       data[len] = '\0';

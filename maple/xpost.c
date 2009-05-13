@@ -829,6 +829,8 @@ XoRXsearch(xo)
 }
 
 
+extern int xo_post_ch;
+
 int
 XOXpost_search_all(xo)
   XO *xo;
@@ -840,6 +842,9 @@ XOXpost_search_all(xo)
 
   char buf[64];
   int i, ch = 2;
+  
+  int x = b_lines - 2;
+  int y = 50;
 
   move(b_lines - 2, 0);
   clrtobot();
@@ -853,6 +858,8 @@ XOXpost_search_all(xo)
     for (i = 0; i < 5; i++)
       prints("/%s %s \033[m", (ch == i) ? "\033[1;44m" : "\033[1;30m", smenu[i]);
     outs("\033[m");
+    
+    prints("   \033[1;33m指令: ← ↓ → 移動\033[m");
 
     move(b_lines - 1, 0);
     clrtoeol();
@@ -860,6 +867,8 @@ XOXpost_search_all(xo)
     for (i = 5; i < 10; i++)
       prints("/%s %s \033[m", (ch == i) ? "\033[1;44m" : "\033[1;30m", lmenu[i - 5]);
     outs("\033[m");
+    
+    prints("      \033[1;33m      ↑前一輸入字串\033[m");
 
     move(b_lines, 0);
     clrtoeol();
@@ -879,7 +888,13 @@ XOXpost_search_all(xo)
     switch (i = vkey())
     {
       case KEY_UP:
-	ch -= 5;
+        if (ch != 4 && ch != 5 && ch != 7 && ch != 8 && ch != 9)
+        {
+	  xs_ch = 1;
+	  xo_post_ch = -1;
+        }
+        //else         /* smiler.090516: 可自行考量其他欄位可正常移動 */
+        //  ch -= 5;
 	break;
       case KEY_DOWN:
 	ch += 5;
@@ -905,6 +920,12 @@ XOXpost_search_all(xo)
 	  xs_ch = i;
 	break;
     }
+
+    /* smiler.090516: 清除命令提示畫面 */    
+    move(x, y);
+    clrtoeol();
+    move(x + 1, y);
+    clrtoeol();
 
     if (xs_ch)
       break;
