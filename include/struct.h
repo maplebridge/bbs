@@ -639,6 +639,17 @@ typedef struct
 {
   int key;
   int (*func) ();
+  int mykey;
+  char level;
+  char funcname[24];
+  char fpath[64];
+}      NewKeyFunc;
+
+
+typedef struct
+{
+  int key;
+  int (*func) ();
 }      KeyFunc;
 
 

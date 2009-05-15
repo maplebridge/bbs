@@ -760,6 +760,7 @@ rss_help(xo)
 }
 
 
+#ifndef NEW_KeyFunc
 KeyFunc rss_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -788,6 +789,36 @@ KeyFunc rss_cb[] =
 
   'h', rss_help
 };
+#else
+KeyFunc rss_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, rss_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, rss_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, rss_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, rss_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, rss_body,            XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'a', rss_add,                 'a',            'p',    "新增rss連結",  	NULL,
+  'd', rss_delete,              'd',            'p',    "刪除rss連結",  	NULL,
+  'm', rss_move,                'm',            'p',    "移動rss連結順序",	NULL,
+
+  'o', rss_mark,                'o',            'p',    "加密",         	NULL,
+  'u', rss_utf8,                'u',            'p',    "變更rss連結編碼",	NULL,
+  'n', rss_html_txt,            'n',            'p',    "以html/txt格式接收",	NULL,
+  's', rss_start_idle,          's',            'p',    "暫停接收此連結",	NULL,
+  'R', rss_restart,             'R',            'p',    "重新接收此連結",	NULL,
+
+  'r', rss_browse,              'r',            'z',    "瀏覽設定容",		NULL,
+  'E', rss_edit,                'E',            'p',    "編輯說明",		NULL,
+  'H', rss_url,                 'H',            'p',    "修改連結網址",		NULL,
+  'T', rss_bookmark,            'T',            'p',    "修改標簽名稱",		NULL,
+  Ctrl('P'), rss_add,           Ctrl('P'),      'p',    "新增rss連結",		NULL,
+
+  'h', rss_help,                'h',            'z',    "\功\能說明"		NULL
+};
+#endif
 
 
 int rss_main()

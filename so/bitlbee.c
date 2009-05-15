@@ -446,7 +446,9 @@ bit_test()
 #endif
 
 
-static KeyFunc bit_cb[] = {
+#ifndef NEW_KeyFunc
+static KeyFunc bit_cb[] = 
+{
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, bit_item_bar,
 #endif
@@ -467,6 +469,40 @@ static KeyFunc bit_cb[] = {
   Ctrl ('K'), bit_close,/* 中斷連線 */
   'h', bit_help
 };
+#else
+static NewKeyFunc bit_cb[] = 
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, bit_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  /* bit_init */
+  XO_INIT, bit_set,             XO_INIT,        'n',    "XO_INIT",      NULL,
+  /* bit_load */
+  XO_LOAD, bit_body,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, bit_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
+//  XO_BODY, bit_body,
+
+  /* 解除封鎖 */
+  'b', bit_unblock,             'b',    'p',    "解除封鎖",     NULL,
+  /* 封鎖連絡人 */
+  'B', bit_block,               'B',    'p',    "封鎖聯若人",   NULL,
+  /* 新增連絡人 */
+  'a', bit_addpal,              'a',    'p',    "新增聯絡人",   NULL,
+  /* 刪除連絡人 */
+  'd', bit_delpal,              'd',    'p',    "刪除聯絡人",   NULL,
+  /* 回顧 FN_MSN 訊息 */
+  'l', bit_show,                'l',    'p',    "回顧訊息",     NULL,
+//  's', bit_save,
+//  'n', bit_onick,
+  /* 更改自己的暱稱 */
+  'c', bit_mynick,              'c',    'p',    "更改自己暱稱", NULL,
+  /* 送 MSN 訊息 */
+  'w', bit_write,               'w',    'p',    "傳送MSN訊息",  NULL,
+  /* 中斷連線 */
+  Ctrl ('K'), bit_close,        Ctrl ('K'),     'p',    "中斷MSN連線",  NULL,
+  'h', bit_help                 'h',    'z',    "\功\能說明",   NULL
+};
+#endif
 
 
 void

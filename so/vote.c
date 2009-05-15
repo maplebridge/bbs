@@ -1191,6 +1191,7 @@ vote_help(xo)
 }
 
 
+#ifndef NEW_KeyFunc
 static KeyFunc vote_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -1220,6 +1221,38 @@ static KeyFunc vote_cb[] =
 
   'h', vote_help
 };
+#else
+static NewKeyFunc vote_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, vote_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, vote_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, vote_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, vote_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, vote_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  /* itoc.010901: 按右鍵比較方便 */
+  'r', vote_join,       'r',    'z',    "參加投票",     	NULL,
+  'v', vote_join,       'v',    'p',    "參加投票",     	NULL,
+  'R', vote_result,     'R',    'p',    "觀看投票結果", 	NULL,
+
+  'V', vote_view,       'V',    'p',    "預覽投票/賭盤結果",    NULL,
+  'E', vote_edit,       'E',    'p',    "編輯投票設定",         NULL,
+  'o', vote_pal,        'o',    'p',    "編輯限制投票名單",     NULL,
+  'd', vote_delete,     'd',    'p',    "刪除",         	NULL,
+  'D', vote_rangedel,   'D',    'p',    "區段刪除",     	NULL,
+  't', vote_tag,        't',    'p',    "切換標籤",     	NULL,
+  'b', vote_open,       'b',    'p',    "立即投票",     	NULL,
+
+  Ctrl('D'), vote_prune,        Ctrl('D'),      'p',    "刪除標籤所選", 	NULL,
+  Ctrl('G'), vote_pal,          Ctrl('G'),      'p',    "編輯限制投票名單",	NULL,
+  Ctrl('P'), vote_add,          Ctrl('P'),      'p',    "舉行投票",     	NULL,
+  Ctrl('Q'), vote_query,        Ctrl('Q'),      'p',    "投票改期",     	NULL,
+
+  'h', vote_help        'h',    'z',    "\功\能說明",     NULL
+};
+#endif
 
 
 int

@@ -4724,6 +4724,7 @@ post_help(xo)
 }
 
 
+#ifndef NEW_KeyFunc
 KeyFunc post_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -4811,8 +4812,112 @@ KeyFunc post_cb[] =
 
   'h', post_help
 };
+#else
+NewKeyFunc post_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  /* verit.20030129 : 請務必將此放在第一項 */
+  XO_ITEM, post_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, post_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, post_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, post_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, post_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'W', post_whereami,   'W',    'p',    "我在哪裡",     	NULL,
+  'r', post_browse,     'r',    'z',    "瀏覽",         	NULL,
+  's', post_switch,     's',    'p',    "切換看板",     	NULL,
+  KEY_TAB, post_gem,    KEY_TAB,        'p',    "精華區",       NULL,
+  'z', post_gem,        'z',    'p',    "精華區",       	NULL,
+  'y', post_reply,      'y',    'p',    "回覆文章",     	NULL,
+  'd', post_delete,     'd',    'p',    "刪文",         	NULL,
+  'v', post_visit,      'v',    'p',    "設定文章\閱\讀記錄",   NULL,
+
+  'x', post_cross,      'x',    'p',    "轉錄文章至看板",       NULL,
+  'X', post_forward,    'X',    'p',    "轉錄文章至信箱",       NULL,
+  't', post_tag,        't',    'p',    "切換標籤",     	NULL,
+  'E', post_edit,       'E',    'p',    "修改文章內容", 	NULL,
+  'T', post_title,      'T',    'p',    "修改文章標題", 	NULL,
+  'm', post_mark,       'm',    'p',    "文章標記",     	NULL,
+  'M', post_mark_good,  'M',    'p',    "優文",         	NULL,
+  '_', post_bottom,     '_',    'p',    "文章置底",     	NULL,
+  'D', post_rangedel,   'D',    'p',    "區段刪除文章", 	NULL,
+  'o', post_noforward,  'o',    'p',    "文章禁止轉錄", 	NULL,
+#ifdef HAVE_SCORE
+  '%', post_score,      '%',    'p',    "推文/接文/噓文",       NULL,
+  'e', post_e_score,    'e',    'p',    "接文",         	NULL,
+  Ctrl('E'), post_noscore,      Ctrl('E'),      'p',    "文章禁止推文", NULL,
+#endif
+
+  'w', post_write,      'w',    'p',    "傳送水球給作者",       NULL,
+
+  'b', post_memo,       'b',    'p',    "瀏覽進板畫面", 	NULL,
+  'c', post_copy,       'c',    'p',    "複製文章(至精華區)",   NULL,
+  'g', gem_gather,      'g',    'p',    "文章收錄至精華區",     NULL,
+
+#ifdef HAVE_REFUSEMARK
+  'l', post_refuse,     'l',    'p',    "文章加密/解密",        NULL,
+#endif
+
+#ifdef HAVE_LABELMARK
+  'n', post_label,              'n',            'p',    "文章標記待砍",		NULL,
+  Ctrl('N'), post_delabel,      Ctrl('N'),      'p',    "刪除標記待砍文章",	NULL,
+#endif
+
+  /* smiler.070201: 搜尋功能整合 */
+  '/', XOXpost_search_all,      '/',    'p',    "搜尋\功\能整合鍵",     NULL,
+
+  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             NULL,
+
+  /* itoc.001220: 搜尋作者/標題 */
+  '~', XoXselect,               '~',    'p',    "搜尋作者及標題",       NULL,
+
+  /* itoc.001220: 搜尋作者 */
+  'a', XoXauthor,               'a',    'p',    "搜尋作者",             NULL,
+
+  /* itoc.001220: 搜尋相同標題文章 */
+  'S', XoXsearch,               'S',    'p',    "搜尋同標題",           NULL,
+
+  /* itoc.010325: 搜尋 mark 文章 */
+  'G', XoXmark,                 'G',    'p',    "搜尋標記",             NULL,
+
+#if 0
+  '~' | XO_DL, (int *)  "bin/dictd.so:main_dictd",
+  '/', XoXtitle,                /* itoc.001220: 搜尋標題 */
+  'f', XoXfull,                 /* itoc.030608: 全文搜尋 */
+  'K', XoXlocal,                /* itoc.010822: 搜尋本地文章 */
+#endif
+
+  Ctrl('P'), post_add,          Ctrl('P'),      'p',    "發表文章",     	NULL,
+  Ctrl('D'), post_prune,        Ctrl('D'),      'p',    "刪除標籤選取文章",	NULL,
+  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢作者",     	NULL,
+  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定作者個人資料",	NULL,
+  'f', post_info,               'f',            'p',    "顯示文章資訊", 	NULL,
+  '#', post_jxname,             '#',            'p',    "依檔名找尋文章",	NULL,
+
+  Ctrl('F'), post_addMF,        Ctrl('F'),      'p',    "將看板加入我的最愛",	NULL,
+  'i', post_ishowbm,            'i',            'p',    "顯示看板資訊及管理",	NULL,
+  'B', post_ishowbm,            'B',            'p',    "顯示看板資訊及管理",	NULL,
+
+  'R' | XO_DL, (void *) "bin/vote.so:vote_result",      'R' | XO_DL,            'z',    "顯示投票結果",         NULL,
+  'V' | XO_DL, (void *) "bin/vote.so:XoVote",           'V' | XO_DL,            'z',    "執行投票相關\功\能",   NULL,
+  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala", Ctrl('G') | XO_DL,      'z',    "丟骰至看板",           NULL,
+
+#ifdef HAVE_TERMINATOR
+  Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",  Ctrl('X') | XO_DL,      'z',    "拂花落葉斬",   NULL,
+#endif
+
+#ifdef HAVE_XYNEWS
+  /* itoc.010822: 新聞閱讀模式 */
+  'u', XoNews,                  'u',            'p',    "切換至新聞\閱\讀模式",	NULL,
+#endif
+
+  'h', post_help                'h',            'z',    "\功\能說明",	NULL
+};
+#endif
 
 
+#ifndef NEW_KeyFunc
 KeyFunc xpost_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -4875,9 +4980,82 @@ KeyFunc xpost_cb[] =
 
   'h', post_help		/* itoc.030511: 共用即可 */
 };
+#else
+NewKeyFunc xpost_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  /* verit.20030129 : 請務必將此放在第一項 */
+  XO_ITEM, post_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, xpost_init,          XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, xpost_load,          XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, xpost_head,          XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  /* Thor.980911: 共用即可 */
+  XO_BODY, post_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'r', xpost_browse,    'r',    'z',    "瀏覽",         	NULL,
+  'y', post_reply,      'y',    'p',    "回覆文章",     	NULL,
+  't', post_tag,        't',    'p',    "切換標籤",     	NULL,
+  'x', post_cross,      'x',    'p',    "轉錄文章至看板",       NULL,
+  'X', post_forward,    'X',    'p',    "轉錄文章至信箱",       NULL,
+  KEY_TAB, post_gem,    KEY_TAB,        'p',    "精華區",       NULL,
+  'z', post_gem,        'z',    'p',    'p',    "精華區",       NULL,
+  'o', post_noforward,  'o',    'p',    "文章禁止轉錄", 	NULL,
+  'c', post_copy,       'c',    'p',    "複製文章(至精華區)",   NULL,
+  'g', gem_gather,      'g',    'p',    "文章收錄至精華區",     NULL,
+  'm', post_mark,       'm',    'p',    "文章標記",     	NULL,
+  'M', post_mark_good,  'M',    'p',    "優文",         	NULL,
+
+  /* Thor.980911: 方便板主 */
+  'd', post_delete,     'd',    'p',    "刪文",         	NULL,
+
+  /* /* itoc.010716: 提供 XPOST 中可以編輯標題、內容 */
+  'E', post_edit,       'E',    'p',    "修改文章內容", 	NULL,
+  'T', post_title,      'T',    'p',    "修改文章標題", 	NULL,
+#ifdef HAVE_SCORE
+  '%', post_score,      '%',    'p',    "推文/接文/噓文",       NULL,
+  'e', post_e_score,    'e',    'p',    "接文",         	NULL,
+  Ctrl('E'), post_noscore,      Ctrl('E'),      'p',    "文章禁止推文", NULL,
+#endif
+
+  'w', post_write,      'w',    'p',    "傳送水球給作者",       NULL,
+
+#ifdef HAVE_REFUSEMARK
+  'l', post_refuse,     'l',    'p',    "文章加密/解密",        NULL,
+#endif
+
+#ifdef HAVE_LABELMARK
+  'n', post_label,              'n',            'p',    "文章標記待砍",	NULL,
+#endif
+
+  /* smiler.070201: 搜尋功能整合 */
+  '/', XOXpost_search_all,      '/',    'p',    "搜尋\功\能整合鍵",     NULL,
+  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             NULL,
+  '~', XoXselect,               '~',    'p',    "搜尋作者及標題",       NULL,
+  'a', XoXauthor,               'a',    'p',    "搜尋作者",             NULL,
+  'S', XoXsearch,               'S',    'p',    "搜尋同標題",           NULL,
+  'G', XoXmark,                 'G',    'p',    "搜尋標記",             NULL,
+
+#if 0
+  '/', XoXtitle,
+  'f', XoXfull,
+  'K', XoXlocal,
+#endif
+
+  Ctrl('P'), post_add,          Ctrl('P'),      'p',    "發表文章",     	NULL,
+  Ctrl('D'), post_prune,        Ctrl('D'),      'p',    "刪除標籤選取文章",	NULL,
+  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢作者",     	NULL,
+  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定作者個人資料",	NULL,
+  'f', post_info,               'f',            'p',    "顯示文章資訊", 	NULL,
+
+  /* itoc.030511: 共用即可 */
+  'h', post_help,               'h',            'z',    "\功\能說明",     NULL
+};
+#endif
 
 
 #ifdef HAVE_XYNEWS
+#ifndef NEW_KeyFunc
 KeyFunc news_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -4892,4 +5070,22 @@ KeyFunc news_cb[] =
 
   'h', post_help		/* itoc.030511: 共用即可 */
 };
+#else
+NewKeyFunc news_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  /* verit.20030129 : 請務必將此放在第一項 */
+  XO_ITEM, post_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, news_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, news_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, news_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, post_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'r', XoXsearch,               'r',    'z',    "搜尋同標題",           NULL,
+
+  /* itoc.030511: 共用即可 */
+  'h', post_help,               'h',            'z',    "\功\能說明",   NULL
+};
+#endif
 #endif	/* HAVE_XYNEWS */

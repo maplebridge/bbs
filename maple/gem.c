@@ -1656,6 +1656,7 @@ gem_help(xo)
 }
 
 
+#ifndef NEW_KeyFunc
 static KeyFunc gem_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
@@ -1703,6 +1704,55 @@ static KeyFunc gem_cb[] =
 
   'h', gem_help
 };
+#else
+static NewKeyFunc gem_cb[] =
+{
+#ifdef  HAVE_LIGHTBAR
+  XO_ITEM, gem_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, gem_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, gem_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, gem_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, gem_body,            XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'r', gem_browse,              'r',            'z',    "瀏覽",         NULL,
+
+  /* itoc.010723: gem_cb 的引數只有 xo */
+  Ctrl('P'), gem_add_all,       Ctrl('P'),      'p',    "新增文章卷宗", NULL,
+  'a', gem_add_article,         'a',            'p',    "新增文章",     NULL,
+  'f', gem_add_folder,          'f',            'p',    "新增卷宗",     NULL,
+
+  'E', gem_edit,                'E',            'p',    "修改文章內容", NULL,
+  'T', gem_title,               'T',            'p',    "修改標題",     NULL,
+  'd', gem_delete,              'd',            'p',    "刪除",         NULL,
+  'D', gem_rangedel,            'D',            'p',    "區段刪除",     NULL,
+
+  'c', gem_copy,                'c',            'p',    "拷貝(支援標籤\功\能)",	NULL,
+  'g', gem_gather,              'g',            'p',    "定錨收錄(支援標籤\功\能)",	NULL,
+
+  Ctrl('G'), gem_anchor,        Ctrl('G'),      'p',    "定下/拔除/進入海錨",	NULL,
+  Ctrl('V'), gem_paste,         Ctrl('V'),      'p',    "貼上",         NULL,
+
+  /* itoc.010223: 使用者習慣 c/p 收錄精華區 */
+  'p', gem_paste,               'p',            'p',    "貼上",         NULL,
+
+  't', gem_tag,                 't',            'p',    "切換標籤",     NULL,
+
+  'x', post_cross,              'x',            'p',    "轉錄至看板",   NULL,
+  'X', post_forward,            'X',            'p',    "轉錄至信箱",   NULL,
+  'B', gem_toggle,              'B',            'p',    "顯示屬性",     NULL,
+  'o', gem_refuse,              'o',            'p',    "加密",         NULL,
+  Ctrl('Y'), gem_refuse,        Ctrl('Y'),      'p',    "加密",         NULL,
+  'm', gem_move,                'm',            'p',    "移動文章順序", NULL,
+  'M', gem_move,                'M',            'p',    "移動卷宗順序", NULL,
+
+  'S', gem_state,               'S',            's',    "觀看詳細屬性", NULL,
+
+  Ctrl('D'), gem_prune,         Ctrl('D'),      'p',    "刪除標籤所選", NULL,
+
+  'h', gem_help,                'h',            'z',    "\功\能說明",	NULL
+};
+#endif
 
 
 void

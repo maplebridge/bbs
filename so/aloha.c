@@ -437,6 +437,7 @@ aloha_help(xo)
 }
 
 
+#ifndef NEW_KeyFunc
 static KeyFunc aloha_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
@@ -463,6 +464,34 @@ static KeyFunc aloha_cb[] =
 
   'h', aloha_help
 };
+#else
+static NewKeyFunc aloha_cb[] =
+{
+#ifdef HAVE_LIGHTBAR
+  XO_ITEM, aloha_item_bar,      XO_ITEM,        'n',    "XO_ITEM",      NULL,
+#endif
+  XO_INIT, aloha_init,          XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_LOAD, aloha_load,          XO_LOAD,        'n',    "XO_LOAD",      NULL,
+  XO_HEAD, aloha_head,          XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_BODY, aloha_body,          XO_BODY,        'n',    "XO_BODY",      NULL,
+
+  'a', aloha_add,       'a',    'p',    "新增",         		NULL,
+  'd', aloha_delete,    'd',    'p',    "刪除",         		NULL,
+  'm', aloha_mail,      'm',    'p',    "寄信給對方",   		NULL,
+  'w', aloha_write,     'w',    'p',    "傳送水球給對方",       	NULL,
+  'D', aloha_rangedel,  'D',    'p',    "區段刪除",     		NULL,
+  'f', aloha_loadpal,   'f',    'p',    "引入朋友名單", 		NULL,
+
+  'r', aloha_query,     'r',    'z',    "查詢對方",     		NULL,
+  Ctrl('Q'), aloha_query,       Ctrl('Q'),      'p',    "查詢對方",     NULL,
+
+  's', aloha_sort,      's',    'p',    "整理名單",     		NULL,
+  't', aloha_tag,       't',    'p',    "切換標籤",     		NULL,
+  Ctrl('D'), aloha_prune,       Ctrl('D'),      'p',    "刪除標籤所選", NULL,
+
+  'h', aloha_help,      'h',    'z',    "\功\能說明",     		NULL
+);
+#endif
 
 
 int
