@@ -871,7 +871,7 @@ login_user(content)
 	vmsg(err_uid);
 	continue;
       }
-      
+
       /* smiler.090510: 限制 guest login 數目 */
       if (utmp_count(cuser.userno, 0) > 30)
       {
@@ -880,16 +880,16 @@ login_user(content)
         move(0, 0);
         login_abort("\n站上guest過多，請稍後登入或以其他帳號登入 ...");
       }
-      
+
       logattempt(' ', content);
       cuser.userlevel = 0;	/* Thor.981207: 怕人亂玩, 強制寫回cuser.userlevel */
       cuser.ufo = UFO_DEFAULT_GUEST;
       cuser.ufo2 = UFO2_DEFAULT_GUEST;
 
       move(0, 0);
-      clrtobot();      
-      vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號\擺\脫受限 !!");
-      
+      clrtobot();
+      vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號\擺\脫受限");
+
       break;	/* Thor.980917: 註解: cuser ok! */
     }
   }

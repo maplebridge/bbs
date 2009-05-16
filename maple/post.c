@@ -4575,6 +4575,8 @@ post_info(xo)
 
     if (hdr->xmode & POST_INCOME)
       prints("本篇為站外信，無文章價值");
+    else if (hdr->xmode & POST_BOTTOM)
+      prints("本篇為置底文，無文章價值");
     else if (acct_load(&acct, hdr->owner) >= 0)
       prints("文章價值：%d 銀", value);
     else if (value)	/* 找不到使用者但又有文章價值的，就表示為匿名文的 userno */

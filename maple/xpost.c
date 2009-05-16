@@ -530,10 +530,33 @@ filter_full(head, hdr)
     return 0;
 
   rc = 0;
-  if (str_sub(fimage, hdr->title))
+  if (!(fsize % 4096))
   {
-    rc = 1;
-    search_fit++;
+#if 0
+    pptpb.090517:
+    4096 是 system pagesize, 在 mmap() 中，若 len 為 pagesize 整數倍,
+    會使得 map 出來的記憶體尾端未以 '\0' 結尾, 造成進行字串搜尋時斷線.
+    因此改用 memory allocation 處理, 而不用 map 對映, 以避開此狀況.
+
+    pagesize 可由 sysconf(_SC_PAGESIZE) 得到, 或是 BSD 下使用 getpagesize()
+#endif
+    char *ptr = (char *) malloc(fsize + 1);
+    strncpy(ptr, fimage, fsize);
+    *(ptr + fsize) = '\0';
+    if (str_sub(ptr, hdr->title))
+    {
+      rc = 1;
+      search_fit++;
+    }
+    free(ptr);
+  }
+  else
+  {
+    if (str_sub(fimage, hdr->title))
+    {
+      rc = 1;
+      search_fit++;
+    }
   }
 
   munmap(fimage, fsize);

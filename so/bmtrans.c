@@ -190,6 +190,12 @@ bmt_add(xo)
     return 0;
   }
 
+  if (!str_ncmp(brd->brdname, "P_", 2))	/* 個人板不得變更板主 */
+  {
+    vmsg("個人板不得異動板主，有問題請洽站務");
+    return 0;
+  }
+
 #if 0
   if (!(brd->battr & BRD_PUBLIC))	/* 只有公眾才需要申請 */
   {
