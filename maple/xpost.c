@@ -71,8 +71,13 @@ extern char xo_pool[];
 extern int z_status;
 #endif
 
+#ifndef NEW_KeyFunc
 extern KeyFunc xpost_cb[];
 extern KeyFunc xmbox_cb[];
+#else
+extern NewKeyFunc xpost_cb[];
+extern NewKeyFunc xmbox_cb[];
+#endif
 
 static int *xpostIndex;		/* Thor: first ypost pos in ypost_xo.key */
 static int comebackPos;		/* 記錄最後閱讀那篇文章的位置 */
@@ -1340,7 +1345,11 @@ re_key:
 
 static int *newsIndex;
 
+#ifndef NEW_KeyFunc
 extern KeyFunc news_cb[];
+#else
+extern NewKeyFunc news_cb[];
+#endif
 
 
 int

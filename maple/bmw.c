@@ -1268,27 +1268,27 @@ KeyFunc bmw_cb[] =
 NewKeyFunc bmw_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, bmw_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, bmw_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, bmw_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, bmw_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, bmw_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, bmw_body,            XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, bmw_init,            XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, bmw_load,            XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, bmw_head,            XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, bmw_body,            XO_BODY,        'n',    "XO_BODY",      "",
 
-  'd', bmw_delete,      'd',    'p',    "刪除",                 NULL,
-  'D', bmw_rangedel,    'D',    'p',    "區段刪除",             NULL,
-  'm', bmw_mail,        'm',    'p',    "寄信給對方",           NULL,
-  'w', bmw_write,       'w',    'p',    "傳送水球給對方",       NULL
-  'r', bmw_query,       'r',    'p',    "查詢對方",             NULL,
-  Ctrl('Q'), bmw_query, Ctrl('Q'),      'p',    "查詢對方",     NULL,
-  's', bmw_init,        's',    'p',    "更新頁面",             NULL,
-  'M', bmw_save,        'M',    'p',    "儲存到信箱",           NULL,
-  'u', bmw_save_user,   'u',    'p',    "特定ID水球存至信箱",   NULL,
-  't', bmw_tag,         't',    'p',    "切換標籤",             NULL,
-  Ctrl('D'), bmw_prune, Ctrl('D'),      'p',    "刪除標籤所選", NULL,
-  'C', bmw_clear,       'C',    'p',    "刪除全部水球",         NULL,
+  'd', bmw_delete,      'd',    'p',    "刪除",                 "",
+  'D', bmw_rangedel,    'D',    'p',    "區段刪除",             "",
+  'm', bmw_mail,        'm',    'p',    "寄信給對方",           "",
+  'w', bmw_write,       'w',    'p',    "傳送水球給對方",       "",
+  'r', bmw_query,       'r',    'p',    "查詢對方",             "",
+  Ctrl('Q'), bmw_query, Ctrl('Q'),      'p',    "查詢對方",     "",
+  's', bmw_init,        's',    'p',    "更新頁面",             "",
+  'M', bmw_save,        'M',    'p',    "儲存到信箱",           "",
+  'u', bmw_save_user,   'u',    'p',    "特定ID水球存至信箱",   "",
+  't', bmw_tag,         't',    'p',    "切換標籤",             "",
+  Ctrl('D'), bmw_prune, Ctrl('D'),      'p',    "刪除標籤所選", "",
+  'C', bmw_clear,       'C',    'p',    "刪除全部水球",         "",
 
-  'h', bmw_help         'h',    'z',    "\功\能說明",           NULL
+  'h', bmw_help,        'h',    'z',    "\功\能說明",           ""
 };
 #endif
 

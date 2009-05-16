@@ -1708,49 +1708,49 @@ static KeyFunc gem_cb[] =
 static NewKeyFunc gem_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, gem_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, gem_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, gem_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, gem_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, gem_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, gem_body,            XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, gem_init,            XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, gem_load,            XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, gem_head,            XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, gem_body,            XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', gem_browse,              'r',            'z',    "瀏覽",         NULL,
+  'r', gem_browse,              'r',            'z',    "瀏覽",         "",
 
   /* itoc.010723: gem_cb 的引數只有 xo */
-  Ctrl('P'), gem_add_all,       Ctrl('P'),      'p',    "新增文章卷宗", NULL,
-  'a', gem_add_article,         'a',            'p',    "新增文章",     NULL,
-  'f', gem_add_folder,          'f',            'p',    "新增卷宗",     NULL,
+  Ctrl('P'), gem_add_all,       Ctrl('P'),      'p',    "新增文章卷宗", "",
+  'a', gem_add_article,         'a',            'p',    "新增文章",     "",
+  'f', gem_add_folder,          'f',            'p',    "新增卷宗",     "",
 
-  'E', gem_edit,                'E',            'p',    "修改文章內容", NULL,
-  'T', gem_title,               'T',            'p',    "修改標題",     NULL,
-  'd', gem_delete,              'd',            'p',    "刪除",         NULL,
-  'D', gem_rangedel,            'D',            'p',    "區段刪除",     NULL,
+  'E', gem_edit,                'E',            'p',    "修改文章內容", "",
+  'T', gem_title,               'T',            'p',    "修改標題",     "",
+  'd', gem_delete,              'd',            'p',    "刪除",         "",
+  'D', gem_rangedel,            'D',            'p',    "區段刪除",     "",
 
-  'c', gem_copy,                'c',            'p',    "拷貝(支援標籤\功\能)",	NULL,
-  'g', gem_gather,              'g',            'p',    "定錨收錄(支援標籤\功\能)",	NULL,
+  'c', gem_copy,                'c',            'p',    "拷貝(支援標籤\功\能)",	"",
+  'g', gem_gather,              'g',            'p',    "定錨收錄(支援標籤\功\能)",	"",
 
-  Ctrl('G'), gem_anchor,        Ctrl('G'),      'p',    "定下/拔除/進入海錨",	NULL,
-  Ctrl('V'), gem_paste,         Ctrl('V'),      'p',    "貼上",         NULL,
+  Ctrl('G'), gem_anchor,        Ctrl('G'),      'p',    "定下/拔除/進入海錨",	"",
+  Ctrl('V'), gem_paste,         Ctrl('V'),      'p',    "貼上",         "",
 
   /* itoc.010223: 使用者習慣 c/p 收錄精華區 */
-  'p', gem_paste,               'p',            'p',    "貼上",         NULL,
+  'p', gem_paste,               'p',            'p',    "貼上",         "",
 
-  't', gem_tag,                 't',            'p',    "切換標籤",     NULL,
+  't', gem_tag,                 't',            'p',    "切換標籤",     "",
 
-  'x', post_cross,              'x',            'p',    "轉錄至看板",   NULL,
-  'X', post_forward,            'X',            'p',    "轉錄至信箱",   NULL,
-  'B', gem_toggle,              'B',            'p',    "顯示屬性",     NULL,
-  'o', gem_refuse,              'o',            'p',    "加密",         NULL,
-  Ctrl('Y'), gem_refuse,        Ctrl('Y'),      'p',    "加密",         NULL,
-  'm', gem_move,                'm',            'p',    "移動文章順序", NULL,
-  'M', gem_move,                'M',            'p',    "移動卷宗順序", NULL,
+  'x', post_cross,              'x',            'p',    "轉錄至看板",   "",
+  'X', post_forward,            'X',            'p',    "轉錄至信箱",   "",
+  'B', gem_toggle,              'B',            'p',    "顯示屬性",     "",
+  'o', gem_refuse,              'o',            'p',    "加密",         "",
+  Ctrl('Y'), gem_refuse,        Ctrl('Y'),      'p',    "加密",         "",
+  'm', gem_move,                'm',            'p',    "移動文章順序", "",
+  'M', gem_move,                'M',            'p',    "移動卷宗順序", "",
 
-  'S', gem_state,               'S',            's',    "觀看詳細屬性", NULL,
+  'S', gem_state,               'S',            's',    "觀看詳細屬性", "",
 
-  Ctrl('D'), gem_prune,         Ctrl('D'),      'p',    "刪除標籤所選", NULL,
+  Ctrl('D'), gem_prune,         Ctrl('D'),      'p',    "刪除標籤所選", "",
 
-  'h', gem_help,                'h',            'z',    "\功\能說明",	NULL
+  'h', gem_help,                'h',            'z',    "\功\能說明",	""
 };
 #endif
 

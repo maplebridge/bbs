@@ -1963,56 +1963,56 @@ static KeyFunc mbox_cb[] =
 static NewKeyFunc mbox_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
-  XO_ITEM, mbox_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, mbox_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, mbox_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, mbox_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, mbox_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, mbox_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, mbox_init,           XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, mbox_load,           XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, mbox_head,           XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, mbox_body,           XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', mbox_browse,             'r',    'z',    "讀信",         	NULL,
-  's', mbox_send,               's',    'p',    "寄信給站內ID",         NULL,
-  'd', mbox_delete,             'd',    'p',    "刪除",         	NULL,
-  'D', mbox_rangedel,           'D',    'p',    "區段刪除",     	NULL,
-  'x', post_cross,              'x',    'p',    "轉錄信件至看板",       NULL,
-  'X', mbox_forward,            'X',    'p',    "轉寄信件給站內ID",     NULL,
-  'E', mbox_edit,               'E',    'p',    "編輯已收信件內容",     NULL,
-  'T', mbox_title,              'T',    'p',    "修改以收信件標題",     NULL,
-  'm', mbox_mark,               'm',    'p',    "標記",                 NULL,
-  'R', mbox_reply,              'R',    'p',    "回信",                 NULL,
-  'y', mbox_reply,              'y',    'p',    "回信",                 NULL,
-  'v', mbox_visit,              'v',    'p',    "設定\閱\讀紀錄",       NULL,
+  'r', mbox_browse,             'r',    'z',    "讀信",         	"",
+  's', mbox_send,               's',    'p',    "寄信給站內ID",         "",
+  'd', mbox_delete,             'd',    'p',    "刪除",         	"",
+  'D', mbox_rangedel,           'D',    'p',    "區段刪除",     	"",
+  'x', post_cross,              'x',    'p',    "轉錄信件至看板",       "",
+  'X', mbox_forward,            'X',    'p',    "轉寄信件給站內ID",     "",
+  'E', mbox_edit,               'E',    'p',    "編輯已收信件內容",     "",
+  'T', mbox_title,              'T',    'p',    "修改以收信件標題",     "",
+  'm', mbox_mark,               'm',    'p',    "標記",                 "",
+  'R', mbox_reply,              'R',    'p',    "回信",                 "",
+  'y', mbox_reply,              'y',    'p',    "回信",                 "",
+  'v', mbox_visit,              'v',    'p',    "設定\閱\讀紀錄",       "",
   /* itoc.010408: 借用 post_write 即可 */
-  'w', post_write,              'w',    'p',    "傳送水球給來信ID",     NULL,
+  'w', post_write,              'w',    'p',    "傳送水球給來信ID",     "",
 
-  KEY_TAB, mbox_sysop,  KEY_TAB,        's',    "切換至sysop/guest信箱",	NULL,
-  'z', mbox_gem,                'z',    'p',    "個人精華區",           NULL,
-  'c', mbox_copy,               'c',    'p',    "複製信件(至個人精華區)",	NULL,
-  'g', gem_gather,              'g',    'p',    "收錄信件至個人精華區",	NULL,
+  KEY_TAB, mbox_sysop,  KEY_TAB,        's',    "切換至sysop/guest信箱",	"",
+  'z', mbox_gem,                'z',    'p',    "個人精華區",           "",
+  'c', mbox_copy,               'c',    'p',    "複製信件(至個人精華區)",	"",
+  'g', gem_gather,              'g',    'p',    "收錄信件至個人精華區",	"",
 
-  't', mbox_tag,                't',    'p',    "切換標籤",             NULL,
+  't', mbox_tag,                't',    'p',    "切換標籤",             "",
 
   /* itoc.001220: 搜尋作者/標題 */
-  '~', XoXselect,               '~',    'p',    "搜尋作者/標題",        NULL,
+  '~', XoXselect,               '~',    'p',    "搜尋作者/標題",        "",
   /* itoc.001220: 搜尋相同標題文章 */
-  'S', XoXsearch,               'S',    'p',    "搜尋同標題信件",       NULL,
+  'S', XoXsearch,               'S',    'p',    "搜尋同標題信件",       "",
   /* itoc.001220: 搜尋作者 */
-  'a', XoXauthor,               'a',    'p',    "搜尋作者",             NULL,
+  'a', XoXauthor,               'a',    'p',    "搜尋作者",             "",
   /* itoc.001220: 搜尋標題 */
-  '/', XoXtitle,                '/'.    'p',    "搜尋標題",             NULL,
+  '/', XoXtitle,                '/',    'p',    "搜尋標題",             "",
   /* itoc.030608: 全文搜尋 */
-  'f', XoXfull,                 'f',    'p',    "全文搜尋",             NULL,
+  'f', XoXfull,                 'f',    'p',    "全文搜尋",             "",
   /* itoc.010325: 搜尋 mark 文章 */
-  'G', XoXmark,                 'G',    'p',    "搜尋標記信件",         NULL,
+  'G', XoXmark,                 'G',    'p',    "搜尋標記信件",         "",
   /* itoc.010822: 搜尋本地文章 */
-  'L', XoXlocal,                'L',    'p',    "搜尋站內信件",         NULL,
-  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             NULL,
+  'L', XoXlocal,                'L',    'p',    "搜尋站內信件",         "",
+  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             "",
 
-  Ctrl('D'), mbox_prune,        Ctrl('D'),      'p',    "刪除標籤信件", NULL,
-  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   NULL,
-  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	NULL,
+  Ctrl('D'), mbox_prune,        Ctrl('D'),      'p',    "刪除標籤信件", "",
+  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   "",
+  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	"",
 
-  'h', mbox_help                'h',    'z',    "\功\能說明",             NULL
+  'h', mbox_help,               'h',    'z',    "\功\能說明",             ""
 };
 #endif
 
@@ -2076,43 +2076,43 @@ KeyFunc xmbox_cb[] =
 NewKeyFunc xmbox_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
-  XO_ITEM, mbox_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, mbox_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, xpost_init,          XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, xpost_load,          XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, xpost_head,          XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_INIT, xpost_init,          XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, xpost_load,          XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, xpost_head,          XO_HEAD,        'n',    "XO_HEAD",      "",
   /* Thor.980911: 共用即可 */
-  XO_BODY, mbox_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_BODY, mbox_body,           XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', xmbox_browse,            'r',    'z',    "讀信",         	NULL,
-  'y', mbox_reply,              'y',    'p',    "回信",                 NULL,
-  's', mbox_send,               's',    'p',    "寄信給站內ID",         NULL,
-  'x', post_cross,              'x',    'p',    "轉錄信件至看板",       NULL,
-  'X', post_forward,            'X',    'p',    "轉寄信件給站內ID",     NULL,
-  'E', mbox_edit,               'E',    'p',    "編輯已收信件內容",     NULL,
-  'T', mbox_title,              'T',    'p',    "修改以收信件標題",     NULL,
-  'm', mbox_mark,               'm',    'p',    "標記",                 NULL,
-  'd', mbox_delete,             'd',    'p',    "刪除",         	NULL,
+  'r', xmbox_browse,            'r',    'z',    "讀信",         	"",
+  'y', mbox_reply,              'y',    'p',    "回信",                 "",
+  's', mbox_send,               's',    'p',    "寄信給站內ID",         "",
+  'x', post_cross,              'x',    'p',    "轉錄信件至看板",       "",
+  'X', post_forward,            'X',    'p',    "轉寄信件給站內ID",     "",
+  'E', mbox_edit,               'E',    'p',    "編輯已收信件內容",     "",
+  'T', mbox_title,              'T',    'p',    "修改以收信件標題",     "",
+  'm', mbox_mark,               'm',    'p',    "標記",                 "",
+  'd', mbox_delete,             'd',    'p',    "刪除",         	"",
   /* itoc.010408: 借用 post_write 即可 */
-  'w', post_write,              'w',    'p',    "傳送水球給來信ID",     NULL,
+  'w', post_write,              'w',    'p',    "傳送水球給來信ID",     "",
 
-  'c', mbox_copy,               'c',    'p',    "複製信件(至個人精華區)",	NULL,
-  'g', gem_gather,              'g',    'p',    "收錄信件至個人精華區",	NULL,
+  'c', mbox_copy,               'c',    'p',    "複製信件(至個人精華區)",	"",
+  'g', gem_gather,              'g',    'p',    "收錄信件至個人精華區",	"",
 
-  't', mbox_tag,                't',    'p',    "切換標籤",             NULL,
+  't', mbox_tag,                't',    'p',    "切換標籤",             "",
 
-  '~', XoXselect,               '~',    'p',    "搜尋作者/標題",        NULL,
-  'S', XoXsearch,               'S',    'p',    "搜尋同標題信件",       NULL,
-  'a', XoXauthor,               'a',    'p',    "搜尋作者",             NULL,
-  '/', XoXtitle,                '/'.    'p',    "搜尋標題",             NULL,
-  'f', XoXfull,                 'f',    'p',    "全文搜尋",             NULL,
-  'G', XoXmark,                 'G',    'p',    "搜尋標記信件",         NULL,
-  'L', XoXlocal,                'L',    'p',    "搜尋站內信件",         NULL,
-  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             NULL,
+  '~', XoXselect,               '~',    'p',    "搜尋作者/標題",        "",
+  'S', XoXsearch,               'S',    'p',    "搜尋同標題信件",       "",
+  'a', XoXauthor,               'a',    'p',    "搜尋作者",             "",
+  '/', XoXtitle,                '/',    'p',    "搜尋標題",             "",
+  'f', XoXfull,                 'f',    'p',    "全文搜尋",             "",
+  'G', XoXmark,                 'G',    'p',    "搜尋標記信件",         "",
+  'L', XoXlocal,                'L',    'p',    "搜尋站內信件",         "",
+  '!', XoRXsearch,              '!',    'p',    "排除搜尋",             "",
 
-  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   NULL,
-  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	NULL,
+  Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   "",
+  Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	"",
 
-  'h', mbox_help                'h',    'z',    "\功\能說明",             NULL
+  'h', mbox_help,               'h',    'z',    "\功\能說明",             ""
 };
 #endif

@@ -1184,11 +1184,17 @@ xo_getch(xo, ch)
 /* XZ							 */
 /* ----------------------------------------------------- */
 
-
+#ifndef NEW_KeyFunc
 extern KeyFunc pal_cb[];
 extern KeyFunc f_pal_cb[];
 extern KeyFunc bmw_cb[];
 extern KeyFunc post_cb[];
+#else
+extern NewKeyFunc pal_cb[];
+extern NewKeyFunc f_pal_cb[];
+extern NewKeyFunc bmw_cb[];
+extern NewKeyFunc post_cb[];
+#endif
 
 XZ xz[] =
 {
@@ -1249,7 +1255,11 @@ xover(cmd)
 {
   int pos, num, zone, sysmode;
   XO *xo;
+#ifndef NEW_KeyFunc
   KeyFunc *xcmd, *cb;
+#else
+  NewKeyFunc *xcmd, *cb;
+#endif
 
   for (;;)
   {

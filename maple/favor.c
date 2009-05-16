@@ -1421,38 +1421,38 @@ static KeyFunc mf_cb[] =
 static NewKeyFunc mf_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, mf_item_bar, XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, mf_item_bar, XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, mf_init,     XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, mf_load,     XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, mf_head,     XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, mf_body,     XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, mf_init,     XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, mf_load,     XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, mf_head,     XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, mf_body,     XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', mf_browse,       'r',    'z',    "進入瀏覽",     NULL,
-  'd', mf_delete,       'd',    'p',    "刪除",         NULL,
-  'D', mf_rangedel,     'D',    'p',    "區段刪除",     NULL,
-  'o', mf_mark,         'o',    'p',    "標記不刪",     NULL,
-  't', mf_label,        't',    'p',    "切換標記T",    NULL,
-  'm', mf_move,         'm',    'p',    "移動位置",     NULL,
-  'T', mf_title,        'T',    'p',    "修改標題",     NULL,
-  'E', mf_edit,         'E',    'p',    "修改看板中文敘述",     NULL,
-  's', mf_switch,       's',    'p',    "選取看板",     NULL,
-  'c', mf_namemode,     'c',    'p',    "切換編號/篇數",        NULL,
-  'v', mf_visit,        'v',    'p',    "設定已讀",     NULL,
-  'V', mf_unvisit,      'V',    'p',    "設定未讀",     NULL,
-  '`', mf_nextunread,   '`',    'p',    "跳至下一未讀", NULL,
-  'i', mf_info,         'i',    'p',    "顯示看板資訊", NULL,
+  'r', mf_browse,       'r',    'z',    "進入瀏覽",     "",
+  'd', mf_delete,       'd',    'p',    "刪除",         "",
+  'D', mf_rangedel,     'D',    'p',    "區段刪除",     "",
+  'o', mf_mark,         'o',    'p',    "標記不刪",     "",
+  't', mf_label,        't',    'p',    "切換標記T",    "",
+  'm', mf_move,         'm',    'p',    "移動位置",     "",
+  'T', mf_title,        'T',    'p',    "修改標題",     "",
+  'E', mf_edit,         'E',    'p',    "修改看板中文敘述",     "",
+  's', mf_switch,       's',    'p',    "選取看板",     "",
+  'c', mf_namemode,     'c',    'p',    "切換編號/篇數",        "",
+  'v', mf_visit,        'v',    'p',    "設定已讀",     "",
+  'V', mf_unvisit,      'V',    'p',    "設定未讀",     "",
+  '`', mf_nextunread,   '`',    'p',    "跳至下一未讀", "",
+  'i', mf_info,         'i',    'p',    "顯示看板資訊", "",
 
-  Ctrl('P'), mf_add,    Ctrl('P'),      'p',    "新增", NULL,
-  'C', mf_copy,         'C',    'p',    "複製",         NULL,
-  'g', mf_copy,         'g',    'p',    "複製",         NULL,
-  'p', mf_paste,        'p',    'p',    "貼上",         NULL,
-  Ctrl('V'), mf_paste,  Ctrl('V'),      'p',    "新增", NULL,
-  Ctrl('A'), mf_append, Ctrl('A'),      'p',	"將全部標記T移至所在目錄",      NULL,
-  Ctrl('T'), mf_clear_label,	Ctrl('T'),	'p',	"清除全部看板之標記T",          NULL,
-  Ctrl('D'), mf_del_label,	Ctrl('D'),	'p',	"刪除全部有標記T之看板",        NULL,
+  Ctrl('P'), mf_add,    Ctrl('P'),      'p',    "新增", "",
+  'C', mf_copy,         'C',    'p',    "複製",         "",
+  'g', mf_copy,         'g',    'p',    "複製",         "",
+  'p', mf_paste,        'p',    'p',    "貼上",         "",
+  Ctrl('V'), mf_paste,  Ctrl('V'),      'p',    "新增", "",
+  Ctrl('A'), mf_append, Ctrl('A'),      'p',	"將全部標記T移至所在目錄",      "",
+  Ctrl('T'), mf_clear_label,	Ctrl('T'),	'p',	"清除全部看板之標記T",          "",
+  Ctrl('D'), mf_del_label,	Ctrl('D'),	'p',	"刪除全部有標記T之看板",        "",
 
-  'h', mf_help          'h',    'z',    "\功\能說明",     NULL
+  'h', mf_help,         'h',    'z',    "\功\能說明",     NULL
 };
 #endif
 

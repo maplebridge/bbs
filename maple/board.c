@@ -2915,41 +2915,41 @@ static KeyFunc class_cb[] =
 static NewKeyFunc class_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, class_bar,   XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, class_bar,   XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, class_head,  XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, class_body,  XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, class_head,  XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, class_body,  XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, class_head,  XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, class_body,  XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, class_head,  XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, class_body,  XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', class_browse,    'r',    'z',    "瀏覽",                 NULL,
-  '/', class_search,    '/',    'p',    "依板名搜尋看板",       NULL,
-  '?', class_searchBM,  '?',    'p',    "依板主搜尋看板",       NULL,
-  's', class_switch,    's',    'p',    "選取看板",             NULL,
-  'c', class_postmode,  'c',    'p',    "切換看板編號/篇數",    NULL,
-  'S', class_namemode,  'S',    'p',    "按照字母/分類排序",    NULL,
+  'r', class_browse,    'r',    'z',    "瀏覽",                 "",
+  '/', class_search,    '/',    'p',    "依板名搜尋看板",       "",
+  '?', class_searchBM,  '?',    'p',    "依板主搜尋看板",       "",
+  's', class_switch,    's',    'p',    "選取看板",             "",
+  'c', class_postmode,  'c',    'p',    "切換看板編號/篇數",    "",
+  'S', class_namemode,  'S',    'p',    "按照字母/分類排序",    "",
 
-  'y', class_yank,      'y',    'p',    "列出/不列出所有看板",  NULL,
-  'z', class_zap,       'z',    'p',    "訂\閱\/不訂\閱\此看板",    NULL,
-  'Z', class_zapall,    'Z',    'p',    "訂閱/不訂\閱\全部看板",  NULL,
-  'v', class_visit,     'v',    'p',    "設定看板已讀",         NULL,
-  'V', class_unvisit,   'V',    'p',    "設定看板未讀",         NULL,
-  '`', class_nextunread,'`',    'p',    "跳至下一未讀看板",     NULL,
-  'E', class_edit,      'E',    'b',    "修改看板",             NULL,
-  'i', class_info,      'i',    'p',    "顯示看板資訊",         NULL,
+  'y', class_yank,      'y',    'p',    "列出/不列出所有看板",  "",
+  'z', class_zap,       'z',    'p',    "訂\閱\/不訂\閱\此看板",    "",
+  'Z', class_zapall,    'Z',    'p',    "訂\閱\不訂\閱\全部看板",  "",
+  'v', class_visit,     'v',    'p',    "設定看板已讀",         "",
+  'V', class_unvisit,   'V',    'p',    "設定看板未讀",         "",
+  '`', class_nextunread,'`',    'p',    "跳至下一未讀看板",     "",
+  'E', class_edit,      'E',    'b',    "修改看板",             "",
+  'i', class_info,      'i',    'p',    "顯示看板資訊",         "",
 
 #ifdef AUTHOR_EXTRACTION
-  'A', XoAuthor,        'A',    'p',    "搜尋全站作者/標題",    NULL,
+  'A', XoAuthor,        'A',    'p',    "搜尋全站作者/標題",    "",
 #endif
 
 #ifdef MY_FAVORITE
-  'a', class_addMF,     'a',    'p',    "加入我的最愛",         NULL,
-  'f', class_addMF,     'f',    'p',    "加入我的最愛",         NULL,
+  'a', class_addMF,     'a',    'p',    "加入我的最愛",         "",
+  'f', class_addMF,     'f',    'p',    "加入我的最愛",         "",
 #endif
 
-  Ctrl('P'), class_newbrd,      'Ctrl('P')',    's',    "開闢看板",     NULL,
+  Ctrl('P'), class_newbrd,      Ctrl('P'),    's',    "開闢看板",     "",
 
-  'h', class_help,      'h',    'z',    "\功\能說明",     NULL
+  'h', class_help,      'h',    'z',    "\功\能說明",     ""
 };
 #endif
 

@@ -1302,64 +1302,64 @@ static KeyFunc ulist_cb[] =
 static NewKeyFunc ulist_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, ulist_item_bar,      XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, ulist_item_bar,      XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, ulist_init,          XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, ulist_body,          XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, ulist_head,          XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_INIT, ulist_init,          XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, ulist_body,          XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, ulist_head,          XO_HEAD,        'n',    "XO_HEAD",      "",
   /* XO_BODY, ulist_body, */    /* 沒有用到 */
 
-  'f', ulist_pal,       'f',    'p',    "顯示好友/全部網友",    NULL,
+  'f', ulist_pal,       'f',    'p',    "顯示好友/全部網友",    "",
   /* itoc.010205: 有人會把 yank 的意思用在這 */
-  'y', ulist_pal,       'y',    'p',    "顯示好友/全部網友",    NULL,
-  'a', ulist_addpal,    'a',    'p',    "增列好友/壞人/特殊",   NULL,
-  'd', ulist_delpal,    'd',    'p',    "刪除好友/壞人/特殊",   NULL,
-  't', ulist_talk,      't',    'p',    "邀請對方進聊天室聊天", NULL,
-  'w', ulist_write,     'w',    'p',    "傳送水球給對方",       NULL,
+  'y', ulist_pal,       'y',    'p',    "顯示好友/全部網友",    "",
+  'a', ulist_addpal,    'a',    'p',    "增列好友/壞人/特殊",   "",
+  'd', ulist_delpal,    'd',    'p',    "刪除好友/壞人/特殊",   "",
+  't', ulist_talk,      't',    'p',    "邀請對方進聊天室聊天", "",
+  'w', ulist_write,     'w',    'p',    "傳送水球給對方",       "",
   /* 水球回顧 */
-  'l', ulist_recall,    'l',    'p',    "回顧水球",             NULL,
-  'L', ulist_display,   'L',    'p',    "瀏覽水球",             NULL,
-  'r', ulist_query,     'r',    'z',    "查詢網友",             NULL,
+  'l', ulist_recall,    'l',    'p',    "回顧水球",             "",
+  'L', ulist_display,   'L',    'p',    "瀏覽水球",             "",
+  'r', ulist_query,     'r',    'z',    "查詢網友",             "",
   /* itoc.020109: 使用者習慣用 q 查詢 */
-  'q', ulist_query,     'q',    'p',    "查詢網友",             NULL,
-  'B', ulist_broadcast, 'B',    'p',    "廣播",                 NULL,
+  'q', ulist_query,     'q',    'p',    "查詢網友",             "",
+  'B', ulist_broadcast, 'B',    'p',    "廣播",                 "",
   /* refresh status Thor: 應user要求 */
-  's', ulist_init,      's',    'p',    "更新網友列表",         NULL,
-  'S', ulist_ship,      'S',    'p',    "顯示故鄉/友誼",        NULL,
+  's', ulist_init,      's',    'p',    "更新網友列表",         "",
+  'S', ulist_ship,      'S',    'p',    "顯示故鄉/友誼",        "",
 
-  Ctrl('K'), ulist_kick,        Ctrl('K'),      's',    "把壞蛋踢下站", 	NULL,
-  Ctrl('O'), ulist_edit,        Ctrl('O'),      's',    "設定使用者資料",	NULL,
-  Ctrl('Q'), ulist_query,       Ctrl('Q'),      'p',    "查詢網友",     	NULL,
+  Ctrl('K'), ulist_kick,        Ctrl('K'),      's',    "把壞蛋踢下站", 	"",
+  Ctrl('O'), ulist_edit,        Ctrl('O'),      's',    "設定使用者資料",	"",
+  Ctrl('Q'), ulist_query,       Ctrl('Q'),      'p',    "查詢網友",     	"",
 
 #ifdef HAVE_CHANGE_NICK
-  Ctrl('N'), ulist_nickchange,  Ctrl('N'),      'p',    "更改個人暱稱", 	NULL,
+  Ctrl('N'), ulist_nickchange,  Ctrl('N'),      'p',    "更改個人暱稱", 	"",
 #endif
 #ifdef HAVE_CHANGE_FROM
-  Ctrl('F'), ulist_fromchange,  Ctrl('F'),      'p',    "更改故鄉來源", 	NULL,
+  Ctrl('F'), ulist_fromchange,  Ctrl('F'),      'p',    "更改故鄉來源", 	"",
 #endif
 #ifdef HAVE_CHANGE_MODE
-  'M', ulist_modechange,        'M',    	'p',    "更改個人顯示動態",     NULL,
+  'M', ulist_modechange,        'M',    	'p',    "更改個人顯示動態",     "",
 #endif
 #ifdef HAVE_CHANGE_ID
-  Ctrl('D'), ulist_idchange,    Ctrl('D'),      's',    "短暫 ID 變身", 	NULL,
+  Ctrl('D'), ulist_idchange,    Ctrl('D'),      's',    "短暫 ID 變身", 	"",
 #endif
 
 #if 0
   '/', ulist_search,
 #endif
   /* Thor.990125: 可前後搜尋, id or nickname */
-  '/', ulist_search_forward,    '/',    	'p',    "向後搜尋id",   NULL,
-  '?', ulist_search_backward,   '?',    	'p',    "向前搜尋id",   NULL,
+  '/', ulist_search_forward,    '/',    	'p',    "向後搜尋id",   "",
+  '?', ulist_search_backward,   '?',    	'p',    "向前搜尋id",   "",
 
-  'm', ulist_mail,      	'm',    	'p',    "寄信給對方",   NULL,
-  KEY_TAB, ulist_toggle,	KEY_TAB,	'p',	"改變排列方式",	NULL,
+  'm', ulist_mail,      	'm',    	'p',    "寄信給對方",   "",
+  KEY_TAB, ulist_toggle,	KEY_TAB,	'p',	"改變排列方式",	"",
 
-  'i', ulist_cloak,     	'i',    	'p',    "隱身",         NULL,
+  'i', ulist_cloak,     	'i',    	'p',    "隱身",         "",
 #ifdef HAVE_SUPERCLOAK
-  'H', ulist_supercloak,        'H',    	's',    "紫隱", 	NULL,
+  'H', ulist_supercloak,        'H',    	's',    "紫隱", 	"",
 #endif
 
-  'h', ulist_help,      	'h',    	'z',    "\功\能說明",   NULL
+  'h', ulist_help,      	'h',    	'z',    "\功\能說明",   ""
 };
 #endif
 

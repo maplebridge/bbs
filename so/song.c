@@ -800,22 +800,22 @@ static KeyFunc song_cb[] =
 static NewKeyFunc song_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
-  XO_ITEM, song_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, song_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, song_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, song_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, song_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, song_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, song_init,           XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, song_load,           XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, song_head,           XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, song_body,           XO_BODY,        'n',    "XO_BODY",      "",
 
-  'r', song_browse,     'r',    'z',    "瀏覽",                 NULL,
-  'o', song_order,      'o',    'p',    "點歌到動態看板",       NULL,
-  'm', song_send,       'm',    'p',    "點歌到站內信箱",       NULL,
-  'M', song_internet,   'M',    'p',    "點歌到站外信箱",       NULL,
+  'r', song_browse,     'r',    'z',    "瀏覽",                 "",
+  'o', song_order,      'o',    'p',    "點歌到動態看板",       "",
+  'm', song_send,       'm',    'p',    "點歌到站內信箱",       "",
+  'M', song_internet,   'M',    'p',    "點歌到站外信箱",       "",
 
-  'E', song_edit,       'E',    's',    "修改內容",             NULL,
-  'T', song_title,      'T',    's',    "修改標題",             NULL,
+  'E', song_edit,       'E',    's',    "修改內容",             "",
+  'T', song_title,      'T',    's',    "修改標題",             "",
 
-  'h', song_help,       'h',    'z',    "\功\能說明",           NULL
+  'h', song_help,       'h',    'z',    "\功\能說明",           ""
 };
 #endif
 

@@ -1274,29 +1274,29 @@ static KeyFunc nbrd_cb[] =
 static NewKeyFunc nbrd_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
-  XO_ITEM, nbrd_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, nbrd_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, nbrd_init,           XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, nbrd_load,           XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, nbrd_head,           XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, nbrd_body,           XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, nbrd_init,           XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, nbrd_load,           XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, nbrd_head,           XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, nbrd_body,           XO_BODY,        'n',    "XO_BODY",      "",
 
-  'y', nbrd_reply,      'y',    'p',    "參加連署",     NULL,
-  'r', nbrd_browse,     'r',    'z',    "瀏覽",         NULL,
-  'o', nbrd_open,       'o',    's',    "開板",         NULL,
+  'y', nbrd_reply,      'y',    'p',    "參加連署",     "",
+  'r', nbrd_browse,     'r',    'z',    "瀏覽",         "",
+  'o', nbrd_open,       'o',    's',    "開板",         "",
 #ifdef SYSOP_START_COSIGN
-  's', nbrd_start,      's',    's',    "開始連署",     NULL,
+  's', nbrd_start,      's',    's',    "開始連署",     "",
 #endif
-  'c', nbrd_finish,     'c',    's',    "關閉連署",     NULL,
-  'd', nbrd_delete,     'd',    's',    "刪除連署",     NULL,
-  'E', nbrd_edit,       'E',    's',    "編輯內容",     NULL,
-  'B', nbrd_setup,      'B',    's',    "連署設定",     NULL,
+  'c', nbrd_finish,     'c',    's',    "關閉連署",     "",
+  'd', nbrd_delete,     'd',    's',    "刪除連署",     "",
+  'E', nbrd_edit,       'E',    's',    "編輯內容",     "",
+  'B', nbrd_setup,      'B',    's',    "連署設定",     "",
 
-  Ctrl('P'), nbrd_add,  	Ctrl('P'),      'p',    "新增連署",     NULL,
-  Ctrl('Q'), nbrd_uquery,       Ctrl('Q'),      'p',    "作者查詢",     NULL,
-  Ctrl('O'), nbrd_usetup,       Ctrl('O'),      's',    "作者設定",     NULL,
+  Ctrl('P'), nbrd_add,  	Ctrl('P'),      'p',    "新增連署",     "",
+  Ctrl('Q'), nbrd_uquery,       Ctrl('Q'),      'p',    "作者查詢",     "",
+  Ctrl('O'), nbrd_usetup,       Ctrl('O'),      's',    "作者設定",     "",
 
-  'h', nbrd_help        'h',    'z',    "\功\能說明",     NULL
+  'h', nbrd_help,       'h',    'z',    "\功\能說明",     ""
 };
 #endif
 

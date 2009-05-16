@@ -989,31 +989,31 @@ KeyFunc pal_cb[] =
 NewKeyFunc pal_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, pal_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, pal_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, pal_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, pal_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, pal_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, pal_body,            XO_BODY,        'n',    "XO_LOAD",      NULL,
+  XO_INIT, pal_init,            XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, pal_load,            XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, pal_head,            XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, pal_body,            XO_BODY,        'n',    "XO_LOAD",      "",
 
-  'a', pal_add,         'a',    'p',    "新增",         NULL,
-  'c', pal_change,      'c',    'p',    "修改",         NULL,
-  'd', pal_delete,      'd',    'p',    "刪除",         NULL,
-  'D', pal_rangedel,    'D',    'p',    "區段刪除",     NULL,
-  'm', pal_mail,        'm',    'p',    "寄信給對方",   NULL,
-  'w', pal_write,       'w',    'p',    "傳送水球給對方",       NULL,
-  'B', pal_broadcast,   'B',    'p',    "廣播",         NULL,
-  'r', pal_query,       'r',    'z',    "查詢對方",     NULL,
-  Ctrl('Q'), pal_query,	Ctrl('Q'),	'p',    "查詢對方",     NULL,
-  's', pal_sort,        's',    'p',    "整理名單",     NULL,
-  't', pal_tag,         't',    'p',    "切換標籤",     NULL,
-  Ctrl('D'), pal_prune,	Ctrl('D'),	'p',	"刪除標籤所選", NULL,
+  'a', pal_add,         'a',    'p',    "新增",         "",
+  'c', pal_change,      'c',    'p',    "修改",         "",
+  'd', pal_delete,      'd',    'p',    "刪除",         "",
+  'D', pal_rangedel,    'D',    'p',    "區段刪除",     "",
+  'm', pal_mail,        'm',    'p',    "寄信給對方",   "",
+  'w', pal_write,       'w',    'p',    "傳送水球給對方",       "",
+  'B', pal_broadcast,   'B',    'p',    "廣播",         "",
+  'r', pal_query,       'r',    'z',    "查詢對方",     "",
+  Ctrl('Q'), pal_query,	Ctrl('Q'),	'p',    "查詢對方",     "",
+  's', pal_sort,        's',    'p',    "整理名單",     "",
+  't', pal_tag,         't',    'p',    "切換標籤",     "",
+  Ctrl('D'), pal_prune,	Ctrl('D'),	'p',	"刪除標籤所選", "",
 
 #if (defined(HAVE_MODERATED_BOARD) || defined(HAVE_LIST))
-  'f', pal_cite,        'f',    'p',    "引入朋友名單", NULL,
+  'f', pal_cite,        'f',    'p',    "引入朋友名單", "",
 #endif
 
-  'h', pal_help,        'h',    'z',    "\功\能說明",     NULL
+  'h', pal_help,        'h',    'z',    "\功\能說明",     ""
 };
 #endif
 
@@ -1040,19 +1040,19 @@ KeyFunc f_pal_cb[] =
 NewKeyFunc f_pal_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, pal_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, pal_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
-  XO_INIT, pal_init,            XO_INIT,        'n',    "XO_INIT",      NULL,
-  XO_LOAD, pal_load,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, pal_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
-  XO_BODY, pal_body,            XO_BODY,        'n',    "XO_BODY",      NULL,
+  XO_INIT, pal_init,            XO_INIT,        'n',    "XO_INIT",      "",
+  XO_LOAD, pal_load,            XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, pal_head,            XO_HEAD,        'n',    "XO_HEAD",      "",
+  XO_BODY, pal_body,            XO_BODY,        'n',    "XO_BODY",      "",
 
-  'm', pal_mail,        'm',    'p',    "寄信給對方",           NULL,
-  'w', pal_write,       'w',    'p',    "傳送水球給對方",       NULL,
-  'r', pal_query,       'r',    'z',    "查詢對方",             NULL,
-  Ctrl('Q'), pal_query, Ctrl('Q'),      'p',    "查詢對方",     NULL,
+  'm', pal_mail,        'm',    'p',    "寄信給對方",           "",
+  'w', pal_write,       'w',    'p',    "傳送水球給對方",       "",
+  'r', pal_query,       'r',    'z',    "查詢對方",             "",
+  Ctrl('Q'), pal_query, Ctrl('Q'),      'p',    "查詢對方",     "",
 
-  'h', f_pal_help       'h',    'z',    "\功\能說明",     NULL
+  'h', f_pal_help,      'h',    'z',    "\功\能說明",     ""
 };
 #endif
 

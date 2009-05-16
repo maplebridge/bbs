@@ -473,34 +473,34 @@ static KeyFunc bit_cb[] =
 static NewKeyFunc bit_cb[] = 
 {
 #ifdef  HAVE_LIGHTBAR
-  XO_ITEM, bit_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      NULL,
+  XO_ITEM, bit_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
 #endif
   /* bit_init */
-  XO_INIT, bit_set,             XO_INIT,        'n',    "XO_INIT",      NULL,
+  XO_INIT, bit_set,             XO_INIT,        'n',    "XO_INIT",      "",
   /* bit_load */
-  XO_LOAD, bit_body,            XO_LOAD,        'n',    "XO_LOAD",      NULL,
-  XO_HEAD, bit_head,            XO_HEAD,        'n',    "XO_HEAD",      NULL,
+  XO_LOAD, bit_body,            XO_LOAD,        'n',    "XO_LOAD",      "",
+  XO_HEAD, bit_head,            XO_HEAD,        'n',    "XO_HEAD",      "",
 //  XO_BODY, bit_body,
 
   /* 解除封鎖 */
-  'b', bit_unblock,             'b',    'p',    "解除封鎖",     NULL,
+  'b', bit_unblock,             'b',    'p',    "解除封鎖",     "",
   /* 封鎖連絡人 */
-  'B', bit_block,               'B',    'p',    "封鎖聯若人",   NULL,
+  'B', bit_block,               'B',    'p',    "封鎖聯若人",   "",
   /* 新增連絡人 */
-  'a', bit_addpal,              'a',    'p',    "新增聯絡人",   NULL,
+  'a', bit_addpal,              'a',    'p',    "新增聯絡人",   "",
   /* 刪除連絡人 */
-  'd', bit_delpal,              'd',    'p',    "刪除聯絡人",   NULL,
+  'd', bit_delpal,              'd',    'p',    "刪除聯絡人",   "",
   /* 回顧 FN_MSN 訊息 */
-  'l', bit_show,                'l',    'p',    "回顧訊息",     NULL,
+  'l', bit_show,                'l',    'p',    "回顧訊息",     "",
 //  's', bit_save,
 //  'n', bit_onick,
   /* 更改自己的暱稱 */
-  'c', bit_mynick,              'c',    'p',    "更改自己暱稱", NULL,
+  'c', bit_mynick,              'c',    'p',    "更改自己暱稱", "",
   /* 送 MSN 訊息 */
-  'w', bit_write,               'w',    'p',    "傳送MSN訊息",  NULL,
+  'w', bit_write,               'w',    'p',    "傳送MSN訊息",  "",
   /* 中斷連線 */
-  Ctrl ('K'), bit_close,        Ctrl ('K'),     'p',    "中斷MSN連線",  NULL,
-  'h', bit_help                 'h',    'z',    "\功\能說明",   NULL
+  Ctrl ('K'), bit_close,        Ctrl ('K'),     'p',    "中斷MSN連線",  "",
+  'h', bit_help,                'h',    'z',    "\功\能說明",   ""
 };
 #endif
 

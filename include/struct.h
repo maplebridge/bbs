@@ -656,7 +656,11 @@ typedef struct
 typedef struct
 {
   XO *xo;
+#ifndef NEW_KeyFunc
   KeyFunc *cb;
+#else
+  NewKeyFunc *cb;
+#endif
   int mode;
   char *feeter;
 } XZ;
