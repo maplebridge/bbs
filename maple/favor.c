@@ -1418,7 +1418,7 @@ static KeyFunc mf_cb[] =
   'h', mf_help
 };
 #else
-static NewKeyFunc mf_cb[] =
+NewKeyFunc mf_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, mf_item_bar, XO_ITEM,        'n',    "XO_ITEM",      "",

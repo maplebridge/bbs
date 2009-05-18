@@ -1190,10 +1190,56 @@ extern KeyFunc f_pal_cb[];
 extern KeyFunc bmw_cb[];
 extern KeyFunc post_cb[];
 #else
+extern NewKeyFunc bmw_cb[];
+extern NewKeyFunc class_cb[];
+extern NewKeyFunc mf_cb[];
+extern NewKeyFunc gem_cb[];
+extern NewKeyFunc mbox_cb[];
+extern NewKeyFunc xmbox_cb[];
 extern NewKeyFunc pal_cb[];
 extern NewKeyFunc f_pal_cb[];
-extern NewKeyFunc bmw_cb[];
 extern NewKeyFunc post_cb[];
+extern NewKeyFunc news_cb[];
+extern NewKeyFunc xpost_cb[];
+extern NewKeyFunc ulist_cb[];
+
+
+//NewKeyFunc aloha_cb[];
+//NewKeyFunc bit_cb[];
+//NewKeyFunc nbrd_cb[];
+//NewKeyFunc rss_cb[];
+//NewKeyFunc song_cb[];
+//NewKeyFunc vote_cb[];
+
+typedef struct
+{
+  NewKeyFunc *cb;
+} MY_XZ;
+
+static MY_XZ my_xz[] =
+{
+  bmw_cb,    // maple/bmw.c
+  class_cb,  // maple/board.c
+  mf_cb,     // maple/favor.c
+  gem_cb,    // maple/gem.c
+  mbox_cb,   // maple/mail.c
+  xmbox_cb,  // maple/mail.c
+  pal_cb,    // maple/pal.c
+  f_pal_cb,  // maple/pal.c
+  post_cb,   // maple/post.c
+  news_cb,   // maple/post.c
+  xpost_cb,  // maple/post.c
+  ulist_cb   // maple/ulist.c
+
+//  aloha_cb,  // so/aloha.c
+//  bit_cb,    // so/bitlbee.c
+//  nbrd_cb,   // so/newbrd.c
+//  rss_cb,    // so/rss.c
+//  song_cb,   // so/song.c
+//  vote_cb    // so/vote.c
+
+};
+
 #endif
 
 XZ xz[] =

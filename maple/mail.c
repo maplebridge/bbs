@@ -1960,7 +1960,7 @@ static KeyFunc mbox_cb[] =
   'h', mbox_help
 };
 #else
-static NewKeyFunc mbox_cb[] =
+NewKeyFunc mbox_cb[] =
 {
 #ifdef HAVE_LIGHTBAR
   XO_ITEM, mbox_item_bar,       XO_ITEM,        'n',    "XO_ITEM",      "",

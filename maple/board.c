@@ -2912,7 +2912,7 @@ static KeyFunc class_cb[] =
   'h', class_help
 };
 #else
-static NewKeyFunc class_cb[] =
+NewKeyFunc class_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, class_bar,   XO_ITEM,        'n',    "XO_ITEM",      "",

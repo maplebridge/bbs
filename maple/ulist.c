@@ -1299,7 +1299,7 @@ static KeyFunc ulist_cb[] =
   'h', ulist_help
 };
 #else
-static NewKeyFunc ulist_cb[] =
+NewKeyFunc ulist_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, ulist_item_bar,      XO_ITEM,        'n',    "XO_ITEM",      "",

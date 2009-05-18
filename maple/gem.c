@@ -1705,7 +1705,7 @@ static KeyFunc gem_cb[] =
   'h', gem_help
 };
 #else
-static NewKeyFunc gem_cb[] =
+NewKeyFunc gem_cb[] =
 {
 #ifdef  HAVE_LIGHTBAR
   XO_ITEM, gem_item_bar,        XO_ITEM,        'n',    "XO_ITEM",      "",
