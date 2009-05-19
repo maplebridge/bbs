@@ -248,16 +248,16 @@ static char *ModeTypeTable[] =
 #define XZ_COSIGN	(XO_ZONE + 7)	/* 連署 */
 #define	XZ_SONG		(XO_ZONE + 8)	/* 點歌 */
 #define XZ_NEWS		(XO_ZONE + 9)	/* 新聞閱讀模式 */
+#define XZ_BITLBEE      (XO_ZONE + 10)  /* BITLBEE */
+#define XZ_FAKE_PAL     (XO_ZONE + 11)  /* post.c內觀看板友名單 */
+#define XZ_RSS          (XO_ZONE + 12)  /* RSS */
 
 /* 以下的有 thread 主題式閱讀的功能 */
 /* 以下的有 tag 功能 */
 
-#define XZ_XPOST        (XO_ZONE + 10)	/* 搜尋文章模式 */
-#define	XZ_MBOX		(XO_ZONE + 11)	/* 信箱 */
-#define	XZ_POST		(XO_ZONE + 12)	/* 看板 */
-#define XZ_GEM		(XO_ZONE + 13)	/* 精華區 */
-#define XZ_BITLBEE	(XO_ZONE + 14)	/* BITLBEE */
-#define XZ_FAKE_PAL	(XO_ZONE + 15)	/* post.c內觀看板友名單 */
-#define XZ_RSS		(XO_ZONE + 16)	/* RSS */
+#define XZ_XPOST        (XO_ZONE + 13)	/* 搜尋文章模式 */
+#define	XZ_MBOX		(XO_ZONE + 14)	/* 信箱 */
+#define	XZ_POST		(XO_ZONE + 15)	/* 看板 */
+#define XZ_GEM		(XO_ZONE + 16)	/* 精華區 */
 
 #endif				/* _MODES_H_ */
