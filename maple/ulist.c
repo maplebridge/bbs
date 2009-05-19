@@ -1259,7 +1259,6 @@ static KeyFunc ulist_cb[] =
   'l', ulist_recall,		/* 水球回顧 */
   'L', ulist_display,
   'r', ulist_query,
-  'q', ulist_query,		/* itoc.020109: 使用者習慣用 q 查詢 */
   'B', ulist_broadcast,
   's', ulist_init,		/* refresh status Thor: 應user要求 */
   'S', ulist_ship,
@@ -1321,7 +1320,6 @@ NewKeyFunc ulist_cb[] =
   'L', ulist_display,   'L',    'p',    "瀏覽水球",             "",
   'r', ulist_query,     'r',    'z',    "查詢網友",             "",
   /* itoc.020109: 使用者習慣用 q 查詢 */
-  'q', ulist_query,     'q',    'p',    "查詢網友",             "",
   'B', ulist_broadcast, 'B',    'p',    "廣播",                 "",
   /* refresh status Thor: 應user要求 */
   's', ulist_init,      's',    'p',    "更新網友列表",         "",

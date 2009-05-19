@@ -1240,6 +1240,48 @@ static MY_XZ my_xz[] =
 
 };
 
+static int key_in_xover[] =
+{
+  KEY_LEFT,  //  0
+  'q',       //  1
+  KEY_UP,    //  2
+  'k',       //  3
+  KEY_DOWN,  //  4
+  'j',       //  5
+  ' ',       //  6
+  KEY_PGDN,  //  7
+  'N',       //  8
+  KEY_PGUP,  //  9
+  'P',       // 10
+  KEY_HOME,  // 11
+  '0',       // 12
+  KEY_END,   // 13
+  '$',       // 14
+  '1',       // 15
+  '2',       // 16
+  '3',       // 17
+  '4',       // 18
+  '5',       // 19
+  '6',       // 20
+  '7',       // 21
+  '8',       // 22
+  '9',       // 23
+  KEY_RIGHT, // 24
+  '\n',      // 25
+  Ctrl('Z'), // 26
+  Ctrl('U'), // 27
+  Ctrl('W'), // 28
+  
+  /* 以下為 zone >= XZ_XPOST */
+  
+  'C',       // 29
+  'F',       // 30
+  Ctrl('C'), // 31
+  Ctrl('A'), // 32
+  Ctrl('T')  // 33
+  
+}
+
 #endif
 
 XZ xz[] =
@@ -1497,7 +1539,12 @@ xover(cmd)
     /* 基本的游標移動 routines				 */
     /* ------------------------------------------------- */
 
-    if (cmd == KEY_LEFT || (cmd == 'q' && zone != XZ_ULIST))
+#ifndef NEW_KeyFunc
+    if (cmd == KEY_LEFT || (cmd == 'q'))
+#else
+    //if (cmd == KEY_LEFT || (cmd == 'q'))
+    if (cmd == key_in_xover[0] || (cmd == key_in_xover[1]))
+#endif
     {
       TagNum = 0;	/* itoc.050413: 從精華區回到文章列表時要清除 tag */
       return;
@@ -1506,27 +1553,57 @@ xover(cmd)
     {
       continue;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_UP || cmd == 'k')
+#else
+    //else if (cmd == KEY_UP || cmd == 'k')
+    else if (cmd == key_in_xover[2] || cmd == key_in_xover[3])
+#endif
     {
       cmd = pos - 1 + XO_MOVE + XO_WRAP;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_DOWN || cmd == 'j')
+#else
+    //else if (cmd == KEY_DOWN || cmd == 'j')
+    else if (cmd == key_in_xover[4] || cmd == key_in_xover[5])
+#endif
     {
       cmd = pos + 1 + XO_MOVE + XO_WRAP;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == ' ' || cmd == KEY_PGDN || cmd == 'N')
+#else
+    //else if (cmd == ' ' || cmd == KEY_PGDN || cmd == 'N')
+    else if (cmd == key_in_xover[6] || cmd == key_in_xover[7] || cmd == key_in_xover[8])
+#endif
     {
       cmd = pos + XO_TALL + XO_MOVE;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_PGUP || cmd == 'P')
+#else
+    //else if (cmd == KEY_PGUP || cmd == 'P')
+    else if (cmd == key_in_xover[9] || cmd == key_in_xover[10])
+#endif
     {
       cmd = pos - XO_TALL + XO_MOVE;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_HOME || cmd == '0')
+#else
+    //else if (cmd == KEY_HOME || cmd == '0')
+    else if (cmd == key_in_xover[11] || cmd == key_in_xover[12])
+#endif
     {
       cmd = XO_MOVE;
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_END || cmd == '$')
+#else
+    //else if (cmd == KEY_END || cmd == '$')
+    else if (cmd == key_in_xover[13] || cmd == key_in_xover[14])
+#endif
     {
       if (zone == XZ_POST)
       {
@@ -1539,11 +1616,21 @@ xover(cmd)
       else
 	cmd = xo->max - 1 + XO_MOVE;
     }
+#ifndef NEW_KeyFunc
     else if (cmd >= '1' && cmd <= '9')
+#else
+    //else if (cmd >= '1' && cmd <= '9')
+    else if (cmd >= key_in_xover[15] && cmd <= key_in_xover[16])
+#endif
     {
       cmd = xo_jump(cmd, zone);
     }
+#ifndef NEW_KeyFunc
     else if (cmd == KEY_RIGHT || cmd == '\n')
+#else
+    //else if (cmd == KEY_RIGHT || cmd == '\n')
+    else if (cmd == key_in_xover[24] || cmd == key_in_xover[25])
+#endif
     {
       cmd = 'r';
     }
@@ -1553,15 +1640,31 @@ xover(cmd)
     /* ------------------------------------------------- */
 
 #ifdef  EVERY_Z
+
+#ifndef NEW_KeyFunc
     else if (cmd == Ctrl('Z'))
+#else
+    //else if (cmd == Ctrl('Z'))
+    else if (cmd == key_in_xover[26])
+#endif
     {
       cmd = every_Z(zone);
     }
+#ifndef NEW_KeyFunc
     else if (cmd == Ctrl('U'))
+#else
+    //else if (cmd == Ctrl('U'))
+    else if (cmd == key_in_xover[27])
+#endif
     {
       cmd = every_U(zone);
     }
+#ifndef NEW_KeyFunc
     else if (cmd == Ctrl('W'))
+#else
+    //else if (cmd == Ctrl('W'))
+    else if (cmd == key_in_xover[28])
+#endif
     {
       DL_func("bin/dictd.so:main_dictd");
       cmd = XO_INIT;
@@ -1581,15 +1684,30 @@ xover(cmd)
 	/* Tag						 */
 	/* --------------------------------------------- */
 
+#ifndef NEW_KeyFunc
 	if (cmd == 'C')
+#else
+        //if (cmd == 'C')
+        if (cmd == key_in_xover[29])
+#endif
 	{
 	  cmd = xo_tbf(xo);
 	}
+#ifndef NEW_KeyFunc
 	else if (cmd == 'F')
+#else
+        //else if (cmd == 'F')
+        else if (cmd == key_in_xover[30])
+#endif
 	{
 	  cmd = xo_forward(xo);
 	}
+#ifndef NEW_KeyFunc
 	else if (cmd == Ctrl('C'))
+#else
+        //else if (cmd == Ctrl('C'))
+        else if (cmd == key_in_xover[31])
+#endif
 	{
 	  if (TagNum)
 	  {
@@ -1599,7 +1717,12 @@ xover(cmd)
 	  else
 	    cmd = XO_NONE;
 	}
+#ifndef NEW_KeyFunc
 	else if (cmd == Ctrl('A') || cmd == Ctrl('T'))
+#else
+        //else if (cmd == Ctrl('A') || cmd == Ctrl('T'))
+        else if (cmd == key_in_xover[32] || cmd == key_in_xover[33])
+#endif
 	{
 	  cmd = xo_tag(xo, cmd);
 	}
