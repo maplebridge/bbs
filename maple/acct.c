@@ -288,7 +288,14 @@ adm_log(old, new)
 int
 adm_check()
 {
+  static time_t last = 0;
   char passbuf[PSWDLEN + 1];
+
+  if (time(0) - last <= 120)	/* 2 分鐘以內不需重新確認身份 */
+  {
+    last = time(0);
+    return 1;
+  }
 
   if (!vget(b_lines, 0, "您即將使用站務功\能，請輸入密碼以確認：", passbuf, PSWDLEN + 1, NOECHO))
     return 0;
@@ -299,6 +306,7 @@ adm_check()
     return 0;
   }
 
+  last = time(0);
   return 1;
 }
 
