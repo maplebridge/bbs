@@ -292,8 +292,16 @@ nbrd_add(xo)
     switch (ntype = (*buf - '0'))
     {
     case 1:
-      plevel = "個人";
-      prefix = "P_";
+      if (vget(++i, 0, "要申請 (P)個人板 (L)情侶板 (P/L)？[P] ", buf, 3, LCECHO) != 'l')
+      {
+	plevel = "個人";
+	prefix = "P_";
+      }
+      else
+      {
+	plevel = "情侶";
+	prefix = "L_";
+      }
       break;
     case 2:
       plevel = "寢板";

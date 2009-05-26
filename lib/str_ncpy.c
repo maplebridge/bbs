@@ -8,7 +8,10 @@ str_ncpy(dst, src, n)
   int n;
 {
   strncpy(dst, src, n);
-  dst[n - 1] = '\0';
+  if (n)
+    *(dst + n - 1) = 0;
+  else
+    *dst = 0;
 }
 
 

@@ -22,8 +22,6 @@
 
 
 static char fn_index[] = "@Class.index";
-static char fn_log[] = "@Class.log";
-
 
 static int gem_default;
 static int ndir;
@@ -114,8 +112,7 @@ gindex(level, toc, fpath, fndx)
       continue;
     }
 
-
-    if(hdr.xname[0] == '@')
+    if (hdr.xname[0] == '@')
       ndir++;
     else
       nfile++;
@@ -125,36 +122,47 @@ gindex(level, toc, fpath, fndx)
 #ifdef COLOR_INDEX
     /* Thor.980307: 加上顏色試試是否比較易找 */
     if(hdr.xname[0] == '@')
-#ifdef SHOW_FILE_NAME
+#  ifdef SHOW_FILE_NAME
       fprintf(fndx, "%-13.13s\t%s\033[1;37;%dm%s\033[m\n", hdr.xname, buf, 41 + (level % 6) , hdr.title);
-#else
+#  else
       fprintf(fndx, "%s\033[1;37;%dm%s\033[m\n", buf, 41 + (level % 6) , hdr.title);
-#endif
-#ifdef SHOW_BRD_LIST
-    else if(strcmp(fname, "@People.1P"))        /* smiler.090112: 個人看板不印 */
-    {
-       for(i=0; i<=level; i++)
-         fprintf(fndx, "*%-12.12s %s%s\n", hdr.xname, i ? "└─" : "─", gem_title[i]);
-    }
-#endif
+#  endif
 #else
     if(hdr.xname[0] == '@')
-#ifdef SHOW_FILE_NAME
+#  ifdef SHOW_FILE_NAME
       fprintf(fndx, "%-13.13s\t*%s%s\n", hdr.xname, buf + 1, hdr.title);
-#else
+#  else
       fprintf(fndx, "*%s%s\n", buf + 1, hdr.title);
+#  endif
+
+#  ifdef SHOW_BRD_LIST
+    else
+#  endif
 #endif
+
 #ifdef SHOW_BRD_LIST
-    else if(strcmp(fname, "@People.1P"))      /* smiler.090112: 個人看板不印 */
+    if (strcmp(fname, "@People.1P"))      /* smiler.090112: 個人看板不印 */
     {
-       for(i=0; i<=level; i++)
-         fprintf(fndx, "*%-12.12s %s%s\n", hdr.xname, i ? "└─" : "─", gem_title[i]);
+      for (i = 0; i <= level; i++)
+      {
+	fprintf(fndx, "*%-*.*s C:%-*.*s   ", BNLEN, BNLEN, hdr.xname, BNLEN + 1, BNLEN + 1, gem_title[i]);
+	if (!strncmp(gem_title[i] + BNLEN + 1, "分類 □ ", 8))	/* "Classname/ 分類 □ " */
+	  fprintf(fndx, "%s\n", gem_title[i] + BNLEN + 9);
+	else
+	{
+	  ptr = gem_title[i] + BNLEN;
+	  if (gem_title[i][BNLEN + 5] == ' ')
+	    ptr += 6;
+	  while (*ptr == ' ')
+	    ptr++;
+	  fprintf(fndx, "%s\n", ptr);
+	}
+/*	fprintf(fndx, "*%-*.*s C:%s\n", BNLEN, BNLEN, hdr.xname, ptr); */
+      }
     }
 #endif
-#endif
 
-
-    if(hdr.xname[0] == '@')
+    if (hdr.xname[0] == '@')
     {
       ptr = hdr.xname;		/* F1234567 */
       sprintf(fname, "%s", ptr);
@@ -226,17 +234,13 @@ main(argc, argv)
   int argc;
   char *argv[];
 {
-  DIR *dirp;
-  struct dirent *de;
-  char *fname, fpath[80];
+  char fpath[80];
 
   umask(077);
   chdir(BBSHOME "/gem");
-
 
   flog = stderr;
   sprintf(fpath, "@");
   gindex(0, "", fpath, NULL);
   exit(0);
-
 }

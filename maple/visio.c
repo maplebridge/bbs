@@ -1858,14 +1858,14 @@ vget(line, col, prompt, data, max, echo)
   for (;;)
   {
     move(x, y + col);
-    
+
     if (xo_post_ch != (-1))
       ch = vkey();
     else
       ch = KEY_UP;
-      
-    xo_post_ch = 0;  /* smiler.090516: 記得歸0 */
-    
+
+    xo_post_ch = 0;	/* smiler.090516: 記得歸 0 */
+
     if (ch == '\n')
     {
       data[len] = '\0';

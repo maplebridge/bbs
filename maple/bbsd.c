@@ -888,7 +888,7 @@ login_user(content)
 
       move(0, 0);
       clrtobot();
-      vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號\擺\脫受限");
+      vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號擺\脫受限");
 
       break;	/* Thor.980917: 註解: cuser ok! */
     }
