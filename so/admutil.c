@@ -37,6 +37,7 @@ a_user()
   return 0;
 }
 
+
 #define	IAS_Can_Delete
 #undef	IAS_Can_Delete
 
@@ -78,56 +79,56 @@ a_ias_bank()
       fd = open(fpath, O_RDWR);
       if (fd > 0)
       {
-        ch = 1;
+	ch = 1;
 #ifdef	IAS_Can_Delete
-        while (ch >= 1 && ch <= 4)
+	while (ch >= 1 && ch <= 4)
 #else
-        while (ch >= 1 && ch <= 2)
+	while (ch >= 1 && ch <= 2)
 #endif
-        {
-          move(5, 0);
+	{
+	  move(5, 0);
 
-          prints("帳號 : \033[1;33m%s\033[m\n\n", acct.userid);
-          prints("永久保留帳號 : %s\n\n", (acct.userlevel & PERM_XEMPT) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
-          prints("永久免認證   : %s\n", (acct.userlevel & PERM_XVALID) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
+	  prints("帳號 : \033[1;33m%s\033[m\n\n", acct.userid);
+	  prints("永久保留帳號 : %s\n\n", (acct.userlevel & PERM_XEMPT) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
+	  prints("永久免認證   : %s\n", (acct.userlevel & PERM_XVALID) ? "\033[1;33m有\033[m" : "\033[1;30m無\033[m");
 
 #ifdef	IAS_Can_Delete
-          switch(ch = vans("◎ 增刪福利 1)增永保 2)增永免 3)刪永保 4)刪永免：[Q] ") - '0')
+	  switch(ch = vans("◎ 增刪福利 1)增永保 2)增永免 3)刪永保 4)刪永免：[Q] ") - '0')
 #else
-          switch(ch = vans("◎ 給予福利 1)增永保 2)增永免：[Q] ") - '0')
+	  switch(ch = vans("◎ 給予福利 1)增永保 2)增永免：[Q] ") - '0')
 #endif
-          {
-            case 1:
-              acct.userlevel |= PERM_XEMPT;
-              break;
-            case 2:
-              acct.userlevel |= PERM_XVALID;
-              break;
+	  {
+	    case 1:
+	      acct.userlevel |= PERM_XEMPT;
+	      break;
+	    case 2:
+	      acct.userlevel |= PERM_XVALID;
+	      break;
 #ifdef	IAS_Can_Delete
-            case 3:
-              acct.userlevel &= (~PERM_XEMPT);
-              break;
-            case 4:
-              acct.userlevel &= (~PERM_XVALID);
-              break;
+	    case 3:
+	      acct.userlevel &= (~PERM_XEMPT);
+	      break;
+	    case 4:
+	      acct.userlevel &= (~PERM_XVALID);
+	      break;
 #endif
-            default:
-              ch = 0;
-              break;
-          }
-        }
+	    default:
+	      ch = 0;
+	      break;
+	  }
+	}
 
-        ch = vans("◎ Y)確定 N)取消：[N] ");
+	ch = vans("◎ Y)確定 N)取消：[N] ");
 
-        if (ch == 'y')
-        {
-          lseek(fd, (off_t) 0, SEEK_SET);
-          write(fd, &acct, sizeof(ACCT));
-          close(fd);
-          vmsg("設定完成，將於使用者下次上站時自動生效 !!");
-        }
-        else
-          vmsg("取消更動 !!");
+	if (ch == 'y')
+	{
+	  lseek(fd, (off_t) 0, SEEK_SET);
+	  write(fd, &acct, sizeof(ACCT));
+	  close(fd);
+	  vmsg("設定完成，將於使用者下次上站時自動生效 !!");
+	}
+	else
+	  vmsg("取消更動 !!");
       }
 
       sprintf(reason, "永久保留帳號 : %s", (acct.userlevel & PERM_XEMPT) ? "有" : "無");
@@ -239,16 +240,16 @@ a_system_setup()
   }
 #endif
 
-  /* 啟用Editlog功能 */
+  /* 啟用 Editlog 功能 */
   sprintf(buf, "%d", editlog_use);
-  vget(++i, 0, "是否啟用Editlog功\能? (是:1 否:0)：", buf, 10, GCARRY);
+  vget(++i, 0, "是否啟用 Editlog 功\能? (是:1 否:0)：", buf, 10, GCARRY);
   if (*buf == '1' || *buf == '0')
     editlog_use_tmp=atoi(buf);
   else
     editlog_use_tmp=0;
 
   sprintf(buf, "%d", deletelog_use);
-  vget(++i, 0, "是否啟用Deletelog功\能? (是:1 否:0)：", buf, 10, GCARRY);
+  vget(++i, 0, "是否啟用 Deletelog 功\能? (是:1 否:0)：", buf, 10, GCARRY);
   if (*buf == '1' || *buf == '0')
     deletelog_use_tmp = atoi(buf);
   else
@@ -357,7 +358,7 @@ a_editbrd()		/* itoc.010929: 修改看板選項 */
   BRD *brd;
   char bname[BNLEN + 1];
 
-  if (brd = ask_board(bname, BRD_R_BIT, NULL))
+  if (brd = ask_board(bname, BRD_L_BIT, NULL))	/* 只要站務看得到(即使進不去)的板, 都可以管 */
   {
     bno = brd - bshm->bcache;
     brd_edit(bno);
