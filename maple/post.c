@@ -1577,11 +1577,17 @@ post_item(num, hdr)
   int num;
   HDR *hdr;
 {
-#ifdef HAVE_SCORE
   if (hdr->xmode & POST_BOTTOM)
+#if 0
+    prints("  \033[1;3%cm%4s%c%s",
+      hdr->color, hdr->mark, tag_char(hdr->chrono), post_attr(hdr));
+#else
     prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
+#endif
   else
-    prints("%6d%c%s", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
+    prints("%6d%c%s", num, tag_char(hdr->chrono), post_attr(hdr));
+
+#ifdef HAVE_SCORE
   if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
 	!chkrestrict(hdr))
   {
@@ -1601,11 +1607,6 @@ post_item(num, hdr)
 
   hdr_outs(hdr, d_cols + 45);	/* 少一格來放分數 */
 #else
- if (hdr->xmode & POST_BOTTOM)
-   prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
- else
-   prints("%6d%c%s ", (hdr->xmode & POST_BOTTOM) ? -1 : num, tag_char(hdr->chrono), post_attr(hdr));
-
  hdr_outs(hdr, d_cols + 47);
 #endif
 }
@@ -1620,16 +1621,22 @@ post_item_bar(xo, mode)
   HDR *hdr;
   int num;
 
-#ifdef HAVE_SCORE
   hdr = (HDR *) xo_pool + xo->pos - xo->top;
   num = xo->pos + 1;
 
   if (hdr->xmode & POST_BOTTOM)
   {
+#if 0
+    prints("%s  \033[1;3%cm%4s\033[m%s%c%s%s",
+      mode ? UCBAR[UCBAR_POST] : "",
+      hdr->color, hdr->mark, mode ? UCBAR[UCBAR_POST] : "",
+      tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
+#else
     prints("%s%s%s%c%s%s",
       mode ? UCBAR[UCBAR_POST] : "",
       "  \033[1;33m重要\033[m", mode ? UCBAR[UCBAR_POST] : "",
       tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
+#endif
   }
   else
   {
@@ -1638,6 +1645,7 @@ post_item_bar(xo, mode)
       num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
   }
 
+#ifdef HAVE_SCORE
   if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
 	!chkrestrict(hdr))
   {
@@ -1662,23 +1670,6 @@ post_item_bar(xo, mode)
   else
     hdr_outs(hdr, d_cols + 45);
 #else
-  hdr = (HDR *) xo_pool + xo->pos - xo->top;
-  num = xo->pos + 1;
-  if (hdr->xmode & POST_BOTTOM)
-  {
-    prints("%s%s%s%c%s%s ",
-      mode ? UCBAR[UCBAR_POST] : "",
-      "  \033[1;33m重要\033[m",mode ? UCBAR[UCBAR_POST] : "",
-      tag_char(hdr->chrono), post_attr(hdr),
-      mode ? UCBAR[UCBAR_POST] : "");
-  }
-  else
-  {
-    prints("%s%6d%c%s%s ",
-      mode ? UCBAR[UCBAR_POST] : "",
-      num, tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-  }
-
   if (mode)
     hdr_outs_bar(hdr, d_cols + 47);
   else
@@ -2581,6 +2572,8 @@ post_bottom(xo)
 
     strcpy(post.owner, hdr->owner);
     strcpy(post.nick, hdr->nick);
+    strcpy(post.mark, "重要");
+    post.color = '3';
     strcpy(post.title, hdr->title);
     rec_add(xo->dir, &post, sizeof(HDR));
 

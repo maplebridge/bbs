@@ -732,7 +732,9 @@ post_changeBM()
   if (oldbrd->battr & BRD_PUBLIC)	/* 公眾板不允許隨意更動 */
     return 0;
 
-  if (!str_ncmp(oldbrd->brdname, "P_", 2))	/* 個人板不允許更改板主 */
+  if (strncmp(oldbrd->brdname, "P_", 2) && strncmp(oldbrd->brdname, "L_", 2) &&
+    strncmp(oldbrd->brdname, "R_", 2) && strncmp(oldbrd->brdname, "G_", 2) &&
+    strncmp(oldbrd->brdname, "LAB_", 4) && !(oldbrd->battr & BRD_IAS))
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));

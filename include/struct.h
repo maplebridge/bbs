@@ -725,7 +725,7 @@ typedef struct
   /* 以下欄位的大小與 HDR 相同 */
   char xname[32];
   char owner[80];
-  char nick[49];
+  char nick[30];
   char title[TTLEN + 1];
 } bntp_t;
 
