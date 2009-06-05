@@ -1337,6 +1337,104 @@ xo_jump(pos, zone)
 
 
 /* ----------------------------------------------------- */
+/* XOX browser                                           */
+/* ----------------------------------------------------- */
+
+#define XOX_UP          0x001
+#define XOX_DOWN        0x002
+#define XOX_LEFT        0x004
+#define XOX_RIGHT       0x008
+
+typedef struct
+{
+        char name[16];
+        int key;
+} XOX;
+
+int
+XOX_browser()
+{
+
+  int x=0;
+  int y=0;
+  int cus_x=0;   //
+  int cus_y=0;   //
+  int num_y = 3;
+  int num_x = 1;
+  int old_x = 0;
+  int old_y = 0;
+  int cmd;
+
+  //screenline xox_line;
+
+  char xox_line[900];
+
+  XOX xox_1[] =
+  {
+     {"0", XOX_LEFT | XOX_UP | XOX_DOWN},
+     {"1", XOX_UP | XOX_DOWN},
+     {"2", XOX_UP | XOX_DOWN}
+  };
+
+  line_save(b_lines - 1, xox_line);
+
+  for (;;)
+  {
+    if (x >= num_x)
+      x = x - num_x;
+    else if (x < 0)
+      x = x + num_x;
+
+    if (y >= num_y)
+      y = y - num_y;
+    else if(y < 0)
+      y = y + num_y;
+
+    if (y != old_y)
+    {
+      line_restore(b_lines - 1 - old_y, xox_line);
+      line_save(b_lines - 1 - y, xox_line);
+    }
+
+    outsxy("\033[1;33mtest\033[m", b_lines - 1 - y, 55);
+
+
+    old_x = x;
+    old_y = y;
+
+    cmd = vkey();
+
+    switch (cmd)
+    {
+      case KEY_UP:
+       if (xox_1[y].key & XOX_UP)
+         y++;
+       break;
+      case KEY_DOWN:
+       if (xox_1[y].key & XOX_DOWN)
+         y--;
+       break;
+      case KEY_LEFT:
+       if (xox_1[y].key & XOX_LEFT)
+         x++;
+       break;
+      case KEY_RIGHT:
+       if (xox_1[y].key & XOX_RIGHT)
+         x--;
+       break;
+      default:
+       break;
+    }
+
+    if (cmd == ' ' /*&& x==0 && y==0*/)
+      break;
+  }
+
+  return XO_HEAD;
+}
+
+
+/* ----------------------------------------------------- */
 /* interactive menu routines			 	 */
 /* ----------------------------------------------------- */
 
@@ -1638,6 +1736,12 @@ xover(cmd)
     {
       cmd = 'r';
     }
+#ifdef NEW_KeyFunc
+    else if (cmd == 'h')
+    {
+      cmd = XOX_browser();
+    }
+#endif
 
     /* ------------------------------------------------- */
     /* switch Zone					 */
