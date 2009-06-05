@@ -1578,8 +1578,8 @@ post_item(num, hdr)
   HDR *hdr;
 {
   if (hdr->xmode & POST_BOTTOM)
-#if 0
-    prints("  \033[1;3%cm%4s%c%s",
+#if 1
+    prints("  \033[1;3%cm%4s\033[m%c%s",
       hdr->color, hdr->mark, tag_char(hdr->chrono), post_attr(hdr));
 #else
     prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
@@ -1626,7 +1626,7 @@ post_item_bar(xo, mode)
 
   if (hdr->xmode & POST_BOTTOM)
   {
-#if 0
+#if 1
     prints("%s  \033[1;3%cm%4s\033[m%s%c%s%s",
       mode ? UCBAR[UCBAR_POST] : "",
       hdr->color, hdr->mark, mode ? UCBAR[UCBAR_POST] : "",
@@ -2575,6 +2575,15 @@ post_bottom(xo)
     strcpy(post.mark, "重要");
     post.color = '3';
     strcpy(post.title, hdr->title);
+
+    vget(b_lines, 0, "請輸入提示文字：", post.mark, 5, GCARRY);
+    post.color = vans("選擇顯示顏色 0) \033[1;30m█\033[m 1) \033[1;31m█\033[m 2) \033[1;32m█\033[m "
+      "3) \033[1;33m█\033[m ""4) \033[1;34m█\033[m 5) \033[1;35m█\033[m "
+      "6) \033[1;36m█\033[m 7) \033[1;37m█\033[m [3] ");
+
+    if (post.color < '0' || post.color > '7')
+      post.color = '3';
+
     rec_add(xo->dir, &post, sizeof(HDR));
 
     /*ryancid: set the parent_chrono*/
@@ -3594,6 +3603,20 @@ post_title(xo)
   else
     unlink(tmpfile);
 #endif
+
+  if ((mhdr.xmode & POST_BOTTOM) && (bbstate & STAT_BM))
+  {
+    char buf[256], ch;
+
+    vget(b_lines, 0, "提示文字：", mhdr.mark, 5, GCARRY);
+    sprintf(buf, "選擇顯示顏色 0) \033[1;30m█\033[m 1) \033[1;31m█\033[m 2) \033[1;32m█\033[m "
+      "3) \033[1;33m█\033[m ""4) \033[1;34m█\033[m 5) \033[1;35m█\033[m "
+      "6) \033[1;36m█\033[m 7) \033[1;37m█\033[m [%c] ", mhdr.color);
+    ch = vans(buf);
+
+    if (ch >= '0' && ch <= '7')
+      mhdr.color = ch;
+  }
 
   if (HAS_PERM(PERM_ALLBOARD))	/* itoc.000213: 原作者只能改標題 */
   {
