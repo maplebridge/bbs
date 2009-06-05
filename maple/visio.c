@@ -793,6 +793,147 @@ outs(str)
 }
 
 
+void
+outsxy(sstr, x, y)
+  uschar *sstr;
+  int x;
+  int y;
+{
+
+  char tmp[64];
+
+  int ch, count, scount, i, j, k, ansi, len, slen, done;
+  char buf[ANSILINELEN * 2], color[ANSILINELEN];
+  char *str;
+
+  /* 超出 screen 範圍*/
+  if (x > b_lines || y > b_cols)
+    return;
+
+  count = y-1;         /* count 為螢幕位置，需再找尋vbuf.data內實際位置 */
+  len = ANSILINELEN;   /* 最大容許長度 */
+
+  scount = 0;
+  slen = 0;
+  ansi = 0;
+  done = 0;
+  i = 0;
+  j = 0;
+  k = 0;
+  len ++;
+  buf[0] = '\0';
+  color[0] = '\0';
+
+  str = vbuf[x].data - 1;
+
+  while (len)   /* 最大 len 長度 */
+  {
+
+    if (count <= 0 /*|| ch == '\0'*/ )  /* 已經數到該位置了 */
+    {
+       buf[j] = '\0';
+       color[k] = '\0';
+       strcat(buf, sstr);
+       strcat(buf, "\033[m");           /* 復原色碼 */
+       strcat(buf, color);              /* 復原 ansi */
+       slen = strlen_ansi(sstr, strlen(sstr), "DECODE", NULL);
+
+       j = strlen(buf);
+       count = ANSILINELEN;             /* 重設count, 使下次不再進入 */
+       done = 1;
+
+       continue;
+    }
+
+    str++;
+    len--;
+    i++;
+
+    if (slen == 0)
+    {
+      buf[j] = *str;
+      j++;
+    }
+
+    ch = *str;
+
+    if (i > vbuf[x].len || (ch == '\0'))  /* 已讀完行尾，補足剩餘部份 */
+    {
+      j--;
+
+      if (done)
+      {
+        buf[j] = '\0';
+        break;
+      }
+
+      while (count)
+      {
+
+        buf[j] = ' ';
+        j++;
+        count--;
+      }
+
+      buf[j] = '\0';
+      strcat(buf, sstr);
+      strcat(buf, "\033[m");          /* 復原色碼 */
+      break;                          /* 已到行尾且複製完，離開 */
+    }
+
+    if (ansi)
+    {
+       if (ch == 'm')
+         ansi = 0;
+
+       if (color)
+       {
+         color[k] = ch;
+         k++;
+       }
+
+       if (slen)
+       {
+          buf[j] = *str;
+          j++;
+       }
+
+       continue;
+    }
+
+    if (ch == KEY_ESC)
+    {
+       ansi = 1;
+
+       if (color)
+       {
+         color[k] = ch;
+         k++;
+       }
+
+       if (slen)
+       {
+         buf[j] = *str;
+         j++;
+       }
+
+       continue;
+    }
+
+    if (slen)
+      slen--;
+
+    count--;
+
+  }
+
+  move (x, 0);
+  clrtoeol();
+  prints("%s\n", buf);
+
+}
+
+
 static int
 process_score_ip(dateip)
   char *dateip;
@@ -1044,6 +1185,26 @@ restore_foot(slp, line)
     move(lines[i], 0);
     memcpy(cur_slp, slp + i, sizeof(screenline));
   }
+}
+
+
+void
+line_save(num, my_line)
+  int num;
+  char *my_line;
+{
+  str_ncpy(my_line, vbuf[num].data, vbuf[num].len + 1);
+}
+
+
+void
+line_restore(num, my_line)
+  int num;
+  char *my_line;
+{
+  move(num, 0);
+  clrtoeol();
+  prints("%s", my_line);
 }
 
 
