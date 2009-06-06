@@ -3081,7 +3081,7 @@ post_delete(xo)	/* 單一刪文 */
     return post_bottom(xo);
 
   if ((hdr->xmode & POST_MARKED) ||
-    (!(bbstate & STAT_BOARD) && strcmp(hdr->owner, cuser.userid)))
+    (!(bbstate & STAT_BOARD) && (strcmp(hdr->owner, cuser.userid) || (currbattr & BRD_NODELETE))))
     return XO_NONE;
 
   by_BM = bbstate & STAT_BOARD;
@@ -3487,7 +3487,7 @@ post_edit(xo)
   }
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* 板主/原作者修改 */
   {
-    if (currbattr & BRD_NOEDIT)
+    if (currbattr & BRD_NODELETE)
     {
       vedit(fpath, -1);
       return XO_HEAD;

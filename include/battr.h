@@ -32,7 +32,7 @@
 #define BRD_IAS		0x00002000	/* 藝文館看板 */
 #define BRD_ATOM	0x00004000	/* ATOM 成員看板 */
 #define BRD_BBS_DOG	0x00008000	/* 加入imaple BBS DOG 計畫 */
-#define BRD_NOEDIT	0x00010000	/* 禁止修文 */
+#define BRD_NODELETE	0x00010000	/* 禁止刪除|修文 */
 #define BRD_POST_IP	0x00020000	/* 1:推文以ip顯示 0:以ip代碼顯示 */
 
 /* ----------------------------------------------------- */
@@ -64,7 +64,7 @@ static char *battr_tbl[NUMBATTRS] =
   "藝文館看板",		/* BRD_IAS */
   "ATOM成員看板",	/* BRD_ATOM */
   "加入BBS DOG 計畫",	/* BRD_BBS_DOG */
-  "禁止修改文章",	/* BRD_NOEDIT */
+  "禁止刪除修改文章",	/* BRD_NOEDIT */
   "推文顯示ip或ip代碼"	/* BRD_POST_IP */
 };
 
