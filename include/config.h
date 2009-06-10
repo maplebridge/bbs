@@ -412,7 +412,7 @@
 /* post.c 盎代 cross-post */
 
 #ifdef  HAVE_DETECT_CROSSPOST
-#  define MAX_CROSS_POST	3	/* cross post 程计秖(絞) */
+#  define MAX_CROSS_POST	10	/* cross post 程计秖(絞) */
 #  define CROSSPOST_DENY_DAY	30	/* cross post 氨舦丁(ぱ) */
 #endif
 

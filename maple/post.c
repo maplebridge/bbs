@@ -37,6 +37,32 @@ cmpchrono(hdr)
   return hdr->chrono == currchrono;
 }
 
+void
+post_no_right()
+{
+
+  int i;
+  for(i = 5; i < 17; i++)
+  {
+    move(i, 0);
+    clrtoeol();
+  }
+
+  move(6, 0);
+  prints("\033[m=============================================================================\033[m\n");
+  prints("\033[m\033[1;37m對不起，您沒有在此發表文章的權限\033[m\n");
+  prints("\033[m\033[1;37m請回到文章列表後，如下操作: \033[m\n\n");
+  prints("\033[m\033[1;37m1. 先按下\033[1;33m i 鍵 \033[m\033[1;37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\n\n");
+  prints("\033[m\033[1;37m2. 並按下\033[1;33m 2 鍵 \033[m\033[1;37m查詢發文限制，確定您具有本看板發文所需權限等級\n\n");
+  prints("\033[m\033[1;37m3. 並按下\033[1;33m 5 鍵 \033[m\033[1;37m查詢板友名單，確定您未被板主浸水桶\n\n");
+  prints("\033[m\033[1;37m4. 若以上 1~3 皆查詢無誤，請聯絡板主或任一站務請求協助\n");
+  prints("\033[m=============================================================================\033\m\n");
+  
+  move(b_lines, 0);
+  clrtoeol();
+  vmsg(NULL);
+}
+
 
 #ifdef DO_POST_FILTER
 
@@ -337,7 +363,11 @@ checksum_put(sum)
 	checksum[i].total++;
 
 	if (checksum[i].total > MAX_CROSS_POST)
+	{
+	  /* smiler.090611: 取消停權，改為提醒 */
+	  checksum[i].total = 1;
 	  return 1;
+        }
 	return 0;	/* total <= MAX_CROSS_POST */
       }
     }
@@ -420,6 +450,8 @@ check_crosspost(fpath, bno)
     rec_bot(folder, &hdr, sizeof(HDR));
     btime_update(brd_bno(BN_SECURITY));
 
+    /* smiler.090611: 取消停權，改為提醒 */
+#if 0
     bbstate &= ~STAT_POST;
     cuser.userlevel &= ~PERM_POST;
     cuser.userlevel |= PERM_DENYPOST;
@@ -432,6 +464,8 @@ check_crosspost(fpath, bno)
     mail_self(FN_ETC_CROSSPOST, str_sysop, "Cross-Post 停權", 0);
     vmsg("您因為過度 Cross-Post 已被停權，請重新上站取得新權限");
     abort_bbs();
+#endif
+
     return 1;
   }
   return 0;
@@ -539,9 +573,10 @@ do_post(xo, title)
       vmsg("新手上路，三日後始可張貼文章");
     else
 #endif
-      vmsg("對不起，您沒有在此發表文章的權限");
+      post_no_right();
+    
     pcurrhdr = NULL;
-    return XO_FOOT;
+    return XO_HEAD;
   }
 
   if (HAS_PERM(PERM_VALID))
@@ -761,6 +796,12 @@ do_post(xo, title)
 
   rec_bot(folder, &hdr, sizeof(HDR));
   btime_update(currbno);
+
+#ifdef HAVE_DETECT_CROSSPOST  
+  /* smiler.090611: 取消停權，改為提醒 */
+  if (check_crosspost(fpath, currbno))
+    vmsg("提醒您，若需發布網宣，請洽 CrossPost 板");
+#endif
 
   if (mode & POST_OUTGO)
     outgo_post(&hdr, currboard);
@@ -991,7 +1032,9 @@ post_reply(xo)
 
     return do_reply(xo, hdr);
   }
-  return XO_NONE;
+  else
+    post_no_right();
+  return XO_HEAD;
 }
 
 
@@ -1865,6 +1908,9 @@ re_key:
 	if (do_reply(xo, hdr) == XO_INIT)	/* 有成功地 post 出去了 */
 	  return post_init(xo);
       }
+      else
+        post_no_right();
+      
       break;
 
     case 'm':
@@ -2239,7 +2285,7 @@ post_cross(xo)
 
 #ifdef HAVE_DETECT_CROSSPOST
     if (check_crosspost(fpath, xbno))
-      break;
+      vmsg("提醒您，若需發布網宣，請洽 CrossPost 板");
 #endif
 
     brd_fpath(xfolder, xboard, fn_dir);
@@ -3814,7 +3860,14 @@ post_append_score(xo, choose)
   static time_t last = 0;
 
   if ((currbattr & BRD_NOSCORE) || !cuser.userlevel || !(bbstate & STAT_POST) )	/* 評分視同發表文章 */
-    return XO_NONE;
+  {
+    if (currbattr & BRD_NOSCORE)
+      vmsg("看板已被設定禁止推文");
+    else if (!(bbstate & STAT_POST))
+      post_no_right();
+    
+    return XO_HEAD;
+  }
 
   pos = xo->pos;
   cur = pos - xo->top;
