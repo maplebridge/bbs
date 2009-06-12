@@ -447,7 +447,7 @@ post_prefix_edit()
     {
       strcpy(buf, prefix[i - 1] + 2);
       vget(b_lines, 0, "類別：", buf, 13, GCARRY);	/* 留白就清空 */
-        strcpy(prefix[i - 1] + 2, buf);
+	strcpy(prefix[i - 1] + 2, buf);
     }
   } while (i);
 #else

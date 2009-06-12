@@ -125,7 +125,7 @@ bmt_sign(xo, hdr)
       {
 	pal.ftype = 0;
 	rec_put(fpath, &pal, sizeof(PAL), pos, NULL);
-        post_t_score(xo, "附議此篇申請案", hdr);
+	post_t_score(xo, "附議此篇申請案", hdr);
 	vmsg("附議成功\");
 	mode |= 0x01;	/* signed */
       }
@@ -164,9 +164,9 @@ bmt_add(xo)
   clrtobot();
   prints("%s\n", MSG_SEPERATE);
   prints("\033[1;33m楓橋驛站 " BRD_NEWBM " 板主異動系統\033[m\n"
-        "本系統功\用在協助各公眾看板進行板主名單異動，\033[1;31m請勿濫用\033[m\n"
-        "若發現有不當使用情形，將以站規處理。\n"
-        "有任何使用上的問題，麻煩至 \033[1;33msysop\033[m 板回報，謝謝！\n\n");
+    "本系統功\用在協助各公眾看板進行板主名單異動，\033[1;31m請勿濫用\033[m\n"
+    "若發現有不當使用情形，將以站規處理。\n"
+    "有任何使用上的問題，麻煩至 \033[1;33msysop\033[m 板回報，謝謝！\n\n");
   prints("%s\n", MSG_SEPERATE);
 
   if (!vget(b_lines, 0, "英文板名：", buf, BNLEN + 1, DOECHO))
@@ -247,7 +247,7 @@ bmt_add(xo)
 	strcat(buf, "/");
 	len++;
 	ptr = str_str(BMlist, buf);
-        strcpy(ptr, ptr + len);
+	strcpy(ptr, ptr + len);
       }
       BMlen -= len;
     }

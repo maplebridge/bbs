@@ -37,7 +37,8 @@ cmpchrono(hdr)
   return hdr->chrono == currchrono;
 }
 
-void
+
+static void
 post_no_right()
 {
 
@@ -49,15 +50,15 @@ post_no_right()
   }
 
   move(6, 0);
-  prints("\033[m=============================================================================\033[m\n");
-  prints("\033[m\033[1;37m對不起，您沒有在此發表文章的權限\033[m\n");
-  prints("\033[m\033[1;37m請回到文章列表後，如下操作: \033[m\n\n");
-  prints("\033[m\033[1;37m1. 先按下\033[1;33m i 鍵 \033[m\033[1;37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\n\n");
-  prints("\033[m\033[1;37m2. 並按下\033[1;33m 2 鍵 \033[m\033[1;37m查詢發文限制，確定您具有本看板發文所需權限等級\n\n");
-  prints("\033[m\033[1;37m3. 並按下\033[1;33m 5 鍵 \033[m\033[1;37m查詢板友名單，確定您未被板主浸水桶\n\n");
-  prints("\033[m\033[1;37m4. 若以上 1~3 皆查詢無誤，請聯絡板主或任一站務請求協助\n");
-  prints("\033[m=============================================================================\033\m\n");
-  
+  prints("=============================================================================\n");
+  prints("\033[1m對不起，您沒有在此發表文章的權限\033[m\n");
+  prints("\033[1m請回到文章列表後，如下操作: \033[m\n\n");
+  prints("\033[1m1. 先按下\033[33m i 鍵 \033[37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\033[m\n\n");
+  prints("\033[1m2. 並按下\033[33m 2 鍵 \033[37m查詢發文限制，確定您具有本看板發文所需權限等級\033[m\n\n");
+  prints("\033[1m3. 並按下\033[33m 5 鍵 \033[37m查詢板友名單，確定您未被板主浸水桶\033[m\n\n");
+  prints("\033[1m4. 若以上 1~3 皆查詢無誤，請聯絡板主或任一站務請求協助\033[m\n");
+  prints("=============================================================================\n");
+
   move(b_lines, 0);
   clrtoeol();
   vmsg(NULL);
@@ -367,7 +368,7 @@ checksum_put(sum)
 	  /* smiler.090611: 取消停權，改為提醒 */
 	  checksum[i].total = 1;
 	  return 1;
-        }
+	}
 	return 0;	/* total <= MAX_CROSS_POST */
       }
     }
@@ -423,7 +424,6 @@ check_crosspost(fpath, bno)
   int bno;			/* 要轉去的看板 */
 {
   char *blist, folder[64];
-  ACCT acct;
   HDR hdr;
 
   if (HAS_PERM(PERM_ALLADMIN))
@@ -537,6 +537,7 @@ copy_post_IAS(hdr, fpath)
   }
 }
 
+
 void
 do_ias_post_log(hdr)
   HDR hdr;
@@ -544,9 +545,9 @@ do_ias_post_log(hdr)
   char fpath[64];
   char buf[512];
 
-  if( ( (currbattr & BRD_IAS) || (strstr(currboard, "IS_")) || 
-        (strstr(currboard, "IA_")) || (strstr(currboard, "IAS_")) ) && 
-        (bbstate & STAT_BM) )
+  if (((currbattr & BRD_IAS) || (strstr(currboard, "IS_")) ||
+    (strstr(currboard, "IA_")) || (strstr(currboard, "IAS_"))) && 
+    (bbstate & STAT_BM))
   {
     sprintf(buf, "時間:%s\n作者:%s 看板:%s\n標題:%s\n檔名:%s\n--\n\n", Now(), cuser.userid, currboard, hdr.title, hdr.xname);
     f_cat("run/IAS_POLOG", buf);
@@ -554,6 +555,7 @@ do_ias_post_log(hdr)
     f_cat(fpath, buf);
   }
 }
+
 
 static int
 do_post(xo, title)
@@ -574,7 +576,7 @@ do_post(xo, title)
     else
 #endif
       post_no_right();
-    
+
     pcurrhdr = NULL;
     return XO_HEAD;
   }
@@ -1034,6 +1036,7 @@ post_reply(xo)
   }
   else
     post_no_right();
+
   return XO_HEAD;
 }
 
@@ -1601,11 +1604,11 @@ post_attr(hdr)
     strcpy(attr_tmp, "");
   }
 
-  if (unread)
+  if (unread && (RefusePal_level(currboard, hdr) >= 0))
   {
     if ((attr == 'm' || attr == 'b') || (mode & POST_BOTTOM))
       attr = '=';
-    else if (attr != 'l' || (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM)))
+    else
       attr = '~';
   }
 
@@ -1909,8 +1912,8 @@ re_key:
 	  return post_init(xo);
       }
       else
-        post_no_right();
-      
+	post_no_right();
+
       break;
 
     case 'm':
@@ -3183,7 +3186,7 @@ post_delete(xo)	/* 單一刪文 */
 	  hdr_fpath(fpath, xo->dir, hdr);
 	  sprintf(title, "[劣退] 理由: %s", reason);
 	  mail_him(fpath, acct.userid, title, 0);
-        }
+	}
 	break;
 
       default:
@@ -3533,7 +3536,7 @@ post_edit(xo)
   }
   else if ((cuser.userlevel && !strcmp(hdr->owner, cuser.userid)) || (bbstate & STAT_BM))	/* 板主/原作者修改 */
   {
-    if (currbattr & BRD_NODELETE)
+    if (!(bbstate & STAT_BM) && (currbattr & BRD_NODELETE))
     {
       vedit(fpath, -1);
       return XO_HEAD;
@@ -3865,7 +3868,7 @@ post_append_score(xo, choose)
       vmsg("看板已被設定禁止推文");
     else if (!(bbstate & STAT_POST))
       post_no_right();
-    
+
     return XO_HEAD;
   }
 
@@ -3887,11 +3890,11 @@ post_append_score(xo, choose)
       case '1':
 	p = DL_get("bin/bmtrans.so:bmt_sign");
 	(*p)(xo, hdr);
-        return XO_LOAD;
+	return XO_LOAD;
       case '2':
-        break;
+	break;
       default:
-        return XO_FOOT;
+	return XO_FOOT;
     }
   }
 
@@ -3990,9 +3993,8 @@ post_append_score(xo, choose)
 #endif
     userid = cuser.userid;
 
-  sprintf(prompt, "%s %s：", (ans == '1') ? "△" :
-                             (ans == '2') ? "▽" :
-                                            "─" , userid);
+  sprintf(prompt, "%s %s：",
+    (ans == '1') ? "△" : (ans == '2') ? "▽" : "─" , userid);
 
   move(b_lines, 0);
   clrtoeol();
@@ -4024,9 +4026,8 @@ post_append_score(xo, choose)
 
     move(0, 0);
     clrtoeol();
-    prints("您的\033[1;3%s文\033[m內容：\n", (ans == '1') ? "1m推" :
-                                           (ans == '2') ? "2m噓" :
-                                                          "7m接");
+    prints("您的\033[1;3%s文\033[m內容：\n",
+      (ans == '1') ? "1m推" : (ans == '2') ? "2m噓" : "7m接");
     prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s \033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
@@ -4071,8 +4072,8 @@ post_append_score(xo, choose)
 
       move(num_reason_record, 0);
       prints("%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
-        strlen(userid) + 5, "", maxlen - 1, reason,
-        ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
+	strlen(userid) + 5, "", maxlen - 1, reason,
+	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
       prints("\033[1;30m==============================================================================\033[m");
 
       if (ans2 != 'y')
