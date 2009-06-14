@@ -51,20 +51,18 @@ extern UMODELOG modelog;
 extern time4_t mode_lastchange;
 #endif
 
-#define	ChangeLoging	0;	/* smiler.070602: 若需要改程式,則改為1,則使用者進不了BBS */
-
 
 /* ----------------------------------------------------- */
-/*                     load .SET                         */
+/* load .SET						 */
 /* ----------------------------------------------------- */
 
-void
-setuploader()	/* smiler.071110: load 整個站的 .SET 進來 */
+
+static void
+setuploader()	/* smiler.071110: load 整個站的設定進來 */
 {
   FILE *fp;
-  char file_space[64];
-  sprintf(file_space, ".SET");
-  if (fp = fopen(file_space, "r"))
+
+  if (fp = fopen(".SET", "r"))
   {
     fscanf(fp, "%d", &host_sight_number);
     fscanf(fp, "%d", &host_sight_select);
@@ -875,10 +873,12 @@ login_user(content)
       /* smiler.090510: 限制 guest login 數目 */
       if (utmp_count(cuser.userno, 0) > 30)
       {
-        move(0, 0);
-        clrtobot();
-        move(0, 0);
-        login_abort("\n站上guest過多，請稍後登入或以其他帳號登入 ...");
+	clear();
+	move(2, 0);
+	outs("站上guest過多，請稍後登入或以其他帳號登入 ...");
+	refresh();
+	sleep(60);
+	login_abort("\n站上guest過多，請稍後登入或以其他帳號登入 ...\n");
       }
 
       logattempt(' ', content);
@@ -886,8 +886,7 @@ login_user(content)
       cuser.ufo = UFO_DEFAULT_GUEST;
       cuser.ufo2 = UFO2_DEFAULT_GUEST;
 
-      move(0, 0);
-      clrtobot();
+      clear();
       vmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號擺\脫受限");
 
       break;	/* Thor.980917: 註解: cuser ok! */
@@ -1290,6 +1289,7 @@ tn_user_setup()
   tn_user_show();
 }
 
+
 static void
 tn_motd()
 {
@@ -1297,7 +1297,7 @@ tn_motd()
 
   ufo = cuser.ufo;
 
-  if (1)	/* if (!(ufo & UFO_MOTD)) */
+  if (!(ufo & UFO_MOTD))
   {
     more("gem/@/@-goodboard", NULL);	/* 推薦看板 */
     more("gem/@/@-day", NULL);		/* 今日熱門話題 */
@@ -1851,22 +1851,8 @@ main(argc, argv)
     ap_start++;
     argc = *totaluser;
 
-    //if(argc<=1)
-    //if(argc>0)
-    if (1)
-    {
-      setuploader();	/* 載入整個站的設定檔 */
-    }
-#if 0
-    /* smiler.070602: 修改程式時,此處可提供公佈資訊,同時防止使用者上站 */
-    if (ChangeLoging)
-    {
-      sprintf(currtitle, "程式修改中，請稍後再來\n");	/* 公佈修改進度及相關資訊 */
-      send(csock, currtitle, strlen(currtitle), 0);
-      close(csock);
-      continue;
-    }
-#endif
+    setuploader();	/* 載入整個站的設定檔 */
+
     if (argc >= MAXACTIVE - 5 /* || *avgload > THRESHOLD */ )
     {
       /* 借用 currtitle */

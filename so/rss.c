@@ -816,7 +816,7 @@ KeyFunc rss_cb[] =
   'T', rss_bookmark,            'T',            'p',    "修改標簽名稱",		"",
   Ctrl('P'), rss_add,           Ctrl('P'),      'p',    "新增rss連結",		"",
 
-  'h', rss_help,                'h',            'z',    "\功\能說明"		""
+  'h', rss_help,                'h',            'z',    "功\能說明"		""
 };
 #endif
 

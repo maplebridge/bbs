@@ -1953,7 +1953,7 @@ int xo_post_ch = 0;
 char lastcmd[MAXLASTCMD + 1][80];
 
 
-/* bbs.h: Flags to getdata input function */
+/* Flags to getdata input function */
 /* NOECHO  0x0000  不顯示，用於密碼取得 */
 /* DOECHO  0x0100  一般顯示 */
 /* LCECHO  0x0200  low case echo，換成小寫 */

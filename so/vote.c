@@ -1250,7 +1250,7 @@ static NewKeyFunc vote_cb[] =
   Ctrl('P'), vote_add,          Ctrl('P'),      'p',    "舉行投票",     	"",
   Ctrl('Q'), vote_query,        Ctrl('Q'),      'p',    "投票改期",     	"",
 
-  'h', vote_help,       'h',    'z',    "\功\能說明",     ""
+  'h', vote_help,       'h',    'z',    "功\能說明",     ""
 };
 #endif
 

@@ -216,8 +216,7 @@ goodbye()
   bmw_log();			/* lkchu.981201: 水球記錄處理 */
 #endif
 
-  //if (!(cuser.ufo & UFO_MOTD))	/* itoc.000407: 離站畫面一併簡化 */
-  if(1)
+  if (!(cuser.ufo & UFO_MOTD))	/* itoc.000407: 離站畫面一併簡化 */
   {
     clear();
     prints("親愛的 \033[32m%s(%s)\033[m，別忘了再度光臨【 %s 】\n"

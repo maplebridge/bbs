@@ -1013,7 +1013,7 @@ NewKeyFunc pal_cb[] =
   'f', pal_cite,        'f',    'p',    "引入朋友名單", "",
 #endif
 
-  'h', pal_help,        'h',    'z',    "\功\能說明",     ""
+  'h', pal_help,        'h',    'z',    "功\能說明",     ""
 };
 #endif
 
@@ -1052,7 +1052,7 @@ NewKeyFunc f_pal_cb[] =
   'r', pal_query,       'r',    'z',    "查詢對方",             "",
   Ctrl('Q'), pal_query, Ctrl('Q'),      'p',    "查詢對方",     "",
 
-  'h', f_pal_help,      'h',    'z',    "\功\能說明",     ""
+  'h', f_pal_help,      'h',    'z',    "功\能說明",     ""
 };
 #endif
 

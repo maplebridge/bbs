@@ -3849,7 +3849,7 @@ post_append_score(xo, choose)
 {
   HDR *hdr;
   int pos, cur, ans, ans2, vtlen, maxlen;
-  char *dir, *userid, *verb, fpath[64], reason[80];/*, vtbuf[12];*/
+  char *dir, *userid, *verb, fpath[64], reason[80];
   //char *prompt[3] = {"說的真好：", "聽你鬼扯：", "留一句話："};
   char prompt[64];
   int  num_reason_record = 0;
@@ -3919,40 +3919,36 @@ post_append_score(xo, choose)
 
   if (!(ans = choose))
   {
-    switch (ans = vans("◎ 1)\033[1;31m推文△\033[m 2)\033[1;32m噓文▽\033[m 3)\033[1;37m接文─ [3] \033[m"))
-    {
-    case '1':
-      verb = "1m△";
-      vtlen = 2;
-      break;
+    sprintf(reason, "◎ 1)\033[1;31m推文△\033[m 2)\033[1;32m噓文▽\033[m 3)\033[1;37m接文─ [%d] \033[m",
+      (cuser.ufo & UFO_ADDSCORE) ? 1 : 3);
+    ans = vans(reason) - '0';
+  }
+  if (ans < 1 || ans > 3)
+    ans = (cuser.ufo & UFO_ADDSCORE) ? 1 : 3;
 
-    case '2':
-      verb = "2m▽";
-      vtlen = 2;
-      break;
+  switch (ans)
+  {
+  case 1:
+    verb = "1m△";
+    vtlen = 2;
+    break;
 
-    case '3':
-      verb = "7m─";
-      vtlen = 2;
-      break;
-      /* songsongboy.070124:lexel version*/
-      /*if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
+  case 2:
+    verb = "2m▽";
+    vtlen = 2;
+    break;
+
+  case 3:
+  default:
+    verb = "7m─";
+    vtlen = 2;
+    break;
+    /* songsongboy.070124:lexel version*/
+    /* if (!vget(b_lines, 0, "請輸入動詞：", fpath, 5, DOECHO))
 	return XO_FOOT;
       vtlen = strlen(fpath);
       sprintf(verb = vtbuf, "%cm%s", ans - 2, fpath);
-     break;*/
-
-    default:
-      ans = '3';
-      verb = "7m─";
-      vtlen = 2;
-    }
-  }
-  else
-  {
-    ans = '3';
-    verb = "7m─";
-    vtlen = 2;
+      break;*/
   }
 
   ip_len = (currbattr & BRD_POST_IP) ? 16 : 5;
@@ -3994,7 +3990,7 @@ post_append_score(xo, choose)
     userid = cuser.userid;
 
   sprintf(prompt, "%s %s：",
-    (ans == '1') ? "△" : (ans == '2') ? "▽" : "─" , userid);
+    (ans == 1) ? "△" : (ans == 2) ? "▽" : "─" , userid);
 
   move(b_lines, 0);
   clrtoeol();
@@ -4027,7 +4023,7 @@ post_append_score(xo, choose)
     move(0, 0);
     clrtoeol();
     prints("您的\033[1;3%s文\033[m內容：\n",
-      (ans == '1') ? "1m推" : (ans == '2') ? "2m噓" : "7m接");
+      (ans == 1) ? "1m推" : (ans == 2) ? "2m噓" : "7m接");
     prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s \033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
@@ -4083,7 +4079,7 @@ post_append_score(xo, choose)
     fclose(fp);
   }
 
-  curraddscore = ans == '1' ? 1 : ans == '2' ? -1 : 0;
+  curraddscore = (ans == 1) ? 1 : (ans == 2) ? -1 : 0;
   currchrono = hdr->chrono;
   change_stamp(dir, hdr);
   rec_ref(dir, hdr, sizeof(HDR), xo->key == XZ_XPOST ? hdr->xid : pos, cmpchrono, addscore);
@@ -4108,7 +4104,7 @@ int
 post_e_score(xo)
   XO *xo;
 {
-  return post_append_score(xo, 3);
+  return post_append_score(xo, (cuser.ufo & UFO_ADDSCORE) ? 1 : 3);
 }
 
 
@@ -4937,7 +4933,7 @@ NewKeyFunc post_cb[] =
 #endif
 
   /* smiler.070201: 搜尋功能整合 */
-  '/', XOXpost_search_all,      '/',    'p',    "搜尋\功\能整合鍵",     "",
+  '/', XOXpost_search_all,      '/',    'p',    "搜尋功\能整合鍵",     "",
 
   '!', XoRXsearch,              '!',    'p',    "排除搜尋",             "",
 
@@ -4972,7 +4968,7 @@ NewKeyFunc post_cb[] =
   'B', post_ishowbm,            'B',            'p',    "顯示看板資訊及管理",	"",
 
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",      'R' | XO_DL,            'z',    "顯示投票結果",         "",
-  'V' | XO_DL, (void *) "bin/vote.so:XoVote",           'V' | XO_DL,            'z',    "執行投票相關\功\能",   "",
+  'V' | XO_DL, (void *) "bin/vote.so:XoVote",           'V' | XO_DL,            'z',    "執行投票相關功\能",   "",
   Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala", Ctrl('G') | XO_DL,      'z',    "丟骰至看板",           "",
 
 #ifdef HAVE_TERMINATOR
@@ -4984,7 +4980,7 @@ NewKeyFunc post_cb[] =
   'u', XoNews,                  'u',            'p',    "切換至新聞\閱\讀模式",	"",
 #endif
 
-  'h', post_help,               'h',            'z',    "\功\能說明",	""
+  'h', post_help,               'h',            'z',    "功\能說明",	""
 };
 #endif
 
@@ -5101,7 +5097,7 @@ NewKeyFunc xpost_cb[] =
 #endif
 
   /* smiler.070201: 搜尋功能整合 */
-  '/', XOXpost_search_all,      '/',    'p',    "搜尋\功\能整合鍵",     "",
+  '/', XOXpost_search_all,      '/',    'p',    "搜尋功\能整合鍵",     "",
   '!', XoRXsearch,              '!',    'p',    "排除搜尋",             "",
   '~', XoXselect,               '~',    'p',    "搜尋作者及標題",       "",
   'a', XoXauthor,               'a',    'p',    "搜尋作者",             "",
@@ -5121,7 +5117,7 @@ NewKeyFunc xpost_cb[] =
   'f', post_info,               'f',            'p',    "顯示文章資訊", 	"",
 
   /* itoc.030511: 共用即可 */
-  'h', post_help,               'h',            'z',    "\功\能說明",     ""
+  'h', post_help,               'h',            'z',    "功\能說明",     ""
 };
 #endif
 
@@ -5157,7 +5153,7 @@ NewKeyFunc news_cb[] =
   'r', XoXsearch,               'r',    'z',    "搜尋同標題",           "",
 
   /* itoc.030511: 共用即可 */
-  'h', post_help,               'h',            'z',    "\功\能說明",   ""
+  'h', post_help,               'h',            'z',    "功\能說明",   ""
 };
 #endif
 #endif	/* HAVE_XYNEWS */

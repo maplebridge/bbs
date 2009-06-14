@@ -13,7 +13,6 @@
 extern BCACHE *bshm;
 extern UCACHE *ushm;
 
-//extern void setuploader();
 
 /* ----------------------------------------------------- */
 /* 站務指令						 */
@@ -295,7 +294,7 @@ a_system_setup()
 
 	fclose(fp);
       }
-      unlink(set_path);              /* smiler.071110: 上述設定保存一份於 .USR */
+      unlink(set_path);              /* smiler.071110: 上述設定保存一份於 ~/.SET */
       rename(set_tmp, set_path);     /* 修改站務設定設定選項時,記得要順便改 bbsd.c 內的 setuploader() */
     }
   }

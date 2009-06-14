@@ -489,7 +489,7 @@ static NewKeyFunc aloha_cb[] =
   't', aloha_tag,       't',    'p',    "切換標籤",     		"",
   Ctrl('D'), aloha_prune,       Ctrl('D'),      'p',    "刪除標籤所選", "",
 
-  'h', aloha_help,      'h',    'z',    "\功\能說明",     		""
+  'h', aloha_help,      'h',    'z',    "功\能說明",     		""
 };
 #endif
 

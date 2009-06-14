@@ -1727,8 +1727,8 @@ NewKeyFunc gem_cb[] =
   'd', gem_delete,              'd',            'p',    "刪除",         "",
   'D', gem_rangedel,            'D',            'p',    "區段刪除",     "",
 
-  'c', gem_copy,                'c',            'p',    "拷貝(支援標籤\功\能)",	"",
-  'g', gem_gather,              'g',            'p',    "定錨收錄(支援標籤\功\能)",	"",
+  'c', gem_copy,                'c',            'p',    "拷貝(支援標籤功\能)",	"",
+  'g', gem_gather,              'g',            'p',    "定錨收錄(支援標籤功\能)",	"",
 
   Ctrl('G'), gem_anchor,        Ctrl('G'),      'p',    "定下/拔除/進入海錨",	"",
   Ctrl('V'), gem_paste,         Ctrl('V'),      'p',    "貼上",         "",
@@ -1750,7 +1750,7 @@ NewKeyFunc gem_cb[] =
 
   Ctrl('D'), gem_prune,         Ctrl('D'),      'p',    "刪除標籤所選", "",
 
-  'h', gem_help,                'h',            'z',    "\功\能說明",	""
+  'h', gem_help,                'h',            'z',    "功\能說明",	""
 };
 #endif
 

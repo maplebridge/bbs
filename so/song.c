@@ -815,7 +815,7 @@ static NewKeyFunc song_cb[] =
   'E', song_edit,       'E',    's',    "修改內容",             "",
   'T', song_title,      'T',    's',    "修改標題",             "",
 
-  'h', song_help,       'h',    'z',    "\功\能說明",           ""
+  'h', song_help,       'h',    'z',    "功\能說明",           ""
 };
 #endif
 

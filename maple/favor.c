@@ -1452,7 +1452,7 @@ NewKeyFunc mf_cb[] =
   Ctrl('T'), mf_clear_label,	Ctrl('T'),	'p',	"清除全部看板之標記T",          "",
   Ctrl('D'), mf_del_label,	Ctrl('D'),	'p',	"刪除全部有標記T之看板",        "",
 
-  'h', mf_help,         'h',    'z',    "\功\能說明",     NULL
+  'h', mf_help,         'h',    'z',    "功\能說明",     NULL
 };
 #endif
 

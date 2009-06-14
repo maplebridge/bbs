@@ -1357,7 +1357,7 @@ NewKeyFunc ulist_cb[] =
   'H', ulist_supercloak,        'H',    	's',    "紫隱", 	"",
 #endif
 
-  'h', ulist_help,      	'h',    	'z',    "\功\能說明",   ""
+  'h', ulist_help,      	'h',    	'z',    "功\能說明",   ""
 };
 #endif
 

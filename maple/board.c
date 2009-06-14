@@ -2949,7 +2949,7 @@ NewKeyFunc class_cb[] =
 
   Ctrl('P'), class_newbrd,      Ctrl('P'),    's',    "開闢看板",     "",
 
-  'h', class_help,      'h',    'z',    "\功\能說明",     ""
+  'h', class_help,      'h',    'z',    "功\能說明",     ""
 };
 #endif
 

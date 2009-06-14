@@ -1288,7 +1288,7 @@ NewKeyFunc bmw_cb[] =
   Ctrl('D'), bmw_prune, Ctrl('D'),      'p',    "刪除標籤所選", "",
   'C', bmw_clear,       'C',    'p',    "刪除全部水球",         "",
 
-  'h', bmw_help,        'h',    'z',    "\功\能說明",           ""
+  'h', bmw_help,        'h',    'z',    "功\能說明",           ""
 };
 #endif
 

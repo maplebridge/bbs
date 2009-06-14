@@ -2012,7 +2012,7 @@ NewKeyFunc mbox_cb[] =
   Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   "",
   Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	"",
 
-  'h', mbox_help,               'h',    'z',    "\功\能說明",             ""
+  'h', mbox_help,               'h',    'z',    "功\能說明",             ""
 };
 #endif
 
@@ -2113,6 +2113,6 @@ NewKeyFunc xmbox_cb[] =
   Ctrl('Q'), xo_uquery,         Ctrl('Q'),      'p',    "查詢來信ID",   "",
   Ctrl('O'), xo_usetup,         Ctrl('O'),      's',    "設定來信ID資料",	"",
 
-  'h', mbox_help,               'h',    'z',    "\功\能說明",             ""
+  'h', mbox_help,               'h',    'z',    "功\能說明",             ""
 };
 #endif

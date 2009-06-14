@@ -1304,7 +1304,7 @@ static NewKeyFunc nbrd_cb[] =
   Ctrl('Q'), nbrd_uquery,       Ctrl('Q'),      'p',    "作者查詢",     "",
   Ctrl('O'), nbrd_usetup,       Ctrl('O'),      's',    "作者設定",     "",
 
-  'h', nbrd_help,       'h',    'z',    "\功\能說明",     ""
+  'h', nbrd_help,       'h',    'z',    "功\能說明",     ""
 };
 #endif
 

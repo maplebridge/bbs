@@ -25,8 +25,7 @@
 #define UFO_BRDNAME	BFLAG(3)	/* itoc.010413: 看板列表依 1:brdname 0:class+title 排序 */
 #define UFO_BRDNOTE	BFLAG(4)	/* 顯示進板畫面 */
 #define UFO_VEDIT	BFLAG(5)	/* 簡化編輯器 */
-//#define UFO_MOTD	BFLAG(6)	/* 簡化進/離站畫面 */
-#define UFO_NOUSE6	BFLAG(6)
+#define UFO_MOTD	BFLAG(6)	/* 簡化進/離站畫面 */
 
 #define UFO_PAGER	BFLAG(7)	/* 關閉呼叫器 */
 #define UFO_RCVER	BFLAG(8)	/* itoc.010716: 拒收廣播 */
@@ -48,8 +47,8 @@
 #define UFO_ZHC		BFLAG(18)	/* hightman.060504: 全型字偵測 */
 #define UFO_JUMPBRD	BFLAG(19)	/* itoc.020122: 自動跳去下一個未讀看板 */
 //#define UFO_TIMEKICKER	BFLAG(20)	/* smiler.070724: TIME_KICKER */
-#define UFO_NOUSE20	BFLAG(20)
-#define UFO_LIGHTBAR  BFLAG(21)       /* 整行光棒 */
+#define UFO_ADDSCORE	BFLAG(20)	/* 按 e 推文時預設為△推 */
+#define UFO_LIGHTBAR	BFLAG(21)	/* 整行光棒 */
 #define UFO_NOUSE22	BFLAG(22)
 #define UFO_NOUSE23	BFLAG(23)
 
@@ -149,8 +148,7 @@ char *ufo_tbl[NUMUFOS] =
   "看板列表排序    (字母/分類)",	/* UFO_BRDNAME */	/* itoc.010413: 看板依照字母/分類排序 */
   "進板畫面        (顯示/跳過)",	/* UFO_BRDNOTE */
   "文章編輯器      (簡化/完整)",	/* UFO_VEDIT */
-//  "進/離站畫面     (簡化/完整)",	/* UFO_MOTD */
-  "保留",
+  "進/離站畫面     (簡化/完整)",	/* UFO_MOTD */
 
   "呼叫器          (好友/所有)",	/* UFO_PAGER */
 #ifdef HAVE_NOBROAD
@@ -198,7 +196,7 @@ char *ufo_tbl[NUMUFOS] =
 #endif
 
 //  "IDLE過久自動離站(選擇/不用)",	/*  UFO_TIMEKICKER */ /* smiler.070724 */
-  "保留",
+  "按 e 推文動作   (推文/接文)",	/* UFO_ADDSCORE */
 #ifdef HAVE_LIGHTBAR
   "整行光棒        (光棒/普通)",	/* UFO_LIGHTBAR */
 #else
@@ -223,7 +221,7 @@ char *ufo_tbl2[NUMUFOS2] =
 {
   "離站預設[Y]",			/* UFO2_LOGOUTY */
 
-  "自訂/隱藏動態",			/* UFO2_CMODE */
+  "自訂/隱藏動態",		/* UFO2_CMODE */
   "自訂/隱藏故鄉"			/* UFO2_CFROM */
 };
 
@@ -234,19 +232,19 @@ char *ufo_tbl2[NUMUFOS2] =
 
 char *usr_show_tbl[NUM_USR_SHOW] =
 {
-  "好友文顯示F|f   (顯示/取消)",
-  "加密文顯示L|l   (顯示/取消)",
-  "標記精華文B|b   (顯示/取消)",
-  "收錄精華文G|g   (顯示/取消)",
-  "待刪文顯示T|t   (顯示/取消)",
-  "禁轉文顯示X|x   (顯示/取消)",
-  "禁推文顯示N|n   (顯示/取消)",
-  "標記文顯示M|m   (顯示/取消)",
-  "推文歸0 顯示    (顯示/取消)",
-  "推文分數顯示    (顯示/取消)",
-  "推文未讀提示    (顯示/取消)",
-  "最愛卷宗未讀顯示(顯示/取消)",
-  "推文IP碼彩色顯示(彩色/單色)"
+  "好友文提示 F|f  (顯示/取消)",
+  "加密文提示 L|l  (顯示/取消)",
+  "精華文提示 B|b  (顯示/取消)",
+  "收錄精華文 G|g  (顯示/取消)",
+  "待刪文提示 T|t  (顯示/取消)",
+  "禁轉文提示 X|x  (顯示/取消)",
+  "禁推文提示 N|n  (顯示/取消)",
+  "標記文提示 M|m  (顯示/取消)",
+  "推文數為 0 提示 (顯示/取消)",
+  "顯示推文分數    (顯示/取消)",
+  "提示推文未讀    (顯示/取消)",
+  "提示最愛卷宗未讀(顯示/取消)",
+  "推文IP碼顏色    (彩色/單色)"
 };
 
 
