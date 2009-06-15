@@ -952,7 +952,7 @@ do_reply(xo, hdr)
 
 
 #ifdef HAVE_REFUSEMARK
-int
+int		/* 0: restrict  1: can_see  */
 chkrestrict(hdr)
   HDR *hdr;
 {
@@ -965,7 +965,7 @@ chkrestrict(hdr)
 #endif
 
 
-int
+int		/* 0: restrict  1: can_do_some_action */
 chkrescofo(hdr)	/* restrict / copy / forward */
   HDR *hdr;
 {
@@ -1478,13 +1478,14 @@ post_load(xo)
 
 
 #ifdef SYSOP_MBOX_BRD
-static char*
-sysop_mbox_attr(hdr, attr, unread)
+static char *
+sysop_mbox_attr(hdr, attr)
   HDR *hdr;
-  int attr, unread;
+  int attr;
 {
+  static char color_attr[32];
   int mode;
-  char attr_tmp[15] = {0};
+  char attr_tmp[16] = {0};
 
   mode = hdr->xmode;
 
@@ -1504,16 +1505,6 @@ sysop_mbox_attr(hdr, attr, unread)
     strcpy(attr_tmp, "");
   }
 
-  if (unread)
-  {
-    if (attr == 'm')
-      attr = '=';
-    else if (!(mode & POST_BOTTOM) &&
-      (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM)))
-      attr = '~';
-  }
-
-  static char color_attr[30];
   sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);
   return color_attr;
 }
@@ -1524,9 +1515,9 @@ static char *
 post_attr(hdr)
   HDR *hdr;
 {
+  static char color_attr[32];
   int mode, attr, read, unread;
-
-  char attr_tmp[15];
+  char attr_tmp[16];
   attr_tmp[0] = '\0';
 
   mode = hdr->xmode;
@@ -1546,7 +1537,7 @@ post_attr(hdr)
 
 #ifdef SYSOP_MBOX_BRD
   if (!strcmp(currboard, BN_SYSOPMBOX))
-    return sysop_mbox_attr(hdr, attr, unread);
+    return sysop_mbox_attr(hdr, attr);
 #endif
 
 #ifdef HAVE_REFUSEMARK
@@ -1610,9 +1601,9 @@ post_attr(hdr)
       attr = '=';
     else
       attr = '~';
+    strcpy(attr_tmp, "\033[36m");
   }
 
-  static char color_attr[30];
   sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);
   return color_attr;
 }
@@ -1624,18 +1615,14 @@ post_item(num, hdr)
   HDR *hdr;
 {
   if (hdr->xmode & POST_BOTTOM)
-#if 1
     prints("  \033[1;3%cm%4s\033[m%c%s",
       hdr->color, hdr->mark, tag_char(hdr->chrono), post_attr(hdr));
-#else
-    prints("  \033[1;33m重要\033[m%c%s", tag_char(hdr->chrono), post_attr(hdr));
-#endif
   else
     prints("%6d%c%s", num, tag_char(hdr->chrono), post_attr(hdr));
 
 #ifdef HAVE_SCORE
-  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
-	!chkrestrict(hdr))
+  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) &&
+    chkrestrict(hdr))
   {
     num = hdr->score;
     if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))
@@ -1672,17 +1659,10 @@ post_item_bar(xo, mode)
 
   if (hdr->xmode & POST_BOTTOM)
   {
-#if 1
     prints("%s  \033[1;3%cm%4s\033[m%s%c%s%s",
       mode ? UCBAR[UCBAR_POST] : "",
       hdr->color, hdr->mark, mode ? UCBAR[UCBAR_POST] : "",
       tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-#else
-    prints("%s%s%s%c%s%s",
-      mode ? UCBAR[UCBAR_POST] : "",
-      "  \033[1;33m重要\033[m", mode ? UCBAR[UCBAR_POST] : "",
-      tag_char(hdr->chrono), post_attr(hdr), mode ? UCBAR[UCBAR_POST] : "");
-#endif
   }
   else
   {
@@ -1692,8 +1672,8 @@ post_item_bar(xo, mode)
   }
 
 #ifdef HAVE_SCORE
-  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) ||
-	!chkrestrict(hdr))
+  if (((hdr->xmode & POST_SCORE) && (USR_SHOW & USR_SHOW_POST_SCORE)) &&
+    chkrestrict(hdr))
   {
     num = hdr->score;
     if (!num && !(USR_SHOW & USR_SHOW_POST_SCORE_0))

@@ -1348,6 +1348,10 @@ menu()
       goto every_key;
 
 #ifdef MY_FAVORITE
+    case 'f':
+      if (bbsmode != M_0MENU)
+	goto default_key;
+
     /* itoc.010911: Favorite everywhere，不再限制是在 M_0MENU */
     case Ctrl('F'):
       if (cuser.userlevel)	/* itoc.010407: 要檢查權限 */
