@@ -927,9 +927,10 @@ outsxy(sstr, x, y)
 
   }
 
-  move (x, 0);
+  move(x, 0);
   clrtoeol();
-  prints("%s\n", buf);
+  outs(buf);
+  outs("\n");
 
 }
 

@@ -1345,38 +1345,615 @@ xo_jump(pos, zone)
 #define XOX_LEFT        0x004
 #define XOX_RIGHT       0x008
 
+#define MAX_XOX_X	3
+#define MAX_XOX_Y	20
+
+static screenline xox_slt[T_LINES];
+static int xox_x_roll;
+
+
 typedef struct
 {
-        char name[16];
-        int key;
+  char name[16];
+  int (*func) ();
+  int key;
 } XOX;
 
+typedef struct
+{
+  int value;
+  char name[5];
+} XOX_KEY;
+
+//typedef struct
+//{
+//  int key;
+//  char key_name[6];    /* smiler.090606: 對映自 xox_key[]         */
+//  char func_name[24];  /* smiler.090606: 對映至 NewKeyFunc struct */
+//} XOX_HELP_ITEM;
+
+static XOX_KEY xox_key[] = 
+{
+  0x00, "  ",
+  0x01, "^A",
+  0x02, "^B",
+  0x03, "^C",
+  0x04, "^D",
+  0x05, "^E",
+  0x06, "^F",
+  0x07, "^G",
+  //0x08, "^H",
+  0x08, "Bksp",   /* smiler.090606: ^H 與 Backspace 重複，取後者 */
+  //0x09, "^I",
+  0x09, "Tab",    /* smiler.090606: ^I 與 Tab 重複，取後者 */
+  //0x0a, "^J",
+  0x0a, "Enter",  /* smiler.090606: ^J 與 Enter 重複，取後者 */
+  0x0b, "^K",
+  0x0c, "^L",
+  0x0d, "^M",
+  0x0e, "^N",
+  0x0f, "^O",
+  
+  0x10, "^P",
+  0x11, "^Q",
+  0x12, "^R",
+  0x13, "^S",
+  0x14, "^T",
+  0x15, "^U",
+  0x16, "^V",
+  0x17, "^W",
+  0x18, "^X",
+  0x19, "^Y",
+  0x1a, "^Z",
+  0x1b, "Esc",
+  0x1c, "  ",
+  0x1d, "  ",
+  0x1e, "  ",
+  0x1f, "  ",
+
+  0x20, " ",
+  0x21, "!",
+  0x22, "\"",
+  0x23, "#",
+  0x24, "$",
+  0x25, "%",
+  0x26, "&",
+  0x27, "\'",
+  0x28, "(",
+  0x29, ")",
+  0x2a, "*",
+  0x2b, "+",
+  0x2c, ",",
+  0x2d, "-",
+  0x2e, ".",
+  0x2f, "/",
+
+  0x30, "0",
+  0x31, "1",
+  0x32, "2",
+  0x33, "3",
+  0x34, "4",
+  0x35, "5",
+  0x36, "6",
+  0x37, "7",
+  0x38, "8",
+  0x39, "9",
+  0x3a, ":",
+  0x3b, ";",
+  0x3c, "<",
+  0x3d, "=",
+  0x3e, ">",
+  0x3f, "?",
+
+  0x40, "@",
+  0x41, "A",
+  0x42, "B",
+  0x43, "C",
+  0x44, "D",
+  0x45, "E",
+  0x46, "F",
+  0x47, "G",
+  0x48, "H",
+  0x49, "I",
+  0x4a, "J",
+  0x4b, "K",
+  0x4c, "L",
+  0x4d, "M",
+  0x4e, "N",
+  0x4f, "O",
+
+  0x50, "P",
+  0x51, "Q",
+  0x52, "R",
+  0x53, "S",
+  0x54, "T",
+  0x55, "U",
+  0x56, "V",
+  0x57, "W",
+  0x58, "X",
+  0x59, "Y",
+  0x5a, "Z",
+  0x5b, "[",
+  0x5c, "\\",
+  0x5d, "]",
+  0x5e, "^",
+  0x5f, "_",
+
+  0x60, "`",
+  0x61, "a",
+  0x62, "b",
+  0x63, "c",
+  0x64, "d",
+  0x65, "e",
+  0x66, "f",
+  0x67, "g",
+  0x68, "h",
+  0x69, "i",
+  0x6a, "j",
+  0x6b, "k",
+  0x6c, "l",
+  0x6d, "m",
+  0x6e, "n",
+  0x6f, "o",
+
+  0x70, "p",
+  0x71, "q",
+  0x72, "r",
+  0x73, "s",
+  0x74, "t",
+  0x75, "u",
+  0x76, "v",
+  0x77, "w",
+  0x78, "x",
+  0x79, "y",
+  0x7a, "z",
+  0x7b, "{",
+  0x7c, "|",
+  0x7d, "}",
+  0x7e, "~",
+//  0x7f, "  "
+
+ /* 值副 */
+ 
+ 0xffffffea, "Ins",   /* 16*8 -1 = 127 */
+ 0xffffffe9, "Del",
+ 0xffffffeb, "Home",
+ 0xffffffe8, "End",
+ 0xffffffe7, "PgUp",
+ 0xffffffe6, "PgDn",
+ 
+ 0xffffffff, "↑",
+ 0xfffffffe, "↓",
+ 0xfffffffd, "→",
+ 0xfffffffc, "←"
+ 
+ /* 重複 */
+ 
+// 0x08, "Bksp",        /* 137 */
+// 0x09, "Tab",
+// 0x0a, "Enter",
+// 0x0d, "\r"
+};
+
+char *
+xox_key_search(int value)
+{
+  int i=0;
+  
+  if (value>=0 && value < 127)
+    return xox_key[value].name;
+  else if (value < 0)
+  {
+    for (i=128; i<137; i++)
+    {
+      if (value == xox_key[i].value)
+        return xox_key[value].name;
+    }
+  }
+  
+  /* smiler.090608: 可能是有 XO_DL ，重新找一遍 */
+  
+  value = value & (~XO_DL);
+
+  if (value>=0 && value < 127)
+    return xox_key[value].name;
+  else if (value < 0)
+  {
+    for (i=128; i<137; i++)
+    {
+      if (value == xox_key[i].value)
+        return xox_key[value].name;
+    }
+    return xox_key[0].name;
+  }
+  else
+    return xox_key[0].name;
+}
+
+
+XOX_list(xcmd, cmd ,xo)
+  NewKeyFunc *xcmd;
+  int cmd;
+  XO *xo;
+{
+      
+  int num = cmd | XO_DL; /* Thor.990220: for dynamic load */
+  int pos;
+  
+  NewKeyFunc *cb;
+
+  for (;;)
+  {
+     pos = cb->key;
+#if 1
+     /* Thor.990220: dynamic load , with key | XO_DL */
+     if (pos == num)
+     {
+        void *p = DL_get((char *) cb->func);
+        if (p)
+        {
+          cb->func = p;
+          pos = cb->key = cmd;
+        }
+        else
+        {
+          cmd = XO_NONE;
+          break;
+        }
+     }
+#endif
+     if (pos == cmd)
+     {
+       cmd = (*(cb->func)) (xo);
+
+       if (cmd == XO_QUIT)
+         return;
+
+       break;
+     }
+
+     if (pos == 'h')         /* itoc.001029: 'h' 是一特例，代表 *_cb 的結束 */
+     {
+        cmd = XO_NONE;        /* itoc.001029: 代表找不到 call-back, 不作了! */
+          break;
+     }
+
+     cb++;
+  }
+
+
+}
+
+void
+xox_help(xcmd, xo)
+  NewKeyFunc *xcmd;
+  XO *xo;
+{
+  int xox_help_item[20];
+  NewKeyFunc *cb, *tail;
+  char buf[64];
+  char xox_line[900];
+  int i=0;
+  int j=0;
+  int x=0;
+  int old_x=0;
+  int cmd=0;
+  int tmp=0;
+  int renew=0;
+  int xox_help_len=0;
+  int xox_max_len=0;  /* smiler.090606: 加速查找 */
+
+  cb = xcmd;
+  
+  cb = cb - 1;
+  
+  for (i = 0; i<20; i++)
+  {
+    cb = cb + 1;
+  
+    while (cb->level == 'n' && cb->key != 'h')
+      cb = cb + 1;
+    
+    xox_help_item[i] = (int) (cb - xcmd);
+    sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ",  xox_key_search(cb->key), cb->funcname);
+    outsxy(buf, 3+i, 30);
+    
+    xox_help_len++;
+    
+    if (cb->key == 'h')
+    {
+      tail = cb;
+      
+      for (i=i+1; i<20; i++)
+      {
+        xox_help_item[i] = 0;
+        sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", " ", " ");
+        outsxy(buf, 3+i, 30);
+      }
+      break;
+    }
+  }
+  
+  if (xox_help_len == 20 && strcmp(xox_key_search(cb->key), "h"))
+  {
+
+     for (;;i++)
+     {
+        cb = cb + 1;
+        
+        if (cb->key == 'h')
+        {
+          tail = cb;
+          break;
+        }
+        
+     }
+     xox_max_len = i + 1;
+
+  }
+  else
+     xox_max_len = xox_help_len;
+     
+  x = 0;
+  old_x = 0;
+
+  for (;;)
+  {
+    old_x = x;
+    
+    line_save(3+x, xox_line);
+    cb = xcmd + xox_help_item[x];
+    sprintf(buf, "\033[m\033[1;33m %-6.6s %-24.24s\033[m ", xox_key_search(cb->key), cb->funcname);
+    outsxy(buf, 3+x, 30);
+    
+    cmd = vkey();
+    
+    switch (cmd)
+    {
+      case KEY_UP:
+        x--;
+        break;
+      case KEY_DOWN:
+        x++;
+        break;
+      case KEY_PGUP:
+        x = x - 20;
+        break;
+      case KEY_PGDN:
+        x = x + 20;
+        break;
+      case KEY_HOME:
+        x = xox_max_len;
+        break;
+      case KEY_END:
+        x = xox_max_len;
+        break;
+      default:
+        return;
+    }
+    
+    line_restore(3+old_x, xox_line);
+    
+    if (xox_max_len <= 20 || (x < xox_help_len && x >= 0))   /* 不需更新資料 */
+    {
+    
+      if (cmd == KEY_PGUP)
+        x = old_x;
+      else if (cmd == KEY_PGDN)
+        x = old_x;
+      else if (cmd == KEY_HOME)
+        x = 0;
+      else if (cmd == KEY_END)
+        x = xox_help_len - 1;
+      else if (x >= xox_help_len)
+        x = x - xox_help_len;
+      else if (x < 0)
+        x = x + xox_help_len;
+      
+      continue;
+    }
+    else
+    {
+//      xox_help_len = 0;
+
+      if (cmd == KEY_HOME)
+      {
+    
+        x = 0;
+    
+        cb = xcmd;
+        cb = cb - 1;
+      
+        for (i = 0; i<20; i++)
+        {
+          cb = cb + 1;
+          while (cb->level == 'n' && cb->key != 'h')
+            cb = cb + 1;
+        
+//          xox_help_len++;
+          
+          xox_help_item[i] = (int)(cb - xcmd);
+          
+          if (cb->key == 'h')
+          {
+            for (i=i+1; i<20; i++)
+              xox_help_item[i] = 0;            
+          }
+        }
+      }
+      else if (cmd == KEY_END)
+      {
+      
+        x = 19;
+        cb = tail;      
+      
+        for (i = 0; i<20; i++)
+        {
+          xox_help_item[i] = (int)(cb - xcmd);
+          cb = cb - 1;
+        
+//          xox_help_len ++;
+        
+          if (cb->level == 'n' || i==19)
+          {
+            x = i;
+          
+            for (j = 0; j <= (i/2); j++)
+            {
+              tmp = xox_help_item[j];
+              xox_help_item[j] = xox_help_item[i - j];
+              xox_help_item[i - j] = tmp; 
+            }
+            for (i = i+1; i<20; i++)
+              xox_help_item[i] = 0;
+          }
+        }
+      }
+      //else if (cmd == KEY_PGUP)
+      else if (cmd == KEY_PGDN)
+      {
+        x = old_x;
+      
+        cb = xcmd + xox_help_item[19];
+        
+        if (cb->key != 'h')
+        {
+          cb = cb + 1;
+          
+          for (i=1;;)
+          {
+            if (cb->key == 'h' || i==20)
+              break;
+            else
+            {
+              cb = cb + 1;
+              i++;
+            }
+          }
+          
+          for (i=0; i<20; i++)
+            xox_help_item[19 - i] = (int)(cb - xcmd) - i;
+          
+        }
+      }
+    
+//    else if (x >= xox_help_len)
+//    {
+       /* 找尋下方之下一個 */
+       //xox_help_tmp
+       /* 已經是底端了，跳回起頭 */
+//    }
+//    else if(x < 0)
+//    {
+       /* 找尋上方之上一個 */
+       /* 已經是上端了，跳回結尾 */
+//    }
+
+      for (i=0; i<20; i++)
+      {
+        cb = xcmd + xox_help_item[i];
+        sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", xox_key_search(cb->key), cb->funcname);
+        outsxy(buf, 3+i, 30);
+      }
+      
+    }
+  }
+  
+}
+
+
+void
+XOX_test(xcmd, xo)
+  NewKeyFunc *xcmd;
+  XO *xo;
+{
+  vmsg("test");
+}
+
 int
-XOX_browser()
+XOX_browser(xcmd, xo)
+  NewKeyFunc *xcmd;
+  XO *xo;
 {
 
+  NewKeyFunc *cb;
   int x=0;
   int y=0;
   int cus_x=0;   //
   int cus_y=0;   //
   int num_y = 3;
-  int num_x = 1;
+  int num_x = MAX_XOX_X;
   int old_x = 0;
   int old_y = 0;
   int cmd;
+  
+  int i=0;
+  
+  char buf[64];
 
   //screenline xox_line;
 
   char xox_line[900];
+  
+  /*
+        十  九
+        八  三
+        七六二
+        五四一
+    y
+    |
+    ->x
+             */
 
-  XOX xox_1[] =
+        /*y x */
+  XOX xox[][MAX_XOX_X] =
   {
-     {"0", XOX_LEFT | XOX_UP | XOX_DOWN},
-     {"1", XOX_UP | XOX_DOWN},
-     {"2", XOX_UP | XOX_DOWN}
+     /* y=0 */
+     {
+      {"一", xox_help, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN},
+      {"四", XOX_test, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN},
+      {"五", XOX_test, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN}
+                                                      },
+     /* y=1 */
+     {
+      {"二", XOX_test, XOX_UP | XOX_DOWN},
+      {"六", XOX_test, XOX_UP | XOX_DOWN},
+      {"七", XOX_test, XOX_UP | XOX_DOWN}
+                                                      },
+     /* y=2 */
+     {
+      {"三", XOX_test, XOX_UP | XOX_DOWN},
+      {},
+      {"八", XOX_test, XOX_UP | XOX_DOWN}
+                                                      },
+     /* y=3 */
+     {
+      {"九", XOX_test, XOX_UP | XOX_DOWN},
+      {},
+      {"十", XOX_test, XOX_UP | XOX_DOWN}
+                                                      }
   };
+  
+  int xox_h[5] = {4,2,4};
+  int xox_x[MAX_XOX_X] = {20, 40, 60};
 
+  vs_save(xox_slt);
+
+  num_y = xox_h[x];
+  
+  for (i = 0; i < num_y; i++)
+  {
+     sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
+     outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+  }
+  
+  sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", " ");
+  outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+  
   line_save(b_lines - 1, xox_line);
+
+
+  cb = xcmd;
 
   for (;;)
   {
@@ -1390,13 +1967,31 @@ XOX_browser()
     else if(y < 0)
       y = y + num_y;
 
-    if (y != old_y)
+    if (y != old_y || x != old_x)
     {
       line_restore(b_lines - 1 - old_y, xox_line);
       line_save(b_lines - 1 - y, xox_line);
+      
+      if (x != old_x)
+      {
+         num_y = xox_h[x];
+         vs_restore(xox_slt);
+         
+         for (i = 0; i < num_y; i++)
+         {
+            sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
+            outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+         }
+         
+         sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", " ");
+         outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+         
+         line_save(b_lines - 1, xox_line);
+      }
     }
 
-    outsxy("\033[1;33mtest\033[m", b_lines - 1 - y, 55);
+    sprintf(buf, "\033[m \033[m\033[1;33m%s\033[m ", xox[y][x].name);
+    outsxy(buf, b_lines - 1 - y, xox_x[x] - 1);
 
 
     old_x = x;
@@ -1407,20 +2002,26 @@ XOX_browser()
     switch (cmd)
     {
       case KEY_UP:
-       if (xox_1[y].key & XOX_UP)
+       if (xox[y][x].key & XOX_UP)
          y++;
        break;
       case KEY_DOWN:
-       if (xox_1[y].key & XOX_DOWN)
+       if (xox[y][x].key & XOX_DOWN)
          y--;
        break;
       case KEY_LEFT:
-       if (xox_1[y].key & XOX_LEFT)
-         x++;
+       if (xox[y][x].key & XOX_LEFT)
+         x--;
        break;
       case KEY_RIGHT:
-       if (xox_1[y].key & XOX_RIGHT)
-         x--;
+       if (xox[y][x].key & XOX_RIGHT)
+         x++;
+       break;
+      case '\n':
+       //cb = xcmd + 6;
+       //sprintf(buf, "%d %s", cb->key, cb->funcname);
+       //vmsg(buf);
+       (*(xox[y][x].func)) (xcmd, xo);
        break;
       default:
        break;
@@ -1737,9 +2338,9 @@ xover(cmd)
       cmd = 'r';
     }
 #ifdef NEW_KeyFunc
-    else if (cmd == 'h')
+    else if (cmd == Ctrl('H'))
     {
-      cmd = XOX_browser();
+      cmd = XOX_browser(xcmd, xo);
     }
 #endif
 
