@@ -38,30 +38,113 @@ cmpchrono(hdr)
 }
 
 
+static int post_show_dog(BPERM *wperm, char *prompt);
+
+
 static void
 post_no_right()
 {
-
   int i;
-  for(i = 5; i < 17; i++)
+  usint postlevel;
+  BRD *brd;
+#ifdef HAVE_MODERATED_BOARD
+  BPAL *bpal;
+#endif
+#ifdef DO_POST_FILTER
+  BPERM *wperm;
+#endif
+static char *perm_tbl[NUMPERMS] = 
+{
+  "基本權力",			/* PERM_BASIC */
+  "進入聊天室",			/* PERM_CHAT */
+  "找人聊天",			/* PERM_PAGE */
+  "發表文章",			/* PERM_POST */
+  "身分認證",			/* PERM_VALID */
+  "信件無上限",			/* PERM_MBOX */
+  "隱身術",			/* PERM_CLOAK */
+  "永久保留帳號",		/* PERM_XEMPT */
+
+  "永久免認證帳號",		/* PERM_XVALID */
+  "保留",			/* PERM_10 */
+  "保留",			/* PERM_11 */
+  "保留",			/* PERM_12 */
+  "保留",			/* PERM_13 */
+  "保留",			/* PERM_14 */
+  "保留",			/* PERM_15 */
+  "ATOM 成員",		/* PERM_ATOM */
+
+  "禁止發表文章",		/* PERM_DENYPOST */
+  "禁止 talk",			/* PERM_DENYTALK */
+  "禁止 chat",			/* PERM_DENYCHAT */
+  "禁止 mail",			/* PERM_DENYMAIL */
+  "保留",			/* PERM_DENY5 */
+  "保留",			/* PERM_DENY6 */
+  "禁止 login",			/* PERM_DENYLOGIN */
+  "清除帳號",			/* PERM_PURGE */
+
+  "板主",			/* PERM_BM */
+  "看見忍者",			/* PERM_SEECLOAK */
+  "保留",			/* PERM_ADMIN3 */
+  "註冊總管",			/* PERM_REGISTRAR */
+  "帳號總管",			/* PERM_ACCOUNTS */
+  "聊天室總管",			/* PERM_CHATCLOAK */
+  "看板總管",			/* PERM_BOARD */
+  "站長"				/* PERM_SYSOP */
+};
+
+#ifdef HAVE_MODERATED_BOARD
+  bpal = bshm->pcache + currbno;
+
+  if (is_bmate(bpal))	/* 若在水桶名單中 */
+    vmsg("很抱歉，您目前在板主設定的水桶名單內");
+  else			/* 公開看板，其他依權限判定 */
+#endif
   {
-    move(i, 0);
-    clrtoeol();
+    brd = bshm->bcache + currbno;
+    postlevel = brd->postlevel;
+    if (postlevel && !(postlevel & cuser.userlevel))
+    {
+      for (i = 5; i < 8; i++)
+      {
+	move(i, 0);
+	clrtoeol();
+      }
+      move(b_lines, 0);
+      clrtoeol();
+
+      move(7, 0);
+      prints("\n本看板發文需至少擁有以下權限之一：\n\033[1;31m");
+      for (i = 0; i < 32; i++)
+      {
+	if (postlevel & (1 << i))
+	  prints("%s  ", perm_tbl[i]);
+      }
+      prints("\033[m\n");
+    }
+
+#ifdef DO_POST_FILTER
+    wperm = bshm->wperm + currbno;
+    if (wperm->exist)
+    {
+      vmsg("按任意鍵觀看[看板發文限制]...");
+      post_show_dog(wperm, "發文推文條件限制");
+    }
+    else
+#endif
+      vmsg(NULL);
   }
 
-  move(6, 0);
-  prints("=============================================================================\n");
-  prints("\033[1m對不起，您沒有在此發表文章的權限\033[m\n");
-  prints("\033[1m請回到文章列表後，如下操作: \033[m\n\n");
-  prints("\033[1m1. 先按下\033[33m i 鍵 \033[37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\033[m\n\n");
-  prints("\033[1m2. 並按下\033[33m 2 鍵 \033[37m查詢發文限制，確定您具有本看板發文所需權限等級\033[m\n\n");
-  prints("\033[1m3. 並按下\033[33m 5 鍵 \033[37m查詢板友名單，確定您未被板主浸水桶\033[m\n\n");
-  prints("\033[1m4. 若以上 1~3 皆查詢無誤，請聯絡板主或任一站務請求協助\033[m\n");
-  prints("=============================================================================\n");
-
-  move(b_lines, 0);
-  clrtoeol();
+#if 0
+  prints("=============================================================================\n"
+    "\033[1m對不起，您沒有在此發表文章的權限\033[m\n"
+    "\033[1m請回到文章列表後，如下操作: \033[m\n\n"
+    "\033[1m1. 先按下\033[33m i 鍵 \033[37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\033[m\n\n"
+    "\033[1m    a. 按下\033[33m 2 鍵 \033[37m查詢發文限制，確定您具有本看板發文所需權限等級\033[m\n"
+    "\033[1m    b. 按下\033[33m 5 鍵 \033[37m查詢板友名單，確定您未被板主浸水桶\033[m\n\n"
+    "\033[1m4. 若以上查詢無誤，請聯絡板主或任一站務請求協助\033[m\n"
+    "=============================================================================\n");
   vmsg(NULL);
+#endif
 }
 
 
@@ -1601,7 +1684,7 @@ post_attr(hdr)
       attr = '=';
     else
       attr = '~';
-    strcpy(attr_tmp, "\033[36m");
+    strcpy(attr_tmp, (mode & POST_GOOD) ? "\033[33m" : "\033[36m");
   }
 
   sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);
@@ -1891,9 +1974,6 @@ re_key:
 	if (do_reply(xo, hdr) == XO_INIT)	/* 有成功地 post 出去了 */
 	  return post_init(xo);
       }
-      else
-	post_no_right();
-
       break;
 
     case 'm':

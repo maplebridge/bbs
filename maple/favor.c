@@ -111,14 +111,13 @@ mf_item(num, mf)
     {
       num = rec_num(folder, sizeof(MF));
     }
-    if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
-    {
-      bno = mf_urifolder(folder);	/* 借用 bno */
-      sprintf(folder, "%2d", bno);
-    }
-    prints("%6d%c\033[1;33m%-2s\033[m%s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
-      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? ((bno > 99) ? "爆" : bno ? folder : "") : "",
-      "◆", mf->title);
+    if ((USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) && (bno = mf_urifolder(folder)))
+      sprintf(folder, "\033[1;33m%2d\033[m", BMIN(99, bno));
+    else
+      sprintf(folder, "◆");
+
+    prints("%6d%c  %-2s %s\n", num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
+      folder, mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -184,18 +183,15 @@ mf_item_bar(xo, mode)
       stat(fpath, &st);
       num = st.st_size / sizeof(MF);
     }
-    if (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD)
-    {
-      unread = mf_urifolder(fpath);
-      if (unread > 99)
-	sprintf(fpath, "%s%s%s", mode ? "" : "\033[1;33m", "爆", mode ? "" : "\033[m");
-      else
-	sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", unread, mode ? "" : "\033[m");
-    }
-    prints("%s%6d%c%-2s%s %-*.*s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
+
+    if ((USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) && (unread = mf_urifolder(fpath)))
+      sprintf(fpath, "%s%2d%s", mode ? "" : "\033[1;33m", BMIN(99, unread), mode ? "" : "\033[m");
+    else
+      sprintf(fpath, "◆");
+
+    prints("%s%6d%c  %-2s %-*.*s\033[m", mode ? UCBAR[UCBAR_BRD] : "",
       num, mftype & MF_MARK ? ')' : label ? 'T' : ' ',
-      (USR_SHOW & USR_SHOW_MF_FOLDER_UNREAD) ? (unread ? fpath : "") : "",
-      "◆", d_cols + 66, d_cols + 65, mf->title);
+      fpath, d_cols + 66, d_cols + 65, mf->title);
   }
   else if (mftype & MF_BOARD)
   {
@@ -1273,8 +1269,8 @@ mf_nextunread(xo)
     bno = brd_bno((++mf)->xname);
 pagewrap:
     if (bno >= 0 && !(mf->mftype & MF_CLASS) &&
-      !(brd_bits[bno] & BRD_Z_BIT) && (brd_bits[bno] & BRD_L_BIT))
-    {	/* 跳過分類及 zap 掉、看不見的看板 */
+      !(brd_bits[bno] & BRD_Z_BIT) && (brd_bits[bno] & BRD_R_BIT))
+    {	/* 跳過分類及 zap 掉、進不去的看板 */
       BRD *brd;
       brd = bshm->bcache + bno;
 

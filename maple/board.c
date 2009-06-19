@@ -2296,8 +2296,8 @@ class_nextunread(xo)
   while (++pos < max)
   {
     chn = *(++chp);
-    if (chn >= 0 && !(brd_bits[chn] & BRD_Z_BIT))	/* 跳過分類及 zap 掉的看板 */
-    {
+    if (chn >= 0 && !(brd_bits[chn] & BRD_Z_BIT) && (brd_bits[chn] & BRD_R_BIT))
+    {	/* 跳過分類及 zap 掉、進不去的看板 */
       brd = bcache + chn;
 
 #ifdef ENHANCED_VISIT

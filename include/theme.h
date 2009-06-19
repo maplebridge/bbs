@@ -299,7 +299,7 @@ COLOR1 " RSS 設定 " COLOR9 " (^P/a)"COLOR2"新增 "COLOR9"(d)"COLOR2"刪除 "COLOR9"
 
 #define VMSG_NULL	"                           " COLOR1 " ● 請按任意鍵繼續 ● \033[m"
 
-#define ICON_UNREAD_BRD		"\033[1;33m˙\033[m"	/* 未讀看板 */
+#define ICON_UNREAD_BRD		"\033[1;33m‧\033[m"	/* 未讀看板 */
 #define ICON_READ_BRD		"  "			/* 已讀看板 */
 
 #define ICON_GAMBLED_BRD	"\033[1;31m賭\033[m"	/* 舉行賭盤中的看板 */
