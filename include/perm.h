@@ -117,7 +117,7 @@
 
 #ifdef _ADMIN_C_
 
-static char *perm_tbl[NUMPERMS] = 
+char *perm_tbl[NUMPERMS] = 
 {
   "基本權力",			/* PERM_BASIC */
   "進入聊天室",			/* PERM_CHAT */

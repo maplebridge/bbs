@@ -53,44 +53,7 @@ post_no_right()
 #ifdef DO_POST_FILTER
   BPERM *wperm;
 #endif
-static char *perm_tbl[NUMPERMS] = 
-{
-  "基本權力",			/* PERM_BASIC */
-  "進入聊天室",			/* PERM_CHAT */
-  "找人聊天",			/* PERM_PAGE */
-  "發表文章",			/* PERM_POST */
-  "身分認證",			/* PERM_VALID */
-  "信件無上限",			/* PERM_MBOX */
-  "隱身術",			/* PERM_CLOAK */
-  "永久保留帳號",		/* PERM_XEMPT */
-
-  "永久免認證帳號",		/* PERM_XVALID */
-  "保留",			/* PERM_10 */
-  "保留",			/* PERM_11 */
-  "保留",			/* PERM_12 */
-  "保留",			/* PERM_13 */
-  "保留",			/* PERM_14 */
-  "保留",			/* PERM_15 */
-  "ATOM 成員",		/* PERM_ATOM */
-
-  "禁止發表文章",		/* PERM_DENYPOST */
-  "禁止 talk",			/* PERM_DENYTALK */
-  "禁止 chat",			/* PERM_DENYCHAT */
-  "禁止 mail",			/* PERM_DENYMAIL */
-  "保留",			/* PERM_DENY5 */
-  "保留",			/* PERM_DENY6 */
-  "禁止 login",			/* PERM_DENYLOGIN */
-  "清除帳號",			/* PERM_PURGE */
-
-  "板主",			/* PERM_BM */
-  "看見忍者",			/* PERM_SEECLOAK */
-  "保留",			/* PERM_ADMIN3 */
-  "註冊總管",			/* PERM_REGISTRAR */
-  "帳號總管",			/* PERM_ACCOUNTS */
-  "聊天室總管",			/* PERM_CHATCLOAK */
-  "看板總管",			/* PERM_BOARD */
-  "站長"				/* PERM_SYSOP */
-};
+  extern char *perm_tbl[];
 
 #ifdef HAVE_MODERATED_BOARD
   bpal = bshm->pcache + currbno;
@@ -1836,7 +1799,7 @@ post_head(xo)
   XO *xo;
 {
   vs_head(currBM, xo->xyz);
-  prints(NECKER_POST, d_cols, "", currbattr & BRD_NOSCORE ? "╳" : "○", bshm->mantime[currbno]);
+  prints(NECKER_POST, d_cols, "", bshm->mantime[currbno]);
 
   return post_body(xo);
 }
@@ -3579,7 +3542,7 @@ post_edit(xo)
 
   curredit = 0;
 
-  if (HAS_PERM(PERM_ALLBOARD))			/* 站長修改 */
+  if (!str_cmp(cuser.userid, str_sysop))	/* 站長修改 */
   {
 #ifdef HAVE_REFUSEMARK
     if (!chkrestrict(hdr))

@@ -125,14 +125,14 @@
 /* ----------------------------------------------------- */
 
 #define COLOR1		"\033[1;33;42m"		/* footer 的前段顏色 */
-#define COLOR2		"\033[m\033[30;47m"	/* footer 的後段顏色 */
+#define COLOR2		"\033[;30;47m"		/* footer 的後段顏色 */
 #define COLOR3		"\033[;30;47m"
 #define COLOR4		"\033[1;42m"		/* 光棒 的顏色 */
 #define COLOR5		"\033[1;37;42m"		/* more 檔頭的標題顏色 */
 #define COLOR6		"\033[0;34;47m"		/* more 檔頭的內容顏色 */
 #define COLOR7		"\033[1m"		/* 作者在線上的顏色 */
-#define COLOR8		"\033[m\033[32;47m"	/* footer 加強標註(綠/白) */
-#define COLOR9		"\033[m\033[31;47m"	/* footer 加強標註(紅/白) */
+#define COLOR8		"\033[;32;47m"		/* footer 加強標註(綠/白) */
+#define COLOR9		"\033[;31;47m"		/* footer 加強標註(紅/白) */
 #define COLOR10		"\033[30;47m"		/* neck 的顏色 */
 #define COLOR11		"\033[31;47m"		/* menu footer 的顏色 */
 #define COLOR_SITE	"\033[1;37;42m"		/* ryanlei.081017: 站台主色 */

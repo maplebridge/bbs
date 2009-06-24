@@ -17,14 +17,14 @@
 
 //#define COLOR1		"\033[34;46m"	/* footer/feeter 的前段顏色 */
 #define COLOR1		"\033[1;33;44m"		/* footer/feeter 的前段顏色 */
-#define COLOR2		"\033[m\033[30;47m"	/* footer/feeter 的後段顏色 */
+#define COLOR2		"\033[;30;47m"		/* footer/feeter 的後段顏色 */
 #define COLOR3		"\033[;30;47m"	
 #define COLOR4		"\033[1;44m"		/* 光棒 的顏色 */
 #define COLOR5		"\033[34;47m"		/* more 檔頭的標題顏色 */
 #define COLOR6		"\033[37;44m"		/* more 檔頭的內容顏色 */
 #define COLOR7		"\033[1m"		/* 作者在線上的顏色 */
-#define COLOR8		"\033[m\033[1;34;47m"	/* feeter 加強標註(藍/白) */
-#define COLOR9		"\033[m\033[31;47m"	/* feeter 加強標註(紅/白) */
+#define COLOR8		"\033[1;34;47m"		/* feeter 加強標註(藍/白) */
+#define COLOR9		"\033[;31;47m"		/* feeter 加強標註(紅/白) */
 #define COLOR10		"\033[34;47m"		/* neck 的顏色 */
 #define COLOR11		"\033[35;47m"		/* menu feeter 的顏色 */
 #define COLOR_SITE	"\033[1;37;44m"		/* ryanlei.081017: 站台主色 */
@@ -51,7 +51,7 @@
 /* 各類光棒顏色						 */
 /* ----------------------------------------------------- */
 
-#define COLORBAR_MENU   "\033[0;30;47m" /* menu.c 選單光棒 */
+#define COLORBAR_MENU	"\033[1;37;44m"	/* menu.c 選單光棒 */
 #define	COLORBAR_BRD	"\033[1;41m"	/* board.c, favor.c 選單光棒 */
 #define COLORBAR_POST	"\033[1;43m"	/* post.c 選單光棒 */
 #define COLORBAR_GEM	"\033[1;42m"	/* gem.c  選單光棒 */
@@ -60,7 +60,7 @@
 #define COLORBAR_BMW	"\033[1;43m"	/* bmw.c 選單光棒 */
 #define COLORBAR_MAIL	"\033[1;42m"	/* mail.c 選單光棒 */
 #define COLORBAR_ALOHA	"\033[1;41m"	/* aloha.c 選單光棒 */
-#define COLORBAR_VOTE	"\033[0;30;43m"	/* vote.c 選單光棒 */
+#define COLORBAR_VOTE	"\033[;30;43m"	/* vote.c 選單光棒 */
 #define COLORBAR_NBRD	"\033[1;46m"	/* newbrd.c 選單光棒 */
 #define COLORBAR_SONG	"\033[1;42m"	/* song.c 選單光棒 */
 #define COLORBAR_RSS	"\033[1;46m"	/* rss.c 選單光棒 */
@@ -119,13 +119,13 @@
 			COLOR10 "  編號     日 期 作  者       新  聞  標  題%*s                                  \033[m"
 
 #define NECKER_XPOST	"\n" \
-			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                           評:%s  \033[m"
+			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                                  \033[m"
 
 #define NECKER_MBOX	"[←]離開 [→,r]讀信 [d]刪除 [R,y](群組)回信 [s]寄信 [x]轉錄 [X]轉達 [h]說明\n" \
 			COLOR10 "  編號   日 期 作  者       信  件  標  題%*s                                    \033[m"
 
 #define NECKER_POST	"[←]離開 [→]閱\讀 [^P]發表 [b]進板畫面 [d]刪除 [V]投票 [TAB]精華區 [h]說明\n" \
-			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                 評:%s  人氣:%-4d \033[m"
+			COLOR10 "  編號     日 期 作  者       文  章  標  題%*s                        人氣:%-4d \033[m"
 
 #define NECKER_GEM	"[←]離開 [→]瀏覽 [B]模式 [C]暫存 [F]轉寄 [d]刪除 [h]說明  %s\n" \
 			COLOR10 "  編號     主              題%*s                            [編      選] [日  期]\033[m"

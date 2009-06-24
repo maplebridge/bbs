@@ -270,11 +270,14 @@ vs_head(title, mid)
   {
     if ((spc = strlen(mid)) >= (len-7))
     {
-      spc = len -7;                  /* smiler.080614 : 原版計算長度有誤，誤差為7 */
-      memcpy(ttl, mid, spc);
+      spc = len - 7;			/* smiler.080614 : 原版計算長度有誤，誤差為7 */
+      strncpy(ttl, mid, spc);
       mid = ttl;
       mid[spc] = '\0';
       broken = 1;
+
+      if (IS_ZHC_HI(mid[spc - 1]))
+	mid[--spc] = '\0';
     }
   }
 
@@ -288,10 +291,10 @@ vs_head(title, mid)
   prints("\033[1;4%cm【%s】%s\033[33m%s\033[1;37;4%cm%s《%s》\033[m\n",
     spc, title, buf, mid, spc, buf + len, currboard);
 #else
-  if(!broken)
+  if (!broken)
   {
-    prints(COLOR_SITE "【%s】%s\033[33m%s" COLOR_SITE "%s看板《%s》\033[m\n",
-      title, buf, mid, buf + len+4, currboard);
+    prints(COLOR_SITE "【%s】%s\033[33m%s" COLOR_SITE "%*s看板《%s》\033[m\n",
+      title, buf, mid, spc - len - 4, "", currboard);
   }
   else
   {

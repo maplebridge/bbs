@@ -1149,7 +1149,7 @@ void		/* Thor.981028: 為了讓 talk.c 有人呼叫時會show字 */
 cursor_restore()
 {
   move(old_row, old_col);
-  
+
   cur_pos = old_pos; /* Thor.990401: 多還原一個 */
 }
 
@@ -1286,7 +1286,7 @@ imsg(msg)			/* itoc.010827: 重要訊息顯示 important message */
 
 #ifdef POPUP_MESSAGE
 int
-vmsg(msg)
+vwmsg(msg)	/* window msg */
   char *msg;			/* length <= 54 */
 {
   if (msg)
@@ -1297,9 +1297,11 @@ vmsg(msg)
   move(b_lines, 0);	/* itoc.010127: 修正在偵測左右鍵全形下，按左鍵會跳離二層選單的問題 */
   return vkey();
 }
-#else
+#endif
+
+
 int
-vmsg(msg)
+vfmsg(msg)	/* footer msg */
   char *msg;			/* length <= 54 */
 {
   if (msg)
@@ -1316,7 +1318,18 @@ vmsg(msg)
   }
   return vkey();
 }
+
+
+int
+vmsg(msg)
+  char *msg;			/* length <= 54 */
+{
+#ifdef POPUP_MESSAGE
+  return vwmsg(msg);
+#else
+  return vfmsg(msg);
 #endif
+}
 
 
 static inline void

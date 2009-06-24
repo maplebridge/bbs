@@ -1017,7 +1017,7 @@ xpost_head(xo)
   if (*HintWord)
     prints("¼ÐÃD¡G%.40s", HintWord);
 
-  prints(NECKER_XPOST, d_cols, "", currbattr & BRD_NOSCORE ? "¢®" : "¡³");
+  prints(NECKER_XPOST, d_cols, "");
 
   return XO_BODY;
 }
