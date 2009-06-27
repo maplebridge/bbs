@@ -722,18 +722,20 @@ Ben_Perm(bno, ulevel)
   if ((ulevel & PERM_BM) && blist[0] > ' ' && is_bm(blist, cuser.userid))
     bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
 
-  /* smiler.080811: ATOM成員於ATOM看板具備全部屬性 */
+  /* smiler.080811: ATOM 成員於 ATOM 看板具備全部屬性 */
   else if ((ulevel & PERM_ATOM) && (brd->battr & BRD_ATOM))
     bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT | BRD_M_BIT;
 
   else if (ulevel & PERM_ALLBOARD)
   {
     if (brd->battr & BRD_PUBLIC)
-      bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
-    else /*if (blist[0] > ' ')*/
+    {
+      bits = BRD_L_BIT | BRD_X_BIT;
+      if (ulevel & PERM_SYSOP)
+        bits |= BRD_R_BIT | BRD_W_BIT;
+    }
+    else	/*if (blist[0] > ' ')*/
       bits |= BRD_L_BIT;
-/*    else
-      bits = BRD_L_BIT | BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;*/
   }
 
   return bits;
@@ -1496,7 +1498,6 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
 {
   BRD *brd;
   char *str1, *str2, *str3, token, buf[16];
-  int post_read_secret = 1;
 
   brd = bshm->bcache + bno;
 
@@ -1516,13 +1517,6 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
   else
     token = ' ';
 
-  /* smiler.080712:處理隱板可見 */
-  if (!infav)		/* smiler.080712: 看板列表要另外處理隱板可見 */
-  {
-    if (((brd->readlevel == PERM_SYSOP) || (brd->readlevel == PERM_BOARD)) && !(brd_bits[bno] & BRD_R_BIT))
-      post_read_secret = 0;
-  }
-
   /* 處理 已讀/未讀 */
 #ifdef ENHANCED_VISIT
   /* itoc.010407: 改用最後一篇已讀/未讀來判斷 */
@@ -1539,6 +1533,7 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
     str2 = (brd->battr & BRD_NOTRAN) ? ICON_NOTRAN_BRD : ICON_TRAN_BRD;
 
   /* 處理 人氣 */
+  brdpost = bno;	/* 記住 bno */
   bno = bshm->mantime[bno];
   if (bno > 730)
     str3 = "\033[1;36m爆了\033[m";
@@ -1567,13 +1562,8 @@ class_item(num, bno, brdpost, infav, label)	/* smiler.070724: 我的最愛看板上色*/
     prints("%6d%c%s", num, token, str1);
 
     /* smiler.080712: 處理隱板可見顯色 */
-    if ((brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP))
-    {
-      if (post_read_secret)
-	prints("\033[m\033[1;32m%-13s\033[m", brd->brdname);
-      else
-	prints("\033[m\033[1;30m%-13s\033[m", brd->brdname);
-    }
+    if (((brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP)) && !(brd_bits[brdpost] & BRD_R_BIT))
+      prints("\033[m\033[1;30m%-13s\033[m", brd->brdname);
     else
       prints("%-13s", brd->brdname);
   }
@@ -1620,7 +1610,6 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
 {
   int num;
   char *str1, *str2, *str3, token, buf[16];
-  int post_read_secret = 1;
 
   btime_refresh(brd);
 
@@ -1636,13 +1625,6 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
     token = TOKEN_FRIEND_BRD;
   else
     token = ' ';
-
-  /* smiler.080712:處理隱板可見 */
-  if (!infav)
-  {
-    if (((brd->readlevel == PERM_SYSOP) || (brd->readlevel == PERM_BOARD)) && !(brd_bits[chn] & BRD_R_BIT))
-      post_read_secret = 0;
-  }
 
   /* 處理 已讀/未讀 */
 #ifdef ENHANCED_VISIT
@@ -1688,13 +1670,8 @@ class_item_bar(brd, bno, chn, brdpost, infav, label)
     prints("\033[m%s%6d%c%s%s", UCBAR[UCBAR_BRD], num, token, str1, UCBAR[UCBAR_BRD]);
 
     /* smiler.080712: 處理隱板可見顯色 */
-    if ((brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP))
-    {
-      if (post_read_secret)
-	prints("\033[1;32m%-13s\033[m%s", brd->brdname, UCBAR[UCBAR_BRD]);
-      else
-	prints("\033[1;30m%-13s\033[m%s", brd->brdname, UCBAR[UCBAR_BRD]);
-    }
+    if (((brd->readlevel == PERM_BOARD) || (brd->readlevel == PERM_SYSOP)) && !(brd_bits[chn] & BRD_R_BIT))
+      prints("\033[1;30m%-13s\033[m%s", brd->brdname, UCBAR[UCBAR_BRD]);
     else
       prints("%-13s", brd->brdname);
   }
