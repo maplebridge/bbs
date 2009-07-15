@@ -729,7 +729,7 @@ Ben_Perm(bno, ulevel)
   else if (ulevel & PERM_ALLBOARD)
   {
     bits |= BRD_L_BIT;
-    if (((ulevel & PERM_SYSOP) && (brd->battr & BRD_PUBLIC) && ) ||
+    if (((ulevel & PERM_SYSOP) && (brd->battr & BRD_PUBLIC)) ||
       !(readlevel & (PERM_SYSOP | PERM_BOARD)))
       bits |= BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
   }
