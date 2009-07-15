@@ -16,14 +16,14 @@
 /* ----------------------------------------------------- */
 
 //#define COLOR1		"\033[34;46m"	/* footer/feeter 的前段顏色 */
-#define COLOR1		"\033[1;33;44m"		/* footer/feeter 的前段顏色 */
+#define COLOR1		"\033[;1;33;44m"	/* footer/feeter 的前段顏色 */
 #define COLOR2		"\033[;30;47m"		/* footer/feeter 的後段顏色 */
 #define COLOR3		"\033[;30;47m"	
 #define COLOR4		"\033[1;44m"		/* 光棒 的顏色 */
 #define COLOR5		"\033[34;47m"		/* more 檔頭的標題顏色 */
 #define COLOR6		"\033[37;44m"		/* more 檔頭的內容顏色 */
 #define COLOR7		"\033[1m"		/* 作者在線上的顏色 */
-#define COLOR8		"\033[1;34;47m"		/* feeter 加強標註(藍/白) */
+#define COLOR8		"\033[;1;34;47m"	/* feeter 加強標註(藍/白) */
 #define COLOR9		"\033[;31;47m"		/* feeter 加強標註(紅/白) */
 #define COLOR10		"\033[34;47m"		/* neck 的顏色 */
 #define COLOR11		"\033[35;47m"		/* menu feeter 的顏色 */
@@ -179,7 +179,7 @@ COLOR1 " 連署機制 " COLOR9 " (ry)"COLOR2"加入連署 "COLOR9"(kj)"COLOR2"上下篇 "CO
 //COLOR1 " 瀏覽 P.%d (%d%%) " COLOR2 " (h)說明 [PgUp][PgDn][0][$]移動 (/n)搜尋 (C)暫存 (←q)結束 "
 
 #define FOOTER_MORE	\
-COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 " COLOR9 "(@)"COLOR2"動畫播放" COLOR2 " "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  "
+COLOR1 " 瀏覽 P.%d (%d%%) " COLOR9 " (h)"COLOR2"說明 " COLOR9 "(@)"COLOR2"動畫播放 "COLOR9"(↑↓0$)"COLOR2"移動 "COLOR9"(/n)"COLOR2"搜尋 "COLOR9"(C)"COLOR2"暫存 "COLOR9"(←q)"COLOR2"結束  "
 
 #define FOOTER_VEDIT	\
 COLOR1 " %s " COLOR9 " (^Z)"COLOR2"說明 "COLOR9"(^W)"COLOR2"符號 "COLOR9"(^L)"COLOR2"重繪 "COLOR9"(^X)"COLOR2"檔案處理 ║"COLOR9"%s"COLOR2"│"COLOR9"%s"COLOR2"║"COLOR9"%5d:%3d"COLOR2"    \033[m"

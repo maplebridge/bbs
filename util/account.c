@@ -688,7 +688,7 @@ class_parse(key, key_xname)
   }
 
   /* build classes */
-  
+
   if (key_xname)
     sprintf(fpath, "gem/@/%s", key_xname);
 

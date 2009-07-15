@@ -3485,7 +3485,7 @@ post_edit_merge(hdr, fpath)
   }
   else	/* 若非取消則加上修改資訊 */
   {
-    if (!HAS_PERM(PERM_ALLBOARD) && (fp = fopen(tmp, "a")))
+    if (str_cmp(cuser.userid, str_sysop) && (fp = fopen(tmp, "a")))
     {
       ve_banner(fp, 1);
       fclose(fp);

@@ -847,7 +847,6 @@ re_key:
       /* lkchu.981201: 先清一次以免重疊顯示 */
       move(b_lines, 0);
       clrtoeol();
-      
 
       if (vmsg(NULL) == 'C')	/* Thor.990204: 特別注意若回傳 'C' 表示暫存檔 */
       {
