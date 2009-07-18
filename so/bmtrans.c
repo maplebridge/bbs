@@ -75,7 +75,8 @@ bmt_setperm(xo, hdr)
   {
     brd = bshm->bcache + pos;
     strcpy(brd->BM, pal.ship);
-    rec_put(FN_BRD, brd, sizeof(BRD), pos, NULL);
+    currchrono = brd->bstamp;
+    rec_put(FN_BRD, brd, sizeof(BRD), pos, cmpbstamp);
     unlink(fpath);
 
     time(&now);

@@ -801,6 +801,22 @@ addgold(addend)
 /* ----------------------------------------------------- */
 
 
+int
+cmpbstamp(brd)
+  BRD *brd;
+{
+  return brd->bstamp == currchrono;
+}
+
+
+static int
+cmpbrddel(brd)
+  BRD *brd;
+{
+  return !strcmp(brd->brdname, "");
+}
+
+
 #ifndef HAVE_COSIGN
 static
 #endif
@@ -1006,9 +1022,9 @@ brd_new(brd)
     return -1;
 
   time4(&brd->bstamp);
-  if ((bno = brd_bno("")) >= 0)
+  if ((bno = brd_bno("")) >= 0)	/* 若有已刪除的看板空位，就放進去 */
   {
-    rec_put(FN_BRD, brd, sizeof(BRD), bno, NULL);
+    rec_put(FN_BRD, brd, sizeof(BRD), bno, cmpbrddel);
   }
   /* Thor.981102: 防止超過shm看板個數 */
   else if (bshm->number >= MAXBOARD)
@@ -1151,10 +1167,11 @@ brd_edit(bno)
 	/* if (!(bhdr->battr & BRD_NOTRAN)) */	/* 有可能只設定轉入不轉出，直接去 newsfeeds.bbs 找 */
 	if (brd_innchange(bname, NULL))
 	  vmsg("轉信資料已一併刪除");
+	currchrono = newbh.bstamp;	/* 借用 currchrono */
 	memset(&newbh, 0, sizeof(BRD));
 	sprintf(newbh.title, "[%s] deleted by %s", bname, cuser.userid);
 	memcpy(bhdr, &newbh, sizeof(BRD));
-	rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
+	rec_put(FN_BRD, &newbh, sizeof(BRD), bno, cmpbstamp);
 
 	/* itoc.050531: 砍板會造成看板不是按字母排序，所以要修正 numberOld */
 	if (bshm->numberOld > bno)
@@ -1192,7 +1209,8 @@ brd_edit(bno)
 	    bshm->numberOld = bno;
 	}
 	memcpy(bhdr, &newbh, sizeof(BRD));
-	rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
+	currchrono = newbh.bstamp;	/* 借用 currchrono */
+	rec_put(FN_BRD, &newbh, sizeof(BRD), bno, cmpbstamp);
       }
     }
     vmsg("設定完畢");
@@ -1219,7 +1237,8 @@ brd_title(bno)		/* itoc.000312: 板主修改中文敘述 */
     {
       vget(b_lines, 0, "看板主題：", newbh.title, BTLEN + 1, GCARRY);
       memcpy(bhdr, &newbh, sizeof(BRD));
-      rec_put(FN_BRD, &newbh, sizeof(BRD), bno, NULL);
+      currchrono = newbh.bstamp;	/* 借用 currchrono */
+      rec_put(FN_BRD, &newbh, sizeof(BRD), bno, cmpbstamp);
     }
     return 1;
   }

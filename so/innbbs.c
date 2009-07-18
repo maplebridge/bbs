@@ -284,7 +284,8 @@ nf_add(fpath, old, pos)
     {
       high = brd - bshm->bcache;
       brd->battr &= ~BRD_NOTRAN;
-      rec_put(FN_BRD, brd, sizeof(BRD), high, NULL);
+      currchrono = brd->bstamp;
+      rec_put(FN_BRD, brd, sizeof(BRD), high, cmpbstamp);
     }
 
     return 1;

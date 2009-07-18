@@ -11,6 +11,7 @@ void acct_setup(ACCT *u, int adm);
 void acct_setperm(ACCT *u, usint leveup, usint leveldown);
 void addmoney(int addend);
 void addgold(int addend);
+int cmpbstamp(BRD *brd);
 int brd_new(BRD *brd);
 void brd_edit(int bno);
 int brd_title(int bno);

@@ -42,6 +42,13 @@ cmpbtime(nbrd)
   return nbrd->btime == currchrono;
 }
 
+static int
+cmpbname(brd)
+  BRD *brd;
+{
+  return brd->bstamp == currchrono;
+}
+
 
 static char
 nbrd_attr(nbrd)
@@ -247,6 +254,7 @@ nbrd_add(xo)
   char *dir, fpath[64], path[64], buf[32], group[64];
   char class[BCLEN + 1], sub[BNLEN + 1];
   char *brdname, *title, *prefix, *plevel;
+  static char *opentype[9] = {"個人/情侶", "寢板", "實驗室", "社團/校友會", "各系(級)所相關|活動板/官方課程板", "校隊/校務看板", "團體板/課程小組討論板", "綜合/其他", NULL};
   FILE *fp;
   NBRD nbrd;
 
@@ -517,6 +525,7 @@ nbrd_add(xo)
 
   if (ans == '1')
   {
+    fprintf(fp, "開板種類：\033[1;33m%s\033[m\n\n", opentype[ntype - 1]);
     fprintf(fp, "英文板名：%s\n", brdname);
     fprintf(fp, "中文板名：%s\n", title);
     fprintf(fp, "板主名單：%s\n", cuser.userid);
@@ -935,7 +944,8 @@ nbrd_nf_add(nbrd)
     if ((brd->battr & BRD_NOTRAN) && vans("本板屬性目前為不轉出，是否改為轉出(Y/N)？[Y] ") != 'n')
     {
       brd->battr &= ~BRD_NOTRAN;
-      rec_put(FN_BRD, brd, sizeof(BRD), high, NULL);
+      currchrono = brd->bstamp;
+      rec_put(FN_BRD, brd, sizeof(BRD), high, cmpbstamp);
     }
 
     return 1;

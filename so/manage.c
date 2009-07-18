@@ -229,7 +229,8 @@ post_brdtitle()
     if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
     {
       memcpy(oldbrd, &newbrd, sizeof(BRD));
-      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+      currchrono = newbrd.bstamp;
+      rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
     }
   }
 
@@ -509,7 +510,8 @@ post_brd_prefix()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -545,7 +547,8 @@ post_brd_ip_char()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -575,7 +578,8 @@ post_battr_noscore()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -610,7 +614,8 @@ post_rlock()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -644,7 +649,8 @@ post_vpal()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 1;
@@ -674,7 +680,8 @@ post_noforward()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -704,7 +711,8 @@ post_showturn()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -803,7 +811,8 @@ post_changeBM()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
 
     sprintf(currBM, "ªO¥D¡G%s", newbrd.BM);
   }
@@ -862,7 +871,8 @@ post_brdlevel()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
@@ -946,7 +956,8 @@ post_bbs_dog()
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
     memcpy(oldbrd, &newbrd, sizeof(BRD));
-    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, NULL);
+    currchrono = newbrd.bstamp;
+    rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);
   }
 
   return 0;
