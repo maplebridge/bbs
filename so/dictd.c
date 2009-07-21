@@ -1,61 +1,63 @@
 /*-------------------------------------------------------*/
-/* dictd.c    ( YZU WindTOPBBS Ver 3.10 )                */
+/* dictd.c    ( YZU WindTOPBBS Ver 3.10 )		 */
 /*-------------------------------------------------------*/
-/* author : statue.bbs@bbs.yzu.edu.tw                    */
-/* target : 字典                                         */
-/* create : 01/11/18                                     */
-/* update : 08/12/11                                     */
+/* author : statue.bbs@bbs.yzu.edu.tw			 */
+/* target : 字典					 */
+/* create : 01/11/18					 */
+/* update : 08/12/11					 */
 /*-------------------------------------------------------*/
+
 
 #include "bbs.h"
 #include "iconv.h"
 
+
 #if 0
-/*
 smiler.080203:
 1.字典相關功能，請見 http://dict.tw/doc/Dict_BSD.htm
   以及 http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/dict.html
 
 2.iconv.h 相關編碼問題，請見 http://netlab.cse.yzu.edu.tw/~statue/freebsd/zh-tut/converter.html
   特別注意: gcc -I/usr/local/include -L/usr/local/lib -liconv -o my_iconv my_iconv.c
-*/
 #endif
 
-//代碼轉換:從一種編碼轉為另一種編碼
-int code_convert(char *from_charset,char *to_charset,char *inbuf,int inlen,char *outbuf,int outlen)
+
+/* 代碼轉換:從一種編碼轉為另一種編碼 */
+static int code_convert(char *tocode, char *fromcode, char *inbuf, int inlen, char *outbuf, int outlen)
 {
   iconv_t cd;
-  char **pin = &inbuf;
-  char **pout = &outbuf;
 
-  if (!(cd = iconv_open(to_charset, from_charset)))
+  if (!(cd = iconv_open(tocode, fromcode)))
     return -1;
 
-  memset(outbuf,0,outlen);
-  if (iconv(cd, pin, &inlen, pout, &outlen) == -1)
+  memset(outbuf, 0, outlen);
+  if (iconv(cd, (const char **) &inbuf, (size_t *) &inlen,  &outbuf, (size_t *) &outlen) == -1)
+  {
+    iconv_close(cd);
     return -1;
+  }
+
   iconv_close(cd);
   return 0;
 }
 
 
 //big5轉為utf-8碼
-int b2u(char *inbuf,int inlen,char *outbuf,int outlen)
+static int b2u(char *inbuf, int inlen, char *outbuf, int outlen)
 {
-  return code_convert("big5","utf-8",inbuf,inlen,outbuf,outlen);
+  return code_convert("UTF-8", "BIG5", inbuf, inlen, outbuf, outlen);
 }
 
 
 int
 main_dictd()
 {
-  char word[73];
+  char word[64];
   char word2[128];
-//  char word_big5[256];     //smiler.0202
   char word_utf8[256];
   char tmp[256];
   char fname[64];
-  char fname_tmp[64];          //smiler.0202
+  char fname_tmp[64];
   uschar *str, *ptr, *pend;
   int is_ch, is_eng;
 
@@ -63,16 +65,16 @@ main_dictd()
   {
     clear();
     move(0, 30);
-    outs("\033[1;37;44m◎ 多用途字典 ◎\033[m");
-    move(2, 0);
-    outs("此字典來源為 FreeBSD 的 dict-database 以及 cdict5 字典。須輸入完整單字或片語。\n");
-    move(4, 0);
+    outs("\033[1;37;44m◎ 多用途字典 ◎\033[m\n\n");
+    outs("此字典來源為 FreeBSD 的 dict-database 以及 cdict5 字典。須輸入完整單字或片語。\n\n");
+    outs("若欲取得完整的字典列表，請輸入 -D");
+#if 0
     outs("字典代號   字典說明\n");
     outs("============================================================================\n");
-    outs("moecomp    Taiwan MOE computer dictionary\n");
-    outs("netterm    Network Terminology\n");
-    outs("pydict     pydict data\n");
-    outs("cedict     Chinese to English dictionary\n");
+//    outs("moecomp    Taiwan MOE computer dictionary\n");
+//    outs("netterm    Network Terminology\n");
+//    outs("pydict     pydict data\n");
+//    outs("cedict     Chinese to English dictionary\n");
     outs("web1913    Webster's Revised Unabridged Dictionary (1913)\n");
     outs("wn         WordNet (r) 2.0\n");
     outs("gazetteer  U.S. Gazetteer (1990)\n");
@@ -85,6 +87,7 @@ main_dictd()
     outs("devils     THE DEVIL'S DICTIONARY ((C)1911 Released April 15 1993)\n");
     outs("world95    The CIA World Factbook (1995)\n");
     outs("cdict5     Chinese to English and English to Chinese Dictionary\n");
+#endif
     memset(word, 0, sizeof(word));
     memset(word2, 0, sizeof(word2));
     is_ch =  is_eng = 0;
@@ -119,26 +122,27 @@ main_dictd()
       }
       else
       {
-        /* smiler.081211: security reason， 僅接受中文，英文，空格符號輸入 !! */
-	if((*str >= 'a' && *str <= 'z') || (*str >= 'A' && *str <= 'Z') || (*str == ' '))
+        /* smiler.081211: security reason， 僅接受中文，英文，空格符號輸入 */
+	if((*str >= 'a' && *str <= 'z') || (*str >= 'A' && *str <= 'Z') ||
+	  (*str == ' ') || (*str == '*') || (*str == '?') || (*str == '-'))
 	{
 	  *ptr = *str;
-	  if(*ptr != ' ')
+	  if (*ptr != ' ')
 	    is_eng = 1;
 	}
 	else
 	{
-	  vmsg("字典僅接受中文/英文/或是空格符號三種輸入 !!");
+	  vmsg("字典僅接受中文/英文/或是 {*,?,-}");
 	  return 0;
 	}
       }
-
+#if 0
       if(is_ch && is_eng)
       {
-	vmsg("不可同時輸入中英文 !!");
+	vmsg("不可同時輸入中英文");
 	return 0;
       }
-
+#endif
       str++;
       ptr++;
     }
@@ -146,12 +150,11 @@ main_dictd()
     sprintf(fname_tmp, "tmp/%s.dictd.tmp", cuser.userid);
     sprintf(fname, "tmp/%s.dictd", cuser.userid);
 
-
     /* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
-    b2u(word,strlen(word),word_utf8,256);
+    b2u(word, strlen(word), word_utf8, sizeof(word_utf8));
 
     /* dict */
-    sprintf(tmp, "/usr/local/bin/dict -h localhost \"%s\" > %s", word_utf8, fname_tmp);
+    sprintf(tmp, "/usr/local/bin/dict \"%s\" > %s", word_utf8, fname_tmp);
     system(tmp);
 
     /* UTF-8 轉 BIG5 */
@@ -163,12 +166,15 @@ main_dictd()
     system(tmp);
 
     more(fname, NULL);
+#if 0
+    /* 使用者可自行按 C 存入暫存檔 */
     sprintf(tmp, "是否把 %s 的查詢結果寄回自己信箱？ (y/N) ", word);
     if (cuser.userlevel && vans(tmp) == 'y')
     {
       sprintf(tmp, "[備 忘 錄] %s 的字典查詢結果", word);
       mail_self(fname, cuser.userid, tmp, 0);
     }
+#endif
     unlink(fname_tmp);
     unlink(fname);
   }

@@ -1332,6 +1332,7 @@ menu()
       goto every_key;
 
     case Ctrl('W'):
+      utmp_mode(M_XMODE);
       DL_func("bin/dictd.so:main_dictd");
       goto every_key;
 
@@ -1365,7 +1366,7 @@ menu()
       goto every_key;
 #endif
 
-    case Ctrl('I'):		/* 閱讀信件 */
+    case KEY_TAB:		/* 閱讀信件 */
       if (cuser.userlevel)
       {
 	utmp_mode(M_RMAIL);

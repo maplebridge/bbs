@@ -291,7 +291,7 @@ mf_body(xo)
       mf_paste(xo);
       return mf_load(xo);
     }
- 
+
     return XO_QUIT;
   }
 

@@ -42,13 +42,6 @@ cmpbtime(nbrd)
   return nbrd->btime == currchrono;
 }
 
-static int
-cmpbname(brd)
-  BRD *brd;
-{
-  return brd->bstamp == currchrono;
-}
-
 
 static char
 nbrd_attr(nbrd)

@@ -2154,7 +2154,7 @@ xover(cmd)
 	  {
 	    int tmp = xo->pos;
 	    clrtoeol();
-	    xo->pos = cmd - num + xo->top;
+	    xo->pos = cmd - num + xo->top;	/* (xo->pos - xo->top + xo->top) == xo->pos ? */
 	    (*(xcmd[0].func)) (xo, 0);
 	    xo->pos = tmp;
 	  }
@@ -2452,16 +2452,16 @@ xover(cmd)
 	  {
 	    move(num, 0);
 #ifdef HAVE_LIGHTBAR
-        /* verit.030129 : xover ¥ú´Î */
-        if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
-        {
-           int tmp = xo->pos;
-           clrtoeol();
-           xo->pos = num + xo->top - 3;
-           (*(xcmd[0].func)) (xo, 0);
-           xo->pos = tmp;
-		}
-        else
+	    /* verit.030129 : xover ¥ú´Î */
+	    if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
+	    {
+	      int tmp = xo->pos;
+	      clrtoeol();
+	      xo->pos = num + xo->top - 3;
+	      (*(xcmd[0].func)) (xo, 0);
+	      xo->pos = tmp;
+	    }
+	    else
 #endif
 	    outc(' ');
 	    /* cmd = XO_NONE; */
