@@ -162,12 +162,12 @@ do_query(acct, from_fpath)
   prints("[帳號] %-12s [暱稱] %-16.16s [上站] %5d 次 [文章] %5d 篇\n",
     userid, acct->username, acct->numlogins, acct->numposts);
 
-  prints("[優文] %9d 篇 [劣文] %13d 篇 [違規] %5d 次 \n",
-	  acct->good_article,acct->poor_article,acct->violation);
-
-  prints("[認證] %s通過認證 [動態] %-16.16s [財產] %s [信箱] %s\n",
+  prints("[認證] %s通過認證 [動態] %-16.16s [優文] %5d 篇 [劣文] %5d 篇\n",
     acct->userlevel & PERM_VALID ? "已經" : "尚未",
     (up && can_see(cutmp, up)) ? bmode(up, 1) : "不在站上",
+    acct->good_article, acct->poor_article);
+
+  prints("[財產] %s     [信箱] %s\n",
     fortune[rich],
     (m_query(userid) & STATUS_BIFF) ? "有新信件" : "都看過了");
 
@@ -176,11 +176,12 @@ do_query(acct, from_fpath)
     prints("[來源] %s\n", up ? up->cfrom : acct->cfrom);
   else
 #endif
+  if (!str_cmp(userid, STR_GUEST))
+    prints("[來源] %s\n",
+      (from_fpath == NULL) ? "\033[1;30m請由網友列表查詢\033[m" : from_fpath);
+  else
     prints("[來源] (%s) %-32.32s\n",
-      Btime(&acct->lastlogin), 
-      !strcmp(userid, "guest") ? 
-      (from_fpath == NULL ? "\033[1;33m請由網友列表查詢\033[m" : from_fpath) :
-      acct->lasthost);
+      Btime(&acct->lastlogin), acct->lasthost);
 
   showplans(userid);
   vmsg(NULL);

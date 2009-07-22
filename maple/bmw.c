@@ -127,21 +127,6 @@ can_see(my, up)
   if (is_super_ogood(up))
     return 1;
 
-  /* smiler.080806: 兩者是否看同一看板，且我是板主 */
-  if (my->reading && up->reading)
-  {
-    BRD *nowbrd;
-    extern BCACHE *bshm;
-
-    nowbrd = bshm->bcache + brd_bno(my->reading);
-
-    if (is_bm(nowbrd->BM, cuser.userid))
-    {
-      if (!strcmp(my->reading, up->reading))
-	return 1;
-    }
-  }
-
   if ((urufo & UFO_CLOAK) && !(mylevel & PERM_SEECLOAK))
     return 0;
 
