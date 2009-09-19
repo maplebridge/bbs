@@ -67,7 +67,9 @@ main_dictd()
     move(0, 30);
     outs("\033[1;37;44m◎ 多用途字典 ◎\033[m\n\n");
     outs("此字典來源為 FreeBSD 的 dict-database 以及 cdict5 字典。須輸入完整單字或片語。\n\n");
-    outs("若欲取得完整的字典列表，請輸入 -D");
+    outs("若欲取得完整的字典列表，請輸入 -D\n\n");
+    outs("查詢英英字典會耗費較久時間，因此預設使用英漢字典查詢\n");
+    outs("若要進行完整的字典查詢，請在查詢單字前加上 '-a '\n例:\nword: \033[7m-a book\033[m\n");
 #if 0
     outs("字典代號   字典說明\n");
     outs("============================================================================\n");
@@ -150,16 +152,23 @@ main_dictd()
     sprintf(fname_tmp, "tmp/%s.dictd.tmp", cuser.userid);
     sprintf(fname, "tmp/%s.dictd", cuser.userid);
 
-    /* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
-    b2u(word, strlen(word), word_utf8, sizeof(word_utf8));
+    if (word[0] == '-' && word[1] == 'a' && word[2] == ' ')
+    {
+      strcpy(word, word + 3);
 
-    /* dict */
-    sprintf(tmp, "/usr/local/bin/dict \"%s\" > %s", word_utf8, fname_tmp);
-    system(tmp);
+      /* smiler.080203: 轉換輸入 由 big5 轉為 utf8 */
+      b2u(word, strlen(word), word_utf8, sizeof(word_utf8));
 
-    /* UTF-8 轉 BIG5 */
-    sprintf(tmp, "/usr/local/bin/iconv -f UTF-8 -t big5 %s > %s", fname_tmp, fname);
-    system(tmp);
+      /* dict */
+      sprintf(tmp, "/usr/local/bin/dict \"%s\" > %s", word_utf8, fname_tmp);
+      system(tmp);
+
+      /* UTF-8 轉 BIG5 */
+      sprintf(tmp, "/usr/local/bin/iconv -f UTF-8 -t big5 %s > %s", fname_tmp, fname);
+      system(tmp);
+    }
+    else
+      unlink(fname);
 
     /* cdict5 */
     sprintf(tmp, BBSHOME"/bin/cdict5/cdict5 \"%s\" >> %s", word, fname);

@@ -389,7 +389,7 @@ nbrd_add(xo)
     strcpy(brdname, buf);
     strcpy(nbrd.class, plevel);
 
-    if (ntype >= 4 && ntype <= 7)
+    if (ntype >= 4 && ntype <= 6)
     {
       switch (ntype)
       {
