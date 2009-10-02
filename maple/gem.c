@@ -876,6 +876,9 @@ gem_browse(xo)
 
     xmode = hdr->xmode;
 
+    if (xmode & GEN_LINE)
+      return XO_NONE;
+
     /* browse folder */
 
     if (xmode & GEM_FOLDER)
