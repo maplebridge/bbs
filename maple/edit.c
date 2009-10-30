@@ -1118,7 +1118,10 @@ ve_quote(this)
 
   if (*quote_file)
   {
-    op = vans("是否引用原文 Y)引用 N)不引用 A)引用全文 R)重貼全文 1-9)引用層數？[Y] ");
+    if (curredit & EDIT_REPOST)
+      op = 'r';
+    else
+      op = vans("是否引用原文 Y)引用 N)不引用 A)引用全文 R)重貼全文 1-9)引用層數？[Y] ");
 
     if (op != 'n')
     {
@@ -1133,12 +1136,15 @@ ve_quote(this)
 
 	if (op != 'a')		/* 去掉 header */
 	{
-	  if (*quote_nick)
-	    sprintf(buf + 128, " (%s)", quote_nick);
-	  else
-	    buf[128] = '\0';
-	  sprintf(str, "※ 引述《%s%s》之銘言：", quote_user, buf + 128);
-	  this = ve_line(this, str);
+	  if (!(curredit & EDIT_REPOST))
+	  {
+	    if (*quote_nick)
+	      sprintf(buf + 128, " (%s)", quote_nick);
+	    else
+	      buf[128] = '\0';
+	    sprintf(str, "※ 引述《%s%s》之銘言：", quote_user, buf + 128);
+	    this = ve_line(this, str);
+	  }
 
 	  while (fgets(str, ANSILINELEN, fp) && *str != '\n');
 
@@ -1158,7 +1164,16 @@ ve_quote(this)
 	  *str++ = ' ';
 	}
 
-	if (op == 'a')
+	if (curredit & EDIT_REPOST)
+	{
+	  while (fgets(str, ANSILINELEN, fp))
+	  {
+	    if (is_quoted(str))	/* "--\n" */
+	      break;
+	    this = ve_line(this, buf);
+	  }
+	}
+	else if (op == 'a')
 	{
 	  while (fgets(str, ANSILINELEN - 2, fp))	/* 留空間給 "> " */
 	    this = ve_line(this, buf);
@@ -1672,13 +1687,13 @@ ve_filer(fpath, ve_op)
   case 'x':
    if (ve_op < 0)		/* itoc.010301: 不能儲存 */
      return VE_FOOTER;
-     
+
    if (currbattr & BRD_PUBLIC)
    {
       vmsg("本看板為公眾板，不接受文章加密");
       return VE_FOOTER;
    }
-      
+
    curredit |= EDIT_RESTRICT;
    curredit &= ~EDIT_OUTGO;	/* 加密必是 local save */
    break;

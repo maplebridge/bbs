@@ -614,140 +614,7 @@ do_post(xo, title)
   int mode = -1, value;
   time_t spendtime;
 
-  if (!(bbstate & STAT_POST))
-  {
-#ifdef NEWUSER_LIMIT
-    if (cuser.lastlogin - cuser.firstlogin < 3 * 86400)
-      vmsg("新手上路，三日後始可張貼文章");
-    else
-#endif
-      post_no_right();
-
-    pcurrhdr = NULL;
-    return XO_HEAD;
-  }
-
-  if (HAS_PERM(PERM_VALID))
-  {
-    if (!strcmp(currboard, "newbm"))
-    {
-      void (*p)();
-      switch (vans("(1)申請公眾板板主名單異動 (2)請辭板主/其他 [Q] "))
-      {
-	case '1':
-	  p = DL_get("bin/bmtrans.so:bmt_add");
-	  (*p)(xo);
-	  return XO_INIT;
-	case '2':
-	  break;
-	default:
-	  return XO_FOOT;
-      }
-    }
-    else if (!strcmp(currboard, "newboard"))
-    {
-      if (vans("是否要申請開板(Y/N)？[N] ") == 'y')
-      {
-	vmsg("進入開板/連署系統。進入後請按 Ctrl + P 申請開板");
-	DL_func("bin/newbrd.so:XoNewBoard");
-	return XO_INIT;
-      }
-    }
-  }
-
-  film_out(FILM_POST, 0);
-
-  move(19, 0);
-  prints("發表文章於【 %s 】看板", currboard);
-
-#ifdef POST_PREFIX
-  /* 借用 mode、rcpt、fpath */
-
-  if (title)
-  {
-    rcpt = NULL;
-  }
-  else		/* itoc.020113: 新文章選擇標題分類 */
-  {
-    if (!(currbattr & BRD_NOPREFIX))
-    {
-      FILE *fp;
-      int len = 6, pnum, newline = 0;
-      char prefix[NUM_PREFIX][16];
-      char *prefix_default[NUM_PREFIX] = DEFAULT_PREFIX;
-
-      for (mode = 0; mode < NUM_PREFIX; mode++)
-	strcpy(prefix[mode], prefix_default[mode]);
-
-      move(21, 0);
-      prints("類別：");
-
-      brd_fpath(fpath, currboard, "prefix.new");
-      if (fp = fopen(fpath, "r"))
-      {
-	/* 載入設定檔 */
-	for (mode = 0; mode < NUM_PREFIX; mode++)
-	{
-	  if (!fgets(fpath, 14, fp))
-	    break;
-	  if (strlen(fpath) == 1)	/* '\n' */
-	    break;
-	  fpath[strlen(fpath) - 1] = '\0';
-	  strcpy(prefix[mode], fpath);
-	  if ((len + 3 + strlen(fpath)) >= 70)	/* 換行列印 */
-	  {
-	    move(22, 0);
-	    prints("      ");
-	    len = 6;
-	    newline = 1;
-	  }
-	  prints("%d.%s ", mode + 1, fpath);
-	  len += (3 + strlen(fpath));
-	  pnum = mode + 1;
-	}
-	fclose(fp);
-      }
-      else	/* 沒有設定檔, 使用預設 */
-      {
-	pnum = NUM_PREFIX;
-	for (mode = 0; mode < NUM_PREFIX; mode++)
-	{
-	  prints("%d.%s ", mode + 1, prefix[mode]);
-	  len += (3 + strlen(prefix[mode]));
-	}
-      }
-
-      mode = vget(21 + newline, len, "", fpath, 3, DOECHO) - '1';
-      if (mode >= 0 && mode < pnum)	/* 輸入數字選項 */
-      {
-	if (prefix[mode][0] == '[' ||
-	    !strncmp(prefix[mode], "【", 2) ||
-	    !strncmp(prefix[mode], "《", 2) ||
-	    !strncmp(prefix[mode], "〈", 2))
-	  sprintf(fpath, "%s ", prefix[mode]);
-	else
-	  sprintf(fpath, "[%s] ", prefix[mode]);
-
-	rcpt = fpath;
-      }
-      else				/* 空白跳過 */
-	rcpt = NULL;
-
-      move(20, 0);
-      clrtobot();
-    }
-    else	/* 看板設定不使用文章類別 */
-      rcpt = NULL;
-  }
-
-  if (!ve_subject(21, title, rcpt))
-#else
-  if (!ve_subject(21, title, NULL))
-#endif
-  {
-    pcurrhdr = NULL;
-    return XO_HEAD;
-  }
+  /* 進入前要先做好 STAT_POST 檢查 */
 
   /* 未具備 Internet 權限者，只能在站內發表文章 */
   /* Thor.990111: 沒轉信出去的看板, 也只能在站內發表文章 */
@@ -861,23 +728,16 @@ do_post(xo, title)
   if (strstr(hdr.title, "賣") || strstr(hdr.title, "售") || strstr(hdr.title, "出清"))
   {
     /* smiler.080820: 依站務要求改轉文至 nthu.forsale */
-    /* smiler.080705: 依站務要求改轉文至 forsale */
     /* smiler.070916: for 轉文至 nthu.forsale */
     HDR  hdr2;
     char fpath2[64], folder2[64];	// smiler.070916
     char board_from[30];		// smiler.070916
 
-    //if( (!strstr(board_from,"P_")) && (!strstr(board_from,"R_")) &&
-    //   (!strstr(board_from,"LAB_")) && (!strstr(board_from,"G_")) &&
-    //   (!strstr(board_from,"deleted")) && (!strstr(board_from,"junk")) &&
-    //   (!strstr(board_from,BN_DELLOG)) && (!strstr(board_from,BN_EDITLOG)) )
-
-    /* smiler.080820: 依站務要求僅 nctu nthu 轉買賣文至 nthu.forsale */
+   /* smiler.080820: 依站務要求僅 nctu nthu 轉買賣文至 nthu.forsale */
     if ((!strcmp(board_from, "nctu")) || (!strcmp(board_from, "nthu")))
     {
       strcpy(fpath2, fpath);			// smiler.070916
       brd_fpath(folder2, "nthu.forsale", FN_DIR);
-      //brd_fpath(folder2, "forsale", FN_DIR);	// smiler.080705
       hdr_stamp(folder2, HDR_LINK | 'A', &hdr2, fpath2);	// smiler.070916
       strcpy(board_from, currboard);		// smiler.070916
 
@@ -888,7 +748,6 @@ do_post(xo, title)
 
       rec_bot(folder2, &hdr2, sizeof(HDR));
       btime_update(brd_bno("nthu.forsale"));
-      //btime_update(brd_bno("forsale"));
     }
   }
 #endif
@@ -936,6 +795,153 @@ do_post(xo, title)
 }
 
 
+static int
+do_post_title(xo, title)
+  XO *xo;
+  char *title;
+{
+  /* Thor.981105: 進入前需設好 curredit 及 quote_file */
+
+  if (!(bbstate & STAT_POST))
+  {
+#ifdef NEWUSER_LIMIT
+    if (cuser.lastlogin - cuser.firstlogin < 3 * 86400)
+      vmsg("新手上路，三日後始可張貼文章");
+    else
+#endif
+      post_no_right();
+
+    pcurrhdr = NULL;
+    return XO_HEAD;
+  }
+
+  if (HAS_PERM(PERM_VALID))
+  {
+    if (!strcmp(currboard, "newbm"))
+    {
+      void (*p)();
+      switch (vans("(1)申請公眾板板主名單異動 (2)請辭板主/其他 [Q] "))
+      {
+	case '1':
+	  p = DL_get("bin/bmtrans.so:bmt_add");
+	  (*p)(xo);
+	  return XO_INIT;
+	case '2':
+	  break;
+	default:
+	  return XO_FOOT;
+      }
+    }
+    else if (!strcmp(currboard, "newboard"))
+    {
+      if (vans("是否要申請開板(Y/N)？[N] ") == 'y')
+      {
+	vmsg("進入開板/連署系統。進入後請按 Ctrl + P 申請開板");
+	DL_func("bin/newbrd.so:XoNewBoard");
+	return XO_INIT;
+      }
+    }
+  }
+
+  film_out(FILM_POST, 0);
+
+  move(19, 0);
+  prints("發表文章於【 %s 】看板", currboard);
+
+#ifdef POST_PREFIX
+  char *subject;
+
+  if (title)
+  {
+    subject = NULL;
+  }
+  else		/* itoc.020113: 新文章選擇標題分類 */
+  {
+    if (!(currbattr & BRD_NOPREFIX))
+    {
+      FILE *fp;
+      int ch, len = 6, pnum, newline = 0;
+      char fpath[64];
+      char prefix[NUM_PREFIX][16];
+      char *prefix_default[NUM_PREFIX] = DEFAULT_PREFIX;
+
+      for (ch = 0; ch < NUM_PREFIX; ch++)
+	strcpy(prefix[ch], prefix_default[ch]);
+
+      move(21, 0);
+      prints("類別：");
+
+      brd_fpath(fpath, currboard, "prefix.new");
+      if (fp = fopen(fpath, "r"))
+      {
+	/* 載入設定檔 */
+	for (ch = 0; ch < NUM_PREFIX; ch++)
+	{
+	  if (!fgets(fpath, 14, fp))
+	    break;
+	  if (strlen(fpath) == 1)	/* '\n' */
+	    break;
+	  fpath[strlen(fpath) - 1] = '\0';
+	  strcpy(prefix[ch], fpath);
+	  if ((len + 3 + strlen(fpath)) >= 70)	/* 換行列印 */
+	  {
+	    move(22, 0);
+	    prints("      ");
+	    len = 6;
+	    newline = 1;
+	  }
+	  prints("%d.%s ", ch + 1, fpath);
+	  len += (3 + strlen(fpath));
+	  pnum = ch + 1;
+	}
+	fclose(fp);
+      }
+      else	/* 沒有設定檔, 使用預設 */
+      {
+	pnum = NUM_PREFIX;
+	for (ch = 0; ch < NUM_PREFIX; ch++)
+	{
+	  prints("%d.%s ", ch + 1, prefix[ch]);
+	  len += (3 + strlen(prefix[ch]));
+	}
+      }
+
+      ch = vget(21 + newline, len, "", fpath, 3, DOECHO) - '1';
+      if (ch >= 0 && ch < pnum)	/* 輸入數字選項 */
+      {
+	if (prefix[ch][0] == '[' ||
+	    !strncmp(prefix[ch], "【", 2) ||
+	    !strncmp(prefix[ch], "《", 2) ||
+	    !strncmp(prefix[ch], "〈", 2))
+	  sprintf(fpath, "%s ", prefix[ch]);
+	else
+	  sprintf(fpath, "[%s] ", prefix[ch]);
+
+	subject = fpath;
+      }
+      else				/* 空白跳過 */
+	subject = NULL;
+
+      move(20, 0);
+      clrtobot();
+    }
+    else	/* 看板設定不使用文章類別 */
+      subject = NULL;
+  }
+
+  if (!ve_subject(21, title, subject))
+#else
+  if (!ve_subject(21, title, NULL))
+#endif
+  {
+    pcurrhdr = NULL;
+    return XO_HEAD;
+  }
+
+  return do_post(xo, title);
+}
+
+
 void
 add_post(brdname, fpath, title, owner, nick, mode, fhdr)	/* 發文到看板 */
   char *brdname;	/* 欲 post 的看板 */
@@ -970,7 +976,7 @@ do_reply(xo, hdr)
   curredit = 0;
 
   pcurrhdr = hdr;
-  switch (vans("▲ 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (Q)取消？[F] "))
+  switch (vans("▲ 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (R)Repost至看板 (Q)取消？[F] "))
   {
   case 'm':
     hdr_fpath(quote_file, xo->dir, hdr);
@@ -984,6 +990,13 @@ do_reply(xo, hdr)
     if (HAS_PERM(strchr(hdr->owner, '@') ? PERM_INTERNET : PERM_LOCAL))
       curredit = EDIT_BOTH;
     break;
+
+  case 'r':
+    /* 因為先前 post_reply() 已做過 STAT_POST 檢查，所以這裡可以直接進到 do_post() */
+    hdr_fpath(quote_file, xo->dir, hdr);
+    curredit = EDIT_REPOST;
+    return do_post(xo, hdr->title);
+    break;
   }
 
   /* Thor.981105: 不論是轉進的, 或是要轉出的, 都是別站可看到的, 所以回信也都應該轉出 */
@@ -993,7 +1006,7 @@ do_reply(xo, hdr)
   hdr_fpath(quote_file, xo->dir, hdr);
   strcpy(quote_user, hdr->owner);
   strcpy(quote_nick, hdr->nick);
-  return do_post(xo, hdr->title);
+  return do_post_title(xo, hdr->title);
 }
 
 
@@ -1098,7 +1111,7 @@ post_add(xo)
 
   curredit = EDIT_OUTGO;
   *quote_file = '\0';
-  return do_post(xo, NULL);
+  return do_post_title(xo, NULL);
 }
 
 
@@ -2444,6 +2457,10 @@ post_forward(xo)
       return XO_NONE;
   }
 
+  move(b_lines - 1, 0);
+  clrtoeol();
+  outs("\033[1;44m◎ 若您要推文，請改用按鍵 \033[33m%\033[37m (shift + 5) 或是 \033[33me\033[37m ！\033[m");
+
   if (acct_get("轉達信件給：", &muser) > 0)
   {
     strcpy(quote_user, hdr->owner);
@@ -2987,7 +3004,7 @@ XoBM_add_pal()
   if (!(bbstate & STAT_BM))
     return 0;
 
-  ans = vans("◎編輯板友特別名單 1~8？[Q] ");
+  ans = vans("◎ 編輯板友特別名單 1~8？[Q] ");
   if (ans > '0' && ans < '9')
   {
     sprintf(fpath, "brd/%s/friend_%c", currboard, ans);

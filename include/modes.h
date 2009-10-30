@@ -201,6 +201,7 @@ static char *ModeTypeTable[] =
 #define EDIT_RESTRICT	0x0020		/* 加密存檔 */
 #define EDIT_GEM	0x0040		/* 編輯精華區 */
 #define EDIT_XFILE	0x0080		/* 編輯個人/系統檔案 */
+#define EDIT_REPOST	0x0100		/* Repost 文章至看板 */
 
 
 /* ----------------------------------------------------- */
