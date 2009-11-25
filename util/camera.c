@@ -376,6 +376,10 @@ main()
     {
       mirror(feast, 0);
     }
+    else if (i >= FILM_OPENING0 && i <= FILM_OPENING9 && dashf("gem/@/@opening.special"))	/* 特殊宣傳活動 */
+    {
+      mirror("gem/@/@opening.special", 0);
+    }
     else
     {
       strcpy(fname, str);

@@ -995,7 +995,9 @@ do_reply(xo, hdr)
     /* 因為先前 post_reply() 已做過 STAT_POST 檢查，所以這裡可以直接進到 do_post() */
     hdr_fpath(quote_file, xo->dir, hdr);
     curredit = EDIT_REPOST;
-    return do_post(xo, hdr->title);
+    sprintf(ve_title, "Re: %s", str_ttl(hdr->title));
+    ve_title[TTLEN] = '\0';
+    return do_post(xo, ve_title);
     break;
   }
 
@@ -1656,6 +1658,19 @@ post_attr(hdr)
 
   if (unread && (RefusePal_level(currboard, hdr) >= 0))
   {
+#ifdef HAVE_REFUSEMARK
+    if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
+    {
+      attr = 'F',
+      strcpy(attr_tmp, "\033[1;33m");
+    }
+    else if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+    {
+      attr = 'L';
+      strcpy(attr_tmp, "\033[1;34m");
+    }
+    else
+#endif
     if ((attr == 'm' || attr == 'b') || (mode & POST_BOTTOM))
       attr = '=';
     else
@@ -2207,15 +2222,24 @@ post_cross(xo)
 
   if (!tag)	/* lkchu.981201: 整批轉錄就不要一一詢問 */
   {
+    char *title = hdr->title;
     if (method)
-      sprintf(ve_title, "[轉錄] %.65s", hdr->title); /* smiler.070602: 改為轉錄時,標題為[轉錄]開頭 */
+    {
+      if ((title[0] == '[' && title[5] == ']') && 	/* 仿 str_ttl(), 留一個 "[轉錄]" 就好 */
+	(title[1] == 0xffffffc2 && title[2] == 0xffffffe0 && title[3] == 0xffffffbf && title[4] == 0xfffffffd))
+      {
+	title += 6;
+	if (*title == ' ')
+	  title++;
+      }
+      sprintf(ve_title, "[轉錄] %.65s", title); /* smiler.070602: 改為轉錄時,標題為[轉錄]開頭 */
+    }
     else
-      strcpy(ve_title, hdr->title);
+      strcpy(ve_title, title);
 
     if (!vget(2, 0, "標題：", ve_title, TTLEN + 1, GCARRY))
       return XO_HEAD;
   }
-
 
   xbno = brd_bno(xboard);
   xbattr = (bshm->bcache + xbno)->battr;
