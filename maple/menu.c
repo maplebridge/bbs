@@ -467,7 +467,6 @@ typedef struct
 
 
 static MENU menu_main[];
-static MENU menu_system[];
 static MENU menu_thala[];
 #ifdef HAVE_BITLBEE
 static MENU menu_msn[];
@@ -478,16 +477,43 @@ static MENU menu_msn[];
 /* ----------------------------------------------------- */
 
 
-static MENU menu_admin[] =
+static MENU menu_system[] =
 {
-  "bin/admutil.so:a_user", PERM_ALLACCT, - M_SYSTEM,
-  "User       【 顧客資料 】",
+  "bin/admutil.so:a_editbrd", PERM_ALLBOARD, - M_SYSTEM,
+  "QSetBoard  【 設定看板 】",
+
+  "bin/admutil.so:a_system_setup", PERM_SYSOP, - M_XFILES,
+  "Setup      【 系統參數 】",
+
+  "bin/admutil.so:a_ias_bank", PERM_ALLADMIN, - M_XFILES,
+  "IAS_Bank   【 給予福利 】",
 
   "bin/admutil.so:a_search", PERM_ALLACCT, - M_SYSTEM,
   "Hunt       【 搜尋引擎 】",
 
-  "bin/admutil.so:a_editbrd", PERM_ALLBOARD, - M_SYSTEM,
-  "QSetBoard  【 設定看板 】",
+#ifdef HAVE_REGISTER_FORM
+  "bin/admutil.so:a_regmerge", PERM_ALLREG, - M_SYSTEM,
+  "Merge      【 復原審核 】",
+#endif
+
+  "bin/admutil.so:a_restore", PERM_SYSOP, - M_SYSTEM,
+  "TRestore   【 還原備份 】",
+
+  "bin/admutil.so:m_bm", PERM_ALLADMIN, - M_SMAIL,
+  "BM All     【 板主通告 】",	/* itoc.000512: 新增 m_bm */
+
+  "bin/admutil.so:m_all", PERM_ALLADMIN, - M_SMAIL,
+  "User All   【 全站通告 】",	/* itoc.000512: 新增 m_all */
+
+  menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
+  "系統維護"
+};
+
+
+static MENU menu_admin[] =
+{
+  "bin/admutil.so:a_user", PERM_ALLACCT, - M_SYSTEM,
+  "User       【 顧客資料 】",
 
   "bin/innbbs.so:a_innbbs", PERM_ALLBOARD, - M_SYSTEM,
   "InnBBS     【 轉信設定 】",
@@ -495,37 +521,18 @@ static MENU menu_admin[] =
 #ifdef HAVE_REGISTER_FORM
   "bin/admutil.so:a_register", PERM_ALLREG, - M_SYSTEM,
   "Register   【 審註冊單 】",
-
-  "bin/admutil.so:a_regmerge", PERM_ALLREG, - M_SYSTEM,
-  "Merge      【 復原審核 】",
 #endif
-
-  menu_system, PERM_ALLADMIN, M_AMENU,
-  "System     【 系統設定 】",
-
-  "bin/admutil.so:a_resetsys", PERM_ALLADMIN, - M_SYSTEM,
-  "BBSreset   【 重置系統 】",
-
-  "bin/admutil.so:a_restore", PERM_SYSOP, - M_SYSTEM,
-  "TRestore   【 還原備份 】",
-
-  menu_main, PERM_MENU + Ctrl('A'), M_AMENU,
-  "系統維護"
-};
-
-
-static MENU menu_system[] =
-{
-  "bin/admutil.so:a_system_setup", PERM_SYSOP, - M_XFILES,
-  "Setup      【 控制設定 】",
 
   "bin/admutil.so:a_xfile", PERM_SYSOP, - M_XFILES,
   "Xfile      【 系統檔案 】",
 
-  "bin/admutil.so:a_ias_bank", PERM_ALLADMIN, - M_XFILES,
-  "IAS_Bank   【 給予福利 】",
+  menu_system, PERM_ALLADMIN, M_AMENU,
+  "System     【 進階設定 】",
 
-  menu_admin, PERM_MENU + Ctrl('A'), M_AMENU,
+  "bin/admutil.so:a_resetsys", PERM_ALLADMIN, - M_SYSTEM,
+  "BBSreset   【 重置系統 】",
+
+  menu_main, PERM_MENU + Ctrl('A'), M_AMENU,
   "系統維護"
 };
 
@@ -571,12 +578,6 @@ static MENU menu_mail[] =
 
   m_sysop, 0, M_SMAIL,
   "Yes Sir!   【 投書站長 】",
-
-  "bin/admutil.so:m_bm", PERM_ALLADMIN, - M_SMAIL,
-  "BM All     【 板主通告 】",	/* itoc.000512: 新增 m_bm */
-
-  "bin/admutil.so:m_all", PERM_ALLADMIN, - M_SMAIL,
-  "User All   【 全站通告 】",	/* itoc.000512: 新增 m_all */
 
   menu_main, PERM_MENU + Ctrl('A'), M_MMENU,	/* itoc.020829: 怕 guest 沒選項 */
   "電子郵件"
@@ -1022,7 +1023,7 @@ static MENU menu_other[] =
   "LoveLetter 【 情書撰寫 】",
 #endif
 
-  "bin/xyz.so:x_password", PERM_VALID, - M_XMODE,
+  "bin/xyz.so:x_password", 0, - M_XMODE,
   "Password   【 忘記密碼 】",
 
 #ifdef HAVE_CLASSTABLE
@@ -1076,7 +1077,7 @@ static MENU menu_tool[] =
   menu_other, 0, M_XMENU,
   "Other      【 雜七雜八 】",
 
-  "bin/nthuctable.so:main_ctable", 0, - M_XMODE,
+  "bin/nthuctable.so:main_ctable", PERM_BASIC, - M_XMODE,
   "ClassTable 【 清華課表 】",
 
   "bin/xyz.so:x_sysinfo", 0, - M_XMODE,

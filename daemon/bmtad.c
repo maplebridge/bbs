@@ -1815,7 +1815,7 @@ mta_from(ap, str)
     if (tail = strchr(head, '@'))	/* Thor.000911.註解: 正常的addr的話 */
     {
       *tail++ = '\0';
-      
+
       if (is_forge(tail))	/* Thor.990811: 假造的, 想都別想 */
 	return NULL;
 

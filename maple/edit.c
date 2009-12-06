@@ -2329,6 +2329,8 @@ ve_key:
 	      ve_row--;
 	      ve_lno--;
 	    }
+	    else if (ve_row == 0)
+	      ve_lno--;
 	  }
 	  if (vln == vx_top)
 	    vx_top = tmp;
