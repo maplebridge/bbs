@@ -603,6 +603,11 @@ do_ias_post_log(hdr)
 }
 
 
+#ifdef HAVE_TEMPLATE
+static char post_title_ch = -1;
+#endif
+
+
 static int
 do_post(xo, title)
   XO *xo;
@@ -625,10 +630,11 @@ do_post(xo, title)
   utmp_mode(M_POST);
   fpath[0] = '\0';
 #ifdef HAVE_TEMPLATE
-  if (mode >= 0 && mode < NUM_PREFIX)
+  if (post_title_ch >= 0 && post_title_ch < NUM_PREFIX)
   {
     char buf1[32], buf2[64];
-    sprintf(buf1, "prefix/template_%d", mode + 1);
+    sprintf(buf1, "prefix/template_%d", post_title_ch + 1);
+    post_title_ch = -1;
     brd_fpath(buf2, currboard, buf1);
     if (dashf(buf2))
     {
@@ -918,6 +924,9 @@ do_post_title(xo, title)
 	  sprintf(fpath, "[%s] ", prefix[ch]);
 
 	subject = fpath;
+#ifdef HAVE_TEMPLATE
+	post_title_ch = ch;
+#endif
       }
       else				/* 空白跳過 */
 	subject = NULL;
@@ -935,6 +944,9 @@ do_post_title(xo, title)
 #endif
   {
     pcurrhdr = NULL;
+#ifdef HAVE_TEMPLATE
+    post_title_ch = -1;
+#endif
     return XO_HEAD;
   }
 
@@ -4424,7 +4436,7 @@ post_ishowbm(xo)
       prints(
 	" %sw%s - 進板畫面     %so%s - 板友名單     %s%sk%s - 板友特別名單"
 #ifdef HAVE_TEMPLATE
-	"%s\n"
+	"   %st%s - 文章範本\n"
 #else
 	"\n"
 #endif
@@ -4444,7 +4456,7 @@ post_ishowbm(xo)
 #endif
 	mark, "\033[m",
 #ifdef HAVE_TEMPLATE
-	(currbattr & BRD_ATOM) ? "   \033[1;33mt\033[m - 文章範本" : "",
+	mark, "\033[m",
 #endif
 #ifdef POST_PREFIX
 	mark, "\033[m",
@@ -4481,7 +4493,7 @@ post_ishowbm(xo)
     if (!(currbattr & BRD_PUBLIC) && ch == 'u')	/* 公眾板才看說明 */
       return reload ? XO_INIT : XO_HEAD;
 
-    if (!(currbattr & BRD_ATOM) && ch == 't')	/* ATOM看板才能使用文章範本 */
+    if (!isbm && ch == 't')	/* 板主才能使用文章範本 */
       return reload ? XO_INIT : XO_HEAD;
 
     if ((currbattr & BRD_PUBLIC) &&

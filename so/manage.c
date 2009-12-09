@@ -345,8 +345,8 @@ post_template_edit()
     for (; i < NUM_PREFIX; i++)
     {
       sprintf(prefix[i], "%s", prefix_def[i]);
-      prints("%d.%s ", i + 1, buf);
-      ans += (3 + strlen(buf));
+      prints("%d.%s ", i + 1, prefix[i]);
+      ans += (3 + strlen(prefix[i]));
     }
   }
   move(b_lines, 0);
@@ -356,7 +356,7 @@ post_template_edit()
   if (i < 0 || i >= pnum)
     return 0;
 
-  sprintf(buf, "範本 %d.[%s] D)刪除 E)修改 Q)取消？[Q] ", i + 1, prefix[i]);
+  sprintf(buf, "範本 \033[1m%d.[%s]\033[m D)刪除 E)修改 Q)取消？[Q] ", i + 1, prefix[i]);
   ans = vans(buf);
 
   if (ans == 'd')

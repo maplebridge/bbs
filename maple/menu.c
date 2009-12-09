@@ -467,6 +467,7 @@ typedef struct
 
 
 static MENU menu_main[];
+static MENU menu_admin[];
 static MENU menu_thala[];
 #ifdef HAVE_BITLBEE
 static MENU menu_msn[];
