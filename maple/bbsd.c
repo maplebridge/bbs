@@ -666,6 +666,8 @@ ip_set()
     ip_encode_color(addr[2]), ip_encode_char(addr[2]),
     ip_encode_color(addr[3]), ip_encode_char(addr[3])
   );
+  if (!srncmp(fromhost, "localhost") && strcmp(fromip, "127.0.0.1"))
+    strcpy(fromhost, fromip);
 }
 
 
@@ -886,9 +888,8 @@ login_user(content)
       cuser.ufo = UFO_DEFAULT_GUEST;
       cuser.ufo2 = UFO2_DEFAULT_GUEST;
 
-      clear();
-      vfmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號擺\脫受限");
-
+//      clear();
+//      vfmsg("guest僅有極低的「使用權限」及「使用時限」，建議您申請個人帳號擺\脫受限");
       break;	/* Thor.980917: 註解: cuser ok! */
     }
   }
@@ -1406,6 +1407,8 @@ tn_main()
 
   currpid = getpid();
 
+  ip_set();
+
   tn_signals();	/* Thor.980806: 放於 tn_login前, 以便 call in不會被踢 */
   tn_login();
 
@@ -1878,7 +1881,6 @@ main(argc, argv)
     tn_addr = sin.sin_addr.s_addr;
     dns_name((char *) &sin.sin_addr, fromhost);
     /* str_ncpy(fromhost, (char *)inet_ntoa(sin.sin_addr), sizeof(fromhost)); */
-    ip_set();
 
     telnet_init();
     term_init();
