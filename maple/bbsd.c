@@ -666,7 +666,7 @@ ip_set()
     ip_encode_color(addr[2]), ip_encode_char(addr[2]),
     ip_encode_color(addr[3]), ip_encode_char(addr[3])
   );
-  if (!srncmp(fromhost, "localhost") && strcmp(fromip, "127.0.0.1"))
+  if (!strcmp(fromhost, "localhost") && strcmp(fromip, "127.0.0.1"))
     strcpy(fromhost, fromip);
 }
 

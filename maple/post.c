@@ -797,6 +797,12 @@ do_post(xo, title)
 
   vmsg(NULL);
 
+#ifdef HAVE_ANONYMOUS
+  /* gaod: 發匿名文後不取消 EDIT_ANONYMOUS 會導致轉錄文章 header 資訊有誤. Thanks for om@cpu.tfcis.org. */
+  if (curredit & EDIT_ANONYMOUS)
+    curredit &= ~EDIT_ANONYMOUS;
+#endif
+
   return XO_INIT;
 }
 

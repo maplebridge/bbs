@@ -1071,7 +1071,7 @@ m_bm()
   *quote_file = '\0';
   if (vedit(fpath, 1) >= 0)
   {
-    vmsg("需要一段蠻長的時間，請耐心等待");
+    vmsg("需要一段滿長的時間，請耐心等待");
 
     size = (IDLEN + 1) * MAXBOARD * 4;	/* 假設每板四個板主已足夠 */
     if (list = (char *) malloc(size))
@@ -1122,7 +1122,7 @@ m_all()
   *quote_file = '\0';
   if (vedit(fpath, 1) >= 0)
   {
-    vmsg("需要一段蠻長的時間，請耐心等待");
+    vmsg("需要一段滿長的時間，請耐心等待");
 
     size = (IDLEN + 1) * rec_num(FN_SCHEMA, sizeof(SCHEMA));
     if (list = (char *) malloc(size))
