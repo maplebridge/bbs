@@ -560,7 +560,7 @@ static MENU menu_mail[] =
   "Mail       【 站內寄信 】",
 
 #ifdef MULTI_MAIL  /* Thor.981009: 防止愛情幸運信 */
-  m_list, PERM_LOCAL, M_SMAIL,
+  m_list, PERM_VALID, M_SMAIL,
   "List       【 群組寄信 】",
 #endif
 
