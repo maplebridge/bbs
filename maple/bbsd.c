@@ -1399,10 +1399,8 @@ tn_main()
   sprintf(header, "線上有 [\033[33m%d\033[37m] 片楓葉%-*s\033[40m",
     ushm->count, 11 - len + d_cols, "");
 
-  prints("\033[1;41m歡迎光臨【\033[33m %s \033[37m】" MYIPADDR " ⊙ " SCHOOLNAME " ⊙%s\n",
+  prints("\033[1;40m歡迎光臨【\033[33m %s \033[37m】" MYIPADDR " ⊙ " SCHOOLNAME " ⊙%s\n",
     str_site, header);
-//  prints("\033[1;41m%-*s\033[m\n", 76 + d_cols, "");
-
   film_out((ap_start % 10) + FILM_OPENING0, 1);	/* 亂數顯示開頭畫面 */ /* smiler.070602:更改進站版面配置 */
 
   currpid = getpid();

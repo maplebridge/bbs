@@ -1513,7 +1513,8 @@ get_sign_select()
       select = host_sight_select - 1;
   }
 
-#ifdef MEICHU_WIN
+//#ifdef MEICHU_WIN
+#if 0
   if (select == 0)
     select = 4;
 #endif

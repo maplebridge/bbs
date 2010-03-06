@@ -1010,9 +1010,13 @@ do_reply(xo, hdr)
     break;
 
   case 'r':
+  case 'y':	/* 支援 yy 鍵直接 Repost */
     /* 因為先前 post_reply() 已做過 STAT_POST 檢查，所以這裡可以直接進到 do_post() */
     hdr_fpath(quote_file, xo->dir, hdr);
     curredit = EDIT_REPOST;
+    /* Thor.981105: 不論是轉進的, 或是要轉出的, 都是別站可看到的, 所以回信也都應該轉出 */
+    if (hdr->xmode & (POST_INCOME | POST_OUTGO))
+      curredit |= EDIT_OUTGO;
     sprintf(ve_title, "Re: %s", str_ttl(hdr->title));
     ve_title[TTLEN] = '\0';
     return do_post(xo, ve_title);
@@ -4084,9 +4088,6 @@ post_append_score(xo, choose)
   if (ans2 == 'n')
     return XO_HEAD;
 
-  move(b_lines, 48);
-  prints("(行數: %d/%d)\n", num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
-
   dir = xo->dir;
   hdr_fpath(fpath, dir, hdr);
 
@@ -4102,14 +4103,12 @@ post_append_score(xo, choose)
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
 
-    move(0, 0);
-    clrtoeol();
-    prints("您的\033[1;3%s文\033[m內容：\n",
-      (ans == 1) ? "1m推" : (ans == 2) ? "2m噓" : "7m接");
+    move(b_lines - 4, 0);
+    prints("\033[1;30m==============================================================================\033[m\n");
+    move(b_lines - 2, 0);
     prints("\033[1;3%s \033[36m%s\033[m：\033[33m%-*s \033[1;30m%02d/%02d %02d:%02d\033[m\n",
       verb, userid, maxlen - 1, reason,
       ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min);
-    prints("\033[1;30m==============================================================================\033[m");
 
 #ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
   if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -4123,14 +4122,17 @@ post_append_score(xo, choose)
       time(&now);
       ptime = localtime(&now);
 
+      move(b_lines - num_reason_record - 2, 0);
+      prints("您的\033[1;3%s文\033[m內容：        目前輸入/剩餘行數：%d/%d\n",
+	(ans == 1) ? "1m推" : (ans == 2) ? "2m噓" : "7m接",
+	num_reason_record + 1, MAX_REASON_RECORD - num_reason_record - 1);
+      move(b_lines, 0);
+      prints("完成輸入直接按 Enter 即可。\n");
+
       if (!vget(b_lines-1, 0, prompt, reason, maxlen, DOECHO))
 	break;
 
       ans2 = vans("◎ Y)完成推文 N)此行重新輸入 E)繼續推文 [E] ");
-
-      move(b_lines, 48);
-      prints("(行數: %d/%d)\n", (ans2 == 'e') ? num_reason_record + 1 : num_reason_record,
-				(ans2 == 'e') ? MAX_REASON_RECORD - num_reason_record - 1 : MAX_REASON_RECORD - num_reason_record);
 
       if (ans2 == 'n')
       {
@@ -4138,9 +4140,7 @@ post_append_score(xo, choose)
 	continue;
       }
 
-      fprintf(fp, "%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
-	strlen(userid) + 5, "", maxlen - 1, reason,
-	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
+      fprintf(fp, "%-*s\033[33m%-*s\033[m\n", strlen(userid) + 5, "", maxlen - 1, reason);
 
 #ifdef HAVE_ANONYMOUS		/* 匿名推文記錄 */
       if (currbattr & BRD_ANONYMOUS && strcmp(userid, cuser.userid))
@@ -4148,14 +4148,13 @@ post_append_score(xo, choose)
 #endif
       num_reason_record++;
 
-      move(num_reason_record, 0);
-      prints("%-*s\033[33m%-*s\033[30m\033*|\033[1m%02d/%02d %02d:%02d\033[m%s\n",
-	strlen(userid) + 5, "", maxlen - 1, reason,
-	ptime->tm_mon + 1, ptime->tm_mday, ptime->tm_hour, ptime->tm_min, ip_str);
-      prints("\033[1;30m==============================================================================\033[m");
-
       if (ans2 != 'y')
 	ans2 = 'e';
+
+      scroll();
+      move(b_lines - 2, 0);
+      clrtoeol();
+      prints("%-*s\033[33m%-*s\033[m\n", strlen(userid) + 5, "", maxlen - 1, reason);
     }
 
     fclose(fp);

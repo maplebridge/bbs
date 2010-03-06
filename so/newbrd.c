@@ -497,7 +497,7 @@ nbrd_add(xo)
   if (ans != '1' || ntype >= 7)
   {
     nbrd.etime = nbrd.btime + days * 86400;
-    nbrd.mode = NBRD_NEWBOARD;
+    nbrd.mode |= NBRD_NEWBOARD;
     nbrd.total = (ntype == 8) ? 20 : numbers;
   }
   else
