@@ -1,5 +1,8 @@
 #!/bin/sh
 #°O¿ýipcs¸ê°T
 
-date >> /usr/home/maple/run/ipcs.log
-/usr/bin/ipcs -a >> /usr/home/maple/run/ipcs.log
+IPCSCMD=`which ipcs`
+BBSROOT="/var/maple"
+
+date >> "${BBSROOT}""/run/ipcs.log"
+${IPCSCMD} -a >> "${BBSROOT}""/run/ipcs.log"

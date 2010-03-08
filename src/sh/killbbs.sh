@@ -1,9 +1,12 @@
 #!/bin/sh
 # 清除站上使用者與shared memory
-kill `ps -auxwww | grep bbsd | awk '{print $2}'`
+
+BBSUSER="maple"
+
+kill `ps -auxw | grep bbsd | awk '{print $2}'`
 
 # for freebsd only
-for i in `ipcs | grep maple | awk '{print $3}'`
+for i in `ipcs | grep ${BBSUSER} | awk '{print $3}'`
 do
   if [ $OSTYPE = "FreeBSD" ]; then
          ipcrm -M $i
