@@ -1121,7 +1121,7 @@ static MENU menu_main[] =
 
 #ifdef MEICHU_WIN
   Class2, 0, M_BOARD,
-  "WinMeichu \033[1;36m【 !!! 己丑梅竹 清大必勝 快進來加油 !!! 】\033[m",
+  "WinMeichu \033[1;36m【 庚寅梅竹 清大必勝 】\033[m",
 #endif
 
 #ifdef MY_FAVORITE

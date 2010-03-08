@@ -1396,7 +1396,7 @@ tn_main()
   char header[ANSILINELEN];
   sprintf(header, "%d", ushm->count);
   len = strlen(header);
-  sprintf(header, "線上有 [\033[33m%d\033[37m] 片楓葉%-*s\033[40m",
+  sprintf(header, "線上有 [\033[33m%d\033[37m] 片楓葉%-*s\033[m",
     ushm->count, 11 - len + d_cols, "");
 
   prints("\033[1;40m歡迎光臨【\033[33m %s \033[37m】" MYIPADDR " ⊙ " SCHOOLNAME " ⊙%s\n",
