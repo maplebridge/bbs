@@ -333,6 +333,7 @@ outs_footer(buf, lino, fsize)
   int fsize;
 {
   int i;
+  static int pad = (strlen(COLOR1) + strlen(COLOR9) * 6 + strlen(COLOR2) * 6);
 
   /* P.1 有 (PAGE_SCROLL + 1) 列，其他 Page 都是 PAGE_SCROLL 列 */
 
@@ -343,8 +344,7 @@ outs_footer(buf, lino, fsize)
 
   outs(buf);
 
-
-  for (i = b_cols + sizeof(COLOR1) + sizeof(COLOR9) * 6 + sizeof(COLOR2) * 6 - strlen(buf); i > 3; i--)
+  for (i = b_cols + pad - strlen(buf); i > 3; i--)
   {
     /* 填滿最後的空白顏色，最後留一個空白 */
     outc(' ');

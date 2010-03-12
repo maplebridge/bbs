@@ -3576,6 +3576,8 @@ post_edit_merge(hdr, fpath)
     system(cmd);
 
     unlink(tmp);
+    sprintf(tmp, "%s.orig", fpath);
+    unlink(tmp);
   }
 
   unlink(ori);
@@ -4370,7 +4372,7 @@ post_ishowbm(xo)
   int ch, reload = 0;
   char *mark;
 
-  isbm = (bbstate & STAT_BM);
+  isbm = (bbstate & STAT_BOARD);
   if (isbm)
     mark = "\033[1;33m";
   else
