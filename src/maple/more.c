@@ -333,7 +333,7 @@ outs_footer(buf, lino, fsize)
   int fsize;
 {
   int i;
-  static int pad = (strlen(COLOR1) + strlen(COLOR9) * 6 + strlen(COLOR2) * 6);
+  static int pad = (sizeof(COLOR1) + sizeof(COLOR9) * 6 + sizeof(COLOR2) * 6 - 13);	/* 使用 sizeof 會多計算 '\0' */
 
   /* P.1 有 (PAGE_SCROLL + 1) 列，其他 Page 都是 PAGE_SCROLL 列 */
 

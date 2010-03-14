@@ -127,6 +127,9 @@ can_see(my, up)
   if (is_super_ogood(up))
     return 1;
 
+  if (my->userno == up->userno)	/* 看見隱身的自己 */
+    return 1;
+
   if ((urufo & UFO_CLOAK) && !(mylevel & PERM_SEECLOAK))
     return 0;
 

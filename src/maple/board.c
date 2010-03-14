@@ -190,42 +190,6 @@ loop:
   /* xsort(pn - r, r / es, es, cmp); */
 }
 
-
-#ifdef	TEST
-
-#define	MMM	(0x40000)
-
-static int
-int_cmp(a, b)
-  int *a;
-  int *b;
-{
-  return *a - *b;
-}
-
-
-main()
-{
-  int *x, *y, *z, n;
-
-  x = malloc(MMM * sizeof(int));
-  if (!x)
-    return;
-
-  y = x;
-  z = x + MMM;
-
-  n = time(0) & (0x40000 -1) /* 16387 */;
-
-  do
-  {
-    *x = n = (n * 10001) & (0x100000 - 1);
-  } while (++x < z);
-
-  xsort(y, MMM, sizeof(int), int_cmp);
-}
-#endif
-
 //*******/* smiler.070602: for xsort 結束處 */********/
 #endif
 
@@ -729,8 +693,7 @@ Ben_Perm(bno, ulevel)
   else if (ulevel & PERM_ALLBOARD)
   {
     bits |= BRD_L_BIT;
-    if (((ulevel & PERM_SYSOP) && (brd->battr & BRD_PUBLIC)) ||
-      !(readlevel & (PERM_SYSOP | PERM_BOARD)))
+    if (!(readlevel & (PERM_SYSOP | PERM_BOARD)))	/* 站長/看板總管於公開板有管理權限 */
       bits |= BRD_R_BIT | BRD_W_BIT | BRD_X_BIT;
   }
 
@@ -1136,6 +1099,7 @@ XoPost(bno)
   int bits;
   char *str, fpath[64];
   char BMstr[17];	/*by ryancid 砍到剩16*/
+  char reason[64];
 
   brd = bshm->bcache + bno;
   if (!brd->brdname[0])	/* 已刪除的看板 */
@@ -1149,8 +1113,6 @@ XoPost(bno)
     /* 070403.songsongboy：不能亂看反匿名版 */
     if (!strcmp(brd->brdname, BN_UNANONYMOUS))
     {
-      char reason[64];
-
       if (vans("您確定要進入反匿名版嗎(y/n)？[N] ") != 'y')
 	return -1;
 
@@ -1163,8 +1125,21 @@ XoPost(bno)
 #ifdef HAVE_MODERATED_BOARD
     if (!(bits & BRD_R_BIT))
     {
-      vmsg("對不起，此板只准板友進入，請向板主申請入境許\可");
-      return -1;
+      if ((cuser.userlevel & PERM_SYSOP) && (brd->battr & BRD_PUBLIC))
+      {
+	vmsg("警告：使用站務進入隱藏公眾板功\能");
+	if (!adm_check())
+	  return -1;
+	sprintf(reason, "%-*s 板：", BNLEN + 1, brd->brdname);
+	vget(b_lines, 0, "請輸入進入隱板的理由：", reason + BNLEN + 6, 50, DOECHO);
+	alog("進入隱板", reason);
+	bits |= BRD_R_BIT | BRD_X_BIT;
+      }
+      else
+      {
+	vmsg("對不起，此板只准板友進入，請向板主申請入境許\可");
+	return -1;
+      }
     }
 #endif
 

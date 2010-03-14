@@ -376,7 +376,7 @@ static void
 talk_save()
 {
   char fpath[64];
-  
+
   /* lkchu.981201: 放進私人信箱內/清除 */
   usr_fpath(fpath, cuser.userid, FN_TALK_LOG);
 
@@ -640,7 +640,7 @@ talk_char(twin, ch)
       twin->curcol = len;
       move(ln, len);
       break;
-    
+
     case Ctrl('Y'):		/* clear this line */
       talk_clearline(ln, 0);
       twin->curcol = 0;
@@ -700,7 +700,7 @@ talk_speak(fd)
 
   /* lkchu: make sure that's empty */
   mywords[0] = itswords[0] = '\0';
-  
+
   strcpy(itsuserid, page_requestor);
   strtok(itsuserid, " (");
 #endif
@@ -833,7 +833,7 @@ talk_speak(fd)
 	    }
 	    else	/* lkchu.981201: itswords 裝滿了 */
 	    {
-  	      fprintf(fp, "\033[32m%s：%s%c\033[m\n", itsuserid, itswords, data[i]);
+	      fprintf(fp, "\033[32m%s：%s%c\033[m\n", itsuserid, itswords, data[i]);
 	      itswords[0] = '\0';
 	    }
 	  }
@@ -1452,7 +1452,7 @@ over_for:
   sin.sin_family = AF_INET;
   sin.sin_port = port;
   memcpy(&sin.sin_addr, h->h_addr, h->h_length);
-  
+
 #else
 
   sin.sin_family = AF_INET;

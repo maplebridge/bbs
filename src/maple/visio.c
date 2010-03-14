@@ -1285,7 +1285,7 @@ imsg(msg)			/* itoc.010827: 重要訊息顯示 important message */
 
 
 #ifdef POPUP_MESSAGE
-int
+static int
 vwmsg(msg)	/* window msg */
   char *msg;			/* length <= 54 */
 {

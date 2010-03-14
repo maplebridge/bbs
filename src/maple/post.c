@@ -1039,10 +1039,6 @@ int		/* 0: restrict  1: can_see  */
 chkrestrict(hdr)
   HDR *hdr;
 {
-#if 0
-  return !(hdr->xmode & POST_RESTRICT) ||
-    !strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM);
-#endif
   return !(hdr->xmode & POST_RESTRICT) || RefusePal_belong(currboard, hdr);
 }
 #endif
@@ -2830,7 +2826,7 @@ RefusePal_belong(board, hdr)
   if (!strcmp(hdr->owner, cuser.userid) || (bbstate & STAT_BM))
     return 1;
 
-  RefusePal_fpath(fpath, board, 'R', hdr);	//smiler 1109
+  RefusePal_fpath(fpath, board, 'R', hdr);
   if (fimage = (int *) f_img(fpath, &fsize))
   {
     fsize = belong_pal(fimage, fsize / sizeof(int), cuser.userno);
@@ -2965,7 +2961,7 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   HDR *hdr, fhdr;
   int pos, cur, ans, xmode;
 
-  if (!cuser.userlevel) /* itoc.020114: guest 不能對其他 guest 的文章加密 */
+  if (!cuser.userlevel)	/* itoc.020114: guest 不能對其他 guest 的文章加密 */
     return XO_NONE;
 
   if (currbattr & BRD_PUBLIC)

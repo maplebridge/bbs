@@ -254,7 +254,6 @@ void line_save(int num, char *my_line);
 void line_restore(int num, char *my_line);
 int vs_save(screenline *slp);
 void vs_restore(screenline *slp);
-int vwmsg(char *msg);
 int vfmsg(char *msg);
 int vmsg(char *msg);
 void zmsg(char *msg);

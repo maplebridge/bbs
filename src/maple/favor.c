@@ -792,21 +792,21 @@ mf_browse(xo)
     /* itoc.010726: 若是看板已經被砍或權限沒有了，則要移除捷徑 */
     if ((bno = brd_bno(xname)) < 0)
     {
-#if 0
       rec_del(xo->dir, sizeof(MF), xo->pos, NULL);
-      vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
-#endif
-      vmsg("本看板已被刪除");
+      vmsg("本看板已被刪除，系統將自動移除捷徑");
       return mf_load(xo);
     }
+#if 0	/* 已於下面的 XoPost() 一併處理 */
     else if (!(brd_bits[bno] & BRD_R_BIT))
     {
       vmsg("您沒有權限閱\讀本看板");
-      return mf_load(xo);
+      return XO_FOOT;
     }
+#endif
 
     brd = bshm->bcache + bno;
-    XoPost(bno);
+    if (XoPost(bno))	/* 無法閱讀該板 */
+      return XO_FOOT;
     xover(XZ_POST);
 #ifndef ENHANCED_VISIT
     time4(&brd_visit[bno]);
@@ -835,7 +835,7 @@ mf_browse(xo)
       vmsg("本看板已被刪除或您沒有權限閱\讀本看板，系統將自動移除捷徑");
 #endif
       vmsg("本看板已被刪除或您沒有權限閱\讀本看板");
-      return mf_load(xo);
+      return XO_FOOT;
     }
 
     gem_fpath(fpath, xname, fn_dir);
