@@ -1156,7 +1156,7 @@ xo_thread(xo, op)
 }
 
 
-/* Thor.990204: 為考慮more 傳回值, 以便看一半可以用 []... 
+/* Thor.990204: 為考慮more 傳回值, 以便看一半可以用 []...
                 ch 為先前more()中所按的key */   
 int
 xo_getch(xo, ch)
@@ -1271,15 +1271,15 @@ static int key_in_xover[] =
   Ctrl('Z'), // 26
   Ctrl('U'), // 27
   Ctrl('W'), // 28
-  
+
   /* 以下為 zone >= XZ_XPOST */
-  
+
   'C',       // 29
   'F',       // 30
   Ctrl('C'), // 31
   Ctrl('A'), // 32
   Ctrl('T')  // 33
-  
+
 };
 
 #endif
@@ -1299,10 +1299,10 @@ XZ xz[] =
   {NULL, NULL, M_MSN, FEETER_BITLBEE},  /* XZ_BITLBEE */
   {NULL, f_pal_cb, M_PAL, FEETER_FAKE_PAL},/* XZ_FAKE_PAL */
   {NULL, NULL, M_RSS, FEETER_RSS},       /* XZ_RSS */
-  
+
   /* smiler.090519: 以下部分與 hdr 有關，其餘請放在上方 */
   /*                include/modes.h 記得同步調整        */
-  
+
   {NULL, NULL, M_READA, FEETER_XPOST},	/* XZ_XPOST */
   {NULL, NULL, M_RMAIL, FEETER_MBOX},	/* XZ_MBOX */
   {NULL, post_cb, M_READA, FEETER_POST},/* XZ_POST */
@@ -1337,13 +1337,13 @@ xo_jump(pos, zone)
 
 
 /* ----------------------------------------------------- */
-/* XOX browser                                           */
+/* XOX browser						 */
 /* ----------------------------------------------------- */
 
-#define XOX_UP          0x001
-#define XOX_DOWN        0x002
-#define XOX_LEFT        0x004
-#define XOX_RIGHT       0x008
+#define XOX_UP		0x001
+#define XOX_DOWN	0x002
+#define XOX_LEFT	0x004
+#define XOX_RIGHT	0x008
 
 #define MAX_XOX_X	3
 #define MAX_XOX_Y	20
@@ -1383,11 +1383,11 @@ static XOX_KEY xox_key[] =
   0x06, "^F",
   0x07, "^G",
   //0x08, "^H",
-  0x08, "Bksp",   /* smiler.090606: ^H 與 Backspace 重複，取後者 */
+  0x08, "Bksp",		/* smiler.090606: ^H 與 Backspace 重複，取後者 */
   //0x09, "^I",
-  0x09, "Tab",    /* smiler.090606: ^I 與 Tab 重複，取後者 */
+  0x09, "Tab",		/* smiler.090606: ^I 與 Tab 重複，取後者 */
   //0x0a, "^J",
-  0x0a, "Enter",  /* smiler.090606: ^J 與 Enter 重複，取後者 */
+  0x0a, "Enter",	/* smiler.090606: ^J 與 Enter 重複，取後者 */
   0x0b, "^K",
   0x0c, "^L",
   0x0d, "^M",
@@ -1514,21 +1514,21 @@ static XOX_KEY xox_key[] =
 //  0x7f, "  "
 
  /* 值副 */
- 
+
  0xffffffea, "Ins",   /* 16*8 -1 = 127 */
  0xffffffe9, "Del",
  0xffffffeb, "Home",
  0xffffffe8, "End",
  0xffffffe7, "PgUp",
  0xffffffe6, "PgDn",
- 
+
  0xffffffff, "↑",
  0xfffffffe, "↓",
  0xfffffffd, "→",
  0xfffffffc, "←"
- 
+
  /* 重複 */
- 
+
 // 0x08, "Bksp",        /* 137 */
 // 0x09, "Tab",
 // 0x0a, "Enter",
@@ -1539,7 +1539,7 @@ char *
 xox_key_search(int value)
 {
   int i=0;
-  
+
   if (value>=0 && value < 127)
     return xox_key[value].name;
   else if (value < 0)
@@ -1547,12 +1547,12 @@ xox_key_search(int value)
     for (i=128; i<137; i++)
     {
       if (value == xox_key[i].value)
-        return xox_key[value].name;
+	return xox_key[value].name;
     }
   }
-  
+
   /* smiler.090608: 可能是有 XO_DL ，重新找一遍 */
-  
+
   value = value & (~XO_DL);
 
   if (value>=0 && value < 127)
@@ -1562,7 +1562,7 @@ xox_key_search(int value)
     for (i=128; i<137; i++)
     {
       if (value == xox_key[i].value)
-        return xox_key[value].name;
+	return xox_key[value].name;
     }
     return xox_key[0].name;
   }
@@ -1576,51 +1576,49 @@ XOX_list(xcmd, cmd ,xo)
   int cmd;
   XO *xo;
 {
-      
   int num = cmd | XO_DL; /* Thor.990220: for dynamic load */
   int pos;
-  
+
   NewKeyFunc *cb;
 
   for (;;)
   {
-     pos = cb->key;
+    pos = cb->key;
 #if 1
      /* Thor.990220: dynamic load , with key | XO_DL */
-     if (pos == num)
-     {
-        void *p = DL_get((char *) cb->func);
-        if (p)
-        {
-          cb->func = p;
-          pos = cb->key = cmd;
-        }
-        else
-        {
-          cmd = XO_NONE;
-          break;
-        }
-     }
+    if (pos == num)
+    {
+      void *p = DL_get((char *) cb->func);
+      if (p)
+      {
+	  cb->func = p;
+	  pos = cb->key = cmd;
+      }
+      else
+      {
+	  cmd = XO_NONE;
+	  break;
+      }
+    }
 #endif
-     if (pos == cmd)
-     {
-       cmd = (*(cb->func)) (xo);
+    if (pos == cmd)
+    {
+      cmd = (*(cb->func)) (xo);
 
-       if (cmd == XO_QUIT)
-         return;
+      if (cmd == XO_QUIT)
+	return;
 
-       break;
-     }
+      break;
+    }
 
-     if (pos == 'h')         /* itoc.001029: 'h' 是一特例，代表 *_cb 的結束 */
-     {
-        cmd = XO_NONE;        /* itoc.001029: 代表找不到 call-back, 不作了! */
-          break;
-     }
+    if (pos == 'h')	/* itoc.001029: 'h' 是一特例，代表 *_cb 的結束 */
+    {
+      cmd = XO_NONE;	/* itoc.001029: 代表找不到 call-back, 不作了! */
+      break;
+    }
 
-     cb++;
+    cb++;
   }
-
 
 }
 
@@ -1641,115 +1639,113 @@ xox_help(xcmd, xo)
   int tmp=0;
   int renew=0;
   int xox_help_len=0;
-  int xox_max_len=0;  /* smiler.090606: 加速查找 */
+  int xox_max_len=0;	/* smiler.090606: 加速查找 */
 
   cb = xcmd;
-  
+
   cb = cb - 1;
-  
+
   for (i = 0; i<20; i++)
   {
     cb = cb + 1;
-  
+
     while (cb->level == 'n' && cb->key != 'h')
       cb = cb + 1;
-    
+
     xox_help_item[i] = (int) (cb - xcmd);
     sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ",  xox_key_search(cb->key), cb->funcname);
     outsxy(buf, 3+i, 30);
-    
+
     xox_help_len++;
-    
+
     if (cb->key == 'h')
     {
       tail = cb;
-      
+
       for (i=i+1; i<20; i++)
       {
-        xox_help_item[i] = 0;
-        sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", " ", " ");
-        outsxy(buf, 3+i, 30);
+	xox_help_item[i] = 0;
+	sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", " ", " ");
+	outsxy(buf, 3+i, 30);
       }
       break;
     }
   }
-  
+
   if (xox_help_len == 20 && strcmp(xox_key_search(cb->key), "h"))
   {
 
-     for (;;i++)
+     for (;; i++)
      {
-        cb = cb + 1;
-        
-        if (cb->key == 'h')
-        {
-          tail = cb;
-          break;
-        }
-        
+	cb = cb + 1;
+
+	if (cb->key == 'h')
+	{
+	  tail = cb;
+	  break;
+	}
      }
      xox_max_len = i + 1;
 
   }
   else
      xox_max_len = xox_help_len;
-     
+
   x = 0;
   old_x = 0;
 
   for (;;)
   {
     old_x = x;
-    
+
     line_save(3+x, xox_line);
     cb = xcmd + xox_help_item[x];
     sprintf(buf, "\033[m\033[1;33m %-6.6s %-24.24s\033[m ", xox_key_search(cb->key), cb->funcname);
     outsxy(buf, 3+x, 30);
-    
+
     cmd = vkey();
-    
+
     switch (cmd)
     {
       case KEY_UP:
-        x--;
-        break;
+	x--;
+	break;
       case KEY_DOWN:
-        x++;
-        break;
+	x++;
+	break;
       case KEY_PGUP:
-        x = x - 20;
-        break;
+	x = x - 20;
+	break;
       case KEY_PGDN:
-        x = x + 20;
-        break;
+	x = x + 20;
+	break;
       case KEY_HOME:
-        x = xox_max_len;
-        break;
+	x = xox_max_len;
+	break;
       case KEY_END:
-        x = xox_max_len;
-        break;
+	x = xox_max_len;
+	break;
       default:
-        return;
+	return;
     }
-    
+
     line_restore(3+old_x, xox_line);
-    
+
     if (xox_max_len <= 20 || (x < xox_help_len && x >= 0))   /* 不需更新資料 */
     {
-    
       if (cmd == KEY_PGUP)
-        x = old_x;
+	x = old_x;
       else if (cmd == KEY_PGDN)
-        x = old_x;
+	x = old_x;
       else if (cmd == KEY_HOME)
-        x = 0;
+	x = 0;
       else if (cmd == KEY_END)
-        x = xox_help_len - 1;
+	x = xox_help_len - 1;
       else if (x >= xox_help_len)
-        x = x - xox_help_len;
+	x = x - xox_help_len;
       else if (x < 0)
-        x = x + xox_help_len;
-      
+	x = x + xox_help_len;
+
       continue;
     }
     else
@@ -1758,85 +1754,82 @@ xox_help(xcmd, xo)
 
       if (cmd == KEY_HOME)
       {
-    
-        x = 0;
-    
-        cb = xcmd;
-        cb = cb - 1;
-      
-        for (i = 0; i<20; i++)
-        {
-          cb = cb + 1;
-          while (cb->level == 'n' && cb->key != 'h')
-            cb = cb + 1;
-        
+	x = 0;
+
+	cb = xcmd;
+	cb = cb - 1;
+
+	for (i = 0; i < 20; i++)
+	{
+	  cb = cb + 1;
+	  while (cb->level == 'n' && cb->key != 'h')
+	    cb = cb + 1;
+
 //          xox_help_len++;
-          
-          xox_help_item[i] = (int)(cb - xcmd);
-          
-          if (cb->key == 'h')
-          {
-            for (i=i+1; i<20; i++)
-              xox_help_item[i] = 0;            
-          }
-        }
+
+	  xox_help_item[i] = (int)(cb - xcmd);
+
+	  if (cb->key == 'h')
+	  {
+	    for (i=i+1; i<20; i++)
+	      xox_help_item[i] = 0;
+	  }
+	}
       }
       else if (cmd == KEY_END)
       {
-      
-        x = 19;
-        cb = tail;      
-      
-        for (i = 0; i<20; i++)
-        {
-          xox_help_item[i] = (int)(cb - xcmd);
-          cb = cb - 1;
-        
+	x = 19;
+	cb = tail;
+
+	for (i = 0; i<20; i++)
+	{
+	  xox_help_item[i] = (int)(cb - xcmd);
+	  cb = cb - 1;
+
 //          xox_help_len ++;
-        
-          if (cb->level == 'n' || i==19)
-          {
-            x = i;
-          
-            for (j = 0; j <= (i/2); j++)
-            {
-              tmp = xox_help_item[j];
-              xox_help_item[j] = xox_help_item[i - j];
-              xox_help_item[i - j] = tmp; 
-            }
-            for (i = i+1; i<20; i++)
-              xox_help_item[i] = 0;
-          }
-        }
+
+	  if (cb->level == 'n' || i==19)
+	  {
+	    x = i;
+
+	    for (j = 0; j <= (i/2); j++)
+	    {
+	      tmp = xox_help_item[j];
+	      xox_help_item[j] = xox_help_item[i - j];
+	      xox_help_item[i - j] = tmp; 
+	    }
+	    for (i = i+1; i<20; i++)
+	      xox_help_item[i] = 0;
+	  }
+	}
       }
       //else if (cmd == KEY_PGUP)
       else if (cmd == KEY_PGDN)
       {
-        x = old_x;
-      
-        cb = xcmd + xox_help_item[19];
-        
-        if (cb->key != 'h')
-        {
-          cb = cb + 1;
-          
-          for (i=1;;)
-          {
-            if (cb->key == 'h' || i==20)
-              break;
-            else
-            {
-              cb = cb + 1;
-              i++;
-            }
-          }
-          
-          for (i=0; i<20; i++)
-            xox_help_item[19 - i] = (int)(cb - xcmd) - i;
-          
-        }
+	x = old_x;
+
+	cb = xcmd + xox_help_item[19];
+
+	if (cb->key != 'h')
+	{
+	  cb = cb + 1;
+
+	  for (i = 1;;)
+	  {
+	    if (cb->key == 'h' || i==20)
+	      break;
+	    else
+	    {
+	      cb = cb + 1;
+	      i++;
+	    }
+	  }
+
+	  for (i = 0; i < 20; i++)
+	    xox_help_item[19 - i] = (int)(cb - xcmd) - i;
+	}
       }
-    
+
 //    else if (x >= xox_help_len)
 //    {
        /* 找尋下方之下一個 */
@@ -1851,14 +1844,14 @@ xox_help(xcmd, xo)
 
       for (i=0; i<20; i++)
       {
-        cb = xcmd + xox_help_item[i];
-        sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", xox_key_search(cb->key), cb->funcname);
-        outsxy(buf, 3+i, 30);
+	cb = xcmd + xox_help_item[i];
+	sprintf(buf, "\033[m %-6.6s %-24.24s\033[m ", xox_key_search(cb->key), cb->funcname);
+	outsxy(buf, 3+i, 30);
       }
-      
+
     }
   }
-  
+
 }
 
 
@@ -1886,15 +1879,15 @@ XOX_browser(xcmd, xo)
   int old_x = 0;
   int old_y = 0;
   int cmd;
-  
+
   int i=0;
-  
+
   char buf[64];
 
   //screenline xox_line;
 
   char xox_line[900];
-  
+
   /*
         十  九
         八  三
@@ -1908,48 +1901,48 @@ XOX_browser(xcmd, xo)
         /*y x */
   XOX xox[][MAX_XOX_X] =
   {
-     /* y=0 */
-     {
+    /* y=0 */
+    {
       {"一", xox_help, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN},
       {"四", XOX_test, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN},
       {"五", XOX_test, XOX_LEFT | XOX_UP | XOX_RIGHT | XOX_DOWN}
-                                                      },
-     /* y=1 */
-     {
+    },
+    /* y=1 */
+    {
       {"二", XOX_test, XOX_UP | XOX_DOWN},
       {"六", XOX_test, XOX_UP | XOX_DOWN},
       {"七", XOX_test, XOX_UP | XOX_DOWN}
-                                                      },
-     /* y=2 */
-     {
+    },
+    /* y=2 */
+    {
       {"三", XOX_test, XOX_UP | XOX_DOWN},
       {},
       {"八", XOX_test, XOX_UP | XOX_DOWN}
-                                                      },
-     /* y=3 */
-     {
+    },
+    /* y=3 */
+    {
       {"九", XOX_test, XOX_UP | XOX_DOWN},
       {},
       {"十", XOX_test, XOX_UP | XOX_DOWN}
-                                                      }
+    }
   };
-  
+
   int xox_h[5] = {4,2,4};
   int xox_x[MAX_XOX_X] = {20, 40, 60};
 
   vs_save(xox_slt);
 
   num_y = xox_h[x];
-  
+
   for (i = 0; i < num_y; i++)
   {
-     sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
-     outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+    sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
+    outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
   }
-  
+
   sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", " ");
   outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
-  
+
   line_save(b_lines - 1, xox_line);
 
 
@@ -1971,22 +1964,22 @@ XOX_browser(xcmd, xo)
     {
       line_restore(b_lines - 1 - old_y, xox_line);
       line_save(b_lines - 1 - y, xox_line);
-      
+
       if (x != old_x)
       {
-         num_y = xox_h[x];
-         vs_restore(xox_slt);
-         
-         for (i = 0; i < num_y; i++)
-         {
-            sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
-            outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
-         }
-         
-         sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", " ");
-         outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
-         
-         line_save(b_lines - 1, xox_line);
+	num_y = xox_h[x];
+	vs_restore(xox_slt);
+
+	for (i = 0; i < num_y; i++)
+	{
+	  sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", xox[i][x].name);
+	  outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+	}
+
+	sprintf(buf, "\033[m \033[m\033[1;32m%-16.16s\033[m ", " ");
+	outsxy(buf, b_lines - 1 - i, xox_x[x] - 1);
+
+	line_save(b_lines - 1, xox_line);
       }
     }
 
@@ -2002,29 +1995,29 @@ XOX_browser(xcmd, xo)
     switch (cmd)
     {
       case KEY_UP:
-       if (xox[y][x].key & XOX_UP)
-         y++;
-       break;
+	if (xox[y][x].key & XOX_UP)
+	  y++;
+	break;
       case KEY_DOWN:
-       if (xox[y][x].key & XOX_DOWN)
-         y--;
-       break;
+	if (xox[y][x].key & XOX_DOWN)
+	  y--;
+	break;
       case KEY_LEFT:
-       if (xox[y][x].key & XOX_LEFT)
-         x--;
-       break;
+	if (xox[y][x].key & XOX_LEFT)
+	  x--;
+	break;
       case KEY_RIGHT:
-       if (xox[y][x].key & XOX_RIGHT)
-         x++;
-       break;
+	if (xox[y][x].key & XOX_RIGHT)
+	  x++;
+	break;
       case '\n':
-       //cb = xcmd + 6;
-       //sprintf(buf, "%d %s", cb->key, cb->funcname);
-       //vmsg(buf);
-       (*(xox[y][x].func)) (xcmd, xo);
-       break;
+	//cb = xcmd + 6;
+	//sprintf(buf, "%d %s", cb->key, cb->funcname);
+	//vmsg(buf);
+	(*(xox[y][x].func)) (xcmd, xo);
+	break;
       default:
-       break;
+	break;
     }
 
     if (cmd == ' ' /*&& x==0 && y==0*/)
@@ -2126,8 +2119,8 @@ xover(cmd)
 	      pos = (cmd || pos == num + XO_TALL) ? 0 : num;	/* itoc.020124: 要避免如果在倒數第二頁按 KEY_PGDN，
 								   而最後一頁篇數太少會直接跳去第一頁，使用者會
 								   不知道有最後一頁，故先在最後一項停一下 */
-          }
-        }
+	  }
+	}
 
 	/* check cursor's range */
 
@@ -2226,8 +2219,8 @@ xover(cmd)
       /* verit.20030129 : xover 光棒 */
       if (cuser.ufo & UFO_LIGHTBAR && xcmd[0].key == XO_ITEM)
       {
-        clrtoeol();
-        (*(xcmd[0].func)) (xo, 1);
+	clrtoeol();
+	(*(xcmd[0].func)) (xo, 1);
       }
       else
 #endif
@@ -2396,8 +2389,8 @@ xover(cmd)
 #ifndef NEW_KeyFunc
 	if (cmd == 'C')
 #else
-        //if (cmd == 'C')
-        if (cmd == key_in_xover[29])
+	//if (cmd == 'C')
+	if (cmd == key_in_xover[29])
 #endif
 	{
 	  cmd = xo_tbf(xo);
@@ -2405,8 +2398,8 @@ xover(cmd)
 #ifndef NEW_KeyFunc
 	else if (cmd == 'F')
 #else
-        //else if (cmd == 'F')
-        else if (cmd == key_in_xover[30])
+	//else if (cmd == 'F')
+	else if (cmd == key_in_xover[30])
 #endif
 	{
 	  cmd = xo_forward(xo);
@@ -2414,8 +2407,8 @@ xover(cmd)
 #ifndef NEW_KeyFunc
 	else if (cmd == Ctrl('C'))
 #else
-        //else if (cmd == Ctrl('C'))
-        else if (cmd == key_in_xover[31])
+	//else if (cmd == Ctrl('C'))
+	else if (cmd == key_in_xover[31])
 #endif
 	{
 	  if (TagNum)
@@ -2429,8 +2422,8 @@ xover(cmd)
 #ifndef NEW_KeyFunc
 	else if (cmd == Ctrl('A') || cmd == Ctrl('T'))
 #else
-        //else if (cmd == Ctrl('A') || cmd == Ctrl('T'))
-        else if (cmd == key_in_xover[32] || cmd == key_in_xover[33])
+	//else if (cmd == Ctrl('A') || cmd == Ctrl('T'))
+	else if (cmd == key_in_xover[32] || cmd == key_in_xover[33])
 #endif
 	{
 	  cmd = xo_tag(xo, cmd);
@@ -2493,7 +2486,7 @@ every_Z(zone)
   int zone;				/* 傳入所在 XZ_ZONE，若傳入 0，表示不在 xover() 中 */
 {
   int cmd, tmpbno, tmpmode;
-  int tmpstate;         /* smiler.070602: every_z 到看板時,可暫存看板權限(bbsstate) */
+  int tmpstate;		/* smiler.070602: every_z 到看板時,可暫存看板權限(bbsstate) */
 
   /* itoc.000319: 最多 every_Z 一層 */
   if (z_status >= 1)
@@ -2566,13 +2559,13 @@ every_Z(zone)
     tmpbno = -1;
 
   tmpmode = bbsmode;
-  tmpstate = bbstate;   /* smiler.070602: every_z時,先暫存目前看板權限 */
+  tmpstate = bbstate;	/* smiler.070602: every_z時,先暫存目前看板權限 */
   xover(cmd);
 
   if (tmpbno >= 0)		/* itoc.030731: 有可能進入別的板，就需要重新 XoPost，會再看一次進板畫面 */
     XoPost(tmpbno);
 
-  bbstate = tmpstate;   /* smiler.070602: every_z回來後,取回之前暫存的看板權限,避免看板權限被蓋掉 */
+  bbstate = tmpstate;	/* smiler.070602: every_z回來後,取回之前暫存的看板權限,避免看板權限被蓋掉 */
   utmp_mode (tmpmode);  
 
   z_status--;

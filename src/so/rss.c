@@ -30,7 +30,7 @@ static rss_currchrono;
 static int IS_URL(url)
   char *url;
 {
-  if (strchr(url, ';') || strchr(url, '"') || strchr(url, '|') || strchr(url, '&') || strchr(url, ' ')) /* security reason */
+  if (strchr(url, ';') || strchr(url, '"') || strchr(url, '|') || strchr(url, ' '))	/* security reason */
     return 0;
 
   return 1;
@@ -206,12 +206,12 @@ rss_add(xo)
     }
     if ( strlen(rss.url) < 7  || strncmp(rss.url, "http://", 7))
     {
-      vmsg("網址格式需為 http:// ，請重新輸入 !!");
+      vmsg("網址格式需為 http:// ，請重新輸入");
       continue;
     }
     if (!IS_URL(rss.url))
     {
-      vmsg("網址格式含不正確字符 ; \" | & space ，請重新輸入 !!");
+      vmsg("網址格式含不正確字符 ; \" | [space] ，請重新輸入");
       continue;
     }
 
@@ -227,7 +227,7 @@ rss_add(xo)
       i += 2;
       if (!vget(i, 0, "輸入編碼名稱：", rss.code_type, 64, DOECHO))
       {
-	vmsg("未輸入編碼名稱 !!");
+	vmsg("未輸入編碼名稱");
 	return XO_INIT;
       }
 
@@ -372,14 +372,14 @@ rss_edit(xo)
     }
     if ( strlen(mrss.url) < 7  || strncmp(mrss.url, "http://", 7))
     {
-      vmsg("網址格式需為 http:// ，請重新輸入 !!");
+      vmsg("網址格式需為 http:// ，請重新輸入");
       continue;
     }
 
     if(!IS_URL(mrss.url))
     {
       char warm_message[64];
-      sprintf(warm_message,"網址格式含不正確字符 ; \" | & space ，請重新輸入 !!");
+      sprintf(warm_message,"網址格式含不正確字符 ; \" | & space ，請重新輸入");
       vmsg(warm_message);
       continue;
     }
@@ -393,7 +393,7 @@ rss_edit(xo)
       i += 2;
       if (!vget(i, 0, "輸入編碼名稱：", mrss.code_type, 64, DOECHO))
       {
-	vmsg("未輸入編碼名稱 !!");
+	vmsg("未輸入編碼名稱");
 	return XO_INIT;
       }
 
@@ -486,7 +486,7 @@ rss_url(xo)
   if (!IS_URL(mrss.url))
   {
     char warm_message[64];
-    sprintf(warm_message,"網址格式含不正確字符 ; \" | & space ，請重新輸入 !!");
+    sprintf(warm_message,"網址格式含不正確字符 ; \" | [space] ，請重新輸入");
     vmsg(warm_message);
     return XO_BODY;
   }
@@ -628,7 +628,7 @@ rss_utf8(xo)
     {
       if (!vget(b_lines, 0, "輸入編碼名稱：", rss->code_type, 64, DOECHO))
       {
-	vmsg("未輸入編碼名稱 !!");
+	vmsg("未輸入編碼名稱");
 	return XO_BODY;
       }
       rss->xmode &= (~RSS_UTF8);

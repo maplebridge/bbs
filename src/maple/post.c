@@ -3337,7 +3337,7 @@ delpost(xo, hdr)
 
   cancel_post(hdr);
   hdr_fpath(fpath, xo->dir, hdr);
-  if (deletelog_use)
+  if (!(hdr->xmode & POST_INCOME) && deletelog_use)	/* 站外信刪除不備份, 從 news server 上重抓即可 */
     backup_post_log(fpath, BN_DELLOG, hdr, 1);
   unlink(fpath);
   if (hdr->xmode & POST_RESTRICT)
