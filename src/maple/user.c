@@ -899,12 +899,13 @@ u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
   else
     helloworld[0] = '\0';
 
+#if 0
   if (!vget(1, 0, "想對大家說的話：", helloworld, 38, GCARRY))
   {
     if (!hello)
     {
       hello = fopen(buf, "w");
-      fprintf(hello,"歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
+      fprintf(hello, "歡迎大家多來楓橋逛逛\\(*￣︶￣*)/");
       fclose(hello);
     }
   }
@@ -914,6 +915,7 @@ u_sign_set()	/* ikulan.080726:將改站簽功能獨立出來 */
     fputs(helloworld, hello);
     fclose(hello);
   }
+#endif
 
   usr_fpath(buf, cuser.userid, "host");
   if (file_host = fopen(buf,"r"))

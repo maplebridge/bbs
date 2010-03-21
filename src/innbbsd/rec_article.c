@@ -363,7 +363,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
     sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    copy_post_to_deletelog(&hdr, fpath);
+//    copy_post_to_deletelog(&hdr, fpath);
     unlink(fpath);
     update_btime(BN_DELLOG);
 
@@ -382,7 +382,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
     sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    copy_post_to_deletelog(&hdr, fpath);
+//    copy_post_to_deletelog(&hdr, fpath);
     unlink(fpath);
     update_btime(BN_DELLOG);
 
@@ -598,7 +598,7 @@ bbspost_add(board, addr, nick)
     sprintf(content_log, "%s BBS看門狗計畫: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    copy_post_to_deletelog(&hdr, fpath);
+//    copy_post_to_deletelog(&hdr, fpath);
     unlink(fpath);
     update_btime(BN_DELLOG);
 
@@ -617,7 +617,7 @@ bbspost_add(board, addr, nick)
     sprintf(content_log, "%s 文章內容限制: 文章轉送至Deletelog板\n作者: %s\n看板: %s\n標題: %s\n字串: %s\n\n", Now(), hdr.owner, board, hdr.title, bbs_dog_str);
     f_cat(FN_ETC_BBSDOG_LOG, content_log);
 
-    copy_post_to_deletelog(&hdr, fpath);
+//    copy_post_to_deletelog(&hdr, fpath);
     unlink(fpath);
     update_btime(BN_DELLOG);
 

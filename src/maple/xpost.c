@@ -1051,7 +1051,7 @@ xpost_pick(xo)
     if (pos >= num)	/* hightman.030528: 避免 .DIR 被刪減時，會沒有文章可以顯示 */
       continue;
     memcpy(hdr, fimage + pos, sizeof(HDR));
-    hdr->xid = pos;		/* 用 hdr->xid 來記錄其原先在看板中的 pos */
+    hdr->xid = pos;	/* 用 hdr->xid 來記錄其原先在看板中的 pos */
     hdr++;
   } while (top < max);
 
@@ -1107,7 +1107,7 @@ xpost_browse(xo)
 
     hdr_fpath(fpath, dir, hdr);
 
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if ((key = more(fpath, FOOTER_POST)) < 0)
       break;
 
@@ -1118,7 +1118,7 @@ xpost_browse(xo)
     strcpy(currtitle, str_ttl(hdr->title));
 
 re_key:
-    /* Thor.990204: 為考慮more 傳回值 */   
+    /* Thor.990204: 為考慮more 傳回值 */
     if (!key)
       key = vkey();
 
@@ -1139,7 +1139,7 @@ re_key:
 
 	if (pos <= xo->top)
 	  xpost_pick(xo);
-  
+
 	continue;
       }
 
@@ -1154,12 +1154,12 @@ re_key:
 	/* Thor.980727: 修正看過頭的bug */
 
 	if (pos >= xo->max)
-    	  return xpost_head(xo);
+	  return xpost_head(xo);
 
 	xo->pos = pos;
 
 	if (pos >= xo->top + XO_TALL)
-  	  xpost_pick(xo);
+	  xpost_pick(xo);
 
 	continue;
       }
@@ -1173,7 +1173,7 @@ re_key:
       }
       break;
 
-    case 'm': 
+    case 'm':
       if ((bbstate & STAT_BOARD) && !(hdr->xmode & POST_MARKED))
       {
 	/* 在 xpost_browse 時看不到 m 記號，所以限制只能 mark */
@@ -1278,7 +1278,7 @@ re_key:
 
 	if (pos <= xo->top)
 	  xpost_pick(xo);
-  
+
 	continue;
       }
 
@@ -1293,12 +1293,12 @@ re_key:
 	/* Thor.980727: 修正看過頭的bug */
 
 	if (pos >= xo->max)
-    	  return xpost_head(xo);
+	  return xpost_head(xo);
 
 	xo->pos = pos;
 
 	if (pos >= xo->top + XO_TALL)
-  	  xpost_pick(xo);
+	  xpost_pick(xo);
 
 	continue;
       }
@@ -1309,7 +1309,7 @@ re_key:
       do_mreply(hdr, 1);
       break;
 
-    case 'm': 
+    case 'm':
       if (!(hdr->xmode & POST_MARKED))
       {
 	/* 在 xmbox_browse 時看不到 m 記號，所以限制只能 mark */

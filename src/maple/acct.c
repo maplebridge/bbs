@@ -915,7 +915,7 @@ brd_set(brd, row)
 	strcat(userid, "/");
 	len++;
 	brdname = str_str(buf, userid);
-        strcpy(brdname, brdname + len);
+	strcpy(brdname, brdname + len);
       }
       BMlen -= len;
     }

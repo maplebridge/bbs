@@ -14,7 +14,7 @@
 int
 main(argc, argv)
   int argc;
-  char *argv[];
+  char **argv;
 {
   int fd;
   char buf[4096];
@@ -24,25 +24,26 @@ main(argc, argv)
   chdir(BBSHOME);
 
   userno = 1;
-  if ((fd = open(FN_SCHEMA, O_RDONLY)) >= 0){
-	while ((size = read(fd, buf, sizeof(buf))) > 0)
-	    {
-         sp = (SCHEMA *) buf;
-	      do
-	    {
-	            if (sp->userid[0] == '\0')
-	               printf("%-4d : !empty!\n",userno);
-		    else
-		      printf("%-4d : %s\n",userno, sp->userid);
+  if ((fd = open(FN_SCHEMA, O_RDONLY)) >= 0)
+  {
+    while ((size = read(fd, buf, sizeof(buf))) > 0)
+    {
+      sp = (SCHEMA *) buf;
+      do
+      {
+	if (sp->userid[0] == '\0')
+	  printf("%-6d : empty!\n", userno);
+	else
+	  printf("%-6d : %s\n", userno, sp->userid);
 
-		    userno++;
-		    size -= sizeof(SCHEMA);
-		          sp++;
-	    } while (size);
-  	}
+	userno++;
+	size -= sizeof(SCHEMA);
+	sp++;
+      } while (size);
+    }
   }
   else
-    printf("error! Can't open .USR");
+    printf("error! Cannott open %s", FN_SCHEMA);
 
   return 0;
 }

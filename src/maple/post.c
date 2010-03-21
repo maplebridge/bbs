@@ -96,18 +96,6 @@ post_no_right()
 #endif
       vmsg(NULL);
   }
-
-#if 0
-  prints("=============================================================================\n"
-    "\033[1m對不起，您沒有在此發表文章的權限\033[m\n"
-    "\033[1m請回到文章列表後，如下操作: \033[m\n\n"
-    "\033[1m1. 先按下\033[33m i 鍵 \033[37m進入 [看板屬性設定] 及 [觀看看板設定] 選單\033[m\n\n"
-    "\033[1m    a. 按下\033[33m 2 鍵 \033[37m查詢發文限制，確定您具有本看板發文所需權限等級\033[m\n"
-    "\033[1m    b. 按下\033[33m 5 鍵 \033[37m查詢板友名單，確定您未被板主浸水桶\033[m\n\n"
-    "\033[1m4. 若以上查詢無誤，請聯絡板主或任一站務請求協助\033[m\n"
-    "=============================================================================\n");
-  vmsg(NULL);
-#endif
 }
 
 
@@ -1620,12 +1608,12 @@ post_attr(hdr)
 #endif
 
 #ifdef HAVE_REFUSEMARK
-  if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
+  if ((RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
   {
     attr |= 'F',
     strcpy(attr_tmp, "\033[1;33m");
   }
-  else if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
+  else if ((RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
   {
     attr |= 'L';
     strcpy(attr_tmp, "\033[1;34m");
@@ -1677,23 +1665,20 @@ post_attr(hdr)
   if (unread && (RefusePal_level(currboard, hdr) >= 0))
   {
 #ifdef HAVE_REFUSEMARK
-    if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == 1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
+    if ((mode & POST_RESTRICT) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT_F))
     {
       attr = 'F',
-      strcpy(attr_tmp, "\033[1;33m");
-    }
-    else if ((mode & POST_RESTRICT) && (RefusePal_level(currboard, hdr) == -1) && (USR_SHOW & USR_SHOW_POST_ATTR_RESTRICT))
-    {
-      attr = 'L';
-      strcpy(attr_tmp, "\033[1;34m");
+      strcpy(attr_tmp, "\033[33m");
     }
     else
 #endif
-    if ((attr == 'm' || attr == 'b') || (mode & POST_BOTTOM))
-      attr = '=';
-    else
-      attr = '~';
-    strcpy(attr_tmp, (mode & POST_GOOD) ? "\033[33m" : "\033[36m");
+    {
+      if ((attr == 'm' || attr == 'b') || (mode & POST_BOTTOM))
+	attr = '=';
+      else
+	attr = '~';
+      strcpy(attr_tmp, (mode & POST_GOOD) ? "\033[33m" : "\033[36m");
+    }
   }
 
   sprintf(color_attr, "%s%c\033[m", attr_tmp, attr);

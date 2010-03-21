@@ -12,7 +12,8 @@
 # ------------------------------------------------------ #
 
 
-EXE =	show_dotUSR collect_uno conflict_uno fix_uno
+EXE =	collect_uno conflict_uno fix_uno \
+	showACCTlist show_dotUSR
 
 
 all: 
