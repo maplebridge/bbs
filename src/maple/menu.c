@@ -327,8 +327,8 @@ status_foot()
   static time_t uptime = -1;
   static int orig_money = -1;
   static int orig_gold = -1;
-  static char flagmsg[100];
-  static char coinmsg[100];
+  static char flagmsg[16];
+  static char coinmsg[64];
 
   int ufo;
   time_t now;
@@ -345,18 +345,18 @@ status_foot()
     orig_flag = ufo;
 #ifndef MENU_FEAST
     sprintf(flagmsg,
-      "%s%s%s%s",
-      (ufo & UFO_PAGER) ? "\033[m\033[30;41m7\033[m" : COLOR2" ",     //7
-      (ufo & UFO_QUIET) ? "\033[m\033[30;42m9\033[m" : COLOR2" ",     //9
-      (ufo & UFO_ALOHA) ? "\033[m\033[30;43mB\033[m" : COLOR2" ",     //B
-      (ufo & UFO_CLOAK) ? "\033[m\033[30;45mO\033[m" : COLOR2" ");    //O
+      "%c%c%c%c",
+      (ufo & UFO_PAGER) ? 'f' : ' ',
+      (ufo & UFO_QUIET) ? 'q' : ' ',
+      (ufo & UFO_ALOHA) ? 'a' : ' ',
+      (ufo & UFO_CLOAK) ? 'c' : ' ');
 #else
     sprintf(flagmsg,
       "%s%s%s%s",
-      (ufo & UFO_PAGER) ? "關" : "開",     //7
-      (ufo & UFO_ALOHA) ? "上" : "  ",     //B
-      (ufo & UFO_QUIET) ? "靜" : "  ",     //9
-      (ufo & UFO_CLOAK) ? "隱" : "  ");    //O
+      (ufo & UFO_PAGER) ? "關" : "開",
+      (ufo & UFO_ALOHA) ? "上" : "  ",
+      (ufo & UFO_QUIET) ? "靜" : "  ",
+      (ufo & UFO_CLOAK) ? "隱" : "  ");
 #endif
   }
 #else
@@ -366,16 +366,16 @@ status_foot()
     orig_flag = ufo;
 #ifndef MENU_FEAST
     sprintf(flagmsg,
-      "%s%s%s  ",
-      (ufo & UFO_PAGER) ? "\033[m\033[30;41m7" : COLOR2" ",     //7
-      (ufo & UFO_QUIET) ? "\033[m\033[30;43mB" : COLOR2" ",     //B
-      (ufo & UFO_CLOAK) ? "\033[m\033[30;45mO" : COLOR2" ");    //O
+      "%c%c%c ",
+      (ufo & UFO_PAGER) ? 'f' : ' ',
+      (ufo & UFO_QUIET) ? 'q' : ' ',
+      (ufo & UFO_CLOAK) ? 'a' : ' ');
 #else
     sprintf(flagmsg,
       "%s%s%s",
-      (ufo & UFO_PAGER) ? "關" : "開",   //7
-      (ufo & UFO_QUIET) ? "靜" : "  ",   //B
-      (ufo & UFO_CLOAK) ? "隱" : "  ");  //O
+      (ufo & UFO_PAGER) ? "關" : "開",
+      (ufo & UFO_QUIET) ? "靜" : "  ",
+      (ufo & UFO_CLOAK) ? "隱" : "  ");
 #endif
   }
 #endif
@@ -397,18 +397,18 @@ status_foot()
   if (cuser.money != orig_money)
   {
     orig_money = cuser.money;
-    /* ryanlei.081018: 把銀幣也配COLOR11控制碼，故修改coinmsg的index */
-    sprintf(coinmsg, "銀" COLOR11 "%4d%c",
+    /* ryanlei.081018: 把銀幣也配COLOR9控制碼，故修改coinmsg的index */
+    sprintf(coinmsg, "銀" COLOR9 "%4d%c ",
       (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
       (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
-    coinmsg[7 + strlen(COLOR11)] = ' ';
   }
 
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg + 8 + strlen(COLOR11), COLOR2 "金" COLOR11 "%4d%c " COLOR2,
+    sprintf(coinmsg,  "%s" COLOR2 "金" COLOR9 "%4d%c " COLOR2,
+      coinmsg,
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
       (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
@@ -422,13 +422,13 @@ status_foot()
   /* itoc.010717: 改一下 feeter 使長度和 FEETER_XXX 一致 */
 #ifndef MENU_FEAST
   sprintf(feeter, COLOR1 " %8.8s %02d:%02d "
-    COLOR2 " 人數 " COLOR11 "%-4d" COLOR2 " 我是" COLOR11 "%-12s"
-    COLOR2 "%s[呼叫]%-4s\033[m" COLOR2 " " COLOR8 "(h)說明",
+    COLOR2 " 人數 " COLOR9 "%-4d" COLOR2 " 我是" COLOR9 "%-12s"
+    COLOR2 "%s[呼叫]%-4s" COLOR2 " " COLOR8 "(h)說明 \033[m",
     fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
 #else
   sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
-    COLOR2 " [訪 客]" COLOR11 "%d" COLOR2 "人 [到此一遊]" COLOR11 "%-12s"
-    COLOR2 "[呼叫]" COLOR11 "%6.6s\033[m" COLOR2 ,
+    COLOR2 " [訪 客]" COLOR9 "%d" COLOR2 "人 [到此一遊]" COLOR9 "%-12s"
+    COLOR2 "[呼叫]" COLOR9 "%6.6s\033[m",
     fshm->today, ufo / 60, ufo % 60, fshm->feast, total_user, cuser.userid, flagmsg);
 #endif
   outf(feeter);

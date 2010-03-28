@@ -43,7 +43,7 @@ main(argc, argv)
     }
   }
   else
-    printf("error! Cannott open %s", FN_SCHEMA);
+    printf("error! Cannot open %s", FN_SCHEMA);
 
   return 0;
 }

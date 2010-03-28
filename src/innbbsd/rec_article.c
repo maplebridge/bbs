@@ -369,7 +369,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
 
     HISadd(MSGID, BN_DELLOG, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
       posted, hdr.xname, MSGID, SUBJECT);
   }
@@ -388,7 +388,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
 
     HISadd(MSGID, BN_DELLOG, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
       posted, hdr.xname, MSGID, SUBJECT);
   }
@@ -400,7 +400,7 @@ bbspost_topic_add(board, addr, nick ,board_from)
 
     HISadd(MSGID, board, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("topic_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
       posted, hdr.xname, board, MSGID, SUBJECT);
   }
@@ -519,7 +519,7 @@ bbspost_add(board, addr, nick)
   char folder[64], fpath[64];
   HDR hdr;
   FILE *fp;
-  short posted = 0;	/* HBrian.080801 : 紀錄文章是否有被此func發出 */
+  short posted = 0;	/* HBrian.080801 : 記錄文章是否有被此func發出 */
 
   char fpath_log[64];
   char content_log[256];
@@ -533,7 +533,8 @@ bbspost_add(board, addr, nick)
   brd_fpath(fpath, board, "spam");	/* 每個板自己的 spam */
   if (belong_spam(fpath, addr, nick))
   {
-    board = "deleted";		// 把有濾掉的信送去 deleted 板
+    //board = "deleted";		// 把有濾掉的信送去 deleted 板
+    return;
   }
 
   /* 寫入文章內容 */
@@ -604,9 +605,9 @@ bbspost_add(board, addr, nick)
 
     HISadd(MSGID, BN_DELLOG, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
-    posted, hdr.xname, MSGID, SUBJECT);
+      posted, hdr.xname, MSGID, SUBJECT);
   }
   else if (IS_BRD_DOG_FOOD(fpath, board))
   {
@@ -623,9 +624,9 @@ bbspost_add(board, addr, nick)
 
     HISadd(MSGID, BN_DELLOG, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:Deletelog MSGID:%s SUBJ:%s\n",
-    posted, hdr.xname, MSGID, SUBJECT);
+      posted, hdr.xname, MSGID, SUBJECT);
   }
   else
   {
@@ -634,9 +635,9 @@ bbspost_add(board, addr, nick)
 
     HISadd(MSGID, board, hdr.xname);
 
-    /* HBrian.080801 : 紀錄文章 */
+    /* HBrian.080801 : 記錄文章 */
     bbslog("bbspost_add: posted:%d afn:%s brd:%s MSGID:%s SUBJ:%s\n",
-    posted, hdr.xname, board, MSGID, SUBJECT);
+      posted, hdr.xname, board, MSGID, SUBJECT);
   }
 }
 
