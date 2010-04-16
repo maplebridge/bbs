@@ -423,7 +423,7 @@ status_foot()
 #ifndef MENU_FEAST
   sprintf(feeter, COLOR1 " %8.8s %02d:%02d "
     COLOR2 " 人數 " COLOR9 "%-4d" COLOR2 " 我是" COLOR9 "%-12s"
-    COLOR2 "%s[呼叫]%-4s" COLOR2 " " COLOR8 "(h)說明 \033[m",
+    COLOR2 "%s[呼叫]" COLOR9 "%-4s" COLOR2 " " COLOR8 "(h)說明 \033[m",
     fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
 #else
   sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
@@ -1345,14 +1345,6 @@ menu()
       Boards();
       goto every_key;
 
-    case Ctrl('C'):		/* 聊天室 */
-      if (cuser.userlevel)
-      {
-	utmp_mode(- M_CHAT);
-	DL_func("bin/chat.so:t_chat");
-      }
-      goto every_key;
-
 #ifdef MY_FAVORITE
     case 'f':
       if (bbsmode != M_0MENU)
@@ -1468,7 +1460,7 @@ default_key:
     if (cc != cx)	/* 若游標移動位置 */
     {
 //#ifdef CURSOR_BAR
-      if(cuser.ufo & UFO_LIGHTBAR)
+      if (cuser.ufo & UFO_LIGHTBAR)
       {
 	if (cx >= 0)
 	{
@@ -1508,7 +1500,7 @@ default_key:
     else		/* 若游標的位置沒有變 */
     {
 //#ifdef CURSOR_BAR
-      if(cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
+      if (cuser.ufo & cuser.ufo & UFO_LIGHTBAR)
       {
 	move(MENU_XPOS + cc, MENU_YPOS);
 	mptr = table[cc];
