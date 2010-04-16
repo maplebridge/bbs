@@ -3975,7 +3975,7 @@ post_append_score(xo, choose)
   time(&start);
   if ((start - last) < 5)
   {
-    vfmsg("◎ 離上次推文時間過短，想說很多話，請在推文後選擇 E)繼續 或直接回覆文章。")
+    vfmsg("◎ 離上次推文時間過短，想說很多話，請在推文後選擇 E)繼續 或直接回覆文章。");
     return XO_FOOT;
   }
   else if ((start - last) < 10)
@@ -4163,7 +4163,7 @@ post_append_score(xo, choose)
   }
   post_history(xo, hdr);
   btime_update(currbno);
-  last = start;		/* prevent successive post_score */
+  time(&last);		/* prevent successive post_score */
 
   return XO_INIT;
 }
