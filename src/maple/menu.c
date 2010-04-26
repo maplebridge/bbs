@@ -709,7 +709,7 @@ static MENU menu_register[] =
   "Address    【 電子信箱 】",
 
 #ifdef HAVE_REGISTER_FORM
-  u_register, PERM_BASIC, M_UFILES,
+  u_register, PERM_SYSOP, M_UFILES,	/* PERM_BASIC, 不接受手動認證 */
   "Register   【 填註冊單 】",
 #endif
 

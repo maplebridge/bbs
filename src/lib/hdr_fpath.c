@@ -22,8 +22,8 @@ hdr_fpath(fpath, folder, hdr)
   folder = hdr->xname;
   cc = *folder;
   if (cc != '@')
-    cc = radix32[chrono & 31]; 
-    //cc = hdr->xname[7];
+    //cc = radix32[chrono & 31]; 
+    cc = hdr->xname[7];
     //cc = radix32[chrono & 31];
 
   if (*str == '.')

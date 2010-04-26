@@ -4699,7 +4699,7 @@ post_info(xo)
 
   move(0, 0);
   clrtoeol();
-  prints("檔案名稱：#%s @ %-*s", hdr->xname, BNLEN + 2, currboard);
+  prints("檔案名稱：#%s@%-*s", hdr->xname, BNLEN + 3, currboard);
   prints("作者：%-19.18s\n", hdr->owner);
 #ifdef HAVE_REFUSEMARK
   if (!chkrestrict(hdr))
