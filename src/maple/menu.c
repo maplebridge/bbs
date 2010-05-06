@@ -407,7 +407,7 @@ status_foot()
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg,  "%s" COLOR2 "金" COLOR9 "%4d%c " COLOR2,
+    sprintf(coinmsg,  "%s" COLOR2 "金" COLOR9 "%4d%c ",
       coinmsg,
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
       (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,
@@ -423,8 +423,8 @@ status_foot()
 #ifndef MENU_FEAST
   sprintf(feeter, COLOR1 " %8.8s %02d:%02d "
     COLOR2 " 人數 " COLOR9 "%-4d" COLOR2 " 我是" COLOR9 "%-12s"
-    COLOR2 "%s[呼叫]" COLOR9 "%-4s" COLOR2 " " COLOR8 "(h)說明 \033[m",
-    fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg);
+    COLOR2 "%s" COLOR2 "[呼叫]" COLOR9 "%-4s" COLOR2 " " COLOR8 "%-*s(h)說明 \033[m",
+    fshm->today, ufo / 60, ufo % 60, total_user, cuser.userid, coinmsg, flagmsg, d_cols, "");
 #else
   sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
     COLOR2 " [訪 客]" COLOR9 "%d" COLOR2 "人 [到此一遊]" COLOR9 "%-12s"

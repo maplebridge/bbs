@@ -3973,13 +3973,13 @@ post_append_score(xo, choose)
 #endif
 
   time(&start);
-  if ((start - last) < 5)
+  if ((start - last) < 2)
   {
     vfmsg("離上次推文時間過短");
     vfmsg("想說很多話，請在推文後選擇 E)繼續 或直接回覆文章。");
     return XO_FOOT;
   }
-  else if ((start - last) < 10)
+  else if ((start - last) < 5)
   {
     srand(start);
     vtlen = rand() % 10000;
