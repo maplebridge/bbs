@@ -67,14 +67,7 @@ can_override(up)
   if ((ufo & UFO_QUIET) || (up->status & STATUS_REJECT))	/* 遠離塵囂/鎖定時 不能被傳 */
     return 0;
 
-  /* smiler.080806: 隱身時傳送水球，須先雙方互加特殊好友才可傳送水球 */
-  if (up->ufo & UFO_CLOAK)
-  {
-    vmsg("雙方互加特殊好友，才可於隱身模式互丟水球");
-    return 0;
-  }
-
-  if (!(up->ufo & UFO_CLOAK) || HAS_PERM(PERM_SEECLOAK))
+  if (!(up->ufo & UFO_CLOAK) || HAS_PERM(PERM_SEECLOAK) || is_super_ogood(up))
   {
     /* itoc.001223: 用 is_ogood/is_obad 來做判斷 */
     if (ufo & UFO_PAGER)
