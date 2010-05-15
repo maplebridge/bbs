@@ -827,6 +827,36 @@ post_changeBM()
 /* ----------------------------------------------------- */
 
 
+static int
+alter_rec(new, old)
+  BRD *new, *old;
+{
+#define BRD_LEVEL(x)	((x) == PERM_SYSOP) ? "秘密" : ((x) == PERM_BOARD) ? "好友" : "公開"
+
+  FILE *fp;
+  HDR hdr;
+  char fpath[64], buf[80];
+
+  sprintf(fpath, "tmp/%s.attrchg", new->brdname);
+  sprintf(buf, "[看板屬性異動] %s", new->brdname);
+  if (fp = fopen(fpath, "w"))
+  {
+    fprintf(fp, "作者: %s (%s) 站內: %s\n", cuser.userid, cuser.username, "BM");
+    fprintf(fp, "標題: %s\n", buf);
+    fprintf(fp, "時間: %s\n\n", Now());
+    fprintf(fp, "英文板名：%s\n", new->brdname);
+    fprintf(fp, "中文板名：%s\n", new->title);
+    fprintf(fp, "板主名單：%s\n", new->BM);
+    fprintf(fp, "更改屬性：由 %s 轉為 %s\n", BRD_LEVEL(old->readlevel), BRD_LEVEL(new->readlevel));
+    fprintf(fp, "\n--\n※ Origin: " BBSNAME "(" MYHOSTNAME ") ◆ From: %s\n", fromhost);
+    fclose(fp);
+    add_post("BM", fpath, buf, cuser.userid, cuser.username, POST_MARKED, &hdr);
+    unlink(fpath);
+  }
+  return 0;
+}
+
+
 int
 post_brdlevel()
 {
@@ -834,9 +864,6 @@ post_brdlevel()
 
   oldbrd = bshm->bcache + currbno;
   memcpy(&newbrd, oldbrd, sizeof(BRD));
-
-  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
-    return 0;
 
   if (oldbrd->battr & BRD_IAS)	/* 藝文館看板不允許隨意更動 */
   {
@@ -870,6 +897,9 @@ post_brdlevel()
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
+    if (oldbrd->battr & BRD_PUBLIC)	/* 公眾板更動屬性記錄至 BM 板 */
+       alter_rec(&newbrd, oldbrd);
+
     memcpy(oldbrd, &newbrd, sizeof(BRD));
     currchrono = newbrd.bstamp;
     rec_put(FN_BRD, &newbrd, sizeof(BRD), currbno, cmpbstamp);

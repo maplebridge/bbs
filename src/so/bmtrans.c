@@ -327,7 +327,7 @@ bmt_add(xo)
     fprintf(fp, "中文板名：%s\n", brd->title);
     fprintf(fp, "原板主名單：%s\n", blist);
     fprintf(fp, "新板主名單：%s\n", BMlist);
-    fprintf(fp, "\n\n\n--\n※ 楓橋驛站 - 板主交接系統\n");
+    fprintf(fp, "\n\n\n--\n※ " BBSNAME " - 板主交接系統 ◆ From: %s\n", fromhost);
     fclose(fp);
     add_post(BRD_NEWBM, fpath, buf, cuser.userid, cuser.username, 0, &hdr);
     unlink(fpath);

@@ -4379,8 +4379,7 @@ post_ishowbm(xo)
     prints(" %s%s - 中文板名: %s\n", mark, "b\033[m", brd->title);
     prints(" %s%s - 板主名單: %s\n", mark,
       (currbattr & BRD_PUBLIC) ? " \033[m" : "m\033[m", brd->BM);
-    prints(" %s%s - 看板屬性: %s", mark,
-      (currbattr & BRD_PUBLIC) ? " \033[m" : "i\033[m",
+    prints(" %s%s - 看板屬性: %s", mark, "i\033[m",
       (brd->readlevel == PERM_SYSOP) ? "秘密" :
       (brd->readlevel == PERM_BOARD) ? "好友" : "公開");
     prints("                          %s%s - 板友名單: %s\n", mark,
@@ -4491,7 +4490,7 @@ post_ishowbm(xo)
       return reload ? XO_INIT : XO_HEAD;
 
     if ((currbattr & BRD_PUBLIC) &&
-      (ch == 'm' || ch == 'i' || ch == 'x' || ch == 'v'))
+      (ch == 'm' || ch == 'x' || ch == 'v'))
       return reload ? XO_INIT : XO_HEAD;
 
     if (isbm && ch == '4')	/* 板主的 4 就是看板友名單 */
