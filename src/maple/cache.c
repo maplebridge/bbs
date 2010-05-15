@@ -237,8 +237,10 @@ utmp_get(userno, userid)	/* itoc.010306: 檢查使用者是否在站上 */
     if (uentp->pid && 		/* 已經離站的不檢查 */
       ((userno && uentp->userno == userno) || (userid && !strcmp(userid, uentp->userid))))
     {
-      /* smiler.080806: 對方是否設我為特殊好友，若有，則必可看到對方 */
-      if (is_super_ogood(uentp))
+      if (is_super_ogood(uentp))		/* 對方設我為特殊好友 */
+	return uentp;
+
+      if (uentp->userno == cuser.userid)	/* 必可看見自己 */
 	return uentp;
 
       if (!seecloak && (uentp->ufo & UFO_CLOAK))	/* 隱形看不見 */
