@@ -407,8 +407,7 @@ status_foot()
   if (cuser.gold != orig_gold)
   {
     orig_gold = cuser.gold;
-    sprintf(coinmsg,  "%s" COLOR2 "金" COLOR9 "%4d%c ",
-      coinmsg,
+    sprintf(coinmsg + 8 + strlen(COLOR9),  COLOR2 "金" COLOR9 "%4d%c ",
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
       (orig_gold & 0x7FFFFC00) ? (orig_gold / 1000) : orig_gold,
       (orig_gold & 0x7FF00000) ? 'M' : (orig_gold & 0x7FFFFC00) ? 'K' : ' ');
@@ -428,8 +427,8 @@ status_foot()
 #else
   sprintf(feeter, COLOR1 "[%10.10s %02d:%02d] " COLOR_SITE "%-10.10s "
     COLOR2 " [訪 客]" COLOR9 "%d" COLOR2 "人 [到此一遊]" COLOR9 "%-12s"
-    COLOR2 "[呼叫]" COLOR9 "%6.6s\033[m",
-    fshm->today, ufo / 60, ufo % 60, fshm->feast, total_user, cuser.userid, flagmsg);
+    COLOR2 "[呼叫]" COLOR9 "%6.6s%-*s\033[m",
+    fshm->today, ufo / 60, ufo % 60, fshm->feast, total_user, cuser.userid, flagmsg, d_cols, "");
 #endif
   outf(feeter);
 }
