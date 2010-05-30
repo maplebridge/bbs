@@ -394,7 +394,7 @@ status_foot()
     uptime = now + 86400 - ptime->tm_hour * 3600 - ptime->tm_min * 60 - ptime->tm_sec;
   }
 
-  if (cuser.money != orig_money)
+  if ((cuser.money != orig_money) || (cuser.gold != orig_gold))
   {
     orig_money = cuser.money;
     /* ryanlei.081018: 把銀幣也配COLOR9控制碼，故修改coinmsg的index */
@@ -402,10 +402,7 @@ status_foot()
       (orig_money & 0x7FF00000) ? (orig_money / 1000000) :
       (orig_money & 0x7FFFFC00) ? (orig_money / 1000) : orig_money,
       (orig_money & 0x7FF00000) ? 'M' : (orig_money & 0x7FFFFC00) ? 'K' : ' ');
-  }
 
-  if (cuser.gold != orig_gold)
-  {
     orig_gold = cuser.gold;
     sprintf(coinmsg + 8 + strlen(COLOR9),  COLOR2 "金" COLOR9 "%4d%c ",
       (orig_gold & 0x7FF00000) ? (orig_gold / 1000000) :
