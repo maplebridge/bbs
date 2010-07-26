@@ -1,0 +1,8 @@
+2010/07/26 Mon 15:28:57 APPLY sysop        1
+2010/07/26 Mon 15:29:21 APPLY guest        2
+2010/07/26 Mon 15:29:21 ENTER guest        r324-15.cs.nthu.edu.tw ip:d756728c (1221)
+2010/07/26 Mon 15:29:28 EXIT  guest        Stay: 0 (1221)
+2010/07/26 Mon 15:29:45 APPLY pptpb        3
+2010/07/26 Mon 15:29:45 ENTER pptpb        r324-15.cs.nthu.edu.tw ip:d756728c (1222)
+2010/07/26 Mon 15:29:48 EXIT  pptpb        Stay: 0 (1222)
+2010/07/26 Mon 15:35:24 ENTER sysop        r324-15.cs.nthu.edu.tw ip:d756728c (1323)

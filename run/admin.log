@@ -1,0 +1,14 @@
+2010/07/26 Mon 15:28:57 站長登入 sysop        登入來源: 140.114.86.215
+2010/07/26 Mon 15:29:12 站長登入 sysop        嘗試過多錯誤離開SYSOP_SUDOER  登入來源: 140.114.86.215
+2010/07/26 Mon 15:35:19 站長登入 sysop        登入來源: 140.114.86.215
+2010/07/26 Mon 15:35:23 站長登入 sysop        帳號 pptpb 正常SYSOP_SUDOER  ip: 140.114.86.215
+2010/07/26 Mon 15:35:34 設定資料 sysop        pptpb 理由：set
+2010/07/26 Mon 15:35:46 異動資料 sysop        pptpb
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 禁止發表文章
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 禁止 talk
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 禁止 chat
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 禁止 mail
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 保留
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 保留
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 禁止 login
+2010/07/26 Mon 15:35:46 異動權限 sysop        pptpb        □ 清除帳號
