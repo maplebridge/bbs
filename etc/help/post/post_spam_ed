@@ -1,0 +1,37 @@
+spam 這檔案的格式為:
+
+===================================================================
+# 這是註解，要擋二個就寫二次
+# 要注意英文要全為小寫
+user    fuck
+user    shit
+host    hinet.net
+nick    幹
+subj    不要的標題
+site    hinet
+from    someone@some.domain
+#
+# 如果後面 spam 的內容有空格，只會抓到第一個字串
+# 也就是說下面這二行的效果是一樣的
+site    giga news service
+site    giga
+===================================================================
+
+
+spam 比較的內容是:
+
+===================================================================
+發信人: itoc.bbs@processor.tfcis.org (今天下雨), 看板: itoc
+標  題: Re: 看板的閱讀權限
+發信站: XEON (Sun Jan  5 01:04:28 2003)
+轉信站: kulu!TomatoNEWS!news.tfcis.org!PROCESSOR
+Origin: zhouer.mcl.math.ncu.edu.tw
+
+  user 比對 itoc.bbs
+  host 比對 processor.tfcis.org
+  nick 比對 今天下雨
+  subj 比對 Re: 看板的閱讀權限
+  site 比對 XEON
+  from 比對 itoc.bbs@processor.tfcis.org
+
+===================================================================

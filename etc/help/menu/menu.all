@@ -1,0 +1,140 @@
+(0)Admin    【 系統維護區 】
+
+     (U)ser       【 顧客資料 】
+     (H)unt       【 搜尋引擎 】
+     (Q)SetBoard  【 設定看板 】
+     (I)nnBBS     【 轉信設定 】
+     (R)egister   【 審註冊單 】
+     (M)erge      【 復原審核 】
+     (S)ystem     【 系統設定 】
+
+          (S)etup      【 控制設定 】
+          (X)file      【 系統檔案 】
+
+     (B)BSreset   【 重置系統 】
+     (T)Restore   【 還原備份 】
+
+(A)nnounce  【 精華公佈欄 】
+(B)oards    【 佈告討論區 】
+(C)lass     【 分組討論區 】
+(F)avorite  【 自訂討論區 】
+(M)ail      【 信件工具區 】
+
+     (R)ead       【 閱讀信件 】
+     (M)ail       【 站內寄信 】
+     (L)ist       【 群組寄信 】
+     (I)nternet   【 寄依妹兒 】
+     (Z)ip        【 打包資料 】
+     (Y)es Sir!   【 投書站長 】
+     (B)M All     【 板主通告 】
+     (U)ser All   【 全站通告 】
+
+(H)ala      【 休閒聊天區 】
+
+     (T)ALK         【 楓人楓語 】
+
+          (U)sers      【 遊客名單 】
+          (L)istMenu   【 設定名單 】
+
+                (P)al        【 朋友名單 】
+                (L)ist       【 特別名單 】
+                (A)loha      【 上站通知 】
+
+          (P)ager      【 切換呼叫 】
+          (I)nvis      【 隱身密法 】
+          (Q)uery      【 查詢網友 】
+          (T)alk       【 情話綿綿 】
+          (C)hatRoom   【 眾口鑠金 】
+          (D)isplay    【 瀏覽水球 】
+          (W)rite      【 回顧水球 】
+
+     (M)SN          【 即時通訊 】
+
+          (M)SN     【 MSN Messenger 】
+          (L)og     【 回顧 msn 訊息 】
+
+(U)ser      【 個人工具區 】
+
+     (I)nfo       【 個人資料 】
+     (H)abit      【 喜好模式 】
+     (R)egister   【 註冊選單 】
+
+          (A)ddress    【 電子信箱 】
+          (R)egister   【 填註冊單 】
+          (V)erify     【 填認證碼 】
+          (P)erm       【 恢復權限 】
+
+     (N)ote       【 觀看留言 】
+     (P)ad        【 心情塗鴉 】
+     (L)ock       【 鎖定螢幕 】
+     (X)file      【 個人檔案 】
+     (V)iewLog    【 上站記錄 】
+
+(X)yz       【 特殊招待所 】
+
+     (K)TV        【 真情點歌 】
+
+          (K)TV        【 點歌紀錄 】
+          (B)ook       【 唱所欲言 】
+          (N)ote       【 歌本投稿 】
+
+     (J)oin       【 看板連署 】
+     (G)ame       【 遊戲人生 】
+
+          (1)Game      【 益智天堂 】
+
+               (0)LightOn   【 房間開燈 】
+               (1)GuessNum  【 玩猜數字 】
+               (2)FightNum  【 互猜數字 】
+               (3)KongMing  【 孔明棋譜 】
+               (4)Recall    【 回憶之卵 】
+               (5)Mine      【 亂踩地雷 】
+               (6)Fantan    【 番攤接龍 】
+               (7)Dragon    【 接龍遊戲 】
+               (8)Nine      【 天地九九 】
+
+          (2)Game      【 遊戲樂園 】
+
+               (0)Dice      【 狂擲骰子 】
+               (1)GoldPoker 【 金牌撲克 】
+               (2)BlackJack 【 二十一點 】
+               (3)ChessMJ   【 象棋麻將 】
+               (4)Seven     【 賭城七張 】
+               (5)Race      【 進賽馬場 】
+               (6)Bingo     【 賓果大戰 】
+               (7)Marie     【 大小瑪莉 】
+               (8)Bar       【 吧台瑪莉 】
+
+          (3)Game      【 反斗特區 】
+
+               (0)Chicken   【 電子小雞 】
+               (1)PushBox   【 倉庫番番 】
+               (2)Tetris    【 俄羅斯塊 】
+               (3)Gray      【 淺灰大戰 】
+
+     (M)arket     【 金融市場 】
+
+               (B)ank       【 信託銀行 】
+               (I)nvis      【 隱形現身 】
+               (C)loak      【 無限隱形 】
+               (M)box       【 信箱無限 】
+               (X)empt      【 永久保留 】
+               (V)alid      【 永免認證 】
+               (N)thu       【 清華成員 】
+
+     (O)ther      【 雜七雜八 】
+
+               (V)oteAll    【 投票中心 】
+               (T)ip        【 教學精靈 】
+               (L)oveLetter 【 情書撰寫 】
+               (P)assword   【 忘記密碼 】
+               (C)lassTable 【 功課時段 】
+               (M)oneyNote  【 記帳手札 】
+               (X)Todo      【 個人行程 】
+               (Y)Calendar  【 萬年月曆 】
+               (D)ictd      【 英漢字典 】
+
+     (S)ysInfo    【 系統資訊 】
+
+
+(G)oodbye   再別楓橋，輕輕的我走了
