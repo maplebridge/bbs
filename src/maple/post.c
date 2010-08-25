@@ -2196,9 +2196,10 @@ post_cross(xo)
       can_showturn = 1;
   }
 
+  pos = xo->pos;
+  cur = pos - xo->top;
+
 #ifdef HAVE_REFUSEMARK
-  pos = xo->pos;	//smiler 1108
-  cur = pos - xo->top;	//smiler 1108
   hdr_org = (HDR *) xo_pool + (xo->pos - xo->top);
   if (hdr_org->xmode & POST_RESTRICT)	/* 若為L文及F文,僅板主及作者可轉錄 */
   {
@@ -2235,7 +2236,7 @@ post_cross(xo)
 	if (*title == ' ')
 	  title++;
       }
-      sprintf(ve_title, "[轉錄] %.65s", title); /* smiler.070602: 改為轉錄時,標題為[轉錄]開頭 */
+      sprintf(ve_title, "[轉錄] %.65s", title);
     }
     else
       strcpy(ve_title, title);

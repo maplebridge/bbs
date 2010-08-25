@@ -50,7 +50,7 @@ int str_has(char *list, char *tag, int len);
 /* str_hash.c */
 int str_hash(char *str, int seed);
 /* str_len.c */
-int str_len(char *str);
+/* int str_len(char *str); */
 /* str_lower.c */
 void str_lower(char *dst, char *src);
 /* str_lowest.c */
