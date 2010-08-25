@@ -552,7 +552,7 @@ static MENU menu_mail[] =
   XoMbox, PERM_BASIC, M_RMAIL,
   "Read       【 閱\讀信件 】",
 
-  m_send, PERM_LOCAL, M_SMAIL,
+  m_send, PERM_VALID, M_SMAIL,
   "Mail       【 站內寄信 】",
 
 #ifdef MULTI_MAIL  /* Thor.981009: 防止愛情幸運信 */

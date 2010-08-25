@@ -2183,13 +2183,18 @@ post_cross(xo)
   if (!cuser.userlevel)	/* itoc.000213: 避免 guest 轉錄去 sysop 板 */
     return XO_NONE;
 
+  move(b_lines - 1, 0);
+  clrtoeol();
+  outs("\033[1;44m◎ 若您要推文，請改用按鍵 \033[33m%\033[37m (shift + 5) 或是 \033[33me\033[37m ！\033[m");
+
   int can_showturn = 0;
   if (xo->dir[0] == 'b')
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
     {
-      vmsg("本看板禁止轉錄");
-      return XO_NONE;
+      move(b_lines -2, 0);
+      outs("\033[1;41m 本看板禁止轉錄 \033[m");
+      return XO_BODY;
     }
 
     if (currbattr & BRD_SHOWTURN)
@@ -2204,13 +2209,17 @@ post_cross(xo)
   if (hdr_org->xmode & POST_RESTRICT)	/* 若為L文及F文,僅板主及作者可轉錄 */
   {
     if (strcmp(hdr_org->owner, cuser.userid) && !(bbstate & STAT_BM))
-      return XO_NONE;
+    {
+      move(b_lines -2, 0);
+      outs("\033[1;41m 此文章只有板主或作者可轉錄 \033[m");
+      return XO_BODY;
+    }
   }
 #endif
 
   tag = AskTag("轉錄");
   if (tag < 0)
-    return XO_FOOT;
+    return XO_BODY;
 
   dir = xo->dir;
 
