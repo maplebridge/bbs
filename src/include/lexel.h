@@ -86,9 +86,13 @@
 
 #define HAVE_UFO2
 #ifdef HAVE_UFO2
-#  define HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
-#  define HAVE_HIDE_FROM	/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#  define HAVE_UFO_CMODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  define HAVE_UFO_CFROM	/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
 				/* 要先 define HAVE_CHANGE_FROM */
+#ifdef HAVE_UFO_CFROM
+#  define HAVE_CFROM_EDIT	/* 發表文章顯示自訂故鄉 */
+#  define HAVE_CFROM_CHANGE	/* 顯示自訂故鄉來源(即可完全變造來源) */
+#endif
 #  define HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
 #endif
 

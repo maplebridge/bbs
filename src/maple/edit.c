@@ -1547,10 +1547,12 @@ ve_banner(fp, modify)	/* 加上來源等訊息 */
   select = get_sign_select();
 #endif
 
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM
+#ifdef HAVE_CFROM_EDIT
   if (cuser.ufo2 & UFO2_CFROM)
     from = cuser.cfrom;
   else
+#endif
 #endif
     from = fromhost;
 

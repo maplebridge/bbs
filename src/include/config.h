@@ -166,11 +166,15 @@
 
 #define	BMW_DISPLAY		/* itoc.010313: 顯示之前的水球 */
 
-#undef HAVE_UFO2
+#define HAVE_UFO2
 #ifdef HAVE_UFO2
-#  undef HAVE_CHANGE_MODE	/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
-#  undef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
-#  undef HAVE_LOGOUTY		/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
+#  undef HAVE_UFO_CMODE		/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
+#  undef HAVE_UFO_CFROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#ifdef HAVE_UFO_CFROM
+#  undef HAVE_CFROM_EDIT	/* 發表文章顯示自訂故鄉 */
+#  undef HAVE_CFROM_CHANGE	/* 顯示自訂故鄉來源(即可完全變造來源) */
+#endif
+#  undef HAVE_UFO_LOGOUTY	/* bossliaw.081019: LEXEL- 離站顯示, 離站預設習慣 */
 #endif
 
 #define	HAVE_CHANGE_NICK	/* 使用者名單 ^N 永久更改暱稱 */
@@ -325,7 +329,6 @@
 #  define HAVE_SONG_CAMERA	/* itoc.010207: 提供點歌到動態看板功能 */
 #  define LOG_SONG_USIES	/* itoc.010928: 點歌記錄 */
 #endif
-
 
 /* ----------------------------------------------------- */
 /* 組態設定                                              */

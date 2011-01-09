@@ -250,8 +250,12 @@ ulist_item(num, up, slot, now, sysop)
 #else
     (pager == ' ' || sysop || ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?			/* 對方設我為好友可看見對方來源 */
 #endif
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM
+#ifdef HAVE_CFROM_CHANGE
     (up->ufo2 & UFO2_CFROM) ? up->cfrom :
+#else
+    (up->ufo2 & UFO2_CFROM) ? "*" :
+#endif
 #endif
     up->from : "*", bmode(up, 0), buf);
 }
@@ -364,8 +368,12 @@ ulist_item_bar(xo, mode)
     (pager == ' ' || HAS_PERM(PERM_ALLACCT) ||
       ftype & (FTYPE_SELF | FTYPE_BOTHGOOD | FTYPE_OGOOD | FTYPE_SUPER_BOTHGOOD | FTYPE_SUPER_OGOOD)) ?
 #endif
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM
+#ifdef HAVE_CFROM_CHANGE
     (up->ufo2 & UFO2_CFROM) ? up->cfrom :
+#else
+    (up->ufo2 & UFO2_CFROM) ? "*" :
+#endif
 #endif
     up->from : "*", bmode(up, 0), buf,
     mode ? "\033[m" : "");
@@ -1059,7 +1067,12 @@ ulist_fromchange(xo)
   if (!cuser.userlevel)
     return XO_NONE;
 
-#ifdef HAVE_HIDE_FROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#ifdef HAVE_UFO_CFROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#ifndef HAVE_CFROM_CHANGE
+  vmsg("開啟隱藏來源模式時，不得自訂故鄉");
+  return XO_FOOT;
+#endif
+
   if (cuser.ufo2 & UFO2_CFROM)
     strcpy(buf, str = cutmp->cfrom);
   else
@@ -1070,13 +1083,13 @@ ulist_fromchange(xo)
     if (strcmp(buf, str))
     {
       strcpy(str, buf);
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM
       if (!(cuser.ufo2 & UFO2_CFROM))
 #endif
 	return ulist_body(xo);
     }
   }
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM
   else if (cuser.ufo2 & UFO2_CFROM)
   {
     strcpy(buf, "不告訴你");
@@ -1095,7 +1108,7 @@ ulist_fromchange(xo)
 #endif
 
 
-#ifdef HAVE_CHANGE_MODE
+#ifdef HAVE_UFO_CMODE
 static int
 ulist_modechange(xo)
   XO *xo;
@@ -1273,7 +1286,7 @@ static KeyFunc ulist_cb[] =
 #ifdef HAVE_CHANGE_FROM
   Ctrl('F'), ulist_fromchange,
 #endif
-#ifdef HAVE_CHANGE_MODE
+#ifdef HAVE_UFO_CMODE
   'M', ulist_modechange,
 #endif
 #ifdef HAVE_CHANGE_ID

@@ -219,10 +219,23 @@ char *ufo_tbl[NUMUFOS] =
 
 char *ufo_tbl2[NUMUFOS2] =
 {
+#ifdef HAVE_UFO_LOGOUTY
   "離站預設[Y]",			/* UFO2_LOGOUTY */
+#else
+  "保留",
+#endif
 
+#ifdef HAVE_UFO_CMODE
   "自訂/隱藏動態",		/* UFO2_CMODE */
+#else
+  "保留",
+#endif
+
+#ifdef HAVE_UFO_CFROM
   "自訂/隱藏故鄉"			/* UFO2_CFROM */
+#else
+  "保留",
+#endif
 };
 
 

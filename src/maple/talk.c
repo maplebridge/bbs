@@ -44,7 +44,7 @@ bmode(up, simple)
   char *word, *mateid;
 
   word =
-#ifdef HAVE_CHANGE_MODE
+#ifdef HAVE_UFO_CMODE
 	(up->ufo2 & UFO2_CMODE) ? up->cmode :
 #endif
 	ModeTypeTable[mode = up->mode];
@@ -171,9 +171,13 @@ do_query(acct, from_fpath)
     fortune[rich],
     (m_query(userid) & STATUS_BIFF) ? "有新信件" : "都看過了");
 
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_UFO_CFROM_
   if ((up ? up->ufo2 : acct->ufo2) & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#ifdef HAVE_CFROM_CHANGE
     prints("[來源] %s\n", up ? up->cfrom : acct->cfrom);
+#else
+    prints("[來源] (*)\n");
+#endif
   else
 #endif
   if (!str_cmp(userid, STR_GUEST))
@@ -1396,7 +1400,7 @@ talk_rqst()
 
   bell();
   prints("您想跟 %s 聊天嗎？(來自 %s)", page_requestor,
-#ifdef HAVE_HIDE_FROM
+#ifdef HAVE_CFROM_CHANGE
   (up->ufo2 & UFO2_CFROM) ? up->cfrom :
 #endif
   up->from);

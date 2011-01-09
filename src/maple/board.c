@@ -1364,7 +1364,7 @@ class_load(xo)
   {
     cbase -= bnum;
 #ifdef	DEBUG_ClassHeader_INT
-    xsort(cbase, bnum, sizeof(int), mantime_cmp)
+    xsort(cbase, bnum, sizeof(int), mantime_cmp);
 #else
     xsort(cbase, bnum, sizeof(short), mantime_cmp);
 #endif

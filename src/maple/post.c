@@ -2192,8 +2192,7 @@ post_cross(xo)
   {
     if ((currbattr & BRD_NOFORWARD) && !(bbstate & STAT_BM))
     {
-      move(b_lines -2, 0);
-      outs("\033[1;41m 本看板禁止轉錄 \033[m");
+      zmsg("\033[1;41m 本看板禁止轉錄 \033[m");
       return XO_BODY;
     }
 
@@ -2210,8 +2209,7 @@ post_cross(xo)
   {
     if (strcmp(hdr_org->owner, cuser.userid) && !(bbstate & STAT_BM))
     {
-      move(b_lines -2, 0);
-      outs("\033[1;41m 此文章只有板主或作者可轉錄 \033[m");
+      zmsg("\033[1;41m 此文章只有板主或作者可轉錄 \033[m");
       return XO_BODY;
     }
   }
@@ -3430,7 +3428,6 @@ post_copy(xo)	   /* itoc.010924: 取代 gem_gather */
 /* ----------------------------------------------------- */
 
 
-#ifdef DO_POST_FILTER
 static int
 find_xname_by_chrono(chrono, xpath, mode)	/* 配合看門狗，修改文章後找副本一併修改 */
   time4_t chrono;
@@ -3498,7 +3495,6 @@ post_bottom_sync(hdr, fpath)
     }
   }
 }
-#endif
 
 
 static int
