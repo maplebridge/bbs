@@ -1069,8 +1069,11 @@ ulist_fromchange(xo)
 
 #ifdef HAVE_UFO_CFROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
 #ifndef HAVE_CFROM_CHANGE
-  vmsg("開啟隱藏來源模式時，不得自訂故鄉");
-  return XO_FOOT;
+  if (cuser.ufo2 & UFO2_CFROM)
+  {
+    vmsg("開啟隱藏來源模式時，不得自訂故鄉");
+    return XO_FOOT;
+  }
 #endif
 
   if (cuser.ufo2 & UFO2_CFROM)
