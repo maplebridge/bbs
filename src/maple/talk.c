@@ -171,12 +171,12 @@ do_query(acct, from_fpath)
     fortune[rich],
     (m_query(userid) & STATUS_BIFF) ? "Τ穝獺ン" : "常筁");
 
-#ifdef HAVE_UFO_CFROM_
+#ifdef HAVE_UFO_CFROM
   if ((up ? up->ufo2 : acct->ufo2) & UFO2_CFROM)	/* Bossliaw.081019: LEXEL 璹/留旅 ㄓ方 */
 #ifdef HAVE_CFROM_CHANGE
     prints("[ㄓ方] %s\n", up ? up->cfrom : acct->cfrom);
 #else
-    prints("[ㄓ方] (*)\n");
+    prints("[ㄓ方] (%s) (*)\n", Btime(&acct->lastlogin));
 #endif
   else
 #endif
@@ -1256,7 +1256,7 @@ t_query()
   {
     move(1, 0);
     clrtobot();
-    do_query(&acct);
+    do_query(&acct, NULL);
   }
 
   return 0;

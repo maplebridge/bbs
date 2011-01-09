@@ -169,7 +169,7 @@
 #define HAVE_UFO2
 #ifdef HAVE_UFO2
 #  undef HAVE_UFO_CMODE		/* Bossliaw.081019: LEXEL 自訂/隱藏 動態 */
-#  undef HAVE_UFO_CFROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
+#  define HAVE_UFO_CFROM		/* Bossliaw.081019: LEXEL 自訂/隱藏 來源 */
 #ifdef HAVE_UFO_CFROM
 #  undef HAVE_CFROM_EDIT	/* 發表文章顯示自訂故鄉 */
 #  undef HAVE_CFROM_CHANGE	/* 顯示自訂故鄉來源(即可完全變造來源) */
