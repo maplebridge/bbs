@@ -742,7 +742,7 @@ post_changeBM()
 
   if (strncmp(oldbrd->brdname, "P_", 2) && strncmp(oldbrd->brdname, "L_", 2) &&
     strncmp(oldbrd->brdname, "R_", 2) && strncmp(oldbrd->brdname, "G_", 2) &&
-    strncmp(oldbrd->brdname, "LAB_", 4) && !(oldbrd->battr & BRD_IAS))
+    strncmp(oldbrd->brdname, "La_", 3) && strncmp(oldbrd->brdname, "LAB_", 4) && !(oldbrd->battr & BRD_IAS))
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
