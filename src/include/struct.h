@@ -488,7 +488,6 @@ typedef struct NewBoardHeader
 #define NBRD_NEWBOARD	0x10000	/* 新板連署 */
 #define NBRD_OTHER	0x20000	/* 其他連署 */
 #define NBRD_INN	0x01000	/* 設定轉信 */
-#define NBRD_PUBLIC	0x02000	/* 公眾看板 */
 
 
 #endif	/* HAVE_COSIGN */

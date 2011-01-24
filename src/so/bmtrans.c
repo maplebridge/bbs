@@ -198,9 +198,9 @@ bmt_add(xo)
   }
 
 #if 0
-  if (!(brd->battr & BRD_PUBLIC))	/* 只有公眾才需要申請 */
+  if (!is_brd_public(brd->brdname))	/* 只有公眾才需要申請 */
   {
-    vmsg("此看板為公眾板，可由正板主自行設定名單");
+    vmsg("此看板不為公眾板，可由正板主自行設定名單");
     return 0;
   }
 #endif

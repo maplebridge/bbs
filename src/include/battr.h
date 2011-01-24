@@ -16,14 +16,13 @@
 /* ----------------------------------------------------- */
 
 
-#define BRD_NOZAP	0x01	/* 不可 zap */
-#define BRD_NOTRAN	0x02	/* 不轉信 */
-#define BRD_NOCOUNT	0x04	/* 不計文章發表篇數 */
-#define BRD_NOSTAT	0x08	/* 不納入熱門話題統計 */
-#define BRD_NOVOTE	0x10	/* 不公佈投票結果於 [record] 板 */
-#define BRD_ANONYMOUS	0x20	/* 匿名看板 */
-#define BRD_NOSCORE	0x40	/* 不評分看板 */
-#define BRD_PUBLIC	0x80	/* 公眾板 */
+#define BRD_NOZAP	0x00000001	/* 不可 zap */
+#define BRD_NOTRAN	0x00000002	/* 不轉信 */
+#define BRD_NOCOUNT	0x00000004	/* 不計文章發表篇數 */
+#define BRD_NOSTAT	0x00000008	/* 不納入熱門話題統計 */
+#define BRD_NOVOTE	0x00000010	/* 不公佈投票結果於 [record] 板 */
+#define BRD_ANONYMOUS	0x00000020	/* 匿名看板 */
+#define BRD_NOSCORE	0x00000040	/* 不評分看板 */
 #define BRD_NOL		0x00000100	/* 不可鎖文 */
 #define	BRD_HIDEPAL	0x00000200	/* 隱藏板友名單 */
 #define BRD_NOPREFIX	0x00000400	/* 關閉看板 POST_PREFIX 功能 */
@@ -55,7 +54,7 @@ static char *battr_tbl[NUMBATTRS] =
   "不公開投票結果",	/* BRD_NOVOTE */
   "匿名看板",		/* BRD_ANONYMOUS */
   "不評分看板",		/* BRD_NOSCORE */
-  "公眾板",		/* BRD_PUBLIC */
+  "保留",		/* */
   "不可鎖文",		/* BRD_NOL */
   "隱藏(不顯示)板友名單",/* BRD_HIDEPAL */
   "停止使用文章類別", 	/* BRD_NOPREFIX */

@@ -519,6 +519,17 @@ is_bm(list, userid)
 }
 
 
+int
+is_brd_public(brdname)
+  char *brdname;
+{
+  return (strncmp(brdname, "P_", 2) && strncmp(brdname, "L_", 2) &&
+	  strncmp(brdname, "R_", 2) && strncmp(brdname, "G_", 2) &&
+	  strncmp(brdname, "La_", 3) && strncmp(brdname, "LAB_", 4) &&
+	  strncmp(brdname, "IS_", 3) && strncmp(brdname, "IA_", 3) && strncmp(brdname, "IAS_", 4));
+}
+
+
 #ifdef DO_POST_FILTER
 int
 IS_BIGGER_AGE(age)
@@ -1125,7 +1136,7 @@ XoPost(bno)
 #ifdef HAVE_MODERATED_BOARD
     if (!(bits & BRD_R_BIT))
     {
-      if ((cuser.userlevel & PERM_SYSOP) && (brd->battr & BRD_PUBLIC))
+      if ((cuser.userlevel & PERM_SYSOP) && (is_brd_public(brd->brdname)))
       {
 	vmsg("警告：使用站務進入隱藏公眾板功\能");
 	if (!adm_check())

@@ -1691,7 +1691,7 @@ ve_filer(fpath, ve_op)
    if (ve_op < 0)		/* itoc.010301: 不能儲存 */
      return VE_FOOTER;
 
-   if (currbattr & BRD_PUBLIC)
+   if (is_brd_public(currboard))
    {
       vmsg("本看板為公眾板，不接受文章加密");
       return VE_FOOTER;

@@ -477,9 +477,6 @@ nbrd_add(xo)
   if (isinn)
     nbrd.mode |= NBRD_INN;
 
-  if ((ntype >= 4 && ntype <= 6) || ntype == 8)
-    nbrd.mode |= NBRD_PUBLIC;
-
   vmsg("開始編輯 [看板說明與板主抱負]，不需再將申請看板的資料貼上一次！");
   sprintf(path, "tmp/%s.nbrd", cuser.userid);	/* 連署原因的暫存檔案 */
   if (fd = vedit(path, 0))
@@ -852,8 +849,6 @@ nbrd_newbrd(xo, nbrd)		/* 開新板 */
     newboard.battr = BRD_NOTRAN;
     break;
   }
-  if (nbrd->mode & NBRD_PUBLIC)
-    newboard.battr = BRD_PUBLIC;
   newboard.postlevel = PERM_POST;
   strcpy(newboard.brdname, nbrd->brdname);
   strcpy(newboard.class, nbrd->class);

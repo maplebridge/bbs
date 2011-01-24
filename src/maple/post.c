@@ -2256,7 +2256,7 @@ post_cross(xo)
   xbattr = (bshm->bcache + xbno)->battr;
 
 #ifdef HAVE_REFUSEMARK
-  if (xbattr & BRD_PUBLIC)
+  if (is_brd_public(xboard))
      rc = vget(2, 0, "(S)存檔 (L)站內 (Q)取消？[Q] ", buf, 3, LCECHO);
   else
      rc = vget(2, 0, "(S)存檔 (L)站內 (X)密封 (Q)取消？[Q] ", buf, 3, LCECHO);
@@ -2268,7 +2268,7 @@ post_cross(xo)
 #endif
     return XO_HEAD;
 
-  if ((xbattr & BRD_PUBLIC) && (rc == 'x'))	/* smiler.090308: 轉文至公眾板不得隱藏 */
+  if (is_brd_public(xboard) && (rc == 'x'))	/* smiler.090308: 轉文至公眾板不得隱藏 */
     return XO_HEAD;
 
   if (method && *dir == 'b')	/* 從看板轉出，先檢查此看板是否為秘密板 */
@@ -2957,7 +2957,7 @@ post_refuse(xo)	/* itoc.010602: 文章加密 */
   if (!cuser.userlevel)	/* itoc.020114: guest 不能對其他 guest 的文章加密 */
     return XO_NONE;
 
-  if (currbattr & BRD_PUBLIC)
+  if (is_brd_public(currboard))
     return XO_NONE;
 
   if ((currbattr & BRD_NOL) && !(bbstate & STAT_BM))
@@ -4361,7 +4361,7 @@ post_ishowbm(xo)
 {
   BRD  *brd;
   brd = bshm->bcache + currbno;
-  int isbm;
+  int isbm, ispub;
   int ch, reload = 0;
   char *mark;
 
@@ -4370,6 +4370,8 @@ post_ishowbm(xo)
     mark = "\033[1;33m";
   else
     mark = "\033[0;30m";
+
+  ispub = is_brd_public(currboard);
 
   while (1)
   {
@@ -4384,16 +4386,16 @@ post_ishowbm(xo)
       brd->brdname, brd->class);
     prints(" %s%s - 中文板名: %s\n", mark, "b\033[m", brd->title);
     prints(" %s%s - 板主名單: %s\n", mark,
-      (currbattr & BRD_PUBLIC) ? " \033[m" : "m\033[m", brd->BM);
+      ispub ? " \033[m" : "m\033[m", brd->BM);
     prints(" %s%s - 看板屬性: %s", mark, "i\033[m",
       (brd->readlevel == PERM_SYSOP) ? "秘密" :
       (brd->readlevel == PERM_BOARD) ? "好友" : "公開");
     prints("                          %s%s - 板友名單: %s\n", mark,
-      (currbattr & BRD_PUBLIC) ? " \033[m" : "v\033[m",
+      ispub ? " \033[m" : "v\033[m",
       (currbattr & BRD_HIDEPAL) ? "板主隱藏板友名單" : "板友可看板友名單");
 
     prints(" %s%s - 鎖文限制: %s", mark,
-      (currbattr & BRD_PUBLIC) ? " \033[m" : "x\033[m",
+      ispub ? " \033[m" : "x\033[m",
       (currbattr & BRD_NOL) ? "板主已設定板友不得鎖文" : "板主未做板友鎖文設定  ");
     prints("        %s%s - 可否推文: %s\n", mark, "e\033[m",
       (currbattr & BRD_NOSCORE) ? "否" : "可");
@@ -4405,11 +4407,11 @@ post_ishowbm(xo)
 
     char buf[64];
     sprintf(buf, "%s%s%s",
-      (currbattr & BRD_PUBLIC) ? "公眾看板" : "非公眾板",
+      ispub ? "公眾看板" : "非公眾板",
       (currbattr & BRD_IAS) ? " | 藝文館看板" : "",
       (currbattr & BRD_ATOM) ? " | ATOM看板" : "");
     prints(" %s - 看板種類: %-30s",
-      (currbattr & BRD_PUBLIC) ? "\033[1;33mu\033[m" : " ", buf);
+      ispub ? "\033[1;33mu\033[m" : " ", buf);
 
     prints("%s%s - 看板推文顯示: %s\n", mark, "!\033[m",
       (currbattr & BRD_POST_IP) ? "IP" : "IP 代碼");
@@ -4489,14 +4491,13 @@ post_ishowbm(xo)
     if (isbm && (ch == '5'))	/* 板主不由觀看介面進 RSS 設定 */
       return reload ? XO_INIT : XO_HEAD;
 
-    if (!(currbattr & BRD_PUBLIC) && ch == 'u')	/* 公眾板才看說明 */
+    if (!ispub && ch == 'u')	/* 公眾板才看說明 */
       return reload ? XO_INIT : XO_HEAD;
 
     if (!isbm && ch == 't')	/* 板主才能使用文章範本 */
       return reload ? XO_INIT : XO_HEAD;
 
-    if ((currbattr & BRD_PUBLIC) &&
-      (ch == 'm' || ch == 'x' || ch == 'v'))
+    if (ispub && (ch == 'm' || ch == 'x' || ch == 'v'))	/* 公眾板主禁用選項 */
       return reload ? XO_INIT : XO_HEAD;
 
     if (isbm && ch == '4')	/* 板主的 4 就是看板友名單 */
@@ -4943,7 +4944,7 @@ KeyFunc post_cb[] =
   'B', post_ishowbm,
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",
   'V' | XO_DL, (void *) "bin/vote.so:XoVote",
-  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala",
+//  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala",
 
 #ifdef HAVE_TERMINATOR
   Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",
@@ -5044,7 +5045,7 @@ NewKeyFunc post_cb[] =
 
   'R' | XO_DL, (void *) "bin/vote.so:vote_result",      'R' | XO_DL,            'z',    "顯示投票結果",         "",
   'V' | XO_DL, (void *) "bin/vote.so:XoVote",           'V' | XO_DL,            'z',    "執行投票相關功\能",   "",
-  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala", Ctrl('G') | XO_DL,      'z',    "丟骰至看板",           "",
+//  Ctrl('G') | XO_DL, (void *) "bin/xyz.so:post_sibala", Ctrl('G') | XO_DL,      'z',    "丟骰至看板",           "",
 
 #ifdef HAVE_TERMINATOR
   Ctrl('X') | XO_DL, (void *) "bin/manage.so:post_terminator",  Ctrl('X') | XO_DL,      'z',    "拂花落葉斬",   "",

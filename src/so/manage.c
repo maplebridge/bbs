@@ -594,7 +594,7 @@ post_rlock()
 
   oldbrd = bshm->bcache + currbno;
 
-  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+  if (is_brd_public(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
@@ -629,7 +629,7 @@ post_vpal()
 
   oldbrd = bshm->bcache + currbno;
 
-  if (oldbrd->battr & BRD_PUBLIC)  /* 公眾板不允許隨意更動 */
+  if (is_brd_public(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
@@ -737,12 +737,10 @@ post_changeBM()
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
     return 0;
 
-  if (oldbrd->battr & BRD_PUBLIC)	/* 公眾板不允許隨意更動 */
+  if (is_brd_brdname(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
     return 0;
 
-  if (strncmp(oldbrd->brdname, "P_", 2) && strncmp(oldbrd->brdname, "L_", 2) &&
-    strncmp(oldbrd->brdname, "R_", 2) && strncmp(oldbrd->brdname, "G_", 2) &&
-    strncmp(oldbrd->brdname, "La_", 3) && strncmp(oldbrd->brdname, "LAB_", 4) && !(oldbrd->battr & BRD_IAS))
+  if(!is_brd_public(oldbrd->brdname))
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));
@@ -897,7 +895,7 @@ post_brdlevel()
 
   if (memcmp(&newbrd, oldbrd, sizeof(BRD)) && vans(msg_sure_ny) == 'y')
   {
-    if (oldbrd->battr & BRD_PUBLIC)	/* 公眾板更動屬性記錄至 BM 板 */
+    if (is_brd_public(oldbrd->brdname))	/* 公眾板更動屬性記錄至 BM 板 */
        alter_rec(&newbrd, oldbrd);
 
     memcpy(oldbrd, &newbrd, sizeof(BRD));

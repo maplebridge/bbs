@@ -52,6 +52,7 @@ void brh_save(void);
 void brd_force(void);
 void class_item(int num, int bno, int brdpost, int infav, int label);
 int is_bm(char *list, char *userid);
+int is_brd_public(char *brdname);
 int IS_BIGGER_AGE(int age);
 int IS_BIGGER_1STLG(int month);
 int last_nobottom(char *folder);
