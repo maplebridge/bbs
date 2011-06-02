@@ -629,9 +629,6 @@ post_vpal()
 
   oldbrd = bshm->bcache + currbno;
 
-  if (is_brd_public(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
-    return 0;
-
   memcpy(&newbrd, oldbrd, sizeof(BRD));
 
   switch (vkans("開放觀看板友名單 (1)允許\ (2)不允許\ (Q)取消？[Q] "))
@@ -737,10 +734,7 @@ post_changeBM()
   if (is_bm(blist, cuser.userid) != 1)	/* 只有正板主可以設定板主名單 */
     return 0;
 
-  if (is_brd_brdname(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
-    return 0;
-
-  if(!is_brd_public(oldbrd->brdname))
+  if (is_brd_public(oldbrd->brdname))	/* 公眾板不允許隨意更動 */
     return 0;
 
   memcpy(&newbrd, oldbrd, sizeof(BRD));

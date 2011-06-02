@@ -523,10 +523,14 @@ int
 is_brd_public(brdname)
   char *brdname;
 {
+#ifdef SITE_LEXEL
+  return 0;
+#else
   return (strncmp(brdname, "P_", 2) && strncmp(brdname, "L_", 2) &&
 	  strncmp(brdname, "R_", 2) && strncmp(brdname, "G_", 2) &&
 	  strncmp(brdname, "La_", 3) && strncmp(brdname, "LAB_", 4) &&
 	  strncmp(brdname, "IS_", 3) && strncmp(brdname, "IA_", 3) && strncmp(brdname, "IAS_", 4));
+#endif
 }
 
 

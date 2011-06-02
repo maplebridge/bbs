@@ -485,7 +485,7 @@ check_crosspost(fpath, bno)
     btime_update(brd_bno(BN_SECURITY));
 
     /* smiler.090611: 取消停權，改為提醒 */
-#if 0
+#if 1
     bbstate &= ~STAT_POST;
     cuser.userlevel &= ~PERM_POST;
     cuser.userlevel |= PERM_DENYPOST;
