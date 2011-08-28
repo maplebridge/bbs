@@ -77,6 +77,35 @@ pad_view()
   }
 
   close(fd);
+
+  if (!HAS_PERM(PERM_SYSOP) || vans("是否管理留言？[y/N] ") != 'y')
+    return 0;
+
+  FILE *fpw;
+
+  if (!(fpw = fopen(FN_RUN_NOTE_TMP, "w")))
+    return 0;
+
+  if ((fd = open(FN_RUN_NOTE_PAD, O_RDONLY)) >= 0)
+  {
+    Pad *pp;
+
+    mgets(-1);
+    while (pp = mread(fd, sizeof(Pad)))
+    {
+      move(b_lines - 5, 0);
+      clrtobot();
+      outs("\n");
+      outs(pp->msg);
+      if (vans("保留此留言？[Y/n]) ") != 'n')
+        fwrite(pp, sizeof(Pad), 1, fpw);
+    }
+    close(fd);
+  }
+
+  fclose(fpw);
+  rename(FN_RUN_NOTE_TMP, FN_RUN_NOTE_PAD);
+
   return 0;
 }
 

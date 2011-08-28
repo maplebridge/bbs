@@ -66,8 +66,6 @@
 #define DEBUG_ClassHeader_INT	/* smiler.090414: 更動 struct.h 內 ClassHeader */
 #define DEBUG_BSHM_WORK		/* smiler.090414: 記錄 BSHM 工作狀態 */
 
-#undef	DEBUG_ClassHeader_INT
-
   /* ------------------------------------------------- */
   /* 組態規劃˙特殊活動                                */
   /* ------------------------------------------------- */
