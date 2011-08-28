@@ -352,8 +352,8 @@ move_post(hdr, folder, by_bm)	/* 將 hdr 從 folder 搬到別的板 */
 /* ----------------------------------------------------- */
 
 
-#define MAX_CHECKSUM_POST	20	/* 記錄最近 20 篇文章的 checksum */
-#define MAX_CHECKSUM_LINE	6	/* 只取文章前 6 行來算 checksum */
+#define MAX_CHECKSUM_POST	4	/* 記錄最近 4 篇文章的 checksum */
+#define MAX_CHECKSUM_LINE	13	/* 只取文章前 13 行來算 checksum */
 
 
 typedef struct
@@ -486,6 +486,8 @@ check_crosspost(fpath, bno)
 
     /* smiler.090611: 取消停權，改為提醒 */
 #if 1
+    ACCT acct;
+
     bbstate &= ~STAT_POST;
     cuser.userlevel &= ~PERM_POST;
     cuser.userlevel |= PERM_DENYPOST;

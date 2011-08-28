@@ -461,6 +461,24 @@ b_xvalid()
 }  
 
 
+static int
+is_new_form_nthumail(domain)
+  char *domain;
+{
+  char *str;
+
+  str = strchr(domain, '.');
+  if (*domain != 'm' || strcmp(str, ".nthu.edu.tw"))
+    return 0;
+
+  do {
+    domain++;
+  } while (*domain >= '0' && *domain <= '9');
+
+  return (*domain == '.') ? 1 : 0;
+}
+
+
 int
 b_nthu()
 {
@@ -480,7 +498,10 @@ b_nthu()
   *domain++ = '\0';
 
   /* songsongboy.070404: 判斷是否為 NTHU 成員*/
-  if (!strncmp(domain, "oz.nthu.edu.tw", 14) || !strncmp(domain, "mx.nthu.edu.tw", 14) || !strncmp(domain, "alumni.nthu.edu.tw", 18) )
+  if (!strcmp(domain, "oz.nthu.edu.tw") ||
+      !strcmp(domain, "mx.nthu.edu.tw") ||
+      !strcmp(domain, "alumni.nthu.edu.tw") ||
+      is_new_form_nthumail(domain))
   {
     if (!HAS_PERM(PERM_XVALID))
       buy_level(PERM_XVALID);

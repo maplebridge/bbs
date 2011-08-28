@@ -702,6 +702,10 @@ u_register()
     return XEASY;
   }
 
+ 
+  more("etc/no_admin_register", NULL);
+  return 0;
+
   if (fn = fopen(FN_RUN_RFORM, "rb"))
   {
     while (fread(&rform, sizeof(RFORM), 1, fn))
