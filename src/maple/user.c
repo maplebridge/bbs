@@ -473,35 +473,10 @@ POP3_Check(sock, account, passwd)
     return -1;
   }
 
-  sock = 1;
+  sock = 1;	/* first message is Welcome Message */
 
-  while (1)
+  while (fgets(buf, sizeof(buf), fsock))
   {
-    switch (sock)
-    {
-    case 1:		/* Welcome Message */
-      fgets(buf, sizeof(buf), fsock);
-      break;
-
-    case 2:		/* Verify Account */
-      fprintf(fsock, "user %s\r\n", account);
-      fflush(fsock);
-      fgets(buf, sizeof(buf), fsock);
-      break;
-
-    case 3:		/* Verify Password */
-      fprintf(fsock, "pass %s\r\n", passwd);
-      fflush(fsock);
-      fgets(buf, sizeof(buf), fsock);
-      sock = -1;
-      break;
-
-    default:		/* 0:Successful 4:Failure  */
-      fprintf(fsock, "quit\r\n");
-      fclose(fsock);
-      return sock;
-    }
-
     if (!strncmp(buf, "+OK", 3))
     {
       sock++;
@@ -512,7 +487,29 @@ POP3_Check(sock, account, passwd)
       prints("%s\n", buf);
       sock = -1;
     }
+
+    switch (sock)
+    {
+    case 2:		/* Send Account */
+      fprintf(fsock, "user %s\r\n", account);
+      fflush(fsock);
+      break;
+
+    case 3:		/* Send Password */
+      fprintf(fsock, "pass %s\r\n", passwd);
+      fflush(fsock);
+      sock = -1;
+      break;
+
+    default:		/* 0:Successful -1:Failure  */
+      fprintf(fsock, "quit\r\n");
+      fclose(fsock);
+      return sock;
+    }
   }
+
+  outs("與伺服器連線閒置過久，請再試一次\n");
+  return -1;
 }
 
 

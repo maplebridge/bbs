@@ -214,7 +214,7 @@ lunar_calendar(key, now, ptime)	/* itoc.050528: 由陽曆算農曆日期 */
 #endif
 
   #define TABLE_INITAIL_YEAR	2005
-  #define TABLE_FINAL_YEAR	2011
+  #define TABLE_FINAL_YEAR	2015
 
   char Table[TABLE_FINAL_YEAR - TABLE_INITAIL_YEAR + 1][21] = 
   {
@@ -223,8 +223,13 @@ lunar_calendar(key, now, ptime)	/* itoc.050528: 由陽曆算農曆日期 */
     "--L--L-LLL-L,X,02:18",	/* 2007 豬年 */
     "L--L--L-LL-L,X,02:07",	/* 2008 鼠年 */
     "LL--L--L-L-L,5,01:26",	/* 2009 牛年 */
+    "LL--L-L-L-LL,5,01:26",	/* 2009 牛年 */
     "L-L-L--L-L-L,X,02:14",	/* 2010 虎年 */
-    "L-LL-L--L-L-,X,02:14",	/* 2011 兔年 */
+    "L-LL-L--L-L-,X,02:03",     /* 2011 兔年 */
+    "L-LLL-L-L-L-,4,01:23",     /* 2012 龍年 */
+    "L-L-LL-L-L-L,X,02:10",     /* 2013 蛇年 */
+    "-L-L-L-LLL-L,9,01:31",     /* 2014 馬年 */
+    "-L--L-LLL-L-,X,02:18",     /* 2015 羊年 */
   };
 
   char year[21];

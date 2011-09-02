@@ -1020,10 +1020,7 @@ static MENU menu_buy[] =
 
   "bin/bank.so:b_nthu", PERM_VALID, - M_GAME,
   "Nthu       【 清華成員 】",
-/*
-  "bin/bank.so:b_celebrate", PERM_VALID, - M_GAME,
-  "Present    ♂ 開站好禮 ♀",
-*/
+
   menu_tool, PERM_MENU + 'B', M_XMENU,
   "金融市場"
 };

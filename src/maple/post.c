@@ -3981,23 +3981,11 @@ post_append_score(xo, choose)
 #endif
 
   time(&start);
-  if ((start - last) < 2)
+  if ((start - last) < 5)
   {
     vfmsg("離上次推文時間過短");
     vfmsg("想說很多話，請在推文後選擇 E)繼續 或直接回覆文章。");
     return XO_FOOT;
-  }
-  else if ((start - last) < 5)
-  {
-    srand(start);
-    vtlen = rand() % 10000;
-    sprintf(fpath, "◎ 離上次推文時間過短，請輸入隨機數字 %4d: ",vtlen);
-    vget(b_lines, 0, fpath, reason, 5, DOECHO);
-    if (atoi(reason) != vtlen)
-    {
-      vfmsg("輸入錯誤");
-      return XO_FOOT;
-    }
   }
 
   if (!(ans = choose))

@@ -488,13 +488,13 @@ b_nthu()
     return XEASY;
   }
 
-  char foo[56];
+  char email[56];	/* same size with ACCT.email */
   char *domain;
   FILE *fp;
 
-  str_lower(foo, cuser.email);
+  str_lower(email, cuser.email);
 
-  domain = (char *) strchr(foo, '@');
+  domain = (char *) strchr(email, '@');
   *domain++ = '\0';
 
   /* songsongboy.070404: 判斷是否為 NTHU 成員*/
@@ -507,7 +507,7 @@ b_nthu()
       buy_level(PERM_XVALID);
     vmsg("你的帳號獲得永久免認證了！");
 
-    if (acl_has("run/nthumember", foo, domain) > 0)     /* 此信箱已經拿過錢 */
+    if (acl_has("run/nthumember", email, domain) > 0)	/* 此信箱已經拿過錢 */
       vmsg("你已經拿過 50 金幣了喔！");
     else if (vans("你要讓此帳號獲得 50 金幣嗎，請注意每人只能拿一次(Y/N)？[N] ") == 'y')
     {
@@ -519,7 +519,7 @@ b_nthu()
       vmsg("恭喜你獲得 50 金幣！");
     }
   }
-  else if (!strncmp(domain,"cs.nthu.edu.tw",14))
+  else if (!strcmp(domain, "cs.nthu.edu.tw"))
   {
     if(!HAS_PERM(PERM_XEMPT))
       buy_level(PERM_XVALID);
@@ -527,41 +527,6 @@ b_nthu()
   }
   else
     vmsg("你的信箱不符合資格喔！");
-
-  return XEASY;
-}
-
-
-int
-b_celebrate()
-{
-  char foo[56];
-  char *domain;
-  FILE *fp;
-
-  str_lower(foo, cuser.email);
-
-  domain = (char *) strchr(foo, '@');
-  *domain++ = '\0';
-
-  if (HAS_PERM(PERM_XVALID) && HAS_PERM(PERM_XEMPT))
-    vmsg("此帳號已經有此權限");
-  else if (acl_has("run/celebrate", foo, domain) > 0)
-    vmsg("你已經申請過了喔！");
-  else if (vans("你要讓此帳號獲得 VIP 嗎，請注意每人只能用在一帳號(Y/N)？[N] ") == 'y')
-  {
-    while (!(fp = fopen("run/celebrate", "a")));
-    fprintf(fp, "%s %s\n", cuser.email, cuser.userid);
-    fclose(fp);
-
-    if (!HAS_PERM(PERM_XVALID))
-      buy_level(PERM_XVALID);
-    vmsg("你的帳號獲得永久免認證了！");
-
-    if (!HAS_PERM(PERM_XEMPT))
-      buy_level(PERM_XEMPT);
-    vmsg("你的帳號獲得永久保留了！");
-  }
 
   return XEASY;
 }
