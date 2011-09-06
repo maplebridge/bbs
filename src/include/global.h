@@ -252,7 +252,7 @@ UnAnonymous 站務 黑函滿天‧匿名現身 PERM_ALLBOARD PERM_SYSOP
 #define BN_JUNK		"junk"		/* 自己刪除的文章放在此 */
 #define BN_DELETED	"deleted"	/* 板主刪除的文章放在此 */
 #define BN_SECURITY	"log"		/* 系統安全記錄 */
-#define BN_RECORD	"record"	/* 系統的一般記錄 */
+#define BN_RECORD	"Record"	/* 系統的一般記錄 */
 #define BN_UNANONYMOUS	"UnAnonymous"	/* 匿名板的文章會複製一份在這裡 */
 #define BN_KTV		"ktv"		/* 點歌記錄放在這板，歌本放在這板的精華區 */
 #define BN_REQUEST	BN_CAMERA	/* 歌本投稿處 */

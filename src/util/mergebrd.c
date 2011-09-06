@@ -4,56 +4,72 @@
 /* target : M3 楓橋 看板合併程式			 */
 /* create : 08/05/09					 */
 /* author : smiler.bbs@lexel.twbbs.org			 */
+/* update : 11/09/05					 */
 /*-------------------------------------------------------*/
-/* syntax : mergebrd board_src1 board_src2 board_dst	 */
+/* syntax : mergebrd bsrc bdst				 */
 /*-------------------------------------------------------*/
 
 
 #include "bbs.h"
-#include <netinet/in.h>
 
-#define FN_DIR_TMP	"./.DIR.tmp"
-#define FN_DIR_TMP2
+#define FN_DIR_TMP	".DIR.tmp"
 
 /* ----------------------------------------------------- */
 /* 轉換主程式						 */
 /* ----------------------------------------------------- */
 
 
-static void
-trans_hdr(old, new, src, dst)
+static int
+transfer_hdr(old, src, dst)
   HDR *old;
-  HDR *new;
-  char *src;
-  char *dst;
+  char *src, *dst;
 {
-  memset(new, 0, sizeof(HDR));
+  char fsrc[64], fdst[64];
+  HDR new;
 
-  new->chrono = old->chrono;
-  new->xmode  = old->xmode;
-  new->xid    = old->xid;
-  str_ncpy(new->xname, old->xname, sizeof(new->xname));
-  new->parent_chrono = old->parent_chrono;
-  str_ncpy(new->owner, old->owner, sizeof(new->owner));
-  new->stamp = old->stamp;
-  str_ncpy(new->nick, old->nick, sizeof(new->nick));
-  new->score = old->score;
-  str_ncpy(new->date, old->date, sizeof(new->date));
-  str_ncpy(new->title, old->title, sizeof(new->title));
+  hdr_fpath(fsrc, src, old);
+  hdr_fpath(fdst, dst, old);
 
-//  printf("%s %s %d\n",src,new->title,new->chrono);
+  char *family, *fname;
+  int chrono = old->chrono;
 
-  FILE *fd;
-  char dst_f[64];
-  char cmd[64];
-  sprintf(dst_f,BBSHOME"/brd/%s/%c/%s",dst,new->xname[7],new->xname);
-  if(fd = fopen(dst_f,"r"))
+  family = fdst;
+  fname = strrchr(fdst, '/') + 2;
+  family = fname - 3;
+
+  for (;;)
   {
-	  new->xname[0]='X';
-	  fclose(fd);
+    if (f_cp(fsrc, fdst, O_EXCL) >= 0)
+      break;
+  
+    if (errno == EEXIST)	/* path already taken, make another new path */
+    {
+      chrono++;
+      *family = radix32[chrono & 31];
+      archiv32(chrono, fname);
+    }
+    else	/* unhandle error */
+      return -1;
   }
-  sprintf(cmd,"cp "BBSHOME"/brd/%s/%c/%s "BBSHOME"/brd/%s/%c/%s",src,old->xname[7],old->xname,dst,new->xname[7],new->xname);
-  system(cmd);
+  
+  memcpy(&new, old, sizeof(HDR));
+  new.chrono = chrono;
+  strcpy(new.xname, --fname);
+
+  rec_add(dst, &new, sizeof(HDR));
+
+  return 0;
+}
+
+
+static int
+hdr_cmp(a, b)
+  HDR *a;
+  HDR *b;
+{
+  return ((a->xmode & POST_BOTTOM) && !(b->xmode & POST_BOTTOM)) ? 1 :
+	(!(a->xmode & POST_BOTTOM) && (b->xmode & POST_BOTTOM)) ? -1 :
+	(a->chrono - b->chrono);
 }
 
 
@@ -62,124 +78,62 @@ main(argc, argv)
   int argc;
   char *argv[];
 {
-  FILE *fp1, *fp2;
-  char buf[64];
-  char buf1[64];
-  char buf2[64];
-  char buf3[64];
-
-  char src1[15];
-  char src2[15];
-  char dst[15];
-
-  if (argc != 4)
-  {
-    printf("syntax: ./mergebrd 來源看板1 來源看板2 目的看板 \n");
-    return 0;
-  }
-
-  strcpy(src1,argv[1]);
-  strcpy(src2,argv[2]);
-  strcpy(dst,argv[3]);
-
-
-  if ((!strcmp(src1,dst)) || (!strcmp(src2,dst)))
-  {
-    printf("來源看板需與目的看板相異 !!\n");
-    return 0;
-  }
+  FILE *fp;
+  char src[64], tmp[64], dst[64];
 
   char start;
-  printf("按 Y 鍵開始看板 merge，其餘任意鍵離開 \n");
-  scanf("%c",&start);
+  HDR hdr;
+
+  if (argc != 3)
+  {
+    printf("Usage: %s <SRC_BRD> <DST_BRD>\n", argv[0]);
+    exit(1);
+  }
+
+  if (!strcmp(argv[1], argv[2]))
+  {
+    printf("來源看板需與目的看板相異 !!\n");
+    exit(1);
+  }
+
+  printf("press key '\e[1;32mY\e[m' to merge \e[1;33m%s\e[m into \e[1;33m%s\e[m, or any other key to exit. ", argv[1], argv[2]);
+  scanf("%c", &start);
   if (start != 'Y')
-    return 0;
+    exit(0);
 
-  sprintf(buf, BBSHOME"/brd");
-  chdir(buf);
+  chdir(BBSHOME);
 
-  HDR hdr1,hdr2,hdr3;
+  brd_fpath(src, argv[1], FN_DIR);
+  brd_fpath(dst, argv[2], NULL);
+  brd_fpath(tmp, argv[2], FN_DIR_TMP);
 
-  sprintf(buf1, BBSHOME"/brd/%s/" FN_DIR, src1);
-  sprintf(buf2, BBSHOME"/brd/%s/" FN_DIR, src2);
-  sprintf(buf3, BBSHOME"/brd/%s/" FN_DIR, dst);
-
-  if (!(fp1 = fopen(buf1, "r")))
+  if (!dashd(dst))
   {
-    printf("%s 開檔失敗.\n", buf1);
-    return 1;
+    printf("Error: board <%s> does not exist.\n", argv[2]);
+    exit(1);
   }
-  if (!(fp2 = fopen(buf2, "r")))
+  else
   {
-    fclose(fp1);
-    printf("%s 開檔失敗.\n", buf2);
-    return 1;
+    brd_fpath(dst, argv[2], FN_DIR);
+    unlink(tmp);	/* delete any possible temp index */
+    f_cp(dst, tmp, O_EXCL);
+    printf("Old <%s> index file has been backed up to: %s\n", argv[2], tmp);
   }
 
-  fread(&hdr1, sizeof(hdr1), 1, fp1);
-  fread(&hdr2, sizeof(hdr2), 1, fp2);
-
-  int empty = 0;
-
-  while (!empty)
+  if (fp = fopen(src, "r"))
   {
-    while ((hdr1.chrono <= hdr2.chrono) && (!empty))
-    {
-//    printf("1.%s %d %s %d\n",hdr1.title,hdr1.chrono,hdr2.title,hdr2.chrono);
-      trans_hdr(&hdr1, &hdr3, src1, dst);
-      rec_add(buf3, &hdr3, sizeof(HDR));
-      if (fread(&hdr1, sizeof(hdr1), 1, fp1) != 1)
-      {
-	empty = 1;
-	break;
-      }
-    }
-    while ((hdr1.chrono > hdr2.chrono) && (!empty))
-    {
-//    printf("2.%s %d %s %d\n",hdr1.title,hdr1.chrono,hdr2.title,hdr2.chrono);
-      trans_hdr(&hdr2, &hdr3, src2, dst);
-      rec_add(buf3, &hdr3, sizeof(HDR));
-      if (fread(&hdr2, sizeof(hdr2), 1, fp2) != 1)
-      {
-	empty = 2;
-	break;
-      }
-    }
-    if (!empty)
-    {
-      trans_hdr(&hdr1, &hdr3, src1, dst);
-      rec_add(buf3, &hdr3, sizeof(HDR));
-      if (fread(&hdr1, sizeof(hdr1), 1, fp1) != 1)
-      {
-	empty = 1;
-	break;
-      }
-    }
+    while (fread(&hdr, sizeof(HDR), 1, fp) == 1)
+      transfer_hdr(&hdr, src, dst);
+    fclose(fp);
+  }
+  else
+  {
+    printf("Error: open index file failed: %s\n", src);
+    exit(1);
   }
 
-  if (empty == 2)
-  {
-    trans_hdr(&hdr1, &hdr3, src1, dst);
-    rec_add(buf3, &hdr3, sizeof(HDR));
-    while (fread(&hdr1, sizeof(hdr1), 1, fp1) == 1)
-    {
-      trans_hdr(&hdr1, &hdr3, src1, dst);
-      rec_add(buf3, &hdr3, sizeof(HDR));
-    }
-  }
-  else if (empty == 1)
-  {
-    trans_hdr(&hdr2, &hdr3, src2, dst);
-    rec_add(buf3, &hdr3, sizeof(HDR));
-    while (fread(&hdr2, sizeof(hdr2), 1, fp2) == 1)
-    {
-      trans_hdr(&hdr2, &hdr3, src2, dst);
-      rec_add(buf3, &hdr3, sizeof(HDR));
-    }
-  }
+  rec_sync(dst, sizeof(HDR), hdr_cmp, NULL);
 
-  fclose(fp1);
-  fclose(fp2);
-
-  return 0;
+  printf("Remember to remove backup index <%s> if the merge work seems well done.\n", tmp);
+  exit(0);
 }
